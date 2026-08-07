@@ -20,7 +20,7 @@ commissioned.** Five are. Wave 0 is half done.
 | D3 | Historical Replay Framework | Complete | 21 / 21 |
 | D4 | Financial Invariant Engine | Complete | 26 / 26 |
 | D5 | Fault Injection Platform | Complete | 37 / 37 |
-| D6 | Regression Dataset Framework | **Partial — non-functional** | — |
+| D6 | Regression Dataset Framework | **Step 1 complete — infrastructure wired, no datasets declared** | — |
 | D7 | Certification Engine | Not started | — |
 | D8 | CI/CD Verification Pipeline | Not started | — |
 | D9 | Backup Restore Verification | **Blocked** | — |
@@ -124,15 +124,29 @@ Missing against the pattern D4 and D5 both established:
 
 | Component | State |
 |---|---|
-| `model.py`, `registry.py`, `schema.py`, `builder.py`, `financials.py`, `evaluate.py` | present |
-| `datasets_core.py`, `datasets_activation.py` | **absent — registry raises** |
-| `__init__.py` | absent (implicit namespace package only) |
-| `commission.py` — the discrimination gate | absent |
-| `report.py` | absent |
-| CLI wiring in `__main__.py` | absent |
+| `model.py`, `registry.py`, `schema.py`, `builder.py`, `financials.py`, `evaluate.py` | present from the start |
+| `__init__.py` | **added, Step 1** |
+| `datasets_core.py`, `datasets_activation.py` | **added, Step 1 — present and empty** |
+| `commission.py` — the discrimination gate | **added, Step 1** |
+| `report.py` | **added, Step 1** |
+| CLI wiring in `__main__.py` | **added, Step 1** — `ds-registry`, `ds-build`, `ds-run`, `ds-commission` |
+| **Dataset declarations** | **none — this is Step 2** |
 
-The scaffold is well-formed and its reasoning is sound. What is missing is
-the declarations and the gate.
+### Step 1 complete (commit `23e3b94`)
+
+The platform is wired and proved to run. `ds-registry` exits 0 against an
+empty registry; `ds-run` and `ds-commission` exit 2 `INCOMPLETE`, never
+`PASS`, because a platform that has measured nothing has demonstrated
+nothing (P10).
+
+The two declaration modules are **present and empty** rather than absent:
+`registry.load_all()` imports them by name, so deleting them breaks every
+registry call, and making `load_all()` tolerant of a missing module would
+hide a genuinely absent declaration file later.
+
+Verified at Step 1: production `sha256` unchanged, 64 modules import, and
+the D1 release gate is byte-identical before and after — 41 changes,
+`IMPL_ADDED` 38 / `VERDICT_CHANGED` 3, `Q16`–`Q18`, both runs.
 
 ---
 
@@ -262,22 +276,68 @@ Recovering those documents is not optional work.
 
 ---
 
-## 7. Recommended next target
+## 7. Where to resume
 
-**Complete D6.** It is already started, it is the declared next step in
-`D5_COMPLETION_REPORT.md`, and it is the single unblocker for the largest
-cluster of open findings — every VACUOUS item in §4.1, and D3's
-single-closed-day limitation.
+**This section is the handover. Read it first.**
 
-Scope, following the pattern D4 and D5 established:
+State as of 2026-08-07, HEAD `23e3b94`, working tree clean, three tags:
+`v2.2.18-preWave1`, `v2.2.18-wave0.5`, `v2.2.18-wave0.5-frozen`.
 
-1. `datasets/__init__.py`
-2. `datasets_core.py` — baseline narratives; makes `load_all()` resolve
-3. `datasets_activation.py` — datasets targeting the four VACUOUS
-   invariants and quantities `Q11`/`Q21`, plus an in-house checked-in
-   reservation to resolve D2's four UNRESOLVED surfaces
-4. `commission.py` — the discrimination gate: perturb each dataset and
-   require the declared expectations to break. A dataset that survives its
-   own perturbation is NOT COMMISSIONED and excluded from certification
-5. `report.py` and CLI wiring (`ds-registry`, `ds-build`, `ds-run`,
-   `ds-commission`)
+### The next piece of work
+
+**D6 Step 2 — but R-1, R-2 and R-3 must land first.**
+
+`datasets/financials.py` has three probe defects found by the D5.5 audit,
+and Step 2 declares regression expectations *against those probes*. Doing
+it in the wrong order bakes the defects into the baseline permanently:
+
+| | Fix | Effect |
+|---|---|---|
+| **R-1** | `outstanding` omits tax | −1,697.32 → **+199.92** |
+| **R-2** | `outstanding` will double count once room rent posts | ~₹37,217 latent error |
+| **R-3** | `taxable_total` double counts CGST/SGST | 75,893.34 → ~37,946.97 |
+| R-6 | no probe models `invoice_round_off_amount` | ±0.01–0.16 residue |
+
+R-1 and R-2 **must ship together**. Fixing the tax alone converts a
+known-wrong probe into a plausibly-wrong one, which is worse.
+
+Full specification and sequencing: `D5_5_REMEDIATION.md`.
+Authoritative financial truth to declare against:
+`D5_5_CONSISTENCY_AUDIT.md`, final table.
+
+Then Step 2, cheapest dataset first: `DS-ACT-INHOUSE` (resolves D2's four
+UNRESOLVED surfaces and costs almost nothing), then `DS-ACT-OVERPAY`, then
+the rest. One dataset at a time, each commissioned before the next.
+**Do not write six datasets and then try to commission them** — the gate
+is the part most likely to reveal that a declaration was wrong.
+
+### Decisions waiting on the project owner
+
+These block nothing mechanical, but three of them affect correctness of
+work not yet done.
+
+1. **P15.** `CONSTITUTION.md` documents P1–P14, recovered from the
+   enforcing registry. The charter says P1–P15 and names *"Independent
+   evidence"*. No P15 exists in code. Its wording is not recoverable and
+   was not invented. See `CONSTITUTION.md` §3.1.
+2. **R-5 — the ₹1.00 materiality threshold** in `INV-A06`. Currently an
+   implicit constant. Either state it in the invariant's business rule, or
+   add a second invariant that aggregates sub-rupee overpayments. Affects
+   how `DS-ACT-OVERPAY` is declared.
+3. **Private remote.** Not configured; no `gh` CLI on this machine.
+   Operational, explicitly not an engineering gate. Bundles in
+   `../repo-backups/` are the interim protection.
+4. **D9's schema exception.** `backup_logs` has no checksum column. D9
+   cannot start without a production schema change that Wave 0 forbids.
+
+### Protection in place
+
+- `../repo-backups/*.bundle` — verified by restore into a fresh directory:
+  identical tree hash, all tags, 713 files, `fsck` clean.
+- `../db-backups/pms_20260807_223539_wave0.5-frozen.db` + manifest —
+  verified read-only snapshot, `integrity_check ok`, row counts matched
+  across 53 tables. Interim until D9. Regenerate with
+  `python tools/backup_db.py --label <name>`.
+
+Both live on the same disk as the repository. Getting one copy off this
+machine is the outstanding operational risk.
