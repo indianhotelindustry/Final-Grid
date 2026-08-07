@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% block title %}OTA Settings — {{ config.HOTEL_NAME }}{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="mb-0"><i class="bi bi-gear me-2"></i>OTA / Channel Manager Settings</h4>
+    <a href="{{ url_for('ota.dashboard') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Back
+    </a>
+</div>
+
+<div class="row g-4">
+    <!-- Webhook API Key -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-semibold py-2">
+                <i class="bi bi-key me-1"></i>Webhook API Key
+            </div>
+            <div class="card-body">
+                <p class="small text-muted mb-3">
+                    This key must be sent in the <code>X-API-Key</code> header by your channel manager
+                    (Staah, Wubook, etc.) with every webhook call.
+                </p>
+                <div class="mb-3">
+                    <label class="form-label small">Current Key</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control font-monospace" id="apiKeyField"
+                               value="{{ api_key }}" readonly>
+                        <button class="btn btn-outline-secondary" type="button"
+                                onclick="toggleKey()"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-outline-secondary" type="button"
+                                onclick="copyKey()"><i class="bi bi-clipboard"></i></button>
+                    </div>
+                </div>
+                <form method="POST">
+                    <input type="hidden" name="action" value="regenerate_key">
+                    <button type="submit" class="btn btn-warning btn-sm"
+                            onclick="return confirm('Regenerate API key? Your channel manager will need to be updated.')">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Regenerate Key
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tunnel URL -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-semibold py-2">
+                <i class="bi bi-cloud me-1"></i>Cloudflare Tunnel URL
+            </div>
+            <div class="card-body">
+                <p class="small text-muted mb-3">
+                    Your public-facing URL via Cloudflare tunnel. Used to build the webhook endpoint URL
+                    shown to channel managers.
+                </p>
+                <form method="POST">
+                    <input type="hidden" name="action" value="save_tunnel">
+                    <div class="mb-3">
+                        <label class="form-label small">Tunnel Base URL</label>
+                        <input type="url" class="form-control" name="tunnel_url"
+                               value="{{ tunnel_url }}" placeholder="https://your-hotel.trycloudflare.com">
+                        <div class="form-text">Do not include trailing slash.</div>
+                    </div>
+                    {% if webhook_url %}
+                    <div class="mb-3">
+                        <label class="form-label small">Webhook Endpoint (share with channel manager)</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control font-monospace small"
+                                   value="{{ webhook_url }}" id="webhookUrlField" readonly>
+                            <button class="btn btn-outline-secondary" type="button"
+                                    onclick="navigator.clipboard.writeText(document.getElementById('webhookUrlField').value)">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="bi bi-save me-1"></i>Save
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Commission Rates -->
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-semibold py-2">
+                <i class="bi bi-percent me-1"></i>OTA Commission Rates
+            </div>
+            <div class="card-body">
+                <p class="small text-muted mb-3">
+                    Set the commission % charged by each OTA. Used for net revenue calculations in reports.
+                </p>
+                <form method="POST">
+                    <input type="hidden" name="action" value="save_commission">
+                    <div class="row g-3">
+                        {% for src in ota_sources %}
+                        <div class="col-sm-6 col-md-4 col-lg-3">
+                            <label class="form-label small mb-1">{{ src }}</label>
+                            <div class="input-group input-group-sm">
+                                <input type="number" class="form-control" name="commission_{{ src }}"
+                                       value="{{ commissions.get(src, '0') }}" min="0" max="100" step="0.1">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm mt-3">
+                        <i class="bi bi-save me-1"></i>Save Commission Rates
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Integration Guide -->
+    <div class="col-12">
+        <div class="card shadow-sm border-info">
+            <div class="card-header bg-info bg-opacity-10 fw-semibold py-2">
+                <i class="bi bi-info-circle me-1 text-info"></i>Channel Manager Integration Guide
+            </div>
+            <div class="card-body small">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <strong>Webhook Payload Format (JSON POST)</strong>
+                        <pre class="bg-light p-2 rounded mt-2" style="font-size:11px;">{
+  "event": "new_booking",
+  "source": "booking.com",
+  "ota_booking_id": "BDC-123456",
+  "room_type_name": "Standard",
+  "arrival_date": "2026-03-15",
+  "departure_date": "2026-03-17",
+  "adults": 2,
+  "children": 0,
+  "rate_per_night": 1500.00,
+  "guest": {
+    "name": "Guest Name",
+    "phone": "9999999999",
+    "email": "guest@example.com"
+  },
+  "special_requests": "Early check-in"
+}</pre>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Supported Events</strong>
+                        <ul class="mt-2">
+                            <li><code>new_booking</code> — Creates a Confirmed reservation</li>
+                            <li><code>cancel_booking</code> — Cancels by <code>ota_booking_id</code></li>
+                            <li><code>modify_booking</code> — Updates dates/rate/pax</li>
+                        </ul>
+                        <strong>Required Headers</strong>
+                        <ul class="mt-2">
+                            <li><code>X-API-Key: &lt;your-api-key&gt;</code></li>
+                            <li><code>Content-Type: application/json</code></li>
+                        </ul>
+                        <strong>Optional HMAC Verification</strong>
+                        <ul class="mt-2">
+                            <li><code>X-Signature-SHA256: sha256=&lt;hex&gt;</code></li>
+                        </ul>
+                        <strong>Test Connectivity</strong>
+                        <ul class="mt-2">
+                            <li>GET <code>/webhook/ping</code> — returns <code>{"status":"ok"}</code></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script nonce="{{ csp_nonce }}">
+function toggleKey() {
+    const f = document.getElementById('apiKeyField');
+    f.type = f.type === 'password' ? 'text' : 'password';
+}
+function copyKey() {
+    const f = document.getElementById('apiKeyField');
+    const t = f.type;
+    f.type = 'text';
+    navigator.clipboard.writeText(f.value);
+    f.type = t;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Guest Report — {{ hotel_name }}</title>
+<style>
+/* ── A4 page setup ───────────────────────────────────────────── */
+@page {
+    size: A4 portrait;
+    margin: 14mm 10mm 16mm 10mm;
+    @top-center  { content: "{{ hotel_name | replace('"','&quot;') }}"; font-size:8pt; color:#555; }
+    @bottom-left { content: "Prepared by: ___________________"; font-size:7pt; color:#555; }
+    @bottom-center { content: "Verified by: ___________________"; font-size:7pt; color:#555; }
+    @bottom-right  { content: "Page " counter(page) " of " counter(pages); font-size:7pt; color:#555; }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; font-size: 8pt; color: #111; background: #fff; }
+
+/* ── Header ─────────────────────────────────────────────────── */
+.rpt-header { text-align: center; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 2px solid #1F4E79; }
+.rpt-hotel  { font-size: 15pt; font-weight: bold; color: #1F4E79; line-height: 1.2; }
+.rpt-address{ font-size: 8pt; color: #555; margin-top: 2px; }
+.rpt-title  { font-size: 13pt; font-weight: bold; margin-top: 6px; letter-spacing: .04em; text-transform: uppercase; }
+.rpt-meta   { font-size: 7.5pt; color: #555; margin-top: 3px; }
+
+/* ── Summary box ─────────────────────────────────────────────── */
+.summary-box {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    margin-bottom: 8px;
+    background: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    border-radius: 4px;
+    padding: 6px 8px;
+}
+.summary-section-title {
+    grid-column: 1 / -1;
+    font-size: 8pt;
+    font-weight: bold;
+    color: #1E3A5F;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    border-bottom: 1px solid #BFDBFE;
+    padding-bottom: 2px;
+    margin-bottom: 3px;
+}
+.kpi { display: flex; flex-direction: column; }
+.kpi-lbl { font-size: 6.5pt; color: #555; text-transform: uppercase; letter-spacing: .04em; }
+.kpi-val { font-size: 9pt; font-weight: bold; color: #1E3A5F; }
+
+/* payment breakdown inline row */
+.pay-row {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 2px;
+    padding-top: 4px;
+    border-top: 1px solid #BFDBFE;
+}
+.pay-item { font-size: 7.5pt; }
+.pay-lbl  { color: #555; }
+.pay-val  { font-weight: bold; color: #1E3A5F; }
+
+/* ── Table ───────────────────────────────────────────────────── */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 7pt;
+    page-break-inside: auto;
+}
+thead { display: table-header-group; }
+tfoot { display: table-footer-group; }
+tr    { page-break-inside: avoid; }
+
+thead tr th {
+    background: #374151;
+    color: #fff;
+    font-weight: bold;
+    padding: 4px 3px;
+    text-align: center;
+    border: 1px solid #4B5563;
+    white-space: nowrap;
+}
+tbody tr:nth-child(odd)  td { background: #F9FAFB; }
+tbody tr:nth-child(even) td { background: #FFFFFF; }
+tbody td {
+    padding: 3px 3px;
+    border: 1px solid #E5E7EB;
+    vertical-align: middle;
+}
+/* Column alignment */
+.num  { text-align: right; }
+.ctr  { text-align: center; }
+
+/* Conditional balance */
+.bal-due  { background: #FEE2E2 !important; color: #991B1B; font-weight: bold; }
+.bal-paid { background: #D1FAE5 !important; color: #065F46; font-weight: bold; }
+
+/* Totals footer row */
+tfoot tr td {
+    background: #E5E7EB;
+    font-weight: bold;
+    padding: 4px 3px;
+    border: 1px solid #D1D5DB;
+}
+
+/* ── Signature footer ────────────────────────────────────────── */
+.sig-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 14px;
+    padding-top: 6px;
+    border-top: 1px solid #ccc;
+    font-size: 7.5pt;
+    color: #555;
+}
+.sig-block { width: 38%; }
+.sig-line  { border-bottom: 1px solid #aaa; height: 16px; margin-bottom: 2px; }
+
+/* screen only — action buttons */
+@media screen {
+    body { padding: 20px; max-width: 210mm; margin: 0 auto; background: #f3f4f6; }
+    .rpt-wrapper { background: #fff; padding: 14mm 10mm; box-shadow: 0 2px 12px rgba(0,0,0,.12); }
+    .no-print-btn {
+        position: fixed; top: 16px; right: 16px; z-index: 100;
+        display: flex; gap: 8px;
+    }
+    .no-print-btn button {
+        padding: 8px 18px; border: none; border-radius: 4px;
+        cursor: pointer; font-size: 13px; font-weight: 600;
+    }
+    .btn-print  { background: #1F4E79; color: #fff; }
+    .btn-close2 { background: #6B7280; color: #fff; }
+}
+@media print {
+    .no-print-btn { display: none !important; }
+    .rpt-wrapper  { padding: 0; box-shadow: none; background: transparent; }
+    body          { background: #fff; padding: 0; max-width: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Screen action buttons -->
+<div class="no-print-btn">
+    <button class="btn-print"  onclick="window.print()">&#128438; Print / Save PDF</button>
+    <button class="btn-close2" onclick="window.close()">&#x2715; Close</button>
+</div>
+
+<div class="rpt-wrapper">
+
+<!-- ── Header ─────────────────────────────────────────────────── -->
+<div class="rpt-header">
+    <div class="rpt-hotel">{{ hotel_name }}</div>
+    {% if hotel_address %}<div class="rpt-address">{{ hotel_address }}</div>{% endif %}
+    <div class="rpt-title">Guest Report</div>
+    <div class="rpt-meta">
+        Period: {{ from_date.strftime('%d %b %Y') }} — {{ to_date.strftime('%d %b %Y') }}
+        &nbsp;&nbsp;|&nbsp;&nbsp; Generated: {{ generated_at }}
+    </div>
+</div>
+
+<!-- ── Summary ────────────────────────────────────────────────── -->
+<div class="summary-box">
+    <div class="summary-section-title">Summary</div>
+    <div class="kpi"><span class="kpi-lbl">Total Guests</span><span class="kpi-val">{{ total_guests }}</span></div>
+    <div class="kpi"><span class="kpi-lbl">Total Revenue</span><span class="kpi-val">&#8377;{{ "{:,.0f}".format(total_revenue) }}</span></div>
+    <div class="kpi"><span class="kpi-lbl">Total Tax</span><span class="kpi-val">&#8377;{{ "{:,.0f}".format(total_tax) }}</span></div>
+    <div class="kpi"><span class="kpi-lbl">Discount</span><span class="kpi-val">&#8377;0</span></div>
+    <div class="kpi"><span class="kpi-lbl">Amount Paid</span><span class="kpi-val">&#8377;{{ "{:,.0f}".format(total_paid) }}</span></div>
+    <div class="kpi"><span class="kpi-lbl">Balance Due</span><span class="kpi-val" style="color:{% if total_balance > 0 %}#991B1B{% else %}#065F46{% endif %}">&#8377;{{ "{:,.0f}".format(total_balance) }}</span></div>
+    <div class="kpi"></div>
+    <div class="kpi"></div>
+    <div class="pay-row">
+        <span class="pay-item"><span class="pay-lbl">Cash: </span><span class="pay-val">&#8377;{{ "{:,.0f}".format(pay_cash) }}</span></span>
+        <span class="pay-item"><span class="pay-lbl">Card: </span><span class="pay-val">&#8377;{{ "{:,.0f}".format(pay_card) }}</span></span>
+        <span class="pay-item"><span class="pay-lbl">UPI: </span><span class="pay-val">&#8377;{{ "{:,.0f}".format(pay_upi) }}</span></span>
+        <span class="pay-item"><span class="pay-lbl">Bank Transfer: </span><span class="pay-val">&#8377;{{ "{:,.0f}".format(pay_bank) }}</span></span>
+        <span class="pay-item"><span class="pay-lbl">Hotel Credit: </span><span class="pay-val">&#8377;{{ "{:,.0f}".format(pay_credit) }}</span></span>
+    </div>
+</div>
+
+<!-- ── Data Table ──────────────────────────────────────────────── -->
+<table>
+    <thead>
+        <tr>
+            <th>Folio No</th>
+            <th>Guest Name</th>
+            <th>Mobile</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th>Room</th>
+            <th>Type</th>
+            <th>Nts</th>
+            <th>Pax</th>
+            <th>Source</th>
+            <th>Total Bill</th>
+            <th>Paid</th>
+            <th>Balance</th>
+            <th>Payment Mode</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for r in rows %}
+        {% set bal = r.balance | float %}
+        {% set paid = r.paid_amount | float %}
+        <tr>
+            <td class="ctr">{{ r.folio_no }}</td>
+            <td>{{ r.guest_name }}</td>
+            <td class="ctr">{{ r.mobile or '—' }}</td>
+            <td class="ctr">{{ r.arrival_date.strftime('%d %b %y') if r.arrival_date else '—' }}</td>
+            <td class="ctr">{{ r.departure_date.strftime('%d %b %y') if r.departure_date else '—' }}</td>
+            <td class="ctr">{{ r.room_number or '—' }}</td>
+            <td class="ctr">{{ r.room_type or '—' }}</td>
+            <td class="ctr">{{ r.nights or 0 }}</td>
+            <td class="ctr">{{ r.pax or 0 }}</td>
+            <td class="ctr">{{ r.source }}</td>
+            <td class="num">&#8377;{{ "{:,.0f}".format(r.total_bill | float) }}</td>
+            <td class="num">&#8377;{{ "{:,.0f}".format(paid) }}</td>
+            <td class="num {% if bal > 0.01 %}bal-due{% else %}bal-paid{% endif %}">
+                {% if bal > 0.01 %}&#8377;{{ "{:,.0f}".format(bal) }}{% else %}&#10003;{% endif %}
+            </td>
+            <td style="font-size:6.5pt;">
+                {%- set modes = [] -%}
+                {%- if r.cash | float > 0 %}{%- set _ = modes.append('Cash ₹' ~ "{:,.0f}".format(r.cash | float)) -%}{%- endif -%}
+                {%- if r.card | float > 0 %}{%- set _ = modes.append('Card ₹' ~ "{:,.0f}".format(r.card | float)) -%}{%- endif -%}
+                {%- if r.upi  | float > 0 %}{%- set _ = modes.append('UPI ₹'  ~ "{:,.0f}".format(r.upi  | float)) -%}{%- endif -%}
+                {%- if r.bank_transfer | float > 0 %}{%- set _ = modes.append('Bank ₹' ~ "{:,.0f}".format(r.bank_transfer | float)) -%}{%- endif -%}
+                {%- if r.hotel_credit  | float > 0 %}{%- set _ = modes.append('Credit ₹' ~ "{:,.0f}".format(r.hotel_credit | float)) -%}{%- endif -%}
+                {{ modes | join(', ') or '—' }}
+            </td>
+            <td class="ctr">
+                {% if r.status == 'CheckedIn' %}<span style="color:#7C3AED;font-weight:bold;">In-House</span>
+                {% elif r.status == 'CheckedOut' %}<span style="color:#374151;">Checked Out</span>
+                {% elif r.status == 'Cancelled' %}<span style="color:#DC2626;">Cancelled</span>
+                {% else %}{{ r.status }}{% endif %}
+            </td>
+        </tr>
+    {% else %}
+        <tr><td colspan="15" style="text-align:center;padding:12px;color:#888;">No records found.</td></tr>
+    {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="10" style="text-align:right;">Total ({{ rows | length }} guest{{ 's' if rows | length != 1 else '' }})</td>
+            <td class="num">&#8377;{{ "{:,.0f}".format(total_revenue) }}</td>
+            <td class="num">&#8377;{{ "{:,.0f}".format(total_paid) }}</td>
+            <td class="num {% if total_balance > 0 %}bal-due{% else %}bal-paid{% endif %}">&#8377;{{ "{:,.0f}".format(total_balance) }}</td>
+            <td colspan="2"></td>
+        </tr>
+    </tfoot>
+</table>
+
+<!-- ── Signature footer ───────────────────────────────────────── -->
+<div class="sig-footer">
+    <div class="sig-block">
+        <div class="sig-line"></div>
+        <div>Prepared by</div>
+    </div>
+    <div class="sig-block">
+        <div class="sig-line"></div>
+        <div>Verified by</div>
+    </div>
+</div>
+
+</div><!-- /.rpt-wrapper -->
+</body>
+</html>

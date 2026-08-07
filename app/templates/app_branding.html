@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}App Branding{% endblock %}
+{% block content %}
+<div class="container-fluid py-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <div class="mb-3">
+                <h5 class="fw-semibold mb-1">
+                    <i class="bi bi-palette text-warning me-1"></i>App Branding
+                </h5>
+                <div class="text-muted small">These settings apply globally across the application.</div>
+            </div>
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('main.save_app_branding') }}" enctype="multipart/form-data">
+                        <div class="row g-3 align-items-start">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">App Name</label>
+                                <input type="text" name="app_name" class="form-control"
+                                       value="{{ app_display_name }}"
+                                       placeholder="DSBC Frontline">
+                                <div class="form-text">Global product name shown in the top navbar.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">App Logo</label>
+                                {% if app_logo_url %}
+                                <div class="mb-2">
+                                    <img src="{{ app_logo_url }}" alt="Current logo"
+                                         style="height:40px;max-width:180px;object-fit:contain;border:1px solid #dee2e6;border-radius:4px;padding:4px;">
+                                    <div class="form-text">Upload a new file to replace.</div>
+                                </div>
+                                {% endif %}
+                                <input type="file" name="app_logo" class="form-control" accept=".png,.jpg,.jpeg,.gif,.svg,.webp">
+                                <div class="form-text">PNG, JPG, SVG or WebP. Recommended height: 28-36 px.</div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-1"></i>Save Branding
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,140 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}OTA Receivables{% endblock %}
+{% block report_name %}OTA Receivables{% endblock %}
+
+{% block report_content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h5 class="mb-0">
+        <i class="bi bi-globe text-info me-2"></i>OTA Receivables
+        <small class="text-muted fs-6 ms-1">{{ from_date.strftime('%d %b') }} – {{ to_date.strftime('%d %b %Y') }}</small>
+    </h5>
+    <button class="btn btn-sm btn-outline-secondary d-print-none" onclick="window.print()">
+        <i class="bi bi-printer me-1"></i>Print
+    </button>
+</div>
+
+<!-- Date range filter -->
+<form class="d-flex align-items-center gap-2 mb-4 d-print-none">
+    <label class="fw-semibold small">From</label>
+    <input type="date" name="from" class="form-control form-control-sm" style="width:auto;"
+           value="{{ from_date.isoformat() }}">
+    <label class="fw-semibold small">To</label>
+    <input type="date" name="to" class="form-control form-control-sm" style="width:auto;"
+           value="{{ to_date.isoformat() }}">
+    <button class="btn btn-sm btn-primary">Apply</button>
+</form>
+
+<div class="row g-3 mb-4">
+    <!-- Outstanding Summary -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-warning bg-opacity-10 fw-semibold py-2">
+                <i class="bi bi-exclamation-triangle me-1 text-warning"></i>OTA Outstanding (Lifetime Gross)
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light">
+                        <tr><th>OTA Channel</th><th class="text-end">Outstanding</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for head, amt in outstanding.items() %}
+                        {% if amt > 0 %}
+                        <tr>
+                            <td><i class="bi bi-globe me-1 text-info"></i>{{ head }}</td>
+                            <td class="text-end fw-semibold text-warning">₹{{ '{:,.2f}'.format(amt) }}</td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                        {% if outstanding_total > 0 %}
+                        <tr class="table-warning fw-bold">
+                            <td>Total Outstanding</td>
+                            <td class="text-end">₹{{ '{:,.2f}'.format(outstanding_total) }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="2" class="text-center text-success py-3"><i class="bi bi-check-circle me-1"></i>No OTA outstanding</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+                <div class="px-3 pb-2"><small class="text-muted">Phase 1: Gross receivable — no payout deductions applied</small></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settlements in period -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-info bg-opacity-10 fw-semibold py-2">
+                <i class="bi bi-check2-circle me-1 text-info"></i>OTA Receivables Posted ({{ from_date.strftime('%d %b') }} – {{ to_date.strftime('%d %b') }})
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light">
+                        <tr><th>OTA Channel</th><th class="text-end">Settled</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for head, amt in settled_by_head.items() %}
+                        <tr>
+                            <td><i class="bi bi-globe me-1 text-info"></i>{{ head }}</td>
+                            <td class="text-end fw-semibold text-info">₹{{ '{:,.2f}'.format(amt) }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="2" class="text-center text-muted py-3">No OTA receivables posted in period</td></tr>
+                        {% endfor %}
+                        {% if settled_total > 0 %}
+                        <tr class="table-info fw-bold">
+                            <td>Total Settled</td>
+                            <td class="text-end">₹{{ '{:,.2f}'.format(settled_total) }}</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transaction Detail -->
+{% if ota_payments %}
+<div class="card shadow-sm">
+    <div class="card-header bg-white fw-semibold py-2">OTA Receivable Transactions</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0" style="font-size:0.82rem;">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Booking Ref</th>
+                        <th>Guest</th>
+                        <th>Room</th>
+                        <th>OTA Head</th>
+                        <th>Reference</th>
+                        <th class="text-end">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in ota_payments %}
+                    <tr>
+                        <td>{{ p.payment_date.strftime('%d %b') }}</td>
+                        <td>{{ p.reservation.booking_reference or p.reservation.id if p.reservation else '—' }}</td>
+                        <td>{{ p.reservation.guest.name if p.reservation and p.reservation.guest else '—' }}</td>
+                        <td>{{ p.reservation.room.room_number if p.reservation and p.reservation.room else '—' }}</td>
+                        <td><span class="badge bg-info bg-opacity-75">{{ p.payment_mode.name if p.payment_mode else '?' }}</span></td>
+                        <td class="text-muted">{{ p.reference_number or '—' }}</td>
+
+                        <td class="text-end fw-semibold">₹{{ '{:,.2f}'.format(p.amount|float) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="table-light">
+                    <tr class="fw-bold">
+                        <td colspan="6">Total ({{ ota_payments|length }} transactions)</td>
+                        <td class="text-end">₹{{ '{:,.2f}'.format(settled_total) }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

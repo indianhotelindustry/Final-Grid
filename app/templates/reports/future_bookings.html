@@ -1,0 +1,102 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Future Bookings Report{% endblock %}
+{% block report_name %}Future Bookings Report{% endblock %}
+
+{% block report_content %}
+<div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+  <h5 class="mb-0">
+    <i class="bi bi-calendar-range text-primary me-2"></i>
+    Future Bookings
+    <span class="badge bg-secondary ms-1">{{ records|length }}</span>
+  </h5>
+  <div class="d-flex gap-2 align-items-center d-print-none">
+    <form class="d-flex gap-1 align-items-center" action="{{ url_for('reports.future_bookings_report') }}">
+      <span class="small text-muted">Up to:</span>
+      <input type="date" class="form-control form-control-sm" name="to"
+             value="{{ to_date.isoformat() }}">
+      <button class="btn btn-sm btn-primary">View</button>
+      <button class="btn btn-sm btn-outline-success" name="format" value="excel"
+              title="Export Excel"><i class="bi bi-file-earmark-excel"></i></button>
+    </form>
+    <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+      <i class="bi bi-printer me-1"></i>Print
+    </button>
+  </div>
+</div>
+
+<div class="text-muted small mb-3">
+  Upcoming arrivals from <strong>{{ from_date.strftime('%d %b %Y') }}</strong>
+  to <strong>{{ to_date.strftime('%d %b %Y') }}</strong>
+</div>
+
+{# Daily mini-chart as progress bars #}
+{% if daily %}
+<div class="card shadow-sm mb-3">
+  <div class="card-header fw-semibold bg-light py-2">Daily Arrival Forecast</div>
+  <div class="card-body py-2">
+    {% set max_day = daily.values() | max %}
+    <div class="row g-1">
+      {% for day_iso, cnt in daily.items() | sort %}
+      <div class="col-auto" style="min-width:60px;">
+        <div class="text-center">
+          <div class="small text-muted" style="font-size:.65rem;">{{ day_iso[5:] }}</div>
+          <div class="progress" style="height:40px; writing-mode:vertical-lr; transform:rotate(180deg);">
+            <div class="progress-bar bg-primary"
+                 style="width:100%; height:{{ (cnt / max_day * 100)|int }}%;"
+                 title="{{ cnt }} arrivals"></div>
+          </div>
+          <div class="small fw-semibold">{{ cnt }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover table-sm align-middle mb-0 small">
+      <thead class="table-primary">
+        <tr>
+          <th>Booking Ref</th>
+          <th>Guest</th>
+          <th>Phone</th>
+          <th>Arrival</th>
+          <th>Departure</th>
+          <th>Nights</th>
+          <th>Room Type</th>
+          <th>Source</th>
+          <th>Rate/Night</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in records %}
+        {% set nights = (r.departure_date - r.arrival_date).days %}
+        <tr>
+          <td class="fw-semibold text-primary">{{ r.booking_reference or r.id }}</td>
+          <td>{{ r.guest.name if r.guest else '—' }}</td>
+          <td>{{ r.guest.phone if r.guest else '—' }}</td>
+          <td>{{ r.arrival_date.strftime('%d %b %Y') }}</td>
+          <td>{{ r.departure_date.strftime('%d %b %Y') }}</td>
+          <td class="text-center">{{ nights }}</td>
+          <td>{{ r.room_type.name if r.room_type else '—' }}</td>
+          <td><span class="badge bg-secondary">{{ r.source or '—' }}</span></td>
+          <td>₹{{ '{:,.0f}'.format(r.rate_per_night) }}</td>
+          <td>
+            <span class="badge {% if r.status == 'Confirmed' %}bg-primary{% else %}bg-info text-dark{% endif %}">
+              {{ r.status }}
+            </span>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="10" class="text-center text-muted py-4">No future bookings found in this range.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>@media print { .d-print-none { display:none !important; } }</style>
+{% endblock %}

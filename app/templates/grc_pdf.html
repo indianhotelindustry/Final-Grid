@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>GRC — {{ guest.first_name or '' }}{% if guest.last_name %} {{ guest.last_name }}{% endif %} — {{ reservation.booking_reference or reservation.id }}</title>
+<style>
+@page {
+    size: A4 portrait;
+    margin: 12mm 12mm 14mm 12mm;
+}
+body { font-family: Helvetica, Arial, sans-serif; font-size: 9pt; color: #111827; margin: 0; padding: 0; }
+.accent-bar { width: 100%; height: 4pt; background: #0d1b2a; margin-bottom: 6pt; }
+h1 { font-size: 13pt; margin: 0 0 2pt; }
+h2 { font-size: 10pt; margin: 8pt 0 4pt; color: #0d1b2a; border-bottom: 1pt solid #e5e7eb; padding-bottom: 2pt; }
+table { width: 100%; border-collapse: collapse; }
+.info-table td { padding: 2pt 4pt; vertical-align: top; }
+.info-label { color: #6b7280; font-size: 8pt; width: 28%; }
+.info-value { font-weight: bold; }
+.section { margin-bottom: 8pt; }
+.badge { display: inline-block; padding: 2pt 8pt; border-radius: 3pt; font-size: 8pt; font-weight: bold; color: #fff; }
+.badge-primary { background: #0d6efd; }
+.badge-success { background: #198754; }
+.badge-warning { background: #ffc107; color: #000; }
+.guest-table td, .guest-table th { border: 0.5pt solid #d1d5db; padding: 3pt 5pt; font-size: 8.5pt; }
+.guest-table th { background: #f3f4f6; font-weight: 600; text-align: left; }
+.photo-box { width: 80pt; height: 100pt; border: 0.5pt solid #d1d5db; text-align: center; overflow: hidden; }
+.photo-box img { max-width: 78pt; max-height: 98pt; }
+.sig-box { border: 0.5pt solid #d1d5db; padding: 4pt; min-height: 50pt; text-align: center; }
+.sig-box img { max-width: 200pt; max-height: 60pt; }
+.id-img { max-width: 140pt; max-height: 90pt; border: 0.5pt solid #d1d5db; }
+.declaration { background: #f9fafb; border: 0.5pt solid #d1d5db; padding: 6pt 8pt; font-size: 8pt; line-height: 1.5; margin-bottom: 6pt; }
+.footer { text-align: center; font-size: 7pt; color: #9ca3af; margin-top: 10pt; border-top: 0.5pt solid #e5e7eb; padding-top: 4pt; }
+</style>
+</head>
+<body>
+
+<div class="accent-bar"></div>
+
+<!-- ═══ HEADER ═══ -->
+<table style="margin-bottom:8pt;">
+<tr>
+    <td style="width:70pt;vertical-align:top;">
+        {% if hotel.logo_path %}
+        <img src="file://{{ hotel.logo_path }}" style="max-width:65pt;max-height:50pt;">
+        {% endif %}
+    </td>
+    <td style="vertical-align:top;">
+        <h1>{{ hotel.get('hotel_name', 'Hotel') }}</h1>
+        <div style="font-size:8pt;color:#6b7280;">{{ hotel.get('hotel_address', '') }}</div>
+        <div style="font-size:8pt;color:#6b7280;">
+            {% if hotel.get('hotel_contact') %}Tel: {{ hotel.hotel_contact }} | {% endif %}
+            {% if hotel.get('hotel_email') %}{{ hotel.hotel_email }} | {% endif %}
+            {% if hotel.get('hotel_gstin') %}GSTIN: {{ hotel.hotel_gstin }}{% endif %}
+        </div>
+    </td>
+    <td style="width:120pt;text-align:right;vertical-align:top;">
+        <span class="badge badge-primary">GUEST REGISTRATION CARD</span>
+        <div style="font-size:8pt;margin-top:4pt;">
+            Ref: <strong>{{ reservation.booking_reference or reservation.id }}</strong><br>
+            Date: {{ generated_at.strftime('%d %b %Y %H:%M') }}
+        </div>
+    </td>
+</tr>
+</table>
+
+<!-- ═══ GUEST DETAILS ═══ -->
+<h2>Guest Information</h2>
+<table class="info-table">
+<tr>
+    <td style="width:80pt;vertical-align:top;padding-right:8pt;" rowspan="6">
+        <div class="photo-box">
+            {% if guest_photo %}
+            <img src="file://{{ guest_photo }}">
+            {% else %}
+            <div style="padding-top:30pt;color:#9ca3af;font-size:8pt;">No Photo</div>
+            {% endif %}
+        </div>
+    </td>
+    <td class="info-label">Name</td>
+    <td class="info-value">{{ guest.first_name or '' }}{% if guest.last_name %} {{ guest.last_name }}{% endif %}</td>
+    <td class="info-label">Phone</td>
+    <td class="info-value">{{ guest.phone }}</td>
+</tr>
+<tr>
+    <td class="info-label">Email</td>
+    <td class="info-value">{{ guest.email or '—' }}</td>
+    <td class="info-label">Date of Birth</td>
+    <td class="info-value">{{ guest.date_of_birth.strftime('%d %b %Y') if guest.date_of_birth else '—' }}</td>
+</tr>
+<tr>
+    <td class="info-label">Gender</td>
+    <td class="info-value">{{ guest.gender or '—' }}</td>
+    <td class="info-label">Nationality</td>
+    <td class="info-value">{{ guest.country or 'India' }}</td>
+</tr>
+<tr>
+    <td class="info-label">ID Type</td>
+    <td class="info-value">{{ guest.id_proof_type or (id_doc.document_type if id_doc else '—') }}</td>
+    <td class="info-label">ID Number</td>
+    <td class="info-value">{{ guest.id_proof_number or (id_doc.document_number if id_doc else '—') }}</td>
+</tr>
+<tr>
+    <td class="info-label">Address</td>
+    <td class="info-value" colspan="3">{{ guest.address or '—' }}, {{ guest.city or '' }} {{ guest.state or '' }} {{ guest.pin_code or '' }}, {{ guest.country or 'India' }}</td>
+</tr>
+<tr>
+    <td class="info-label">Purpose of Visit</td>
+    <td class="info-value">{{ guest.purpose_of_visit or '—' }}</td>
+    <td class="info-label">Company</td>
+    <td class="info-value">{{ guest.company or '—' }}</td>
+</tr>
+</table>
+
+<!-- ═══ STAY DETAILS ═══ -->
+<h2>Stay Details</h2>
+<table class="info-table">
+<tr>
+    <td class="info-label">Room</td>
+    <td class="info-value">{{ reservation.room.room_number if reservation.room else '—' }} ({{ reservation.room_type.name if reservation.room_type else '—' }})</td>
+    <td class="info-label">Booking Ref</td>
+    <td class="info-value">{{ reservation.booking_reference or '—' }}</td>
+</tr>
+<tr>
+    <td class="info-label">Check-in</td>
+    <td class="info-value">{{ reservation.arrival_date.strftime('%d %b %Y') }}{% if checkin and checkin.checkin_date %} · {{ checkin.checkin_date.strftime('%I:%M %p').lstrip('0') }}{% elif reservation.checkin_time %} · {{ reservation.checkin_time }}{% endif %}</td>
+    <td class="info-label">Check-out</td>
+    <td class="info-value">{{ reservation.departure_date.strftime('%d %b %Y') }}{% if checkin and checkin.checkout_date %} · {{ checkin.checkout_date.strftime('%I:%M %p').lstrip('0') }}{% elif reservation.checkout_time %} · {{ reservation.checkout_time }}{% endif %}</td>
+</tr>
+<tr>
+    <td class="info-label">Duration</td>
+    <td class="info-value">{{ nights }} Night(s)</td>
+    <td class="info-label">Guests</td>
+    <td class="info-value">{{ reservation.adults }} Adult(s), {{ reservation.children }} Child(ren)</td>
+</tr>
+<tr>
+    <td class="info-label">Rate / Night</td>
+    <td class="info-value">₹{{ "%.2f"|format(reservation.rate_per_night) }}</td>
+    <td class="info-label">Source</td>
+    <td class="info-value">{{ source_display }}{% if ota_channel_display %} · {{ ota_channel_display }}{% endif %}</td>
+</tr>
+<tr>
+    <td class="info-label">Advance Paid</td>
+    <td class="info-value">₹{{ "%.2f"|format(stay_amount.paid|default(0)) }}</td>
+    <td class="info-label">Balance Due</td>
+    <td class="info-value">₹{{ "%.2f"|format(stay_amount.balance|default(0)) }}</td>
+</tr>
+<tr>
+    <td class="info-label">Mode of Payment</td>
+    <td class="info-value" colspan="3">{{ payment_mode_summary }}</td>
+</tr>
+</table>
+
+<!-- ═══ ID DOCUMENT SCANS ═══ -->
+{% if id_front or id_back %}
+<h2>ID Document</h2>
+<table>
+<tr>
+    {% if id_front %}
+    <td style="padding:4pt;text-align:center;">
+        <div style="font-size:7pt;color:#6b7280;margin-bottom:2pt;">Front</div>
+        <img src="file://{{ id_front }}" class="id-img">
+    </td>
+    {% endif %}
+    {% if id_back %}
+    <td style="padding:4pt;text-align:center;">
+        <div style="font-size:7pt;color:#6b7280;margin-bottom:2pt;">Back</div>
+        <img src="file://{{ id_back }}" class="id-img">
+    </td>
+    {% endif %}
+</tr>
+</table>
+{% endif %}
+
+<!-- ═══ ADDITIONAL PASSENGERS ═══ -->
+{% if passengers %}
+<h2>Additional Guests</h2>
+<table class="guest-table">
+<thead>
+<tr><th>Name</th><th>Gender</th><th>Age</th><th>ID Type</th><th>ID Number</th><th>Relation</th></tr>
+</thead>
+<tbody>
+{% for p in passengers %}
+<tr>
+    <td>{{ p.name }}</td>
+    <td>{{ p.gender or '—' }}</td>
+    <td>{{ p.age or '—' }}</td>
+    <td>{{ p.id_type or '—' }}</td>
+    <td>{{ p.id_number or '—' }}</td>
+    <td>{{ p.relationship or '—' }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endif %}
+
+<!-- ═══ FOREIGN NATIONAL DETAILS ═══ -->
+{% if is_foreign and foreign_info %}
+<h2><span class="badge badge-warning">Foreign National</span> Passport &amp; Visa</h2>
+<table class="info-table">
+<tr>
+    <td class="info-label">Nationality</td>
+    <td class="info-value">{{ foreign_info.nationality }}</td>
+    <td class="info-label">Passport No.</td>
+    <td class="info-value">{{ foreign_info.passport_number or '—' }}</td>
+</tr>
+<tr>
+    <td class="info-label">Passport Issue</td>
+    <td class="info-value">{{ foreign_info.passport_issue_place or '—' }}, {{ foreign_info.passport_issue_date.strftime('%d %b %Y') if foreign_info.passport_issue_date else '—' }}</td>
+    <td class="info-label">Passport Expiry</td>
+    <td class="info-value">{{ foreign_info.passport_expiry_date.strftime('%d %b %Y') if foreign_info.passport_expiry_date else '—' }}</td>
+</tr>
+<tr>
+    <td class="info-label">Visa No.</td>
+    <td class="info-value">{{ foreign_info.visa_number or '—' }}</td>
+    <td class="info-label">Visa Type</td>
+    <td class="info-value">{{ foreign_info.visa_type or '—' }}</td>
+</tr>
+<tr>
+    <td class="info-label">Visa Issue</td>
+    <td class="info-value">{{ foreign_info.visa_issue_place or '—' }}, {{ foreign_info.visa_issue_date.strftime('%d %b %Y') if foreign_info.visa_issue_date else '—' }}</td>
+    <td class="info-label">Visa Expiry</td>
+    <td class="info-value">{{ foreign_info.visa_expiry_date.strftime('%d %b %Y') if foreign_info.visa_expiry_date else '—' }}</td>
+</tr>
+<tr>
+    <td class="info-label">Arrived From</td>
+    <td class="info-value">{{ foreign_info.arrival_from or '—' }}</td>
+    <td class="info-label">Next Destination</td>
+    <td class="info-value">{{ foreign_info.next_destination or '—' }}</td>
+</tr>
+</table>
+{% endif %}
+
+<!-- ═══ DECLARATION & SIGNATURE ═══ -->
+<h2>Guest Declaration &amp; Signature</h2>
+<div class="declaration">
+I hereby declare that the particulars given above are true and correct to the best of my knowledge.
+I agree to abide by the rules and regulations of the hotel. I am personally responsible for the payment
+of all charges incurred during my stay unless otherwise arranged. I authorise the hotel to charge any
+outstanding balance to my payment method on file. I understand that the hotel is not responsible for
+any loss of valuables not deposited in the hotel safe. I consent to my personal data being processed
+for the purpose of this stay and regulatory compliance.
+{% if is_foreign %}
+I acknowledge that my details will be shared with the Foreigners Regional Registration Office (FRRO)
+as required under the Registration of Foreigners Act, 1939.
+{% endif %}
+</div>
+
+<table>
+<tr>
+    <td style="width:55%;vertical-align:top;">
+        <div class="sig-box">
+            {% if signature %}
+            <img src="file://{{ signature }}">
+            {% else %}
+            <div style="padding-top:16pt;color:#9ca3af;font-size:8pt;">No digital signature</div>
+            {% endif %}
+        </div>
+        <div style="font-size:7pt;color:#6b7280;margin-top:2pt;">
+            Guest Signature
+            {% if checkin and checkin.grc_signature_timestamp %}
+            — Signed {{ checkin.grc_signature_timestamp.strftime('%d %b %Y at %H:%M IST') }}
+            {% endif %}
+            {% if checkin and checkin.grc_signature_ip %}
+            from IP {{ checkin.grc_signature_ip }}
+            {% endif %}
+        </div>
+    </td>
+    <td style="width:10%;">&nbsp;</td>
+    <td style="width:35%;vertical-align:bottom;">
+        <div style="border-top:0.5pt solid #000;padding-top:4pt;text-align:center;">
+            <div style="font-size:8pt;">For <strong>{{ hotel.get('hotel_name', 'Hotel') }}</strong></div>
+            <div style="font-size:7pt;color:#6b7280;">Authorised Signatory</div>
+        </div>
+    </td>
+</tr>
+</table>
+
+<div class="footer">
+    Computer-generated Guest Registration Card &mdash; {{ hotel.get('hotel_name', '') }}
+    {% if hotel.get('hotel_cin') %} &mdash; CIN: {{ hotel.hotel_cin }}{% endif %}
+    <br>
+    Operator: <strong>{{ current_user.full_name if current_user.full_name else current_user.username }}</strong>
+    {% if current_user.role %} ({{ current_user.role }}){% endif %}
+</div>
+
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "blocking_count": 0,
+  "by_kind": {},
+  "current_app_version": "2.2.18",
+  "current_business_date": "2026-05-28",
+  "dates_clean": 28,
+  "dates_compared": 28,
+  "difference_count": 0,
+  "differences": [],
+  "read_only_verified": true,
+  "stored_app_version": "2.2.18",
+  "stored_business_date": "2026-05-28",
+  "stored_captured_at": "2026-08-04T11:33:20",
+  "tag": "production",
+  "verdict": "PASS"
+}

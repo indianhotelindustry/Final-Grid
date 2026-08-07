@@ -1,0 +1,35 @@
+{
+  "anon_location": "/auth/login?next=%2Fai%2Fsentiment",
+  "anon_status": 302,
+  "body_bytes": 41069,
+  "body_sha256": "b0ef30f7d6103f517bd3b7912c23f9a404eed6874144a8529e5fc8e33c6b257e",
+  "category": "ADVISORY",
+  "content_type": "text/html",
+  "duration_ms": 6,
+  "endpoint": "ai.sentiment_dashboard",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "INFO",
+  "status": 200,
+  "surface_id": "ai.sentiment_dashboard",
+  "templates": [
+    "ai/sentiment_dashboard.html"
+  ],
+  "truncations": [],
+  "url": "/ai/sentiment"
+}

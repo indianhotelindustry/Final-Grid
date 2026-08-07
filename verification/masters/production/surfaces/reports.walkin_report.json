@@ -1,0 +1,51 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Fwalkin",
+  "anon_status": 302,
+  "body_bytes": 29945,
+  "body_sha256": "dfe4638c00046e6491b8dfa8f2c44cfc562c11671416b2606863d1b423acb9b1",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 26,
+  "endpoint": "reports.walkin_report",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "records[0][type]": "Reservation",
+    "records[10][type]": "Reservation",
+    "records[11][type]": "Reservation",
+    "records[12][type]": "Reservation",
+    "records[13][type]": "Reservation",
+    "records[1][type]": "Reservation",
+    "records[2][type]": "Reservation",
+    "records[3][type]": "Reservation",
+    "records[4][type]": "Reservation",
+    "records[5][type]": "Reservation",
+    "records[6][type]": "Reservation",
+    "records[7][type]": "Reservation",
+    "records[8][type]": "Reservation",
+    "records[9][type]": "Reservation",
+    "records[len]": "14",
+    "report_date": "2026-05-28"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.walkin_report",
+  "templates": [
+    "reports/walkin_report.html"
+  ],
+  "truncations": [],
+  "url": "/reports/walkin"
+}

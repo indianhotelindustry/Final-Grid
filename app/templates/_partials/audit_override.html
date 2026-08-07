@@ -1,0 +1,72 @@
+{# ============================================================================
+   Reusable Admin Override UI for actions blocked by a closed Night Audit.
+
+   USE WHENEVER a route mutates financial state on a date that may be locked
+   by a completed Night Audit. The macro renders nothing for non-Admin users
+   and nothing when there is no lock — so it is always safe to drop in.
+
+   Server contract (same everywhere):
+       form field  audit_override         = '1'
+       form field  audit_override_reason  = '<non-empty reason>'
+   These are read by ``app.services.assert_or_admin_override`` which returns
+   ``(True, None, override_used=True, reason)`` on success and writes an
+   ``audit_lock_override`` row to AuditLog when the caller honours the
+   ``override_used`` flag.
+
+   Parameters
+   ----------
+   can_override : bool
+       Usually ``current_user.is_authenticated and current_user.has_role('Admin')``.
+       Macro emits no markup if False.
+   lock_info : dict | None
+       Output of ``app.services.get_locking_audit(target_date)`` shaped as::
+           {'date_human': 'DD MMM YYYY', 'audit_id': 12, 'status': 'Completed', ...}
+       Macro emits no markup if None / falsy.
+   suffix : str  (kwarg)
+       Appended to control IDs. REQUIRED when the macro is rendered more
+       than once per page (e.g. inside a payment-row loop) to keep IDs
+       unique.
+   form_id : str  (kwarg)
+       Sets the ``form="..."`` attribute on the inputs when they live in
+       markup that is OUTSIDE the form they should submit with (banner
+       above the form, etc.). Leave blank when the macro lives inside its
+       parent form.
+============================================================================ #}
+
+{% macro audit_override(can_override, lock_info, suffix='', form_id='') %}
+{% if can_override and lock_info %}
+{% set _sfx = suffix or '' %}
+<details class="audit-override-block mt-2">
+  <summary class="small fw-semibold" style="cursor:pointer;user-select:none;color:#b45309;">
+    <i class="bi bi-shield-lock me-1"></i>Admin Override
+    <span class="text-muted fw-normal">— locked {{ lock_info.date_human }}</span>
+  </summary>
+  <div class="mt-2 p-2 rounded border border-warning"
+       style="background:rgba(245,158,11,0.10);">
+    <div class="form-check mb-2">
+      <input class="form-check-input" type="checkbox"
+             name="audit_override" value="1"
+             id="auditOverrideChk{{ _sfx }}"
+             {% if form_id %}form="{{ form_id }}"{% endif %}>
+      <label class="form-check-label small fw-semibold" style="color:#92400e;"
+             for="auditOverrideChk{{ _sfx }}">
+        Override Night Audit lock for this action
+      </label>
+    </div>
+    <label class="form-label small mb-1" style="color:#92400e;"
+           for="auditOverrideReason{{ _sfx }}">
+      Reason <span class="text-danger">*</span>
+    </label>
+    <input type="text" name="audit_override_reason"
+           id="auditOverrideReason{{ _sfx }}"
+           class="form-control form-control-sm"
+           {% if form_id %}form="{{ form_id }}"{% endif %}
+           placeholder="e.g. Late-arriving payment / data correction"
+           maxlength="200">
+    <div class="small text-muted mt-1">
+      <i class="bi bi-info-circle me-1"></i>Audit log will record your user, the reason, and the locked date.
+    </div>
+  </div>
+</details>
+{% endif %}
+{% endmacro %}

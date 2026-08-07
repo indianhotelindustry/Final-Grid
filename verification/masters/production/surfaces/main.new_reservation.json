@@ -1,0 +1,52 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/reservations/new",
+  "anon_status": 302,
+  "body_bytes": 30651,
+  "body_sha256": "4753c1407d9755412f1b169c522ba34246be532f668191f8664ee8bd9198008c",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 14,
+  "endpoint": "main.new_reservation",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "payment_modes[0][type]": "PaymentMode",
+    "payment_modes[10][type]": "PaymentMode",
+    "payment_modes[11][type]": "PaymentMode",
+    "payment_modes[1][type]": "PaymentMode",
+    "payment_modes[2][type]": "PaymentMode",
+    "payment_modes[3][type]": "PaymentMode",
+    "payment_modes[4][type]": "PaymentMode",
+    "payment_modes[5][type]": "PaymentMode",
+    "payment_modes[6][type]": "PaymentMode",
+    "payment_modes[7][type]": "PaymentMode",
+    "payment_modes[8][type]": "PaymentMode",
+    "payment_modes[9][type]": "PaymentMode",
+    "payment_modes[len]": "12",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "room_types[0][type]": "RoomType",
+    "room_types[1][type]": "RoomType",
+    "room_types[2][type]": "RoomType",
+    "room_types[len]": "3"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 5,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "main.new_reservation",
+  "templates": [
+    "reservation_form.html"
+  ],
+  "truncations": [],
+  "url": "/reservations/new"
+}

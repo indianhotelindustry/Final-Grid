@@ -1,0 +1,1629 @@
+{
+  "category_matrix": {
+    "A-ACCOUNTING": {
+      "CRITICAL": [
+        "INV-A01",
+        "INV-A04",
+        "INV-A05"
+      ],
+      "HIGH": [
+        "INV-A02",
+        "INV-A03",
+        "INV-A06"
+      ]
+    },
+    "B-TEMPORAL": {
+      "CRITICAL": [
+        "INV-B01",
+        "INV-B02",
+        "INV-B03",
+        "INV-B04"
+      ],
+      "HIGH": [
+        "INV-B05"
+      ],
+      "MEDIUM": [
+        "INV-B06"
+      ]
+    },
+    "C-DOMAIN": {
+      "CRITICAL": [
+        "INV-C01",
+        "INV-C03"
+      ],
+      "HIGH": [
+        "INV-C02",
+        "INV-C04",
+        "INV-C06"
+      ],
+      "MEDIUM": [
+        "INV-C05"
+      ]
+    },
+    "D-REFERENTIAL": {
+      "CRITICAL": [
+        "INV-D01",
+        "INV-D02",
+        "INV-D03"
+      ],
+      "HIGH": [
+        "INV-D04",
+        "INV-D05",
+        "INV-D06"
+      ]
+    }
+  },
+  "commissioning_gaps": [],
+  "invariants": [
+    {
+      "affected_reports": [
+        "main.reservation_folio",
+        "main.invoice",
+        "reports.ar_aging",
+        "night audit folio control"
+      ],
+      "applicable_business_dates": "all",
+      "applicable_releases": "all",
+      "blocking": "RELEASE_BLOCKING",
+      "business_purpose": "The balance shown on a folio is what the hotel tells a guest they owe. If it is not the arithmetic consequence of the charges and the payments, then either the guest is being asked for the wrong money or the hotel is writing off revenue it never decided to write off.",
+      "business_rule": "For every reservation, calculate_stay_amount must satisfy balance = grand_total - paid - company_credit, and settlement_balance = rounded_grand_total - paid - company_credit.",
+      "canonical_engine": "app.services.calculate_stay_amount",
+      "category": "A-ACCOUNTING",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "reservations",
+        "extra_charges",
+        "payments",
+        "reservation_night_rates",
+        "tax_lines"
+      ],
+      "evidence_produced": "Per reservation: grand_total, paid, company_credit, reported balance, computed balance, variance.",
+      "failure_message": "The settlement identity does not hold. A folio balance is not the arithmetic consequence of its own charges and payments.",
+      "invariant_id": "INV-A01",
+      "likely_root_causes": [
+        "A rounding step applied to one side of the identity but not the other",
+        "company_credit subtracted twice, or not at all, on one path",
+        "GST added to grand_total after balance was computed",
+        "A caller mutating the returned dict"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING",
+        "SINGLE_RESERVATION"
+      ],
+      "negative_patch": [
+        "app.services.calculate_stay_amount",
+        "balance",
+        1000.0
+      ],
+      "negative_patch_reason": "The identity is computed inside one function from values it derives itself, so no mutation of the DATA can break it: every input moves both sides together. The only thing that can break it is the code, and Wave 0 forbids changing that. So the fault is injected at the engine boundary instead \u2014 the returned balance is moved by 1,000 inside the commissioning subprocess only \u2014 which is precisely the shape of the regression this invariant exists to catch.",
+      "negative_seed": [],
+      "negative_seed_reason": "",
+      "not_seedable_reason": "",
+      "principles": [
+        "P1",
+        "P11"
+      ],
+      "severity": "CRITICAL",
+      "suggested_investigation": [
+        "Re-run calculate_stay_amount for the reported reservation and print every key it returns",
+        "Compare grand_total against total + gst_amount",
+        "Check whether round2 is applied before or after the subtraction"
+      ],
+      "title": "Settlement identity: grand total - payments - company credit = balance",
+      "validation_method": "Call the canonical engine for every reservation in scope and check its own outputs against each other. This is an internal-consistency check of the engine, deliberately separate from INV-A04 which checks the engine against the primary record."
+    },
+    {
+      "affected_reports": [
+        "main.reservation_folio",
+        "billing.gst_report",
+        "reports.daily_reconciliation",
+        "night audit folio control"
+      ],
+      "applicable_business_dates": "all",
+      "applicable_releases": "all",
+      "blocking": "CERTIFICATION_BLOCKING",
+      "business_purpose": "A folio is the unit a bill is issued against and the unit a company or an OTA is invoiced on. A payment or a charge that belongs to no folio still moves the hotel's money, but it cannot be attributed to anything, cannot appear on a split bill, and cannot be reconciled by anyone downstream.",
+      "business_rule": "Every payments row and every extra_charges row carries a non-null folio_id (Financial Constitution, Article V \u00a73).",
+      "canonical_engine": "none \u2014 read directly from the primary record",
+      "category": "A-ACCOUNTING",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "payments",
+        "extra_charges",
+        "folios"
+      ],
+      "evidence_produced": "Count and rupee total of unrouted payments and charges, with the first of each listed by id.",
+      "failure_message": "Financial rows exist that belong to no folio. The money is real and its attribution is not.",
+      "invariant_id": "INV-A02",
+      "likely_root_causes": [
+        "Posting paths that write a payment before a folio exists",
+        "A folio-creation step that runs only on the check-in route",
+        "Legacy rows predating the folio model, never backfilled"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING",
+        "BUSINESS_DATE",
+        "NIGHT_AUDIT",
+        "HISTORICAL_REPLAY"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "INSERT INTO payments (reservation_id, folio_id, payment_mode_id, amount, payment_date,  created_at, is_voided, is_correction, is_reversal, payment_purpose) SELECT p.reservation_id, NULL, p.payment_mode_id, 191.00,   p.payment_date, p.created_at, 0, 0, 0, 'settlement' FROM payments p ORDER BY p.id LIMIT 1"
+      ],
+      "negative_seed_reason": "Posting a payment with no folio is exactly the state the rule forbids. The seed ADDS an unrouted row rather than detaching an existing one, because on this dataset every payment is already unrouted \u2014 the first version of this seed set folio_id = NULL where it was NOT NULL, matched nothing, and was correctly reported as a broken seed. Detection is therefore by the violation count rising, not by the status changing.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P1",
+        "P5"
+      ],
+      "severity": "HIGH",
+      "suggested_investigation": [
+        "Group the unrouted rows by created_at to see whether they are legacy or still being produced today",
+        "Trace the posting path for the most recent unrouted row",
+        "Check whether folio creation is conditional on booking_type"
+      ],
+      "title": "Every financial row belongs to a folio",
+      "validation_method": "Count rows with folio_id IS NULL, and total the money they carry so the finding has a size and not merely a count."
+    },
+    {
+      "affected_reports": [
+        "main.reservation_folio",
+        "reports.revenue",
+        "night audit folio control"
+      ],
+      "applicable_business_dates": "all",
+      "applicable_releases": "all",
+      "blocking": "RELEASE_BLOCKING",
+      "business_purpose": "The same money must total the same whichever way it is sliced. If the folio view and the reservation view of the same charges differ, then at least one report in the system is showing a number that does not exist.",
+      "business_rule": "\u03a3 extra_charges grouped by folio = \u03a3 extra_charges grouped by reservation, over the same population.",
+      "canonical_engine": "none \u2014 read directly from the primary record",
+      "category": "A-ACCOUNTING",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "extra_charges",
+        "folios",
+        "reservations"
+      ],
+      "evidence_produced": "Both totals, their variance, and any orphan rows.",
+      "failure_message": "The folio and reservation views of the same charges disagree.",
+      "invariant_id": "INV-A03",
+      "likely_root_causes": [
+        "A charge whose folio belongs to a different reservation",
+        "Charges with folio_id NULL falling out of the folio view",
+        "A folio whose reservation_id was repointed"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "INSERT INTO folios (reservation_id, folio_letter, label, is_closed) SELECT (SELECT MAX(id) FROM reservations), 'Z', 'SEEDED', 0",
+        "INSERT INTO extra_charges (reservation_id, folio_id, description, amount, charge_date,  charge_type, charge_category, is_correction, is_reversal) SELECT (SELECT MIN(id) FROM reservations),   (SELECT MAX(id) FROM folios), 'SEEDED cross-routed charge',   613.00, r.arrival_date, 'food', 'Restaurant', 0, 0 FROM reservations r ORDER BY r.id LIMIT 1"
+      ],
+      "negative_seed_reason": "A charge whose folio belongs to a DIFFERENT reservation makes the two views of the same money disagree. The seed adds such a row rather than re-routing an existing one: on this dataset every charge is already unrouted, so re-routing one would merely swap it from one violation category to another and leave the count unchanged \u2014 the first version of this seed did exactly that and was correctly reported as undetected.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P1",
+        "P5"
+      ],
+      "severity": "HIGH",
+      "suggested_investigation": [
+        "List charges whose folio.reservation_id differs from their own reservation_id",
+        "Check INV-A02 first \u2014 unrouted rows are the usual cause"
+      ],
+      "title": "Charges summed over folios equal charges summed over reservations",
+      "validation_method": "Total the charge rows twice, once joined through folios and once through reservations, and compare. A row reachable by neither route is reported separately, because it would otherwise cancel out of both totals and leave them agreeing."
+    },
+    {
+      "affected_reports": [
+        "reports.flash",
+        "main.dashboard",
+        "reports.front_office_mis",
+        "reports.payment_collection"
+      ],
+      "applicable_business_dates": "every date with payment activity",
+      "applicable_releases": "all",
+      "blocking": "RELEASE_BLOCKING",
+      "business_purpose": "The day's cash figure is what the hotel banks against, what the shift is balanced against, and what the owner reads first. It must be the sum of the payment rows for that date and nothing else.",
+      "business_rule": "kpi_helpers.get_cash_revenue(d) = \u03a3 payments on d that are not voided and whose mode category is direct_payment, AND no non-voided payment on d falls outside the direct/OTA classification.",
+      "canonical_engine": "app.kpi_helpers.get_cash_revenue",
+      "category": "A-ACCOUNTING",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "payments",
+        "payment_modes"
+      ],
+      "evidence_produced": "Engine figure, ledger figure, variance, row count and the ids of the payments in the population.",
+      "failure_message": "The day's collected cash does not equal the payments recorded for that day.",
+      "invariant_id": "INV-A04",
+      "likely_root_causes": [
+        "The engine's join dropping rows whose payment mode is missing",
+        "A filter on is_voided applied on one side only",
+        "Float accumulation in SQL SUM over a REAL column",
+        "A second definition of \"cash\" introduced by a report"
+      ],
+      "modes": [
+        "BUSINESS_DATE",
+        "NIGHT_AUDIT",
+        "HISTORICAL_REPLAY",
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "CONTINUOUS_MONITORING"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "UPDATE payments SET payment_mode_id = 999999 WHERE id = (SELECT MIN(p.id) FROM payments p             JOIN payment_modes m ON m.id = p.payment_mode_id             WHERE p.is_voided = 0 AND m.category='direct_payment')"
+      ],
+      "negative_seed_reason": "An orphan payment mode is dropped by the engine's inner join but still sits in the table, so the engine and the primary record part company. This is the live gap D3 recorded; foreign keys are not enforced on this database, so the state is reachable.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P1",
+        "P3",
+        "P8"
+      ],
+      "severity": "CRITICAL",
+      "suggested_investigation": [
+        "List the payments for the date with their mode and category",
+        "Compare against INV-D03 \u2014 an orphan payment mode is the known route to this failure",
+        "Re-run D3 replay for the date and read reconciliation RC01"
+      ],
+      "title": "Daily collections equal the direct payments recorded for the day",
+      "validation_method": "Call the canonical engine for the date in scope and compare it against the same population summed in Decimal straight from the table. The ledger side additionally LEFT-joins the payment mode and totals anything that lands in neither the direct nor the OTA bucket.\n        That second half is not decoration. The first version of this invariant summed the ledger with the same INNER JOIN the engine uses, which made it tautological: a payment whose mode row is missing was dropped by both sides, they agreed, and the money vanished from the report unnoticed. Commissioning found that \u2014 the seeded fault was not detected \u2014 and the rule was widened rather than the seed weakened."
+    },
+    {
+      "affected_reports": [
+        "billing.gst_report",
+        "main.invoice",
+        "billing.gstr_export"
+      ],
+      "applicable_business_dates": "all",
+      "applicable_releases": "all",
+      "blocking": "CERTIFICATION_BLOCKING",
+      "business_purpose": "Stored tax lines are what a GST return is filed from. A line whose amount does not follow from its own base and rate is a filing error waiting to be made, and it is invisible on any screen that shows only the total.",
+      "business_rule": "For every tax_lines row that is not exempt: |tax_amount - taxable_amount x tax_rate / 100| <= 0.01.",
+      "canonical_engine": "none \u2014 the stored line is checked against itself",
+      "category": "A-ACCOUNTING",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "tax_lines"
+      ],
+      "evidence_produced": "Per line: base, rate, stored amount, recomputed amount, variance.",
+      "failure_message": "A stored tax line does not equal its own base times its own rate.",
+      "invariant_id": "INV-A05",
+      "likely_root_causes": [
+        "A rate change applied to the rate column without recomputing the amount",
+        "Rounding applied per invoice rather than per line",
+        "A manual correction to one column only"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING",
+        "BUSINESS_DATE",
+        "NIGHT_AUDIT",
+        "HISTORICAL_REPLAY"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "UPDATE tax_lines SET tax_amount = tax_amount + 100.00 WHERE id = (SELECT MIN(id) FROM tax_lines)"
+      ],
+      "negative_seed_reason": "Moving a stored tax amount away from its base breaks the relationship the rule asserts, without touching anything else.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P1",
+        "P11"
+      ],
+      "severity": "CRITICAL",
+      "suggested_investigation": [
+        "Group the failing lines by tax_rate and by charge_date to see whether they cluster around a rate change",
+        "Compare against the invoice totals stored on the reservation"
+      ],
+      "title": "Every stored tax line equals its taxable base times its rate",
+      "validation_method": "Recompute each line from its own stored base and rate. This is deliberately not a comparison against gst_service: that service writes (it calls ensure_all_tax_lines, which commits), and an invariant may not write."
+    },
+    {
+      "affected_reports": [
+        "reports.refund_report",
+        "main.reservation_folio",
+        "night audit folio control"
+      ],
+      "applicable_business_dates": "all",
+      "applicable_releases": "all",
+      "blocking": "CERTIFICATION_BLOCKING",
+      "business_purpose": "Money held above what a guest owes is a liability, not revenue. Until it is recorded as an overpayment it looks like income, inflates the day's collections, and nobody knows to refund it.",
+      "business_rule": "For every reservation whose settlement_balance is negative by more than one rupee, an overpayment_logs row exists.",
+      "canonical_engine": "app.services.calculate_stay_amount",
+      "category": "A-ACCOUNTING",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "reservations",
+        "payments",
+        "overpayment_logs"
+      ],
+      "evidence_produced": "Per reservation: settlement balance, amount overpaid, whether an overpayment record exists.",
+      "failure_message": "A reservation is overpaid with no overpayment record. The hotel is holding money it has not acknowledged owing.",
+      "invariant_id": "INV-A06",
+      "likely_root_causes": [
+        "An overpayment path that logs only when detected at checkout",
+        "A payment posted after checkout, bypassing the detection",
+        "Rounding: an invoice rounded down while payment matched the unrounded total"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING",
+        "SINGLE_RESERVATION"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "INSERT INTO payments (reservation_id, folio_id, payment_mode_id, amount, payment_date,  is_voided, is_correction, is_reversal, payment_purpose) SELECT p.reservation_id, p.folio_id, p.payment_mode_id, 50000.00,   p.payment_date, 0, 0, 0, 'settlement' FROM payments p ORDER BY p.id LIMIT 1"
+      ],
+      "negative_seed_reason": "A 50,000 payment against one reservation drives its settlement balance far negative with no overpayment record, which is exactly the unacknowledged liability the rule forbids.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P1",
+        "P5",
+        "P10"
+      ],
+      "severity": "HIGH",
+      "suggested_investigation": [
+        "Compare each finding's magnitude against 1.00 \u2014 sub-rupee cases are the rounding path, larger ones are not",
+        "Check the created_at of the last payment against checked_out_at"
+      ],
+      "title": "A guest who has paid more than they owe has an overpayment record",
+      "validation_method": "Compute the settlement balance through the canonical engine, take the reservations that are negative, and require each to appear in overpayment_logs."
+    },
+    {
+      "affected_reports": [
+        "night audit",
+        "reports.daily_reconciliation",
+        "billing.gst_report",
+        "reports.revenue"
+      ],
+      "applicable_business_dates": "every date with a completed night audit",
+      "applicable_releases": "all",
+      "blocking": "RELEASE_BLOCKING",
+      "business_purpose": "Once a night audit completes, the day has been reported. Someone has read the figure, banked against it and possibly filed it. A row inserted into that day afterwards changes a number that has already been relied upon, and nothing on any screen says so.",
+      "business_rule": "For every date with a completed night audit, no payments or extra_charges row dated to that date has created_at later than the audit's completed_at.",
+      "canonical_engine": "none \u2014 read directly from the primary record",
+      "category": "B-TEMPORAL",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "payments",
+        "extra_charges",
+        "night_audit_logs"
+      ],
+      "evidence_produced": "Per closed date: audit completion time, offending row ids, their creation times and the money they carry.",
+      "failure_message": "A financial row was posted into a business date after that date was closed. The closed period is not append-only.",
+      "invariant_id": "INV-B01",
+      "likely_root_causes": [
+        "A posting route that takes the business date without checking whether it is closed",
+        "A night audit reopened, posted into, and not re-run",
+        "Manual data correction against the live database"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING",
+        "BUSINESS_DATE",
+        "NIGHT_AUDIT",
+        "HISTORICAL_REPLAY"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "INSERT INTO payments (reservation_id, folio_id, payment_mode_id, amount, payment_date,  created_at, is_voided, is_correction, is_reversal, payment_purpose) SELECT p.reservation_id, p.folio_id, p.payment_mode_id, 321.00,   (SELECT audit_date FROM night_audit_logs     WHERE status IN ('Completed','Warning') ORDER BY audit_date LIMIT 1),   '2099-01-01 00:00:00', 0, 0, 0, 'settlement' FROM payments p ORDER BY p.id LIMIT 1"
+      ],
+      "negative_seed_reason": "A payment dated to a closed day but created in 2099 is unambiguously a posting into a reported period, with no other explanation.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P2",
+        "P7",
+        "P12"
+      ],
+      "severity": "CRITICAL",
+      "suggested_investigation": [
+        "Read night_audit_reopen_logs for the date",
+        "Check whether the posting route validates against NightAuditLog.status before writing",
+        "Re-run the D3 replay for the date and compare against the frozen snapshot"
+      ],
+      "title": "No financial row was created into a business date after that date closed",
+      "validation_method": "For each closed date, compare the created_at of every row dated to it against the audit's completed_at. Rows with a null created_at are reported separately: they cannot be judged, and treating them as compliant would let the whole control be bypassed by not stamping a row."
+    },
+    {
+      "affected_reports": [
+        "night audit",
+        "reports.night_audit_history"
+      ],
+      "applicable_business_dates": "every date with a night audit snapshot",
+      "applicable_releases": "v2.2 and later (snapshot_hash was added then)",
+      "blocking": "RELEASE_BLOCKING",
+      "business_purpose": "The snapshot is the hotel's own frozen statement about a day. Its hash exists so that a manual database edit, or a change in how the snapshot is serialised, cannot silently rewrite history. An unhashed snapshot is a statement nobody can vouch for.",
+      "business_rule": "For every night_audit_logs row carrying a snapshot_json: a snapshot_hash exists and equals SHA-256 of the snapshot text.",
+      "canonical_engine": "app.services.verify_snapshot_integrity",
+      "category": "B-TEMPORAL",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "night_audit_logs"
+      ],
+      "evidence_produced": "Per audited date: whether a snapshot exists, whether a hash exists, stored hash, recomputed hash, and the version that wrote it.",
+      "failure_message": "A frozen night-audit snapshot no longer matches its hash, or was never hashed. The record of that day cannot be vouched for.",
+      "invariant_id": "INV-B02",
+      "likely_root_causes": [
+        "A manual UPDATE against night_audit_logs",
+        "A change to how the snapshot dict is serialised, without re-hashing",
+        "A close path that writes the snapshot but not the hash"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING",
+        "BUSINESS_DATE",
+        "NIGHT_AUDIT",
+        "HISTORICAL_REPLAY"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "UPDATE night_audit_logs SET snapshot_json = snapshot_json || ' ' WHERE snapshot_json IS NOT NULL AND snapshot_hash IS NOT NULL"
+      ],
+      "negative_seed_reason": "Appending one byte to the snapshot without touching the hash is the exact tamper the control claims to detect.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P2",
+        "P7",
+        "P11",
+        "P12"
+      ],
+      "severity": "CRITICAL",
+      "suggested_investigation": [
+        "Compare snapshot_version against the current application version",
+        "Read night_audit_reopen_logs for the date",
+        "Diff the snapshot against a fresh D3 replay of the same date"
+      ],
+      "title": "Every frozen night-audit snapshot matches its stored hash",
+      "validation_method": "Call the application's own integrity helper rather than re-implementing the hash. A second implementation would drift, and if the application's control is broken this is the run that should say so."
+    },
+    {
+      "affected_reports": [
+        "night audit",
+        "reports.revenue",
+        "reports.daily_reconciliation"
+      ],
+      "applicable_business_dates": "every closed date with a snapshot",
+      "applicable_releases": "all",
+      "blocking": "RELEASE_BLOCKING",
+      "business_purpose": "This is the whole point of closing a day. If recomputing 27 May today gives a different answer from the one reported on the night of 27 May, then the accounts and the system disagree about a period that is supposed to be settled, and every downstream consumer of that figure is now wrong.",
+      "business_rule": "For every closed date, the read-only NightAuditService recomputation equals the frozen snapshot on collected cash, accrual revenue, occupancy and outstanding balance.",
+      "canonical_engine": "app.night_audit_service.NightAuditService",
+      "category": "B-TEMPORAL",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "night_audit_logs",
+        "payments",
+        "extra_charges",
+        "reservations"
+      ],
+      "evidence_produced": "Per closed date and per field: frozen value, recomputed value, variance.",
+      "failure_message": "A closed day no longer computes the figures it reported. History has changed.",
+      "invariant_id": "INV-B03",
+      "likely_root_causes": [
+        "A present-tense field \u2014 Reservation.status, Room.status, a credit balance \u2014 used inside a date-scoped report",
+        "Data posted into the period after it closed (see INV-B01)",
+        "A change to a canonical engine that was never replayed against history"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING",
+        "BUSINESS_DATE",
+        "NIGHT_AUDIT",
+        "HISTORICAL_REPLAY"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "UPDATE night_audit_logs SET snapshot_json = REPLACE(snapshot_json,     '\"total_collected\":', '\"total_collected\": 1.0, \"_seeded\":') WHERE snapshot_json LIKE '%total_collected%'"
+      ],
+      "negative_seed_reason": "Rewriting the frozen collected figure to 1.00 makes the snapshot and the recomputation disagree, which is the state the rule forbids. It also demonstrates that this invariant and INV-B02 are independent: the hash check fires too, and each names a different thing that is wrong.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P2",
+        "P4",
+        "P7",
+        "P8",
+        "P12"
+      ],
+      "severity": "CRITICAL",
+      "suggested_investigation": [
+        "Run the D3 replay for the date; it attributes the movement to a dotted path",
+        "Check INV-B01 for the same date first \u2014 a back-dated posting explains this without any code being at fault",
+        "Look for query filters that use the reservation status rather than the stay span"
+      ],
+      "title": "Recomputing a closed day reproduces the figures it reported",
+      "validation_method": "Recompute the day with the clock frozen to it and compare against the stored snapshot, field by declared field. Only fields present on both sides are compared; a field the snapshot never carried is reported as uncomparable rather than assumed equal."
+    },
+    {
+      "affected_reports": [
+        "every date-scoped report",
+        "night audit",
+        "main.dashboard"
+      ],
+      "applicable_business_dates": "all",
+      "applicable_releases": "all",
+      "blocking": "RELEASE_BLOCKING",
+      "business_purpose": "The business date is the single temporal basis the whole system agrees on: reports, night audit, shift close and every \"today\" tile. Two of them, or financial activity dated past it, means different parts of the system are trading on different days.",
+      "business_rule": "The business_date table holds exactly one row, and no payment or charge is dated later than it.",
+      "canonical_engine": "app.services.get_business_date",
+      "category": "B-TEMPORAL",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "business_date",
+        "payments",
+        "extra_charges"
+      ],
+      "evidence_produced": "Row count, the canonical business date, the table's business date, and any financial row dated beyond it.",
+      "failure_message": "The system does not have a single unambiguous business date, or money is dated beyond it.",
+      "invariant_id": "INV-B04",
+      "likely_root_causes": [
+        "A second business_date row inserted by a migration or a reset",
+        "A night audit that advanced the date without committing",
+        "A posting route that uses the wall clock rather than the business date"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "INSERT INTO business_date (\"current_date\", is_locked, updated_at) SELECT DATE(\"current_date\", '+1 day'), 0, updated_at FROM business_date ORDER BY id LIMIT 1"
+      ],
+      "negative_seed_reason": "A second business_date row is the ambiguity the rule forbids, and it is a state a careless migration can genuinely produce.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P8",
+        "P11"
+      ],
+      "severity": "CRITICAL",
+      "suggested_investigation": [
+        "SELECT * FROM business_date \u2014 there should be exactly one row",
+        "Compare the offending rows' created_at against the business date",
+        "Check whether the posting path calls get_business_date()"
+      ],
+      "title": "Exactly one business date exists and no activity is dated beyond it",
+      "validation_method": "Compare the row count and the canonical engine's answer against the table, then look for dated financial rows beyond it. Future RESERVATIONS are legitimate and are not counted; future money is not."
+    },
+    {
+      "affected_reports": [
+        "night audit",
+        "reports.night_audit_history",
+        "reports.revenue"
+      ],
+      "applicable_business_dates": "from the first night audit onwards",
+      "applicable_releases": "all",
+      "blocking": "CERTIFICATION_BLOCKING",
+      "business_purpose": "Each night audit closes one day. A missing audit is a day nobody closed: its revenue was never frozen, its cash was never reconciled, and the figures for it can still move. A gap in the sequence is a gap in the accounts.",
+      "business_rule": "Audit dates are unique, none is later than the business date, and there is no un-audited date between the first audit and the day before the business date.",
+      "canonical_engine": "none \u2014 read directly from the primary record",
+      "category": "B-TEMPORAL",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "night_audit_logs",
+        "business_date"
+      ],
+      "evidence_produced": "First and last audit dates, the business date, the list of missing dates and any duplicates.",
+      "failure_message": "The night audit sequence has a hole. At least one trading day was never closed.",
+      "invariant_id": "INV-B05",
+      "likely_root_causes": [
+        "The audit was skipped on a quiet night and never back-run",
+        "A crash mid-audit leaving the log in Pending and never retried",
+        "The business date advanced without the audit completing"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "UPDATE night_audit_logs SET audit_date = DATE(audit_date, '-5 day') WHERE id = (SELECT MIN(id) FROM night_audit_logs)"
+      ],
+      "negative_seed_reason": "Moving the earliest audit five days earlier opens a five-day hole between it and the business date \u2014 days that are now un-audited.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P7",
+        "P8",
+        "P10"
+      ],
+      "severity": "HIGH",
+      "suggested_investigation": [
+        "Check for Pending rows in night_audit_logs on the missing dates",
+        "Look for activity on the missing dates \u2014 a day with payments and no audit is materially different from an empty one"
+      ],
+      "title": "Night audits form an unbroken sequence up to the business date",
+      "validation_method": "Walk the calendar from the first audit to the day before the business date and require an audit for each. The current business date is excluded: it has not finished, so its audit is not yet due."
+    },
+    {
+      "affected_reports": [
+        "reports.flash",
+        "reports.payment_collection",
+        "shift close",
+        "night audit"
+      ],
+      "applicable_business_dates": "all",
+      "applicable_releases": "all",
+      "blocking": "OPERATIONAL_WARNING",
+      "business_purpose": "A payment carries two times: the business date it is booked to and the wall-clock moment it was created. When the two disagree wildly, or when a payment is booked to a day far outside the stay it settles, the day's cash figure stops describing the day's trading, and the shift it is reconciled against is the wrong one.",
+      "business_rule": "For every payment: payment_date lies between the reservation's arrival date and 30 days after its departure date.",
+      "canonical_engine": "none \u2014 read directly from the primary record",
+      "category": "B-TEMPORAL",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "payments",
+        "reservations"
+      ],
+      "evidence_produced": "Per payment: reservation stay window, payment date, days outside the window, amount.",
+      "failure_message": "A payment is booked to a business date outside the stay it settles.",
+      "invariant_id": "INV-B06",
+      "likely_root_causes": [
+        "A posting route defaulting the date to the wall clock rather than the business date",
+        "A back-dated correction entered by hand",
+        "A long-running credit recovery beyond the declared tail"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING",
+        "BUSINESS_DATE",
+        "NIGHT_AUDIT",
+        "HISTORICAL_REPLAY"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "UPDATE payments SET payment_date = DATE(payment_date, '-400 day') WHERE id = (SELECT MIN(id) FROM payments)"
+      ],
+      "negative_seed_reason": "A payment booked 400 days before its own stay cannot belong to the day it is dated to, and it moves that day's cash figure.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P8",
+        "P10"
+      ],
+      "severity": "MEDIUM",
+      "suggested_investigation": [
+        "Compare payment_date against created_at for the offending rows",
+        "Check payment_purpose \u2014 credit_recovery legitimately lags the stay",
+        "Confirm the 30-day tail is still the right business assumption"
+      ],
+      "title": "A payment is never dated outside the stay it belongs to",
+      "validation_method": "Join every payment to its reservation and bound the payment date by the stay window. The 30-day tail is declared, not discovered: post-checkout credit recovery is a legitimate business flow and a tighter bound would report it as a fault."
+    },
+    {
+      "affected_reports": [
+        "reports.ota_reconciliation",
+        "reports.ar_aging",
+        "reports.flash",
+        "night audit payment summary"
+      ],
+      "applicable_business_dates": "all",
+      "applicable_releases": "all",
+      "blocking": "CERTIFICATION_BLOCKING",
+      "business_purpose": "An OTA receivable posting says \"a travel agent owes us this money and will remit it\". For a guest who walked in off the street there is no agent, so the posting creates a receivable against nobody. The cash was either taken at the desk and is now missing from the cash figure, or it was never taken at all.",
+      "business_rule": "No payment whose mode category is ota_receivable belongs to a reservation whose source is a walk-in.",
+      "canonical_engine": "none \u2014 read directly from the primary record",
+      "category": "C-DOMAIN",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "payments",
+        "payment_modes",
+        "reservations"
+      ],
+      "evidence_produced": "Per payment: reservation, source, ota_channel, mode, amount. Totalled so the exposure has a rupee value.",
+      "failure_message": "Walk-in reservations carry OTA receivable postings. Money is booked as owed by an agent that was never involved.",
+      "invariant_id": "INV-C01",
+      "likely_root_causes": [
+        "The payment mode list is presented unfiltered at the desk, so an OTA head can be picked for any booking",
+        "A booking imported from an OTA whose source was overwritten to walk-in during check-in",
+        "Test or seed data that was never cleaned out"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING",
+        "BUSINESS_DATE",
+        "NIGHT_AUDIT",
+        "HISTORICAL_REPLAY"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "UPDATE payments SET payment_mode_id =   (SELECT id FROM payment_modes WHERE category='ota_receivable'     ORDER BY id LIMIT 1) WHERE id = (SELECT MIN(p.id) FROM payments p             JOIN payment_modes m ON m.id = p.payment_mode_id             WHERE m.category = 'direct_payment')"
+      ],
+      "negative_seed_reason": "Repointing a direct payment at an OTA head creates exactly the forbidden pairing. On the current dataset the rule already fails, so the seed is verified by the violation count rising.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P5",
+        "P11"
+      ],
+      "severity": "CRITICAL",
+      "suggested_investigation": [
+        "Check whether ota_channel or ota_booking_id is set on the affected reservations \u2014 if not, the OTA head is certainly wrong",
+        "Confirm whether the desk UI restricts payment modes by booking source",
+        "Compare the total against the OTA receivable balance being chased"
+      ],
+      "title": "A walk-in reservation is never settled through an OTA receivable",
+      "validation_method": "Join payments to their mode and their reservation and report every ota_receivable posting on a walk-in booking. Source matching is case-insensitive and covers the spellings the dataset actually contains, because a rule that missed \"Walk-in\" while catching \"walk_in\" would report a clean result on a dirty system."
+    },
+    {
+      "affected_reports": [
+        "reports.ar_aging",
+        "main.reservation_folio",
+        "night audit folio control"
+      ],
+      "applicable_business_dates": "all",
+      "applicable_releases": "all",
+      "blocking": "CERTIFICATION_BLOCKING",
+      "business_purpose": "Letting a guest leave with money outstanding is a decision \u2014 a credit arrangement, a company account, a write-off. It is never an accident, and it must leave a trace. An unexplained outstanding balance on a departed guest is money the hotel has stopped being able to collect and has not decided to lose.",
+      "business_rule": "For every reservation with status CheckedOut: checked_out_at is set, and either settlement_balance <= 1.00 or the reservation carries a credit_amount, a company credit, or a credit note.",
+      "canonical_engine": "app.services.calculate_stay_amount",
+      "category": "C-DOMAIN",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "reservations",
+        "payments",
+        "extra_charges",
+        "credit_notes"
+      ],
+      "evidence_produced": "Per reservation: checkout time, settlement balance, the justification found or its absence.",
+      "failure_message": "Guests have departed with an unexplained outstanding balance.",
+      "invariant_id": "INV-C02",
+      "likely_root_causes": [
+        "A checkout route that warns about a balance but does not require a reason",
+        "A credit arrangement agreed verbally and never recorded",
+        "Charges posted after the guest departed"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING",
+        "SINGLE_RESERVATION"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "INSERT INTO extra_charges (reservation_id, folio_id, description, amount, charge_date,  charge_type, charge_category, is_correction, is_reversal) SELECT id, NULL, 'SEEDED unpaid charge', 7500.00, departure_date,   'food', 'Restaurant', 0, 0 FROM reservations WHERE status = 'CheckedOut'   AND COALESCE(credit_amount, 0) = 0 ORDER BY id LIMIT 1"
+      ],
+      "negative_seed_reason": "A 7,500 charge added to a departed guest with no credit arrangement leaves exactly the unexplained balance the rule forbids. The reservation is chosen for having NO credit_amount: the first version of this seed took the lowest-id checked-out reservation, which happens to carry a 200.00 credit, so the balance was correctly treated as justified and the seed went undetected \u2014 a broken seed, not a blind invariant.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P5",
+        "P11"
+      ],
+      "severity": "HIGH",
+      "suggested_investigation": [
+        "Compare the last charge's created_at against checked_out_at",
+        "Check whether the checkout route blocks or merely warns",
+        "Look for a matching credit_note issued later"
+      ],
+      "title": "A checked-out reservation is settled, or its balance is explained",
+      "validation_method": "Compute the settlement balance through the canonical engine and require either settlement or a recorded justification. The one rupee allowance is the invoice rounding the engine itself applies; anything larger is a real balance."
+    },
+    {
+      "affected_reports": [
+        "every financial report",
+        "night audit",
+        "billing.gst_report"
+      ],
+      "applicable_business_dates": "all",
+      "applicable_releases": "all",
+      "blocking": "RELEASE_BLOCKING",
+      "business_purpose": "A payment or a charge that points at no reservation still appears in the day's totals, but it cannot be billed, refunded, explained to a guest or attributed to a stay. It is money without a story.",
+      "business_rule": "Every payments, extra_charges and tax_lines row references an existing reservations row.",
+      "canonical_engine": "none \u2014 read directly from the primary record",
+      "category": "C-DOMAIN",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "payments",
+        "extra_charges",
+        "tax_lines",
+        "reservations"
+      ],
+      "evidence_produced": "Per orphan row: table, id, the reservation id it claims, amount.",
+      "failure_message": "Financial rows reference reservations that do not exist.",
+      "invariant_id": "INV-C03",
+      "likely_root_causes": [
+        "A reservation deleted without cascading its financial rows",
+        "A data import that wrote children before parents",
+        "Foreign keys not enforced on this database, so the state is reachable at any time"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "UPDATE payments SET reservation_id = 987654 WHERE id = (SELECT MIN(id) FROM payments)"
+      ],
+      "negative_seed_reason": "Repointing a payment at a reservation id that does not exist is the orphan state the rule forbids, and foreign keys are not enforced so it is a state the live system can reach.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P1",
+        "P5"
+      ],
+      "severity": "CRITICAL",
+      "suggested_investigation": [
+        "Check whether any delete path removes reservations directly",
+        "PRAGMA foreign_keys is off on this database \u2014 confirm whether enabling it is viable",
+        "Compare the orphans' created_at against known imports"
+      ],
+      "title": "Every financial event belongs to a reservation that exists",
+      "validation_method": "Left-join each financial table to reservations and report every row whose reservation is missing."
+    },
+    {
+      "affected_reports": [
+        "reports.room_status_report",
+        "night audit occupancy",
+        "main.dashboard",
+        "reports.front_office_mis"
+      ],
+      "applicable_business_dates": "all",
+      "applicable_releases": "all",
+      "blocking": "CERTIFICATION_BLOCKING",
+      "business_purpose": "Two guests cannot sleep in one room. A double allocation means either a guest was moved and the record not updated, or the same room night was sold twice \u2014 and if it was sold twice, occupancy, ADR and RevPAR are all overstated for that night.",
+      "business_rule": "For every room and every night, at most one reservation with status CheckedIn or CheckedOut spans that night in that room.",
+      "canonical_engine": "none \u2014 read directly from the primary record",
+      "category": "C-DOMAIN",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "reservations",
+        "rooms"
+      ],
+      "evidence_produced": "Per clash: room, night, the reservations involved.",
+      "failure_message": "A room is recorded as occupied by more than one reservation on the same night. Occupancy and rate metrics for that night are overstated.",
+      "invariant_id": "INV-C04",
+      "likely_root_causes": [
+        "A room move that assigned the new room without releasing the old",
+        "An allocation route with no availability check",
+        "A group booking assigned to one room by default"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "UPDATE reservations SET room_id =   (SELECT room_id FROM reservations WHERE room_id IS NOT NULL     ORDER BY id LIMIT 1),   arrival_date = (SELECT arrival_date FROM reservations                    WHERE room_id IS NOT NULL ORDER BY id LIMIT 1),   departure_date = (SELECT departure_date FROM reservations                      WHERE room_id IS NOT NULL ORDER BY id LIMIT 1) WHERE id = (SELECT MAX(id) FROM reservations)"
+      ],
+      "negative_seed_reason": "Copying one reservation's room and stay dates onto another puts two guests in one room for the same nights.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P5",
+        "P11"
+      ],
+      "severity": "HIGH",
+      "suggested_investigation": [
+        "Read the reservation_rooms bridge rows for the affected stays \u2014 a split-room stay may be modelled there rather than on the reservation",
+        "Check the created_at of the two reservations to see which was later",
+        "Compare against the night audit occupancy for that date"
+      ],
+      "title": "No room is occupied by two reservations on the same night",
+      "validation_method": "Expand every stay into its nights and count reservations per (room, night). Only CheckedIn and CheckedOut are counted: a cancelled or no-show booking does not occupy anything, and counting it would make the rule fire on ordinary overbooking protection."
+    },
+    {
+      "affected_reports": [
+        "reports.ota_reconciliation",
+        "reports.ota_settlement",
+        "reports.ar_aging"
+      ],
+      "applicable_business_dates": "all",
+      "applicable_releases": "all",
+      "blocking": "OPERATIONAL_WARNING",
+      "business_purpose": "An OTA receivable is only collectable if the hotel knows which agent owes it and against which booking reference. Without a channel and a booking id the receivable cannot be reconciled against the agent's remittance, and it sits on the ledger indefinitely.",
+      "business_rule": "Every reservation carrying a payment through an ota_receivable mode has a non-empty ota_channel and ota_booking_id.",
+      "canonical_engine": "none \u2014 read directly from the primary record",
+      "category": "C-DOMAIN",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "payments",
+        "payment_modes",
+        "reservations"
+      ],
+      "evidence_produced": "Per reservation: OTA amount posted, channel, booking id, which field is missing.",
+      "failure_message": "OTA receivables exist that cannot be attributed to an agent.",
+      "invariant_id": "INV-C05",
+      "likely_root_causes": [
+        "A manual OTA posting at the desk with no import behind it",
+        "An import that maps the amount but not the channel",
+        "A booking whose source was edited after import"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "UPDATE payments SET payment_mode_id =   (SELECT id FROM payment_modes WHERE category='ota_receivable'     ORDER BY id LIMIT 1) WHERE id = (SELECT MAX(id) FROM payments)"
+      ],
+      "negative_seed_reason": "Adding an OTA posting to a reservation that carries no channel or booking reference creates an unattributable receivable.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P5",
+        "P10"
+      ],
+      "severity": "MEDIUM",
+      "suggested_investigation": [
+        "Check whether the affected reservations came through an import or were created at the desk",
+        "Compare against the OTA settlement report to see whether these receivables have ever been collected"
+      ],
+      "title": "An OTA settlement identifies the agent it will be collected from",
+      "validation_method": "For each reservation with an OTA posting, require both identifying fields. Reported separately from INV-C01: a booking can be genuinely from an agent and still be missing its reference, and conflating the two would hide whichever is less common."
+    },
+    {
+      "affected_reports": [
+        "reports.ar_aging",
+        "reports.company_ledger",
+        "night audit folio control"
+      ],
+      "applicable_business_dates": "all",
+      "applicable_releases": "all",
+      "blocking": "CERTIFICATION_BLOCKING",
+      "business_purpose": "When a stay is billed to a company, the hotel is extending credit to that company and will invoice it. If the folio names no company, or names one that does not exist, there is nobody to invoice and the balance is uncollectable.",
+      "business_rule": "Every folio with a company_id references an existing companies row, and every reservation whose billing is corporate has a folio carrying a company.",
+      "canonical_engine": "none \u2014 read directly from the primary record",
+      "category": "C-DOMAIN",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "folios",
+        "companies",
+        "reservations"
+      ],
+      "evidence_produced": "Per folio: the company id claimed and whether it resolves; per corporate reservation: whether any folio names a company.",
+      "failure_message": "Corporate credit exists with no company account behind it.",
+      "invariant_id": "INV-C06",
+      "likely_root_causes": [
+        "A company deleted while folios still referenced it",
+        "A corporate booking created before the company record",
+        "Billing responsibility set on the reservation but not propagated to the folio"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "UPDATE folios SET company_id = 424242 WHERE id = (SELECT MIN(id) FROM folios)"
+      ],
+      "negative_seed_reason": "Pointing a folio at a company id that does not exist creates exactly the uncollectable corporate balance the rule forbids.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P1",
+        "P5"
+      ],
+      "severity": "HIGH",
+      "suggested_investigation": [
+        "Check whether the company delete path guards against existing folios",
+        "Compare Company.credit_used against the sum of the folios that name it"
+      ],
+      "title": "Corporate credit is backed by a company account that exists",
+      "validation_method": "Left-join folios to companies for the referential half, then check reservations flagged as corporate for a company-bearing folio. Corporate is detected from booking_type and from a non-zero credit_amount, both of which the schema uses."
+    },
+    {
+      "affected_reports": [
+        "main.reservation_folio",
+        "reports.ar_aging"
+      ],
+      "applicable_business_dates": "all",
+      "applicable_releases": "all",
+      "blocking": "RELEASE_BLOCKING",
+      "business_purpose": "A folio is a bill. A bill for no stay cannot be issued, chased or explained, but its charges and payments still appear in the hotel's totals.",
+      "business_rule": "Every folios row references an existing reservations row.",
+      "canonical_engine": "none \u2014 read directly from the primary record",
+      "category": "D-REFERENTIAL",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "folios",
+        "reservations"
+      ],
+      "evidence_produced": "Per orphan folio: id and the reservation id claimed.",
+      "failure_message": "Folios exist for reservations that do not.",
+      "invariant_id": "INV-D01",
+      "likely_root_causes": [
+        "A reservation deleted without cascading its folios",
+        "Foreign keys not enforced, so nothing at the database level prevents it"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "UPDATE folios SET reservation_id = 876543 WHERE id = (SELECT MIN(id) FROM folios)"
+      ],
+      "negative_seed_reason": "Repointing a folio at a reservation id that does not exist is the dangling reference the rule forbids.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P1",
+        "P5"
+      ],
+      "severity": "CRITICAL",
+      "suggested_investigation": [
+        "Check every delete path that touches reservations",
+        "Total the charges and payments routed to the orphan folios"
+      ],
+      "title": "Every folio references a reservation that exists",
+      "validation_method": "Left-join folios to reservations and report the misses."
+    },
+    {
+      "affected_reports": [
+        "reports.revenue",
+        "billing.gst_report",
+        "night audit payment summary"
+      ],
+      "applicable_business_dates": "all",
+      "applicable_releases": "all",
+      "blocking": "RELEASE_BLOCKING",
+      "business_purpose": "A correction is only auditable if you can see what it corrected. A reversal with no original is indistinguishable from a new negative transaction invented from nothing, and it is the classic shape of a concealed adjustment.",
+      "business_rule": "Every payments or extra_charges row flagged is_correction or is_reversal carries a corrects_id, and that id resolves to a row in the same table.",
+      "canonical_engine": "app.services.signed_extra_charge_amount",
+      "category": "D-REFERENTIAL",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "payments",
+        "extra_charges"
+      ],
+      "evidence_produced": "Per row: which flag is set, the corrects_id, whether it resolves, the amount involved.",
+      "failure_message": "A correction or reversal exists with no traceable original.",
+      "invariant_id": "INV-D02",
+      "likely_root_causes": [
+        "A correction UI that sets the flag but not the link",
+        "The original deleted after the correction was raised",
+        "A bulk adjustment written directly to the database"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "UPDATE payments SET is_reversal = 1 WHERE id = (SELECT MIN(id) FROM payments)"
+      ],
+      "negative_seed_reason": "Flagging a payment as a reversal without giving it a corrects_id creates a negative-signed entry with no original \u2014 the unauditable adjustment the rule forbids.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P1",
+        "P5",
+        "P11"
+      ],
+      "severity": "CRITICAL",
+      "suggested_investigation": [
+        "Read correction_reason on the affected rows",
+        "Check whether the correction path is transactional",
+        "Confirm signed_extra_charge_amount treats these rows as intended"
+      ],
+      "title": "Every correction and reversal references the transaction it corrects",
+      "validation_method": "Check the flag and the pointer together. A row flagged as a correction with no pointer is reported, and so is a pointer that does not resolve \u2014 they are different failures and each is named."
+    },
+    {
+      "affected_reports": [
+        "reports.flash",
+        "main.dashboard",
+        "night audit payment summary",
+        "reports.payment_collection"
+      ],
+      "applicable_business_dates": "all",
+      "applicable_releases": "all",
+      "blocking": "RELEASE_BLOCKING",
+      "business_purpose": "The payment mode decides whether money is cash in the drawer or a receivable from an agent. A payment whose mode is missing is counted as direct cash by the night audit and dropped entirely by the dashboard helpers, so the same rupees appear on one report and not the other.",
+      "business_rule": "Every payments row references an existing payment_modes row, and that row's category is one of direct_payment or ota_receivable.",
+      "canonical_engine": "app.kpi_helpers.get_cash_revenue and app.night_audit_service.NightAuditService.payment_summary",
+      "category": "D-REFERENTIAL",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "payments",
+        "payment_modes"
+      ],
+      "evidence_produced": "Per orphan payment: the mode id claimed and the amount, plus any mode whose category is outside the known set.",
+      "failure_message": "A payment references a payment mode that does not exist, or a mode carries an unrecognised category. The money will be counted differently by different reports.",
+      "invariant_id": "INV-D03",
+      "likely_root_causes": [
+        "A payment mode deactivated by deletion rather than is_active=0",
+        "A category value introduced without updating the consuming code",
+        "Foreign keys not enforced, so nothing prevents the dangling id"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "UPDATE payments SET payment_mode_id = 999999 WHERE id = (SELECT MIN(id) FROM payments)"
+      ],
+      "negative_seed_reason": "This is the exact live gap D3 found: an orphan mode is treated as direct cash by one engine and dropped by another, so the same money is counted twice differently.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P1",
+        "P3",
+        "P5"
+      ],
+      "severity": "CRITICAL",
+      "suggested_investigation": [
+        "Compare get_cash_revenue against the night audit total_collected for the affected date \u2014 they will differ by exactly the orphan amount",
+        "Check that mode deactivation uses is_active rather than DELETE"
+      ],
+      "title": "Every payment references a payment mode that exists",
+      "validation_method": "Left-join payments to payment_modes and report the misses, then check the category of every mode in use against the two the system understands."
+    },
+    {
+      "affected_reports": [
+        "billing.gst_report",
+        "billing.gstr_export",
+        "main.invoice"
+      ],
+      "applicable_business_dates": "all",
+      "applicable_releases": "all",
+      "blocking": "CERTIFICATION_BLOCKING",
+      "business_purpose": "A GST line must be traceable to the supply that gave rise to it. A tax line whose source cannot be identified cannot be defended in an assessment, and it cannot be reversed if the underlying charge is cancelled.",
+      "business_rule": "Every tax_lines row carries a charge_source_type and a charge_source_id, and where the source type is a known table the id resolves.",
+      "canonical_engine": "none \u2014 read directly from the primary record",
+      "category": "D-REFERENTIAL",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "tax_lines",
+        "extra_charges",
+        "reservations"
+      ],
+      "evidence_produced": "Per tax line: source type, source id, whether it resolves, the tax amount at stake.",
+      "failure_message": "Tax lines exist whose originating charge cannot be identified.",
+      "invariant_id": "INV-D04",
+      "likely_root_causes": [
+        "A tax line written before its charge was committed",
+        "A new charge source type added without updating the tax writer",
+        "The originating charge deleted, leaving the tax line behind"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "UPDATE tax_lines SET charge_source_id = 'night_1999-01-01' WHERE id = (SELECT MIN(id) FROM tax_lines             WHERE charge_source_type = 'room_night')"
+      ],
+      "negative_seed_reason": "Pointing a room-night tax line at a night the guest never stayed makes it untraceable to any supply. The seed does not set the column to NULL: charge_source_id is NOT NULL, and the first version of this seed raised an IntegrityError, which the suite correctly reported as a broken seed rather than a blind invariant.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P1",
+        "P5"
+      ],
+      "severity": "HIGH",
+      "suggested_investigation": [
+        "Group the failures by charge_source_type to see whether one type accounts for all of them",
+        "Compare against INV-A05 \u2014 a line with no source may also have no valid base"
+      ],
+      "title": "Every tax line names the charge it was raised on",
+      "validation_method": "Require both source fields, then resolve the id against the table the type names. Source types the engine does not recognise are reported as unresolvable rather than assumed valid, so a new source type cannot slip in unnoticed."
+    },
+    {
+      "affected_reports": [
+        "reports.refund_report",
+        "billing.gst_report",
+        "reports.revenue"
+      ],
+      "applicable_business_dates": "all",
+      "applicable_releases": "all",
+      "blocking": "CERTIFICATION_BLOCKING",
+      "business_purpose": "A void and a credit note both remove money that was previously recognised. Each is only auditable if the thing it removed can still be identified \u2014 otherwise the reduction stands with nothing behind it.",
+      "business_rule": "Every void_requests row references an existing payment, and every credit_notes row references an existing reservation.",
+      "canonical_engine": "none \u2014 read directly from the primary record",
+      "category": "D-REFERENTIAL",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "void_requests",
+        "payments",
+        "credit_notes",
+        "reservations"
+      ],
+      "evidence_produced": "Per orphan: the record, what it claims to reference, the amount.",
+      "failure_message": "A void or credit note exists with nothing behind it.",
+      "invariant_id": "INV-D05",
+      "likely_root_causes": [
+        "A payment hard-deleted instead of voided",
+        "A credit note raised against a reservation later removed",
+        "A void request left behind after its payment was purged"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "INSERT INTO void_requests (payment_id, requested_by_user_id, requested_at, reason, status) VALUES (555444, 1, '2026-01-01 00:00:00', 'SEEDED', 'Pending')"
+      ],
+      "negative_seed_reason": "A void request against a payment that does not exist is a reduction with nothing behind it.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P1",
+        "P5",
+        "P11"
+      ],
+      "severity": "HIGH",
+      "suggested_investigation": [
+        "Check whether any path deletes payments rather than voiding them",
+        "Total the credit notes with no reservation \u2014 that is revenue reduced against nothing"
+      ],
+      "title": "Every void request and credit note references what it cancels",
+      "validation_method": "Left-join each cancellation record to what it claims to cancel. Both tables are checked in one invariant because they are the same obligation \u2014 a reduction must name what it reduced \u2014 and splitting them would make the constitutional coverage read as broader than it is."
+    },
+    {
+      "affected_reports": [
+        "reports.revenue",
+        "night audit revenue summary",
+        "reports.front_office_mis"
+      ],
+      "applicable_business_dates": "all",
+      "applicable_releases": "all",
+      "blocking": "RELEASE_BLOCKING",
+      "business_purpose": "The nightly rate rows are what room revenue is earned from. A row whose reservation does not exist, or whose stay date falls outside the stay it belongs to, contributes revenue to a night the hotel did not sell.",
+      "business_rule": "Every reservation_night_rates row references an existing reservation, and its stay_date satisfies arrival_date <= stay_date < departure_date.",
+      "canonical_engine": "app.services.get_room_revenue",
+      "category": "D-REFERENTIAL",
+      "commissioning_status": "COMMISSIONED",
+      "data_sources": [
+        "reservation_night_rates",
+        "reservations"
+      ],
+      "evidence_produced": "Per row: reservation, stay window, stay date, rate at stake.",
+      "failure_message": "Priced room nights exist outside the stay they belong to.",
+      "invariant_id": "INV-D06",
+      "likely_root_causes": [
+        "A stay shortened or extended without regenerating the nightly rows",
+        "A date-shift correction applied to the reservation only",
+        "Nightly rows generated before the dates were finalised"
+      ],
+      "modes": [
+        "ENTIRE_DATABASE",
+        "RELEASE_VERIFICATION",
+        "REGRESSION_DATASET",
+        "CONTINUOUS_MONITORING"
+      ],
+      "negative_patch": [],
+      "negative_patch_reason": "",
+      "negative_seed": [
+        "UPDATE reservation_night_rates SET stay_date = DATE(stay_date, '+90 day') WHERE id = (SELECT MIN(id) FROM reservation_night_rates)"
+      ],
+      "negative_seed_reason": "Moving one priced night ninety days out of its stay attributes room revenue to a night the guest was not present.",
+      "not_seedable_reason": "",
+      "principles": [
+        "P1",
+        "P5",
+        "P8"
+      ],
+      "severity": "HIGH",
+      "suggested_investigation": [
+        "Compare the nightly rows' created_at against the reservation's updated dates",
+        "Check whether the date-change path regenerates nightly rows",
+        "Total the out-of-window rates \u2014 that is revenue attributed to nights that were not sold"
+      ],
+      "title": "Every priced room night belongs to a stay that covers that night",
+      "validation_method": "Join each nightly row to its reservation and bound its stay date by the stay window."
+    }
+  ],
+  "mode_matrix": {
+    "BUSINESS_DATE": [
+      "INV-A02",
+      "INV-A04",
+      "INV-A05",
+      "INV-B01",
+      "INV-B02",
+      "INV-B03",
+      "INV-B06",
+      "INV-C01"
+    ],
+    "CONTINUOUS_MONITORING": [
+      "INV-A01",
+      "INV-A02",
+      "INV-A03",
+      "INV-A04",
+      "INV-A05",
+      "INV-A06",
+      "INV-B01",
+      "INV-B02",
+      "INV-B03",
+      "INV-B04",
+      "INV-B05",
+      "INV-B06",
+      "INV-C01",
+      "INV-C02",
+      "INV-C03",
+      "INV-C04",
+      "INV-C05",
+      "INV-C06",
+      "INV-D01",
+      "INV-D02",
+      "INV-D03",
+      "INV-D04",
+      "INV-D05",
+      "INV-D06"
+    ],
+    "ENTIRE_DATABASE": [
+      "INV-A01",
+      "INV-A02",
+      "INV-A03",
+      "INV-A04",
+      "INV-A05",
+      "INV-A06",
+      "INV-B01",
+      "INV-B02",
+      "INV-B03",
+      "INV-B04",
+      "INV-B05",
+      "INV-B06",
+      "INV-C01",
+      "INV-C02",
+      "INV-C03",
+      "INV-C04",
+      "INV-C05",
+      "INV-C06",
+      "INV-D01",
+      "INV-D02",
+      "INV-D03",
+      "INV-D04",
+      "INV-D05",
+      "INV-D06"
+    ],
+    "HISTORICAL_REPLAY": [
+      "INV-A02",
+      "INV-A04",
+      "INV-A05",
+      "INV-B01",
+      "INV-B02",
+      "INV-B03",
+      "INV-B06",
+      "INV-C01"
+    ],
+    "NIGHT_AUDIT": [
+      "INV-A02",
+      "INV-A04",
+      "INV-A05",
+      "INV-B01",
+      "INV-B02",
+      "INV-B03",
+      "INV-B06",
+      "INV-C01"
+    ],
+    "REGRESSION_DATASET": [
+      "INV-A01",
+      "INV-A02",
+      "INV-A03",
+      "INV-A05",
+      "INV-A06",
+      "INV-B01",
+      "INV-B02",
+      "INV-B03",
+      "INV-B04",
+      "INV-B05",
+      "INV-B06",
+      "INV-C01",
+      "INV-C02",
+      "INV-C03",
+      "INV-C04",
+      "INV-C05",
+      "INV-C06",
+      "INV-D01",
+      "INV-D02",
+      "INV-D03",
+      "INV-D04",
+      "INV-D05",
+      "INV-D06"
+    ],
+    "RELEASE_VERIFICATION": [
+      "INV-A01",
+      "INV-A02",
+      "INV-A03",
+      "INV-A04",
+      "INV-A05",
+      "INV-A06",
+      "INV-B01",
+      "INV-B02",
+      "INV-B03",
+      "INV-B04",
+      "INV-B05",
+      "INV-B06",
+      "INV-C01",
+      "INV-C02",
+      "INV-C03",
+      "INV-C04",
+      "INV-C05",
+      "INV-C06",
+      "INV-D01",
+      "INV-D02",
+      "INV-D03",
+      "INV-D04",
+      "INV-D05",
+      "INV-D06"
+    ],
+    "SINGLE_RESERVATION": [
+      "INV-A01",
+      "INV-A06",
+      "INV-C02"
+    ]
+  },
+  "principle_matrix": {
+    "P1": [
+      "INV-A01",
+      "INV-A02",
+      "INV-A03",
+      "INV-A04",
+      "INV-A05",
+      "INV-A06",
+      "INV-C03",
+      "INV-C06",
+      "INV-D01",
+      "INV-D02",
+      "INV-D03",
+      "INV-D04",
+      "INV-D05",
+      "INV-D06"
+    ],
+    "P10": [
+      "INV-A06",
+      "INV-B05",
+      "INV-B06",
+      "INV-C05"
+    ],
+    "P11": [
+      "INV-A01",
+      "INV-A05",
+      "INV-B02",
+      "INV-B04",
+      "INV-C01",
+      "INV-C02",
+      "INV-C04",
+      "INV-D02",
+      "INV-D05"
+    ],
+    "P12": [
+      "INV-B01",
+      "INV-B02",
+      "INV-B03"
+    ],
+    "P2": [
+      "INV-B01",
+      "INV-B02",
+      "INV-B03"
+    ],
+    "P3": [
+      "INV-A04",
+      "INV-D03"
+    ],
+    "P4": [
+      "INV-B03"
+    ],
+    "P5": [
+      "INV-A02",
+      "INV-A03",
+      "INV-A06",
+      "INV-C01",
+      "INV-C02",
+      "INV-C03",
+      "INV-C04",
+      "INV-C05",
+      "INV-C06",
+      "INV-D01",
+      "INV-D02",
+      "INV-D03",
+      "INV-D04",
+      "INV-D05",
+      "INV-D06"
+    ],
+    "P7": [
+      "INV-B01",
+      "INV-B02",
+      "INV-B03",
+      "INV-B05"
+    ],
+    "P8": [
+      "INV-A04",
+      "INV-B03",
+      "INV-B04",
+      "INV-B05",
+      "INV-B06",
+      "INV-D06"
+    ]
+  },
+  "severity_matrix": {
+    "CRITICAL": {
+      "CERTIFICATION_BLOCKING": [
+        "INV-A05",
+        "INV-C01"
+      ],
+      "RELEASE_BLOCKING": [
+        "INV-A01",
+        "INV-A04",
+        "INV-B01",
+        "INV-B02",
+        "INV-B03",
+        "INV-B04",
+        "INV-C03",
+        "INV-D01",
+        "INV-D02",
+        "INV-D03"
+      ]
+    },
+    "HIGH": {
+      "CERTIFICATION_BLOCKING": [
+        "INV-A02",
+        "INV-A06",
+        "INV-B05",
+        "INV-C02",
+        "INV-C04",
+        "INV-C06",
+        "INV-D04",
+        "INV-D05"
+      ],
+      "RELEASE_BLOCKING": [
+        "INV-A03",
+        "INV-D06"
+      ]
+    },
+    "MEDIUM": {
+      "OPERATIONAL_WARNING": [
+        "INV-B06",
+        "INV-C05"
+      ]
+    }
+  }
+}

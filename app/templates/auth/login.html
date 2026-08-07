@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#C2410C">
+    <title>{{ config.HOTEL_NAME }} — Staff Login</title>
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap-icons/font/bootstrap-icons.css') }}">
+    <style>
+        :root {
+            --warm-primary: #C2410C;
+            --warm-primary-dark: #9A3412;
+            --warm-cream: #FFF7ED;
+            --warm-text: #3F2A1D;
+            --warm-text-muted: #7C5240;
+            --warm-border: #E8D5C4;
+        }
+        * { box-sizing: border-box; }
+        body {
+            background: linear-gradient(145deg, #C2410C 0%, #9A3412 45%, #7C2D12 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .login-wrap {
+            width: 100%;
+            max-width: 400px;
+        }
+        .login-card {
+            background: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 24px 64px rgba(63, 42, 29, 0.3);
+            padding: 2.25rem 2rem;
+            width: 100%;
+        }
+        .hotel-logo {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #C2410C, #9A3412);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.25rem;
+            box-shadow: 0 4px 16px rgba(194, 65, 12, 0.35);
+        }
+        .hotel-logo i { font-size: 1.875rem; color: #fff; }
+        .login-title { font-size: 1.35rem; font-weight: 700; color: var(--warm-text); }
+        .login-subtitle { color: var(--warm-text-muted); font-size: 0.8125rem; }
+        .form-label { font-weight: 500; color: var(--warm-text); font-size: 0.875rem; }
+        .form-control {
+            border: 1.5px solid var(--warm-border);
+            border-left: none;
+            border-radius: 0 0.5rem 0.5rem 0;
+            color: var(--warm-text);
+            min-height: 44px;
+        }
+        .form-control:focus {
+            border-color: var(--warm-primary);
+            box-shadow: 0 0 0 0.2rem rgba(194, 65, 12, 0.15);
+        }
+        .form-control.left-border { border-left: 1.5px solid var(--warm-border); border-radius: 0.5rem; }
+        .input-group-text {
+            background: var(--warm-cream);
+            border: 1.5px solid var(--warm-border);
+            border-right: none;
+            border-radius: 0.5rem 0 0 0.5rem;
+            color: var(--warm-text-muted);
+            min-height: 44px;
+        }
+        .btn-login {
+            background: linear-gradient(135deg, var(--warm-primary), #9A3412);
+            border: none;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            min-height: 48px;
+            border-radius: 0.5rem;
+            transition: all 0.18s;
+            box-shadow: 0 4px 12px rgba(194, 65, 12, 0.3);
+        }
+        .btn-login:hover {
+            background: linear-gradient(135deg, #9A3412, #7C2D12);
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(194, 65, 12, 0.4);
+            transform: translateY(-1px);
+        }
+        .btn-outline-secondary {
+            border: 1.5px solid var(--warm-border);
+            color: var(--warm-text-muted);
+            background: var(--warm-cream);
+            min-height: 44px;
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+        .btn-outline-secondary:hover { background: var(--warm-primary); color: #fff; border-color: var(--warm-primary); }
+        .form-check-input:checked { background-color: var(--warm-primary); border-color: var(--warm-primary); }
+        .brand-hint { font-size: 0.7rem; color: var(--warm-text-muted); margin-top: 1.25rem; }
+        .alert-danger  { background:#FEF2F2; border-left:4px solid #DC2626; color:#991B1B; border-radius:0.5rem; }
+        .alert-success { background:#ECFCCB; border-left:4px solid #6B8E23; color:#4A6117; border-radius:0.5rem; }
+        .alert-warning { background:#FFFBEB; border-left:4px solid #D97706; color:#92400E; border-radius:0.5rem; }
+    </style>
+</head>
+<body>
+    <div class="login-wrap">
+    <div class="login-card">
+        <div class="hotel-logo">
+            <i class="bi bi-building"></i>
+        </div>
+        <div class="text-center mb-4">
+            <div class="login-title">{{ config.HOTEL_NAME }}</div>
+            <div class="login-subtitle">Front Office Management System</div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show py-2" role="alert">
+                <i class="bi bi-{% if category == 'danger' %}exclamation-circle{% elif category == 'success' %}check-circle{% else %}info-circle{% endif %} me-1"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('auth.login') }}{% if request.args.get('next') %}?next={{ request.args.get('next') }}{% endif %}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Username</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                    <input type="text" class="form-control" name="username"
+                           placeholder="Enter your username"
+                           value="{{ request.form.get('username', '') }}"
+                           autocomplete="username" required autofocus>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Password</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                    <input type="password" class="form-control" name="password"
+                           id="passwordField"
+                           placeholder="Enter your password"
+                           autocomplete="current-password" required>
+                    <button type="button" class="btn btn-outline-secondary"
+                            onclick="togglePassword()" title="Show/Hide">
+                        <i class="bi bi-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" name="remember" id="rememberMe">
+                <label class="form-check-label text-secondary" for="rememberMe">Keep me signed in</label>
+            </div>
+            <button type="submit" class="btn btn-login w-100">
+                <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+            </button>
+        </form>
+
+        <div class="text-center brand-hint">
+            <i class="bi bi-shield-lock me-1"></i>
+            Authorised staff only · All access is logged
+        </div>
+    </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script nonce="{{ csp_nonce }}">
+        function togglePassword() {
+            const field = document.getElementById('passwordField');
+            const icon = document.getElementById('eyeIcon');
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.className = 'bi bi-eye-slash';
+            } else {
+                field.type = 'password';
+                icon.className = 'bi bi-eye';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/health",
+  "anon_status": 302,
+  "body_bytes": 45,
+  "body_sha256": "8ca208ba5f4ebdf588e0dcc62cb46db58e27d7470513afe30e677f5aeeea333c",
+  "category": "PUBLIC",
+  "content_type": "application/json",
+  "duration_ms": 3,
+  "endpoint": "main.health",
+  "error": "",
+  "figure_source": "json",
+  "figures": {
+    "$[len]": "3"
+  },
+  "location": "",
+  "normalisation_hits": {},
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "INFO",
+  "status": 200,
+  "surface_id": "main.health",
+  "templates": [],
+  "truncations": [],
+  "url": "/health"
+}

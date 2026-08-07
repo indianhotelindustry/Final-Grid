@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{# ── OTA Payout Reconciliation — Phase 2 ─────────────────────────────
+   Sits ON TOP of the existing /reports/ota-receivables report (which
+   shows what the hotel is OWED). This page shows what has actually
+   been PAID, the gap, and how late each channel is.
+─────────────────────────────────────────────────────────────────── #}
+
+{% block content %}
+<div class="container-fluid mt-3" id="otaReconciliationPage">
+
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+            <h4 class="mb-0">
+                <i class="bi bi-arrow-left-right text-primary"></i>
+                OTA Payout Reconciliation
+            </h4>
+            <div class="text-muted small">
+                Match channel-manager payouts against OTA receivables
+                · As of <strong>{{ summary.as_of }}</strong>
+            </div>
+        </div>
+        <div>
+            <a href="{{ url_for('reports.ota_receivables') }}"
+               class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-receipt"></i> OTA Receivables
+            </a>
+        </div>
+    </div>
+
+    {# ── Date range filter (applies to in-range columns only) ──── #}
+    <form method="GET" class="row g-2 mb-3 align-items-end">
+        <div class="col-auto">
+            <label class="form-label small mb-0">From</label>
+            <input type="date" name="from" class="form-control form-control-sm"
+                   value="{{ from_date }}">
+        </div>
+        <div class="col-auto">
+            <label class="form-label small mb-0">To</label>
+            <input type="date" name="to" class="form-control form-control-sm"
+                   value="{{ to_date }}">
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-sm btn-primary">
+                <i class="bi bi-funnel"></i> Filter
+            </button>
+        </div>
+    </form>
+
+    {# ── Totals strip ───────────────────────────────────────────── #}
+    <style>
+    .recon-totals { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
+    @media (min-width: 768px) { .recon-totals { grid-template-columns: repeat(4, 1fr); } }
+    .recon-card { background: #fff; border: 1px solid #e9ecef; border-radius: 8px; padding: 10px 14px; }
+    .recon-card .label { font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+    .recon-card .val   { font-size: 1.3rem; font-weight: 800; color: #111827; line-height: 1.2; }
+    .recon-card.danger { border-left: 3px solid #ef4444; }
+    .recon-card.warn   { border-left: 3px solid #f59e0b; }
+    .recon-card.ok     { border-left: 3px solid #10b981; }
+
+    .recon-table { width: 100%; font-size: 0.82rem; background: #fff; border-radius: 8px; overflow: hidden; }
+    .recon-table th { font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; padding: 8px 10px; background: #f9fafb; border-bottom: 1px solid #e9ecef; }
+    .recon-table td { padding: 9px 10px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; font-variant-numeric: tabular-nums; }
+    .recon-table tr:last-child td { border-bottom: none; }
+    .recon-table .num { text-align: right; }
+    .badge-status { font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 12px; }
+    .badge-status.ok      { background: #d1fae5; color: #065f46; }
+    .badge-status.warn    { background: #fef3c7; color: #92400e; }
+    .badge-status.danger  { background: #fee2e2; color: #991b1b; }
+    .badge-status.healthy { background: #d1fae5; color: #065f46; }
+
+    .recon-section { background: #fff; border: 1px solid #e9ecef; border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; }
+    .recon-section h6 { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #6b7280; margin-bottom: 10px; }
+    </style>
+
+    {% set t = summary.totals %}
+    <div class="recon-totals">
+        <div class="recon-card">
+            <div class="label">Channels Tracked</div>
+            <div class="val">{{ t.channel_count }}</div>
+        </div>
+        <div class="recon-card ok">
+            <div class="label">Revenue (in range)</div>
+            <div class="val">₹{{ "{:,.0f}".format(t.revenue_in_range) }}</div>
+        </div>
+        <div class="recon-card ok">
+            <div class="label">Paid (in range)</div>
+            <div class="val">₹{{ "{:,.0f}".format(t.paid_in_range) }}</div>
+        </div>
+        <div class="recon-card {% if t.pending > 0 %}{% if t.max_delay_days > 7 %}danger{% else %}warn{% endif %}{% else %}ok{% endif %}">
+            <div class="label">Total Pending (lifetime)</div>
+            <div class="val">₹{{ "{:,.0f}".format(t.pending) }}</div>
+            <div class="text-muted" style="font-size:0.6rem;">max delay: {{ t.max_delay_days }} day(s)</div>
+        </div>
+    </div>
+
+    {# ── Per-channel table ──────────────────────────────────────── #}
+    <div class="recon-section">
+        <h6>Channel Reconciliation</h6>
+        <div class="table-responsive">
+            <table class="recon-table">
+                <thead>
+                    <tr>
+                        <th>Channel</th>
+                        <th class="num">Cycle</th>
+                        <th class="num">Revenue ({{ from_date }} → {{ to_date }})</th>
+                        <th class="num">Paid (in range)</th>
+                        <th class="num">Pending (lifetime)</th>
+                        <th class="num">Last Payout</th>
+                        <th class="num">Delay</th>
+                        <th class="num">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in summary.rows %}
+                    <tr>
+                        <td><strong>{{ r.channel }}</strong></td>
+                        <td class="num">{{ r.cycle_days }} d</td>
+                        <td class="num">₹{{ "{:,.0f}".format(r.revenue_in_range) }}</td>
+                        <td class="num">₹{{ "{:,.0f}".format(r.paid_in_range) }}</td>
+                        <td class="num"><strong>₹{{ "{:,.0f}".format(r.pending) }}</strong></td>
+                        <td class="num">{{ r.last_payout_date or '—' }}</td>
+                        <td class="num">{{ r.delay_days }} d</td>
+                        <td class="num">
+                            <span class="badge-status {{ r.status }}">
+                                {% if r.status == 'healthy' %}On time
+                                {% elif r.status == 'warn' %}Warning
+                                {% elif r.status == 'danger' %}Overdue
+                                {% else %}{{ r.status }}{% endif %}
+                            </span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="8" class="text-muted text-center py-3">
+                        No OTA channels with revenue or payouts yet.
+                    </td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {# ── Add payout form ────────────────────────────────────────── #}
+    <div class="recon-section">
+        <h6><i class="bi bi-plus-circle"></i> Record OTA Payout</h6>
+        <form method="POST" action="{{ url_for('reports.add_ota_payout') }}"
+              class="row g-2 align-items-end">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}">
+            <div class="col-md-2">
+                <label class="form-label form-label-sm">Channel *</label>
+                <select name="ota_channel" class="form-select form-select-sm" required>
+                    <option value="">Select…</option>
+                    {% for src in ota_sources %}
+                    <option value="{{ src }}">{{ src }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label form-label-sm">Payout Date *</label>
+                <input type="date" name="payout_date" class="form-control form-control-sm" required>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label form-label-sm">Reference #</label>
+                <input type="text" name="reference_number" class="form-control form-control-sm"
+                       placeholder="UTR / Statement ref">
+            </div>
+            <div class="col-md-1">
+                <label class="form-label form-label-sm">Gross *</label>
+                <input type="number" step="0.01" min="0" name="gross_amount"
+                       class="form-control form-control-sm" required>
+            </div>
+            <div class="col-md-1">
+                <label class="form-label form-label-sm">Commission</label>
+                <input type="number" step="0.01" min="0" name="commission_amount"
+                       class="form-control form-control-sm" value="0">
+            </div>
+            <div class="col-md-1">
+                <label class="form-label form-label-sm">Tax</label>
+                <input type="number" step="0.01" min="0" name="tax_deducted"
+                       class="form-control form-control-sm" value="0">
+            </div>
+            <div class="col-md-1">
+                <label class="form-label form-label-sm">Net Paid</label>
+                <input type="number" step="0.01" min="0" name="net_paid"
+                       class="form-control form-control-sm"
+                       placeholder="auto">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label form-label-sm">Remarks</label>
+                <input type="text" name="remarks" class="form-control form-control-sm">
+            </div>
+            <div class="col-md-12 mt-2">
+                <button type="submit" class="btn btn-sm btn-success">
+                    <i class="bi bi-check-circle"></i> Record Payout
+                </button>
+                <span class="text-muted small ms-2">
+                    If Net is left blank it auto-computes as Gross − Commission − Tax.
+                </span>
+            </div>
+        </form>
+    </div>
+
+    {# ── Recent payouts table ───────────────────────────────────── #}
+    <div class="recon-section">
+        <h6>Recent Payouts (latest 50)</h6>
+        <div class="table-responsive">
+            <table class="recon-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Channel</th>
+                        <th>Reference</th>
+                        <th class="num">Gross</th>
+                        <th class="num">Commission</th>
+                        <th class="num">Tax</th>
+                        <th class="num">Net Paid</th>
+                        <th>Remarks</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in recent_payouts %}
+                    <tr>
+                        <td>{{ p.payout_date }}</td>
+                        <td>{{ p.ota_channel }}</td>
+                        <td>{{ p.reference_number or '—' }}</td>
+                        <td class="num">₹{{ "{:,.0f}".format(p.gross_amount) }}</td>
+                        <td class="num">₹{{ "{:,.0f}".format(p.commission_amount) }}</td>
+                        <td class="num">₹{{ "{:,.0f}".format(p.tax_deducted) }}</td>
+                        <td class="num"><strong>₹{{ "{:,.0f}".format(p.net_paid) }}</strong></td>
+                        <td class="text-muted" style="font-size:0.7rem;">{{ p.remarks or '' }}</td>
+                        <td>
+                            <form method="POST"
+                                  action="{{ url_for('reports.delete_ota_payout', payout_id=p.id) }}"
+                                  onsubmit="return confirm('Delete this payout?');"
+                                  class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}">
+                                <button class="btn btn-sm btn-link text-danger p-0" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="9" class="text-muted text-center py-3">
+                        No payouts recorded yet.
+                    </td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,585 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Room Revenue Report — {{ from_date.strftime('%d %b') }} to {{ to_date.strftime('%d %b %Y') }}{% endblock %}
+{% block report_name %}Room Revenue Report{% endblock %}
+
+{% block styles %}
+<style>
+/* ══════════════════════════════════════════════════════════════════════════
+   PRINT / PDF — injected into <head> so Chrome PDF renderer picks it up
+   ══════════════════════════════════════════════════════════════════════════ */
+@media print {
+    /* 1. Kill every navbar, sidebar, breadcrumb, toast, filter bar — including
+          sticky/fixed elements that escape visibility:hidden            */
+    nav.navbar,
+    nav[aria-label="breadcrumb"],
+    hr.d-print-none,
+    .d-print-none,
+    .toast-container      { display: none !important; }
+
+    /* 2. Strip container padding so #print-area fills the page            */
+    .container-fluid      { padding: 0 !important; margin-top: 0 !important; }
+    body                  { margin: 0 !important; padding: 0 !important; }
+
+    /* 3. Isolate the print-area; everything else invisible                */
+    body *                { visibility: hidden; }
+    #print-area,
+    #print-area *         { visibility: visible; }
+    #print-area           { position: absolute; top: 0; left: 0; width: 100%; }
+
+    /* 4. Page setup                                                        */
+    @page                 { size: A4 landscape; margin: 1.2cm 1.5cm; }
+
+    /* 5. Typography                                                        */
+    #print-area           { font-size: 10px; color: #000; font-family: Arial, sans-serif; }
+
+    /* 6. Section titles                                                    */
+    .rr-section-title {
+        font-size: 10pt; font-weight: 700;
+        border-bottom: 1.5pt solid #333;
+        margin: 10pt 0 4pt; padding-bottom: 2pt;
+    }
+    .rr-section-title .badge,
+    .rr-section-title i   { display: none; }
+
+    /* 7. Tables — full-width, visible borders, repeating headers          */
+    .rr-table {
+        width: 100% !important;
+        font-size: 9px;
+        border-collapse: collapse;
+        table-layout: auto;
+    }
+    .rr-table th,
+    .rr-table td {
+        border: 0.5pt solid #999 !important;
+        padding: 2px 4px !important;
+        word-break: break-word;
+    }
+    .rr-table thead       { display: table-header-group; }   /* repeat */
+    .rr-table tr          { page-break-inside: avoid; }
+
+    /* 8. Coloured headers must print                                       */
+    .rr-thead-blue th { background: #1F4E79 !important; color: #fff !important;
+                        -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .rr-thead-green th{ background: #198754 !important; color: #fff !important;
+                        -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .rr-thead-amber th{ background: #b45309 !important; color: #fff !important;
+                        -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .rr-thead-teal th { background: #0e7490 !important; color: #fff !important;
+                        -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .rr-thead-red th  { background: #b91c1c !important; color: #fff !important;
+                        -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .rr-tfoot         { background: #f0f0f0 !important;
+                        -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .rr-kpi-table th  { background: #e8eaf6 !important;
+                        -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+    /* 9. KPI table sizing                                                  */
+    .rr-kpi-table      { font-size: 9px; }
+
+    /* 10. Negative values                                                  */
+    .rr-neg            { color: #c00 !important; }
+
+    /* 11. Remove Bootstrap scroll wrappers that clip content              */
+    .table-responsive  { overflow: visible !important; }
+
+    /* 12. Sections — allow natural page-break logic                       */
+    .rr-section        { page-break-before: auto; }
+}
+</style>
+{% endblock %}
+
+{% block report_content %}
+
+{# ══════════════════════════════════════════════════════════════════════════
+   FILTER BAR  — screen only, never printed
+   ══════════════════════════════════════════════════════════════════════════ #}
+<form method="get" class="d-print-none mb-3">
+    <div class="row g-2 align-items-end">
+        <div class="col-auto">
+            <label class="form-label form-label-sm mb-0">From</label>
+            <input type="date" name="from" class="form-control form-control-sm"
+                   value="{{ from_date.isoformat() }}">
+        </div>
+        <div class="col-auto">
+            <label class="form-label form-label-sm mb-0">To</label>
+            <input type="date" name="to" class="form-control form-control-sm"
+                   value="{{ to_date.isoformat() }}">
+        </div>
+        <div class="col-auto">
+            <label class="form-label form-label-sm mb-0">Room Type</label>
+            <select name="room_type" class="form-select form-select-sm">
+                <option value="">All Types</option>
+                {% for rt in all_rt_names %}
+                <option value="{{ rt }}" {% if rt_filter == rt %}selected{% endif %}>{{ rt }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-auto d-flex gap-2">
+            <button type="submit" class="btn btn-sm btn-primary">Apply</button>
+            <a href="{{ url_for('reports.room_revenue') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+        </div>
+        <div class="col-auto ms-auto d-flex gap-2">
+            <a href="{{ url_for('reports.room_revenue',
+                        **({'from': from_str, 'to': to_str, 'room_type': rt_filter, 'format': 'excel'})
+                      ) }}"
+               class="btn btn-sm btn-outline-success">
+                <i class="bi bi-file-earmark-excel me-1"></i>Excel (6 sheets)
+            </a>
+            <button type="button" id="rr-print-btn" class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-printer me-1"></i>Print / PDF
+            </button>
+        </div>
+    </div>
+</form>
+
+{# ══════════════════════════════════════════════════════════════════════════
+   PRINT AREA  — everything inside here is printed
+   ══════════════════════════════════════════════════════════════════════════ #}
+<div id="print-area">
+
+{# ── Print header ──────────────────────────────────────────────────────── #}
+<div class="rr-print-header d-none d-print-block mb-2">
+    <table style="width:100%;border:none;">
+        <tr>
+            <td style="border:none;padding:0;">
+                <strong style="font-size:13pt;">Room Revenue Report</strong><br>
+                <span style="font-size:9pt;color:#555;">
+                    Period: {{ from_date.strftime('%d %b %Y') }} &mdash; {{ to_date.strftime('%d %b %Y') }}
+                    ({{ summary.num_days }} day{{ 's' if summary.num_days != 1 else '' }})
+                    {% if rt_filter %}&nbsp;|&nbsp; Room Type: {{ rt_filter }}{% endif %}
+                </span>
+            </td>
+            <td style="border:none;padding:0;text-align:right;vertical-align:top;">
+                <span style="font-size:8pt;color:#888;">Generated: {{ now.strftime('%d %b %Y %H:%M') }}</span>
+            </td>
+        </tr>
+    </table>
+    <hr style="margin:4px 0 6px;border-top:1px solid #333;">
+</div>
+
+{# ── 1. KPI summary ── screen: cards  /  print: compact horizontal table ── #}
+
+{# Screen KPI cards (hidden in print) #}
+<div class="row g-3 mb-4 d-print-none">
+    {% set kpis = [
+        ('Total Rooms',      summary.total_rooms,           ''),
+        ('Available Nights', summary.available_room_nights, ''),
+        ('Room Nights Sold', summary.occupied_room_nights,  ''),
+        ('Utilisation',      summary.occupancy_pct,         '%'),
+        ('Total Revenue',    summary.total_revenue,         '₹'),
+        ('ADR',              summary.arr,                   '₹'),
+        ('RevPAR',           summary.revpar,                '₹'),
+        ('Discount Total',   summary.discount_total,        '₹'),
+    ] %}
+    {% for label, val, prefix in kpis %}
+    <div class="col-6 col-sm-4 col-xl-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body py-2 px-3">
+                <div class="text-muted small mb-1">{{ label }}</div>
+                <div class="fw-bold fs-5">
+                    {% if prefix == '₹' %}₹{{ '{:,.0f}'.format(val) }}
+                    {% elif prefix == '%' %}{{ val }}%
+                    {% else %}{{ val }}{% endif %}
+                </div>
+                {% if label == 'Utilisation' %}
+                <div class="progress mt-1" style="height:3px;">
+                    <div class="progress-bar bg-info" style="width:{{ [summary.occupancy_pct,100]|min }}%"></div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{# Print KPI summary table (hidden on screen) #}
+<div class="d-none d-print-block mb-3">
+    <div class="rr-section-title">Key Performance Indicators</div>
+    <table class="rr-kpi-table">
+        <tr>
+            <th>Total Rooms</th><td>{{ summary.total_rooms }}</td>
+            <th>Available Nights</th><td>{{ summary.available_room_nights }}</td>
+            <th>Room Nights Sold</th><td>{{ summary.occupied_room_nights }}</td>
+            <th>Utilisation %</th><td>{{ summary.occupancy_pct }}%</td>
+        </tr>
+        <tr>
+            <th>Total Revenue</th><td>&#8377;{{ '{:,.0f}'.format(summary.total_revenue) }}</td>
+            <th>Discount Total</th><td>&#8377;{{ '{:,.0f}'.format(summary.discount_total) }}</td>
+            <th>Net Revenue</th><td>&#8377;{{ '{:,.0f}'.format(summary.net_revenue) }}</td>
+            <th>ADR</th><td>&#8377;{{ '{:,.0f}'.format(summary.arr) }}</td>
+        </tr>
+        <tr>
+            <th>RevPAR</th><td>&#8377;{{ '{:,.0f}'.format(summary.revpar) }}</td>
+            <td colspan="6"></td>
+        </tr>
+    </table>
+</div>
+
+{# ── 2. Room-wise table ───────────────────────────────────────────────────── #}
+<div class="rr-section mb-4">
+    <div class="rr-section-title d-print-none">
+        <i class="bi bi-door-closed me-2 text-primary"></i>Room-wise Performance
+        <span class="badge bg-secondary ms-2">{{ room_rows|length }} rooms</span>
+    </div>
+    <div class="rr-section-title d-none d-print-block">Room-wise Performance</div>
+    <table class="rr-table w-100">
+        <thead>
+            <tr class="rr-thead-blue">
+                <th>Room</th>
+                <th>Type</th>
+                <th class="rr-num">Nights</th>
+                <th class="rr-num">Utilisation %</th>
+                <th class="rr-num">Revenue (&#8377;)</th>
+                <th class="rr-num">Avg Rate (&#8377;)</th>
+                <th class="rr-num">Discount (&#8377;)</th>
+                <th class="rr-num">Net Revenue (&#8377;)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in room_rows %}
+            <tr>
+                <td class="fw-semibold">{{ r.room_no }}</td>
+                <td>{{ r.room_type }}</td>
+                <td class="rr-num">{{ r.nights_sold }}</td>
+                <td class="rr-num">{% if r.occupancy_pct is none %}—{% else %}{{ r.occupancy_pct }}%{% endif %}</td>
+                <td class="rr-num">{{ '{:,.0f}'.format(r.total_revenue) }}</td>
+                <td class="rr-num">{{ '{:,.0f}'.format(r.avg_rate) }}</td>
+                <td class="rr-num {% if r.discount > 0 %}rr-neg{% endif %}">
+                    {% if r.discount > 0 %}({{ '{:,.0f}'.format(r.discount) }}){% else %}—{% endif %}
+                </td>
+                <td class="rr-num fw-semibold">{{ '{:,.0f}'.format(r.net_revenue) }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8" class="text-center text-muted py-3">No data for this period.</td></tr>
+            {% endfor %}
+        </tbody>
+        {% if room_rows %}
+        <tfoot>
+            <tr class="rr-tfoot">
+                <td colspan="2"><strong>Total</strong></td>
+                <td class="rr-num"><strong>{{ room_rows | sum(attribute='nights_sold') }}</strong></td>
+                <td class="rr-num"><strong>{{ summary.occupancy_pct }}%</strong></td>
+                <td class="rr-num"><strong>{{ '{:,.0f}'.format(summary.total_revenue) }}</strong></td>
+                <td class="rr-num"><strong>{{ '{:,.0f}'.format(summary.arr) }}</strong></td>
+                <td class="rr-num rr-neg"><strong>({{ '{:,.0f}'.format(summary.discount_total) }})</strong></td>
+                <td class="rr-num"><strong>{{ '{:,.0f}'.format(summary.net_revenue) }}</strong></td>
+            </tr>
+        </tfoot>
+        {% endif %}
+    </table>
+</div>
+
+{# ── 3 & 4. Date-wise and Room Type ── screen: side-by-side / print: stacked #}
+<div class="row g-3 mb-4 d-print-none">
+    <div class="col-lg-7">
+        <div class="card shadow-sm">
+            <div class="card-header py-2 d-flex align-items-center justify-content-between">
+                <h6 class="mb-0"><i class="bi bi-calendar-week me-2 text-success"></i>Daily Breakdown</h6>
+                <span class="badge bg-secondary">{{ date_rows|length }} days</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle mb-0 small">
+                    <thead class="table-success">
+                        <tr>
+                            <th>Date</th>
+                            <th class="text-end">Rooms</th>
+                            <th class="text-end">Revenue (&#8377;)</th>
+                            <th class="text-end">ADR (&#8377;)</th>
+                            <th class="text-end">RevPAR (&#8377;)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in date_rows %}
+                        <tr {% if r.rooms_sold == 0 %}class="text-muted"{% endif %}>
+                            <td>{{ r.date.strftime('%a %d %b') }}</td>
+                            <td class="text-end">{{ r.rooms_sold or '—' }}</td>
+                            <td class="text-end">{{ '{:,.0f}'.format(r.revenue) if r.revenue else '—' }}</td>
+                            <td class="text-end">{{ '{:,.0f}'.format(r.arr) if r.arr else '—' }}</td>
+                            <td class="text-end">{{ '{:,.0f}'.format(r.revpar) if r.revpar else '—' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-header py-2">
+                <h6 class="mb-0"><i class="bi bi-layers me-2 text-warning"></i>Room Type Performance</h6>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle mb-0 small">
+                    <thead class="table-warning">
+                        <tr>
+                            <th>Type</th>
+                            <th class="text-end">Avail.</th>
+                            <th class="text-end">Sold</th>
+                            <th class="text-end">Utilisation %</th>
+                            <th class="text-end">Revenue (&#8377;)</th>
+                            <th class="text-end">ADR (&#8377;)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in rt_rows %}
+                        <tr>
+                            <td>{{ r.room_type }}</td>
+                            <td class="text-end">{{ r.rooms_available }}</td>
+                            <td class="text-end">{{ r.nights_sold }}</td>
+                            <td class="text-end">{{ r.occupancy_pct }}%</td>
+                            <td class="text-end">{{ '{:,.0f}'.format(r.revenue) }}</td>
+                            <td class="text-end">{{ '{:,.0f}'.format(r.avg_rate) }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="6" class="text-center text-muted py-3">No data.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Print-only: date-wise and room-type stacked #}
+<div class="d-none d-print-block mb-3">
+    <div class="rr-section-title">Daily Breakdown</div>
+    <table class="rr-table w-100">
+        <thead>
+            <tr class="rr-thead-green">
+                <th>Date</th>
+                <th class="rr-num">Rooms Sold</th>
+                <th class="rr-num">Revenue (&#8377;)</th>
+                <th class="rr-num">ADR (&#8377;)</th>
+                <th class="rr-num">RevPAR (&#8377;)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in date_rows %}
+            <tr {% if r.rooms_sold == 0 %}class="rr-muted"{% endif %}>
+                <td>{{ r.date.strftime('%a %d %b %Y') }}</td>
+                <td class="rr-num">{{ r.rooms_sold or '—' }}</td>
+                <td class="rr-num">{{ '{:,.0f}'.format(r.revenue) if r.revenue else '—' }}</td>
+                <td class="rr-num">{{ '{:,.0f}'.format(r.arr) if r.arr else '—' }}</td>
+                <td class="rr-num">{{ '{:,.0f}'.format(r.revpar) if r.revpar else '—' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="d-none d-print-block mb-3">
+    <div class="rr-section-title">Room Type Performance</div>
+    <table class="rr-table w-100">
+        <thead>
+            <tr class="rr-thead-amber">
+                <th>Room Type</th>
+                <th class="rr-num">Available Nights</th>
+                <th class="rr-num">Nights Sold</th>
+                <th class="rr-num">Utilisation %</th>
+                <th class="rr-num">Revenue (&#8377;)</th>
+                <th class="rr-num">ADR (&#8377;)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in rt_rows %}
+            <tr>
+                <td>{{ r.room_type }}</td>
+                <td class="rr-num">{{ r.rooms_available }}</td>
+                <td class="rr-num">{{ r.nights_sold }}</td>
+                <td class="rr-num">{{ r.occupancy_pct }}%</td>
+                <td class="rr-num">{{ '{:,.0f}'.format(r.revenue) }}</td>
+                <td class="rr-num">{{ '{:,.0f}'.format(r.avg_rate) }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="rr-muted rr-num">No data.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{# ── 5. Source-wise ── screen: cards with progress  /  print: plain table ── #}
+<div class="card shadow-sm mb-4 d-print-none">
+    <div class="card-header py-2">
+        <h6 class="mb-0"><i class="bi bi-funnel me-2 text-info"></i>Booking Source Analysis</h6>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-sm table-hover align-middle mb-0 small">
+            <thead class="table-info">
+                <tr>
+                    <th>Source</th>
+                    <th class="text-end">Nights Sold</th>
+                    <th class="text-end">Revenue (&#8377;)</th>
+                    <th class="text-end">Avg Rate (&#8377;)</th>
+                    <th>Revenue Share</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set total_src_rev = src_rows | sum(attribute='revenue') %}
+                {% for r in src_rows %}
+                <tr>
+                    <td><span class="badge bg-secondary">{{ r.source }}</span></td>
+                    <td class="text-end">{{ r.nights_sold }}</td>
+                    <td class="text-end fw-semibold">{{ '{:,.0f}'.format(r.revenue) }}</td>
+                    <td class="text-end">{{ '{:,.0f}'.format(r.avg_rate) }}</td>
+                    <td style="min-width:120px;">
+                        {% set share = (r.revenue / total_src_rev * 100) | round(1) if total_src_rev else 0 %}
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="progress flex-grow-1" style="height:6px;">
+                                <div class="progress-bar bg-info" style="width:{{ share }}%"></div>
+                            </div>
+                            <small>{{ share }}%</small>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="text-center text-muted py-3">No data.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="d-none d-print-block mb-3">
+    <div class="rr-section-title">Booking Source Analysis</div>
+    <table class="rr-table w-100">
+        <thead>
+            <tr class="rr-thead-teal">
+                <th>Source</th>
+                <th class="rr-num">Nights Sold</th>
+                <th class="rr-num">Revenue (&#8377;)</th>
+                <th class="rr-num">Avg Rate (&#8377;)</th>
+                <th class="rr-num">Share %</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set total_src_rev = src_rows | sum(attribute='revenue') %}
+            {% for r in src_rows %}
+            <tr>
+                <td>{{ r.source }}</td>
+                <td class="rr-num">{{ r.nights_sold }}</td>
+                <td class="rr-num">{{ '{:,.0f}'.format(r.revenue) }}</td>
+                <td class="rr-num">{{ '{:,.0f}'.format(r.avg_rate) }}</td>
+                <td class="rr-num">{{ ((r.revenue / total_src_rev * 100) | round(1)) if total_src_rev else 0 }}%</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" class="rr-muted rr-num">No data.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{# ── 6. Discount Audit ─────────────────────────────────────────────────────── #}
+<div class="rr-section mb-4">
+    <div class="rr-section-title d-print-none">
+        <i class="bi bi-tag me-2 text-danger"></i>Discount Audit
+        <span class="badge bg-danger ms-2">
+            {{ discount_rows|length }} discounted stay{{ 's' if discount_rows|length != 1 else '' }}
+            &nbsp;|&nbsp; Total: &#8377;{{ '{:,.0f}'.format(summary.discount_total) }}
+        </span>
+    </div>
+    <div class="rr-section-title d-none d-print-block">
+        Discount Audit
+        &nbsp;&mdash;&nbsp; {{ discount_rows|length }} stay{{ 's' if discount_rows|length != 1 else '' }},
+        Total: &#8377;{{ '{:,.0f}'.format(summary.discount_total) }}
+    </div>
+
+    {% if discount_rows %}
+    <table class="rr-table w-100">
+        <thead>
+            <tr class="rr-thead-red">
+                <th>Room</th>
+                <th>Guest</th>
+                <th>Arrival</th>
+                <th>Departure</th>
+                <th class="rr-num">Nights</th>
+                <th class="rr-num">Orig. Tariff (&#8377;)</th>
+                <th class="rr-num">Discount (&#8377;)</th>
+                <th class="rr-num">Final Rate (&#8377;)</th>
+                <th>Reason</th>
+                <th>Approved By</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in discount_rows %}
+            <tr>
+                <td class="fw-semibold">{{ r.room_no }}</td>
+                <td>{{ r.guest_name }}</td>
+                <td>{{ r.arrival.strftime('%d %b') }}</td>
+                <td>{{ r.departure.strftime('%d %b') }}</td>
+                <td class="rr-num">{{ r.nights_in_window }}</td>
+                <td class="rr-num">{{ '{:,.0f}'.format(r.original_tariff) }}</td>
+                <td class="rr-num rr-neg fw-semibold">({{ '{:,.0f}'.format(r.discount_window) }})</td>
+                <td class="rr-num">{{ '{:,.0f}'.format(r.final_rate) }}</td>
+                <td class="rr-muted">{{ r.discount_reason }}</td>
+                <td>{{ r.approved_by }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr class="rr-tfoot">
+                <td colspan="6"><strong>Total Discounts (period)</strong></td>
+                <td class="rr-num rr-neg"><strong>({{ '{:,.0f}'.format(summary.discount_total | round(0) | int) }})</strong></td>
+                <td colspan="3"></td>
+            </tr>
+        </tfoot>
+    </table>
+    {% else %}
+    <div class="text-muted small py-2">No discounts recorded in this period.</div>
+    {% endif %}
+</div>
+
+</div>{# end #print-area #}
+
+{# ══════════════════════════════════════════════════════════════════════════
+   STYLES
+   ══════════════════════════════════════════════════════════════════════════ #}
+<style>
+/* ── Screen: section titles ──────────────────────────────────────────────── */
+.rr-section-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 6px 0 4px;
+    margin-bottom: 6px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* ── Shared table base (screen + print) ───────────────────────────────────── */
+.rr-table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.82rem;
+}
+.rr-table th,
+.rr-table td {
+    border: 1px solid #dee2e6;
+    padding: 5px 8px;
+    vertical-align: middle;
+}
+.rr-table .rr-num  { text-align: right; }
+.rr-table .rr-neg  { color: #dc3545; }
+.rr-table .rr-muted{ color: #6c757d; }
+.rr-table tfoot tr { background: #f8f9fa; }
+
+/* Header colour classes */
+.rr-thead-blue th { background: #1F4E79; color: #fff; }
+.rr-thead-green th{ background: #198754; color: #fff; }
+.rr-thead-amber th{ background: #b45309; color: #fff; }
+.rr-thead-teal th { background: #0e7490; color: #fff; }
+.rr-thead-red th  { background: #b91c1c; color: #fff; }
+
+/* KPI table (print-only, no-border variant) */
+.rr-kpi-table { border-collapse: collapse; width: 100%; font-size: 9pt; }
+.rr-kpi-table th,
+.rr-kpi-table td { border: 1px solid #ccc; padding: 3px 8px; }
+.rr-kpi-table th  { background: #e8eaf6; font-weight: 600; }
+
+/* (print CSS is in the styles block in <head> for reliable Chrome PDF rendering) */
+</style>
+
+<script nonce="{{ csp_nonce }}">
+document.getElementById('rr-print-btn').addEventListener('click', function () {
+    window.print();
+});
+</script>
+
+{% endblock %}

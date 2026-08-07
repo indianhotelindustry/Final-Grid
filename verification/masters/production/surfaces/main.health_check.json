@@ -1,0 +1,27 @@
+{
+  "anon_location": "",
+  "anon_status": 200,
+  "body_bytes": 49,
+  "body_sha256": "b131d19fbc43a52383678de50dbbef58bd00a963f140d52f3a77c5a132eeca16",
+  "category": "PUBLIC",
+  "content_type": "application/json",
+  "duration_ms": 1,
+  "endpoint": "main.health_check",
+  "error": "",
+  "figure_source": "json",
+  "figures": {
+    "$.online": "True",
+    "$[len]": "3"
+  },
+  "location": "",
+  "normalisation_hits": {},
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "INFO",
+  "status": 200,
+  "surface_id": "main.health_check",
+  "templates": [],
+  "truncations": [],
+  "url": "/api/health"
+}

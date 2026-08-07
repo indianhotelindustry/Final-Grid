@@ -1,0 +1,669 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Daily Profit Snapshot — {{ config.HOTEL_NAME }}{% endblock %}
+{% block report_name %}Daily Profit Snapshot{% endblock %}
+
+{% block styles %}
+<style>
+.kpi-card {
+    border-radius: 10px;
+    transition: transform .12s, box-shadow .12s;
+}
+.kpi-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.14) !important; }
+.section-label {
+    font-size: .72rem; font-weight: 700; letter-spacing: .07em;
+    text-transform: uppercase; color: #6c757d;
+}
+.profit-input {
+    width: 110px; text-align: right; font-size: .85rem;
+}
+.comparison-win  { color: #198754; font-weight: 700; }
+.comparison-loss { color: #dc3545; font-weight: 700; }
+.comparison-flat { color: #6c757d; }
+.net-rev-box {
+    background: linear-gradient(135deg, #0d6efd22, #0d6efd11);
+    border: 2px solid #0d6efd;
+    border-radius: 10px;
+}
+.profit-box {
+    background: linear-gradient(135deg, #19875422, #19875411);
+    border: 2px solid #198754;
+    border-radius: 10px;
+}
+@media print {
+    .d-print-none { display: none !important; }
+    @page { size: A4; margin: 12mm; }
+    .profit-input { border: none; background: transparent; }
+}
+</style>
+{% endblock %}
+
+{% block report_content %}
+
+{# ── Page header ─────────────────────────────────────────────────────────── #}
+<div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+    <div>
+        <h5 class="mb-0">
+            <i class="bi bi-graph-up-arrow text-primary me-2"></i>Daily Profit Snapshot
+        </h5>
+        <small class="text-muted">
+            {{ today.strftime('%A, %d %B %Y') }}
+            &mdash; operational estimate, not audited accounting profit
+        </small>
+    </div>
+    <div class="d-flex gap-2 d-print-none">
+        <a href="{{ url_for('reports.daily_profit_snapshot', format='excel') }}"
+           class="btn btn-sm btn-success">
+            <i class="bi bi-file-earmark-excel me-1"></i>Excel
+        </a>
+        <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i>Print / PDF
+        </button>
+    </div>
+</div>
+
+{# ── KPI top row ─────────────────────────────────────────────────────────── #}
+<div class="row g-3 mb-4">
+
+    <div class="col-6 col-md-4 col-lg">
+        <div class="card kpi-card shadow-sm border-0 bg-primary text-white h-100"
+             data-bs-toggle="modal" data-bs-target="#modalOccupancy"
+             style="cursor:pointer;">
+            <div class="card-body text-center py-3">
+                <div class="fs-3 fw-bold">{{ today_d.occ_pct }}%</div>
+                <div class="small opacity-75">Occupancy</div>
+                <div class="opacity-50 small mt-1">{{ today_d.occ_count }} / {{ today_d.total_rooms }} rooms</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg">
+        <div class="card kpi-card shadow-sm border-0 bg-white border-start border-4 border-primary h-100"
+             data-bs-toggle="modal" data-bs-target="#modalARR"
+             style="cursor:pointer;">
+            <div class="card-body text-center py-3">
+                <div class="fs-3 fw-bold text-primary">₹{{ '{:,.0f}'.format(today_d.arr) }}</div>
+                <div class="small text-muted">ARR</div>
+                <div class="small text-muted opacity-75 mt-1">Average Room Rate</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg">
+        <div class="card kpi-card shadow-sm border-0 bg-white border-start border-4 border-info h-100">
+            <div class="card-body text-center py-3">
+                <div class="fs-3 fw-bold text-info">₹{{ '{:,.0f}'.format(today_d.revpar) }}</div>
+                <div class="small text-muted">RevPAR</div>
+                <div class="small text-muted opacity-75 mt-1">Revenue per Available Room</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg">
+        <div class="card kpi-card shadow-sm border-0 bg-white border-start border-4 border-secondary h-100">
+            <div class="card-body text-center py-3">
+                <div class="fs-3 fw-bold text-secondary">{{ today_d.alos }}</div>
+                <div class="small text-muted">ALOS</div>
+                <div class="small text-muted opacity-75 mt-1">Average Length of Stay</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg">
+        <div class="card kpi-card shadow-sm border-0 bg-white border-start border-4 border-success h-100"
+             data-bs-toggle="modal" data-bs-target="#modalMTD"
+             style="cursor:pointer;">
+            <div class="card-body text-center py-3">
+                <div class="fs-3 fw-bold text-success">₹{{ '{:,.0f}'.format(today_d.mtd) }}</div>
+                <div class="small text-muted">MTD Revenue</div>
+                <div class="small text-muted opacity-75 mt-1">{{ today.strftime('%B') }} so far</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{# ── Two-column layout: Revenue + Costs ──────────────────────────────────── #}
+<div class="row g-4 mb-4">
+
+    {# ── LEFT: Revenue Summary + Reductions + Net Revenue ──────────────── #}
+    <div class="col-lg-6">
+
+        {# Revenue Summary #}
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white py-2 fw-semibold">
+                <i class="bi bi-building text-primary me-2"></i>Revenue Summary
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm align-middle mb-0 small">
+                    <tbody>
+                        <tr>
+                            <td class="ps-3">Room Revenue
+                                <small class="text-muted d-block">{{ today_d.occ_count }} rooms × nightly rate</small>
+                            </td>
+                            <td class="text-end pe-3 fw-semibold text-primary">₹{{ '{:,.2f}'.format(today_d.room_rev) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3">Food Revenue
+                                <small class="text-muted d-block">Extra charges with food keywords</small>
+                            </td>
+                            <td class="text-end pe-3 fw-semibold">₹{{ '{:,.2f}'.format(today_d.food_rev) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3">Other Income
+                                <small class="text-muted d-block">Overpayment adjusted as income</small>
+                            </td>
+                            <td class="text-end pe-3 fw-semibold text-info">₹{{ '{:,.2f}'.format(today_d.other_income) }}</td>
+                        </tr>
+                        <tr class="table-primary fw-bold">
+                            <td class="ps-3">Gross Revenue</td>
+                            <td class="text-end pe-3">₹{{ '{:,.2f}'.format(today_d.gross) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {# Reductions #}
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white py-2 fw-semibold">
+                <i class="bi bi-dash-circle text-danger me-2"></i>Reductions
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm align-middle mb-0 small">
+                    <tbody>
+                        <tr>
+                            <td class="ps-3">Discounts Applied Today</td>
+                            <td class="text-end pe-3 fw-semibold text-danger">− ₹{{ '{:,.2f}'.format(today_d.discounts) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3">Refunds Processed Today</td>
+                            <td class="text-end pe-3 fw-semibold text-danger">− ₹{{ '{:,.2f}'.format(today_d.refunds) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3">OTA Commission Estimate
+                                <small class="text-muted d-block">15% of OTA arrivals' total room value</small>
+                            </td>
+                            <td class="text-end pe-3 fw-semibold text-danger">− ₹{{ '{:,.2f}'.format(today_d.ota_commission) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3">Complimentary / Waiver
+                                <small class="text-muted d-block">Enter manually below if applicable</small>
+                            </td>
+                            <td class="text-end pe-3">
+                                <div class="input-group input-group-sm justify-content-end">
+                                    <span class="input-group-text bg-transparent border-0 text-danger pe-1">−₹</span>
+                                    <input type="number" id="inpComplimentary" class="profit-input form-control form-control-sm"
+                                           value="0" min="0" step="1">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="table-danger fw-bold">
+                            <td class="ps-3">Total Reductions</td>
+                            <td class="text-end pe-3" id="totalReductions">− ₹{{ '{:,.2f}'.format(today_d.total_reductions) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {# Net Operating Revenue #}
+        <div class="net-rev-box p-3 mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="fw-bold text-primary fs-6">Net Operating Revenue</div>
+                    <div class="small text-muted">Gross Revenue − All Reductions</div>
+                </div>
+                <div class="fs-3 fw-bold text-primary" id="netRevDisplay">
+                    ₹{{ '{:,.2f}'.format(today_d.net_rev) }}
+                </div>
+            </div>
+        </div>
+
+    </div>{# /col-lg-6 Revenue #}
+
+    {# ── RIGHT: Direct Costs + Profit Estimate ─────────────────────────── #}
+    <div class="col-lg-6">
+
+        {# Daily Direct Costs — editable inputs #}
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white py-2 fw-semibold">
+                <i class="bi bi-tools text-secondary me-2"></i>Daily Direct Costs
+                <small class="text-muted fw-normal ms-2 d-print-none">(enter actual amounts)</small>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm align-middle mb-0 small">
+                    <tbody>
+                        <tr>
+                            <td class="ps-3">Housekeeping Cost
+                                <small class="text-muted d-block">Staff, supplies, linens</small>
+                            </td>
+                            <td class="text-end pe-3">
+                                <div class="input-group input-group-sm justify-content-end">
+                                    <span class="input-group-text bg-transparent border-0 pe-1">₹</span>
+                                    <input type="number" class="profit-input form-control form-control-sm cost-input"
+                                           id="costHK" value="0" min="0" step="1">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3">Front Office Cost
+                                <small class="text-muted d-block">Shift staff, consumables</small>
+                            </td>
+                            <td class="text-end pe-3">
+                                <div class="input-group input-group-sm justify-content-end">
+                                    <span class="input-group-text bg-transparent border-0 pe-1">₹</span>
+                                    <input type="number" class="profit-input form-control form-control-sm cost-input"
+                                           id="costFO" value="0" min="0" step="1">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3">Utilities Estimate
+                                <small class="text-muted d-block">Electricity, water, gas</small>
+                            </td>
+                            <td class="text-end pe-3">
+                                <div class="input-group input-group-sm justify-content-end">
+                                    <span class="input-group-text bg-transparent border-0 pe-1">₹</span>
+                                    <input type="number" class="profit-input form-control form-control-sm cost-input"
+                                           id="costUtil" value="0" min="0" step="1">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3">Food Cost
+                                <small class="text-muted d-block">Raw material, kitchen</small>
+                            </td>
+                            <td class="text-end pe-3">
+                                <div class="input-group input-group-sm justify-content-end">
+                                    <span class="input-group-text bg-transparent border-0 pe-1">₹</span>
+                                    <input type="number" class="profit-input form-control form-control-sm cost-input"
+                                           id="costFood" value="0" min="0" step="1">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3">Laundry Cost</td>
+                            <td class="text-end pe-3">
+                                <div class="input-group input-group-sm justify-content-end">
+                                    <span class="input-group-text bg-transparent border-0 pe-1">₹</span>
+                                    <input type="number" class="profit-input form-control form-control-sm cost-input"
+                                           id="costLaundry" value="0" min="0" step="1">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3">Miscellaneous Direct Cost</td>
+                            <td class="text-end pe-3">
+                                <div class="input-group input-group-sm justify-content-end">
+                                    <span class="input-group-text bg-transparent border-0 pe-1">₹</span>
+                                    <input type="number" class="profit-input form-control form-control-sm cost-input"
+                                           id="costMisc" value="0" min="0" step="1">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="table-secondary fw-bold">
+                            <td class="ps-3">Total Direct Costs</td>
+                            <td class="text-end pe-3" id="totalCosts">₹0.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {# Daily Profit Estimate #}
+        <div class="profit-box p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <div class="fw-bold text-success fs-6">Daily Profit Estimate</div>
+                    <div class="small text-muted">Net Revenue − Direct Costs</div>
+                </div>
+                <div class="fs-3 fw-bold" id="profitDisplay">—</div>
+            </div>
+            <div class="progress" style="height:8px;" id="profitBar">
+                <div class="progress-bar bg-success" id="profitBarFill" style="width:0%;"></div>
+            </div>
+            <div class="small text-muted mt-2" id="profitNote">
+                Enter costs above to compute the estimate.
+            </div>
+        </div>
+
+    </div>{# /col-lg-6 Costs #}
+</div>
+
+{# ── Cash Collection by Payment Mode ────────────────────────────────────── #}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white py-2 fw-semibold">
+        <i class="bi bi-credit-card text-primary me-2"></i>Cash Collected Today — by Payment Mode
+    </div>
+    <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0 small">
+            <thead class="table-primary">
+                <tr><th>Payment Mode</th><th class="text-end">Collected (₹)</th></tr>
+            </thead>
+            <tbody>
+                {% for row in today_d.mode_rows %}
+                <tr>
+                    <td>{{ row.name }}</td>
+                    <td class="text-end fw-semibold">₹{{ '{:,.2f}'.format(row.total) }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="2" class="text-center text-muted py-3">No payments recorded today.</td></tr>
+                {% endfor %}
+            </tbody>
+            {% if today_d.mode_rows %}
+            <tfoot class="table-primary fw-bold">
+                <tr>
+                    <td>Total Cash Collected</td>
+                    <td class="text-end">₹{{ '{:,.2f}'.format(today_d.total_collected) }}</td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+    <div class="card-footer bg-white py-2 small text-muted d-print-none">
+        <i class="bi bi-info-circle me-1"></i>
+        Tips are not included in room revenue. Refunds reduce net collection.
+        Other income is tracked separately from room revenue.
+    </div>
+</div>
+
+{# ── Today vs Yesterday ──────────────────────────────────────────────────── #}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white py-2 fw-semibold">
+        <i class="bi bi-arrow-left-right text-secondary me-2"></i>
+        Today vs Yesterday
+    </div>
+    <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0 small">
+            <thead class="table-secondary">
+                <tr>
+                    <th>Metric</th>
+                    <th class="text-end">{{ today.strftime('%d %b') }}</th>
+                    <th class="text-end">{{ yesterday.strftime('%d %b') }}</th>
+                    <th class="text-end">Change</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set comparisons = [
+                    ('Room Revenue',       today_d.room_rev,       yest_d.room_rev,       True,  '₹'),
+                    ('Food Revenue',       today_d.food_rev,       yest_d.food_rev,       True,  '₹'),
+                    ('Gross Revenue',      today_d.gross,          yest_d.gross,          True,  '₹'),
+                    ('Net Revenue',        today_d.net_rev,        yest_d.net_rev,        True,  '₹'),
+                    ('Cash Collected',     today_d.total_collected, yest_d.total_collected, True, '₹'),
+                    ('Discounts',          today_d.discounts,      yest_d.discounts,      False, '₹'),
+                    ('Refunds',            today_d.refunds,        yest_d.refunds,        False, '₹'),
+                    ('Occupancy',          today_d.occ_pct,        yest_d.occ_pct,        True,  '%'),
+                    ('ARR',                today_d.arr,            yest_d.arr,            True,  '₹'),
+                    ('RevPAR',             today_d.revpar,         yest_d.revpar,         True,  '₹'),
+                    ('ALOS',               today_d.alos,           yest_d.alos,           True,  ' nights'),
+                ] %}
+                {% for label, tv, yv, higher_is_better, unit in comparisons %}
+                {% set diff = tv - yv %}
+                {% set pct = ((diff / yv * 100) | round(1)) if yv != 0 else 0 %}
+                {% set improved = (diff > 0 and higher_is_better) or (diff < 0 and not higher_is_better) %}
+                {% set worsened = (diff < 0 and higher_is_better) or (diff > 0 and not higher_is_better) %}
+                <tr>
+                    <td>{{ label }}</td>
+                    <td class="text-end fw-semibold">
+                        {% if unit == '₹' %}₹{{ '{:,.2f}'.format(tv) }}
+                        {% elif unit == '%' %}{{ tv }}%
+                        {% else %}{{ tv }}{{ unit }}{% endif %}
+                    </td>
+                    <td class="text-end text-muted">
+                        {% if unit == '₹' %}₹{{ '{:,.2f}'.format(yv) }}
+                        {% elif unit == '%' %}{{ yv }}%
+                        {% else %}{{ yv }}{{ unit }}{% endif %}
+                    </td>
+                    <td class="text-end
+                        {% if improved %}comparison-win
+                        {% elif worsened %}comparison-loss
+                        {% else %}comparison-flat{% endif %}">
+                        {% if diff > 0 %}<i class="bi bi-arrow-up-short"></i>+
+                        {% elif diff < 0 %}<i class="bi bi-arrow-down-short"></i>
+                        {% else %}<i class="bi bi-dash"></i>{% endif %}
+                        {% if unit == '₹' %}₹{{ '{:,.0f}'.format(diff | abs) }}
+                        {% elif unit == '%' %}{{ (diff | abs | round(1)) }}%
+                        {% else %}{{ (diff | abs | round(1)) }}{{ unit }}{% endif %}
+                        {% if yv != 0 %}
+                        <span class="opacity-60 small">({{ pct | abs }}%)</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{# ── Alerts & Notes ──────────────────────────────────────────────────────── #}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white py-2 fw-semibold">
+        <i class="bi bi-bell text-warning me-2"></i>Alerts &amp; Notes
+    </div>
+    <div class="card-body">
+        {% set alerts = [] %}
+
+        {% if today_d.occ_pct < 50 %}
+        {% set _ = alerts.append({'type': 'danger', 'icon': 'bi-house-slash', 'msg': 'Occupancy is below 50% (' ~ today_d.occ_pct ~ '%). Check walk-in and booking pipeline.'}) %}
+        {% endif %}
+
+        {% if today_d.discounts > today_d.room_rev * 0.1 %}
+        {% set _ = alerts.append({'type': 'warning', 'icon': 'bi-tag-fill', 'msg': 'Discounts (₹' ~ '{:,.0f}'.format(today_d.discounts) ~ ') exceed 10% of room revenue. Review authorizations.'}) %}
+        {% endif %}
+
+        {% if today_d.refunds > 0 %}
+        {% set _ = alerts.append({'type': 'warning', 'icon': 'bi-arrow-counterclockwise', 'msg': 'Refunds of ₹' ~ '{:,.0f}'.format(today_d.refunds) ~ ' processed today. These reduce net collection.'}) %}
+        {% endif %}
+
+        {% if today_d.ota_commission > 0 %}
+        {% set _ = alerts.append({'type': 'info', 'icon': 'bi-globe', 'msg': 'OTA commission estimate: ₹' ~ '{:,.0f}'.format(today_d.ota_commission) ~ ' (15% of OTA arrivals). Actual may vary by agreement.'}) %}
+        {% endif %}
+
+        {% if today_d.gross == 0 %}
+        {% set _ = alerts.append({'type': 'secondary', 'icon': 'bi-info-circle', 'msg': 'No revenue recorded yet for today.'}) %}
+        {% endif %}
+
+        {% if alerts %}
+        {% for a in alerts %}
+        <div class="alert alert-{{ a.type }} py-2 mb-2 d-flex align-items-start gap-2">
+            <i class="bi {{ a.icon }} mt-1 flex-shrink-0"></i>
+            <span class="small">{{ a.msg }}</span>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="alert alert-success py-2 mb-0">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            No alerts for today. Business metrics look healthy.
+        </div>
+        {% endif %}
+
+        <div class="alert alert-light border mt-3 py-2 mb-0 small text-muted">
+            <i class="bi bi-info-circle me-1"></i>
+            <strong>Accounting note:</strong>
+            Tips are excluded from room revenue and tracked separately for staff allocation.
+            Refunds reduce collection but are not room revenue.
+            Other income stays separate from room tariff revenue.
+            This snapshot is an operational estimate and does not represent audited profit.
+        </div>
+    </div>
+</div>
+
+{# ══════════════════════════════════════════════════════════════════════════ #}
+{# MODALS                                                                     #}
+{# ══════════════════════════════════════════════════════════════════════════ #}
+
+{# Modal — Occupancy detail #}
+<div class="modal fade" id="modalOccupancy" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white py-2">
+                <h6 class="modal-title"><i class="bi bi-house-fill me-2"></i>Occupancy Detail</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3 text-center">
+                    <div class="col-4">
+                        <div class="fs-3 fw-bold text-primary">{{ today_d.occ_count }}</div>
+                        <div class="small text-muted">Occupied</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fs-3 fw-bold">{{ today_d.total_rooms }}</div>
+                        <div class="small text-muted">Total Rooms</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fs-3 fw-bold text-primary">{{ today_d.occ_pct }}%</div>
+                        <div class="small text-muted">Occupancy</div>
+                    </div>
+                </div>
+                <div class="progress mt-3" style="height:12px;">
+                    <div class="progress-bar bg-primary" style="width:{{ today_d.occ_pct }}%;"></div>
+                </div>
+                <p class="small text-muted mt-3 mb-0">
+                    Yesterday: {{ yest_d.occ_count }} rooms / {{ yest_d.occ_pct }}%
+                </p>
+            </div>
+            <div class="modal-footer py-2">
+                <a href="{{ url_for('reports.inhouse') }}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>In-House Guest List
+                </a>
+                <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal — ARR detail #}
+<div class="modal fade" id="modalARR" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header py-2">
+                <h6 class="modal-title text-primary">
+                    <i class="bi bi-currency-rupee me-2"></i>ARR — Average Room Rate
+                </h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3 text-center">
+                    <div class="col-6">
+                        <div class="fs-4 fw-bold text-primary">₹{{ '{:,.0f}'.format(today_d.arr) }}</div>
+                        <div class="small text-muted">Today ({{ today.strftime('%d %b') }})</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="fs-4 fw-bold text-secondary">₹{{ '{:,.0f}'.format(yest_d.arr) }}</div>
+                        <div class="small text-muted">Yesterday ({{ yesterday.strftime('%d %b') }})</div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row g-3 text-center">
+                    <div class="col-6">
+                        <div class="fw-bold text-info">₹{{ '{:,.0f}'.format(today_d.revpar) }}</div>
+                        <div class="small text-muted">RevPAR Today</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="fw-bold text-secondary">₹{{ '{:,.0f}'.format(yest_d.revpar) }}</div>
+                        <div class="small text-muted">RevPAR Yesterday</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer py-2">
+                <a href="{{ url_for('reports.room_revenue') }}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>Room Revenue Report
+                </a>
+                <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal — MTD Revenue #}
+<div class="modal fade" id="modalMTD" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header py-2">
+                <h6 class="modal-title text-success">
+                    <i class="bi bi-calendar-range me-2"></i>Month-to-Date Revenue
+                </h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="fs-2 fw-bold text-success">₹{{ '{:,.2f}'.format(today_d.mtd) }}</div>
+                <div class="text-muted">{{ today.strftime('1 %B') }} — {{ today.strftime('%d %B %Y') }}</div>
+                <div class="small text-muted mt-2">
+                    Based on payments received in {{ today.strftime('%B %Y') }}.
+                </div>
+            </div>
+            <div class="modal-footer py-2">
+                <a href="{{ url_for('reports.revenue') }}" class="btn btn-sm btn-success">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>Revenue Report
+                </a>
+                <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    var NET_REV = {{ today_d.net_rev | round(2) }};
+    var BASE_REDUCTIONS = {{ today_d.total_reductions | round(2) }};
+
+    function fmt(n) {
+        return '₹' + n.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
+
+    function recalculate() {
+        // Total costs
+        var totalCosts = 0;
+        document.querySelectorAll('.cost-input').forEach(function (inp) {
+            totalCosts += parseFloat(inp.value) || 0;
+        });
+
+        // Complimentary (extra reduction)
+        var comp = parseFloat(document.getElementById('inpComplimentary').value) || 0;
+        var netRev = NET_REV - comp;
+        var profit = netRev - totalCosts;
+
+        // Update displays
+        document.getElementById('totalCosts').textContent = fmt(totalCosts);
+        document.getElementById('netRevDisplay').textContent = fmt(netRev);
+        document.getElementById('totalReductions').textContent = '− ' + fmt(BASE_REDUCTIONS + comp);
+
+        var profitEl  = document.getElementById('profitDisplay');
+        var noteEl    = document.getElementById('profitNote');
+        var barFill   = document.getElementById('profitBarFill');
+
+        if (totalCosts === 0 && comp === 0) {
+            profitEl.textContent = '—';
+            profitEl.className   = 'fs-3 fw-bold text-muted';
+            noteEl.textContent   = 'Enter costs above to compute the estimate.';
+            barFill.style.width  = '0%';
+            barFill.className    = 'progress-bar bg-secondary';
+            return;
+        }
+
+        profitEl.textContent = fmt(profit);
+        if (profit >= 0) {
+            profitEl.className = 'fs-3 fw-bold text-success';
+            var pct = netRev > 0 ? Math.min((profit / netRev) * 100, 100) : 0;
+            barFill.style.width = pct.toFixed(1) + '%';
+            barFill.className   = 'progress-bar bg-success';
+            noteEl.textContent  = 'Profit margin: ' + pct.toFixed(1) + '% of net revenue.';
+        } else {
+            profitEl.className = 'fs-3 fw-bold text-danger';
+            barFill.style.width = '100%';
+            barFill.className   = 'progress-bar bg-danger';
+            noteEl.textContent  = 'Operating at a loss. Review cost inputs.';
+        }
+    }
+
+    document.querySelectorAll('.cost-input, #inpComplimentary').forEach(function (inp) {
+        inp.addEventListener('input', recalculate);
+    });
+
+    recalculate();
+})();
+</script>
+{% endblock %}

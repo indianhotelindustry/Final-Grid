@@ -1,0 +1,856 @@
+{% extends 'base.html' %}
+{% block title %}Reports — {{ config.HOTEL_NAME }}{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center mb-3">
+    <h4 class="mb-0"><i class="bi bi-bar-chart-line me-2"></i>Reports</h4>
+</div>
+
+<!-- Report Tabs -->
+<ul class="nav nav-tabs mb-3" id="reportTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-dash" data-bs-toggle="tab" data-bs-target="#pane-dash"
+                type="button" role="tab" aria-selected="false">
+            <i class="bi bi-speedometer2"></i> Dashboards
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tab-ops" data-bs-toggle="tab" data-bs-target="#pane-ops"
+                type="button" role="tab" aria-selected="true">
+            <i class="bi bi-calendar-check"></i> Daily Operations
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-fin" data-bs-toggle="tab" data-bs-target="#pane-fin"
+                type="button" role="tab" aria-selected="false">
+            <i class="bi bi-currency-rupee"></i> Financial
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-guest" data-bs-toggle="tab" data-bs-target="#pane-guest"
+                type="button" role="tab" aria-selected="false">
+            <i class="bi bi-people"></i> Guest &amp; Audit
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-reservations" data-bs-toggle="tab" data-bs-target="#pane-reservations"
+                type="button" role="tab" aria-selected="false">
+            <i class="bi bi-journal-bookmark"></i> Reservations
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-hk" data-bs-toggle="tab" data-bs-target="#pane-hk"
+                type="button" role="tab" aria-selected="false">
+            <i class="bi bi-house-gear"></i> Housekeeping
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-billing" data-bs-toggle="tab" data-bs-target="#pane-billing"
+                type="button" role="tab" aria-selected="false">
+            <i class="bi bi-receipt"></i> Billing &amp; Folio
+        </button>
+    </li>
+    {% if current_user.has_role('Admin','Manager') %}
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-admin" data-bs-toggle="tab" data-bs-target="#pane-admin"
+                type="button" role="tab" aria-selected="false">
+            <i class="bi bi-shield-check"></i> Admin &amp; Approvals
+            {% set _badges = (pending_void_count or 0) + (pending_shift_count if pending_shift_count is defined and pending_shift_count else 0) %}
+            {% if _badges > 0 %}
+            <span class="badge bg-danger ms-1">{{ _badges }}</span>
+            {% endif %}
+        </button>
+    </li>
+    {% endif %}
+</ul>
+
+<div class="tab-content">
+
+    <!-- ===== DASHBOARDS ===== -->
+    <div class="tab-pane fade" id="pane-dash" role="tabpanel">
+        <div class="row g-4">
+
+            <div class="col-sm-6 col-lg-5">
+                <div class="card shadow h-100 border-0 overflow-hidden">
+                    <div class="card-body d-flex gap-4 align-items-center p-4" style="background:linear-gradient(135deg,#dc354522,#fff);">
+                        <div class="fs-1 text-danger"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                        <div class="flex-grow-1">
+                            <h5 class="fw-bold mb-1">Money at Risk</h5>
+                            <p class="text-muted small mb-3">
+                                Live exposure view — pending dues, overdue checkouts, revenue leakage,
+                                unauthorized discounts, tariff overrides, dirty rooms blocking revenue,
+                                and unresolved overpayments.
+                            </p>
+                            <a href="{{ url_for('reports.money_at_risk') }}" class="btn btn-danger">
+                                <i class="bi bi-arrow-right-circle me-1"></i>Open Dashboard
+                            </a>
+                            <a href="{{ url_for('reports.money_at_risk', format='excel') }}"
+                               class="btn btn-outline-success ms-2">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-0 pt-0 pb-3 px-4">
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Pending Dues</span>
+                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">Overdue Checkouts</span>
+                            <span class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle">Dirty Rooms</span>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Revenue Leakage</span>
+                            <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">Overpayments</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-5">
+                <div class="card shadow h-100 border-0 overflow-hidden">
+                    <div class="card-body d-flex gap-4 align-items-center p-4" style="background:linear-gradient(135deg,#0d6efd22,#fff);">
+                        <div class="fs-1 text-primary"><i class="bi bi-graph-up-arrow"></i></div>
+                        <div class="flex-grow-1">
+                            <h5 class="fw-bold mb-1">Daily Profit Snapshot</h5>
+                            <p class="text-muted small mb-3">
+                                Today's revenue, reductions, net operating revenue, KPIs (Occupancy, ARR,
+                                RevPAR, ALOS, MTD Revenue), cost input panel for live profit estimate,
+                                and comparison with yesterday.
+                            </p>
+                            <a href="{{ url_for('reports.daily_profit_snapshot') }}" class="btn btn-primary">
+                                <i class="bi bi-arrow-right-circle me-1"></i>Open Dashboard
+                            </a>
+                            <a href="{{ url_for('reports.daily_profit_snapshot', format='excel') }}"
+                               class="btn btn-outline-success ms-2">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-0 pt-0 pb-3 px-4">
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Revenue</span>
+                            <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">Profit Estimate</span>
+                            <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle">KPIs</span>
+                            <span class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle">Today vs Yesterday</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <p class="small text-muted mt-4">
+            <i class="bi bi-info-circle me-1"></i>
+            Dashboards show live data and operational estimates. They are not substitutes for audited reports.
+            Tips are excluded from room revenue. Refunds reduce collection. Other income stays separate from room tariff revenue.
+        </p>
+    </div><!-- /pane-dash -->
+
+    <!-- ===== DAILY OPERATIONS ===== -->
+    <div class="tab-pane fade show active" id="pane-ops" role="tabpanel">
+        <div class="row g-3">
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-danger">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-lightning-charge-fill text-danger me-1"></i>Manager Flash Report</h6>
+                        <p class="small text-muted mb-2">Daily summary: occupancy, revenue, arrivals, departures, payment modes.</p>
+                        <form class="d-flex gap-2" action="{{ url_for('reports.flash_report') }}">
+                            <input type="date" class="form-control form-control-sm" name="date" value="{{ today }}">
+                            <button class="btn btn-sm btn-danger">View</button>
+                            <button class="btn btn-sm btn-outline-danger" name="format" value="excel" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-primary">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-house-door-fill text-primary me-1"></i>In-House Guest List</h6>
+                        <p class="small text-muted mb-2">All currently checked-in guests with room, balance, and checkout date.</p>
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('reports.inhouse') }}" class="btn btn-sm btn-primary">View</a>
+                            <a href="{{ url_for('reports.inhouse', format='excel') }}" class="btn btn-sm btn-outline-primary" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-success">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-box-arrow-in-right text-success me-1"></i>Arrivals List</h6>
+                        <p class="small text-muted mb-2">All incoming reservations for a given date.</p>
+                        <form class="d-flex gap-2" action="{{ url_for('reports.arrivals') }}">
+                            <input type="date" class="form-control form-control-sm" name="date" value="{{ today }}">
+                            <button class="btn btn-sm btn-success">View</button>
+                            <button class="btn btn-sm btn-outline-success" name="format" value="excel" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-warning">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-box-arrow-right text-warning me-1"></i>Departures List</h6>
+                        <p class="small text-muted mb-2">All check-outs due for a given date.</p>
+                        <form class="d-flex gap-2" action="{{ url_for('reports.departures') }}">
+                            <input type="date" class="form-control form-control-sm" name="date" value="{{ today }}">
+                            <button class="btn btn-sm btn-warning text-dark">View</button>
+                            <button class="btn btn-sm btn-outline-warning" name="format" value="excel" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-info">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-grid text-info me-1"></i>Occupancy Report</h6>
+                        <p class="small text-muted mb-2">Room-by-room status snapshot with ARR and RevPAR.</p>
+                        <form class="d-flex gap-2" action="{{ url_for('reports.occupancy') }}">
+                            <input type="date" class="form-control form-control-sm" name="date" value="{{ today }}">
+                            <button class="btn btn-sm btn-info text-dark">View</button>
+                            <button class="btn btn-sm btn-outline-info" name="format" value="excel" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4" style="border-color:#1a3c5e!important;">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-graph-up-arrow me-1" style="color:#1a3c5e;"></i>Front Office MIS</h6>
+                        <p class="small text-muted mb-2">Full management intelligence — occupancy, revenue, movement, ledger, discounts, audit &amp; staff, for any date range.</p>
+                        <a href="{{ url_for('reports.front_office_mis') }}" class="btn btn-sm" style="background:#1a3c5e;color:#fff;">Open MIS</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-dark">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-moon-stars-fill text-dark me-1"></i>Night Audit Report</h6>
+                        <p class="small text-muted mb-2">End-of-day audit: occupancy, revenue, exceptions, folio control, room charges, shift reconciliation.</p>
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('main.night_audit', tab='analytics') }}" class="btn btn-sm btn-dark">View</a>
+                            <a href="{{ url_for('reports.night_audit', format='excel') }}" class="btn btn-sm btn-outline-dark" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div><!-- /pane-ops -->
+
+    <!-- ===== FINANCIAL ===== -->
+    <div class="tab-pane fade" id="pane-fin" role="tabpanel">
+        <div class="row g-3">
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4" style="border-color:#1a5276!important;">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-building me-1" style="color:#1a5276;"></i>Room Revenue Report</h6>
+                        <p class="small text-muted mb-2">ARR, RevPAR, occupancy %, room-wise &amp; date-wise revenue, source analysis, discount audit. Excel (6 sheets) + A4 PDF.</p>
+                        <form action="{{ url_for('reports.room_revenue') }}">
+                            <div class="d-flex gap-1 mb-2">
+                                <input type="date" class="form-control form-control-sm" name="from"
+                                       value="{{ today.replace(day=1).isoformat() }}">
+                                <span class="align-self-center small">→</span>
+                                <input type="date" class="form-control form-control-sm" name="to" value="{{ today }}">
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm" style="background:#1a5276;color:#fff;">View</button>
+                                <button class="btn btn-sm btn-outline-success" name="format" value="excel" title="Export Excel (6 sheets)">
+                                    <i class="bi bi-file-earmark-excel"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-success">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-currency-rupee text-success me-1"></i>Revenue Report</h6>
+                        <p class="small text-muted mb-2">Revenue by date range with daily trend, room type, and source breakdown.</p>
+                        <form action="{{ url_for('reports.revenue') }}">
+                            <div class="d-flex gap-1 mb-2">
+                                <input type="date" class="form-control form-control-sm" name="from"
+                                       value="{{ (today - timedelta(days=29)).isoformat() }}">
+                                <span class="align-self-center small">→</span>
+                                <input type="date" class="form-control form-control-sm" name="to" value="{{ today }}">
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-success">View</button>
+                                <button class="btn btn-sm btn-outline-success" name="format" value="excel" title="Export Excel">
+                                    <i class="bi bi-file-earmark-excel"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-secondary">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-cash-stack text-secondary me-1"></i>Payment Collection</h6>
+                        <p class="small text-muted mb-2">All payments received by mode (Cash, UPI, Card) for a date range.</p>
+                        <form action="{{ url_for('reports.payment_collection') }}">
+                            <div class="d-flex gap-1 mb-2">
+                                <input type="date" class="form-control form-control-sm" name="from" value="{{ today }}">
+                                <span class="align-self-center small">→</span>
+                                <input type="date" class="form-control form-control-sm" name="to" value="{{ today }}">
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-secondary">View</button>
+                                <button class="btn btn-sm btn-outline-secondary" name="format" value="excel" title="Export Excel">
+                                    <i class="bi bi-file-earmark-excel"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-success">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-percent text-success me-1"></i>GST Report</h6>
+                        <p class="small text-muted mb-2">CGST / SGST / IGST summary for filing. Immutable tax lines.</p>
+                        <a href="{{ url_for('billing.gst_report') }}" class="btn btn-sm btn-success">View</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-dark">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-cash-coin me-1"></i>Shift Cash Reconciliation</h6>
+                        <p class="small text-muted mb-2">Declared vs expected closing cash per shift. Variance flagged.</p>
+                        <a href="{{ url_for('reports.shift_reconciliation') }}" class="btn btn-sm btn-dark">View</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-info">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-ticket text-info me-1"></i>Credit Voucher Ledger</h6>
+                        <p class="small text-muted mb-2">Vouchers issued from cancellations. Liability — guest-redeemable on future bookings.</p>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="{{ url_for('reports.voucher_ledger') }}" class="btn btn-sm btn-info text-white">All</a>
+                            <a href="{{ url_for('reports.voucher_ledger', status='active') }}" class="btn btn-sm btn-outline-success">Active</a>
+                            <a href="{{ url_for('reports.voucher_ledger', status='expired') }}" class="btn btn-sm btn-outline-danger">Expired</a>
+                            <a href="{{ url_for('reports.voucher_ledger', format='excel') }}" class="btn btn-sm btn-outline-success" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-warning">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-person-badge text-warning me-1"></i>Credit Ledger</h6>
+                        <p class="small text-muted mb-2">Individual guests checked out on credit. Outstanding only — not revenue.</p>
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('reports.credit_ledger') }}" class="btn btn-sm btn-warning">Ledger</a>
+                            <a href="{{ url_for('reports.credit_aging') }}" class="btn btn-sm btn-outline-warning">Aging</a>
+                            <a href="{{ url_for('reports.credit_ledger', format='excel') }}" class="btn btn-sm btn-outline-success" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-danger">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-arrow-counterclockwise text-danger me-1"></i>Refund Report</h6>
+                        <p class="small text-muted mb-2">All overpayment refunds with folio, guest, mode, reason, and processed-by details.</p>
+                        <form action="{{ url_for('reports.refund_report') }}">
+                            <div class="d-flex gap-1 mb-2">
+                                <input type="date" class="form-control form-control-sm" name="from" value="{{ today }}">
+                                <span class="align-self-center small">→</span>
+                                <input type="date" class="form-control form-control-sm" name="to" value="{{ today }}">
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-danger">View</button>
+                                <button class="btn btn-sm btn-outline-success" name="format" value="excel" title="Export Excel">
+                                    <i class="bi bi-file-earmark-excel"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-success">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-cash-coin text-success me-1"></i>Tip Report</h6>
+                        <p class="small text-muted mb-2">Overpayments recorded as staff tips, with waiter name and folio reference.</p>
+                        <form action="{{ url_for('reports.tip_report') }}">
+                            <div class="d-flex gap-1 mb-2">
+                                <input type="date" class="form-control form-control-sm" name="from" value="{{ today }}">
+                                <span class="align-self-center small">→</span>
+                                <input type="date" class="form-control form-control-sm" name="to" value="{{ today }}">
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-success">View</button>
+                                <button class="btn btn-sm btn-outline-success" name="format" value="excel" title="Export Excel">
+                                    <i class="bi bi-file-earmark-excel"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-info">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-plus-circle text-info me-1"></i>Other Income Report</h6>
+                        <p class="small text-muted mb-2">Overpayments adjusted as non-room income with reason and remarks.</p>
+                        <form action="{{ url_for('reports.other_income_report') }}">
+                            <div class="d-flex gap-1 mb-2">
+                                <input type="date" class="form-control form-control-sm" name="from" value="{{ today }}">
+                                <span class="align-self-center small">→</span>
+                                <input type="date" class="form-control form-control-sm" name="to" value="{{ today }}">
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-info text-dark">View</button>
+                                <button class="btn btn-sm btn-outline-success" name="format" value="excel" title="Export Excel">
+                                    <i class="bi bi-file-earmark-excel"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-dark">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-calculator me-1"></i>Daily Cash Reconciliation</h6>
+                        <p class="small text-muted mb-2">Full daily cash summary: collection by mode, refunds, tips, other income, net collection. Excel (5 sheets).</p>
+                        <form action="{{ url_for('reports.daily_reconciliation') }}">
+                            <div class="d-flex gap-1 mb-2">
+                                <input type="date" class="form-control form-control-sm" name="date" value="{{ today }}">
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-dark">View</button>
+                                <button class="btn btn-sm btn-outline-success" name="format" value="excel" title="Export Excel (5 sheets)">
+                                    <i class="bi bi-file-earmark-excel"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div><!-- /pane-fin -->
+
+    <!-- ===== GUEST & AUDIT ===== -->
+    <div class="tab-pane fade" id="pane-guest" role="tabpanel">
+        <div class="row g-3">
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-primary">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-person-lines-fill text-primary me-1"></i>Guest Report</h6>
+                        <p class="small text-muted mb-2">Full guest register with billing, payment breakdown, and balance status by date range.</p>
+                        <form class="mb-2" action="{{ url_for('reports.guest_report') }}">
+                            <div class="d-flex gap-1 mb-1">
+                                <input type="date" class="form-control form-control-sm" name="from"
+                                       value="{{ (today - timedelta(days=29)).isoformat() }}">
+                                <span class="align-self-center small">→</span>
+                                <input type="date" class="form-control form-control-sm" name="to" value="{{ today }}">
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-primary">View</button>
+                                <button class="btn btn-sm btn-outline-success" name="format" value="excel" title="Export Excel">
+                                    <i class="bi bi-file-earmark-excel"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-secondary">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-people me-1"></i>Guest History</h6>
+                        <p class="small text-muted mb-2">Search guest stay history, total spend, and export.</p>
+                        <form class="d-flex gap-2" action="{{ url_for('reports.guest_history') }}">
+                            <input type="text" class="form-control form-control-sm" name="q" placeholder="Name / Phone…">
+                            <button class="btn btn-sm btn-outline-secondary">Search</button>
+                            <button class="btn btn-sm btn-secondary" name="format" value="excel" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-warning">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-star-half text-warning me-1"></i>Guest Feedback</h6>
+                        <p class="small text-muted mb-2">Post-stay ratings, NPS score, negative alerts, Google review push.</p>
+                        <a href="{{ url_for('feedback.dashboard') }}" class="btn btn-sm btn-warning text-dark">View</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-danger">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-person-x text-danger me-1"></i>No-Show Report</h6>
+                        <p class="small text-muted mb-2">All no-shows with OTA flag, fee applied, and override notes.</p>
+                        <a href="{{ url_for('noshow.report') }}" class="btn btn-sm btn-danger">View</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-info">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-person-check text-info me-1"></i>Pre-Check-In Submissions</h6>
+                        <p class="small text-muted mb-2">Guest self-submitted data from the pre-arrival portal.</p>
+                        <a href="{{ url_for('portal.submissions') }}" class="btn btn-sm btn-info text-dark">View</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-danger">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-hourglass-split text-danger me-1"></i>Overstay Control Report</h6>
+                        <p class="small text-muted mb-2">All hourly overstay actions — charges, waivers, extensions — with revenue captured, GST, waive reasons, and staff accountability.</p>
+                        <form action="{{ url_for('reports.overstay_control') }}">
+                            <div class="d-flex gap-1 mb-2">
+                                <input type="date" class="form-control form-control-sm" name="from"
+                                       value="{{ (today - timedelta(days=29)).isoformat() }}">
+                                <span class="align-self-center small">→</span>
+                                <input type="date" class="form-control form-control-sm" name="to" value="{{ today }}">
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-danger">View</button>
+                                <button class="btn btn-sm btn-outline-success" name="format" value="excel" title="Export Excel">
+                                    <i class="bi bi-file-earmark-excel"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div><!-- /pane-guest -->
+
+    <!-- ===== RESERVATIONS ===== -->
+    <div class="tab-pane fade" id="pane-reservations" role="tabpanel">
+        <div class="row g-3">
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-secondary">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-pie-chart text-secondary me-1"></i>Source Analysis</h6>
+                        <p class="small text-muted mb-2">Breakdown of bookings by source (Walk-in, OTA, Company, Direct) with share %.</p>
+                        <form action="{{ url_for('reports.source_analysis_report') }}">
+                            <div class="d-flex gap-1 mb-2">
+                                <input type="date" class="form-control form-control-sm" name="from"
+                                       value="{{ (today - timedelta(days=29)).isoformat() }}">
+                                <span class="align-self-center small">→</span>
+                                <input type="date" class="form-control form-control-sm" name="to" value="{{ today }}">
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-secondary">View</button>
+                                <button class="btn btn-sm btn-outline-secondary" name="format" value="excel" title="Export Excel">
+                                    <i class="bi bi-file-earmark-excel"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-primary">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-calendar-range text-primary me-1"></i>Future Bookings</h6>
+                        <p class="small text-muted mb-2">Upcoming confirmed reservations with daily arrival forecast.</p>
+                        <form action="{{ url_for('reports.future_bookings_report') }}">
+                            <div class="d-flex gap-1 mb-2">
+                                <span class="align-self-center small text-muted">Up to:</span>
+                                <input type="date" class="form-control form-control-sm" name="to"
+                                       value="{{ (today + timedelta(days=30)).isoformat() }}">
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-primary">View</button>
+                                <button class="btn btn-sm btn-outline-primary" name="format" value="excel" title="Export Excel">
+                                    <i class="bi bi-file-earmark-excel"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-danger">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-x-circle text-danger me-1"></i>Cancellations</h6>
+                        <p class="small text-muted mb-2">All cancelled reservations for a period with source and room type.</p>
+                        <form action="{{ url_for('reports.cancellation_report') }}">
+                            <div class="d-flex gap-1 mb-2">
+                                <input type="date" class="form-control form-control-sm" name="from"
+                                       value="{{ (today - timedelta(days=29)).isoformat() }}">
+                                <span class="align-self-center small">→</span>
+                                <input type="date" class="form-control form-control-sm" name="to" value="{{ today }}">
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-danger">View</button>
+                                <button class="btn btn-sm btn-outline-danger" name="format" value="excel" title="Export Excel">
+                                    <i class="bi bi-file-earmark-excel"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-info">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-person-walking text-info me-1"></i>Walk-in Report</h6>
+                        <p class="small text-muted mb-2">All walk-in arrivals for a given date with room, rate, and status.</p>
+                        <form class="d-flex gap-2" action="{{ url_for('reports.walkin_report') }}">
+                            <input type="date" class="form-control form-control-sm" name="date" value="{{ today }}">
+                            <button class="btn btn-sm btn-info text-dark">View</button>
+                            <button class="btn btn-sm btn-outline-info" name="format" value="excel" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div><!-- /pane-reservations -->
+
+    <!-- ===== HOUSEKEEPING ===== -->
+    <div class="tab-pane fade" id="pane-hk" role="tabpanel">
+        <div class="row g-3">
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-success">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-grid-3x3-gap-fill text-success me-1"></i>Room Status</h6>
+                        <p class="small text-muted mb-2">Current status of all rooms: Available, Occupied, Dirty, Out-of-Order.</p>
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('reports.room_status_report') }}" class="btn btn-sm btn-success">View</a>
+                            <a href="{{ url_for('reports.room_status_report', format='excel') }}" class="btn btn-sm btn-outline-success" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-warning">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-house-heart text-warning me-1"></i>Housekeeping Status</h6>
+                        <p class="small text-muted mb-2">Room-by-room HK priority: Checkout Due, Arrival Due, occupied rooms.</p>
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('reports.housekeeping_report') }}" class="btn btn-sm btn-warning text-dark">View</a>
+                            <a href="{{ url_for('reports.housekeeping_report', format='excel') }}" class="btn btn-sm btn-outline-warning" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-secondary">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-tools text-secondary me-1"></i>Maintenance Work Orders</h6>
+                        <p class="small text-muted mb-2">All maintenance requests: pending, in-progress, resolved. Filter by status.</p>
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('reports.maintenance_report') }}" class="btn btn-sm btn-secondary">View</a>
+                            <a href="{{ url_for('reports.maintenance_report', format='excel') }}" class="btn btn-sm btn-outline-secondary" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div><!-- /pane-hk -->
+
+    <!-- ===== BILLING & FOLIO ===== -->
+    <div class="tab-pane fade" id="pane-billing" role="tabpanel">
+        <div class="row g-3">
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-dark">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-building me-1"></i>Company / Direct Billing</h6>
+                        <p class="small text-muted mb-2">All company-billed stays with outstanding balances per account.</p>
+                        <form action="{{ url_for('reports.company_billing_report') }}">
+                            <div class="d-flex gap-1 mb-2">
+                                <input type="date" class="form-control form-control-sm" name="from"
+                                       value="{{ (today - timedelta(days=29)).isoformat() }}">
+                                <span class="align-self-center small">→</span>
+                                <input type="date" class="form-control form-control-sm" name="to" value="{{ today }}">
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-dark">View</button>
+                                <button class="btn btn-sm btn-outline-dark" name="format" value="excel" title="Export Excel">
+                                    <i class="bi bi-file-earmark-excel"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-warning">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-exclamation-circle text-warning me-1"></i>Pending Payments</h6>
+                        <p class="small text-muted mb-2">All in-house and checked-out reservations with outstanding balances.</p>
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('reports.pending_payments_report') }}" class="btn btn-sm btn-warning text-dark">View</a>
+                            <a href="{{ url_for('reports.pending_payments_report', format='excel') }}" class="btn btn-sm btn-outline-warning" title="Export Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-danger">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-slash-circle text-danger me-1"></i>Void &amp; Adjustments</h6>
+                        <p class="small text-muted mb-2">All voided payments and pending void requests for a period.</p>
+                        <form action="{{ url_for('reports.void_adjustments_report') }}">
+                            <div class="d-flex gap-1 mb-2">
+                                <input type="date" class="form-control form-control-sm" name="from"
+                                       value="{{ (today - timedelta(days=29)).isoformat() }}">
+                                <span class="align-self-center small">→</span>
+                                <input type="date" class="form-control form-control-sm" name="to" value="{{ today }}">
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-danger">View</button>
+                                <button class="btn btn-sm btn-outline-danger" name="format" value="excel" title="Export Excel">
+                                    <i class="bi bi-file-earmark-excel"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div><!-- /pane-billing -->
+
+    <!-- ===== ADMIN & APPROVALS ===== -->
+    {% if current_user.has_role('Admin','Manager') %}
+    <div class="tab-pane fade" id="pane-admin" role="tabpanel">
+        <div class="row g-3">
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-warning">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-exclamation-triangle text-warning me-1"></i>Pending No-Shows</h6>
+                        <p class="small text-muted mb-2">Reservations not checked in — mark as no-show or override.</p>
+                        <a href="{{ url_for('noshow.pending') }}" class="btn btn-sm btn-warning text-dark">Review</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-danger">
+                    <div class="card-body">
+                        <h6 class="fw-bold">
+                            <i class="bi bi-slash-circle text-danger me-1"></i>Void Requests
+                            {% if pending_void_count > 0 %}
+                            <span class="badge bg-danger ms-1">{{ pending_void_count }}</span>
+                            {% endif %}
+                        </h6>
+                        <p class="small text-muted mb-2">Billing void requests awaiting manager approval.</p>
+                        <a href="{{ url_for('billing.void_pending') }}" class="btn btn-sm btn-danger">Review</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-dark">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-clock-history me-1"></i>Shift History</h6>
+                        <p class="small text-muted mb-2">All closed shifts with cash declarations and variance summary.</p>
+                        <a href="{{ url_for('auth.shifts') }}" class="btn btn-sm btn-dark">View</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-start border-4 border-warning">
+                    <div class="card-body">
+                        <h6 class="fw-bold">
+                            <i class="bi bi-hourglass-split text-warning me-1"></i>Pending Shift Approvals
+                            {% if pending_shift_count is defined and pending_shift_count %}
+                            <span class="badge bg-warning text-dark ms-1">{{ pending_shift_count }}</span>
+                            {% endif %}
+                        </h6>
+                        <p class="small text-muted mb-2">Shift closures submitted by staff awaiting manager sign-off.</p>
+                        <a href="{{ url_for('auth.shift_pending_approvals') }}" class="btn btn-sm btn-warning text-dark">Review</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div><!-- /pane-admin -->
+    {% endif %}
+
+</div><!-- /tab-content -->
+{% endblock %}
+
+{% block scripts %}
+<script nonce="{{ csp_nonce }}">
+// Persist active report tab across refresh
+document.getElementById('reportTabs').addEventListener('shown.bs.tab', function (e) {
+    sessionStorage.setItem('reportTab', e.target.dataset.bsTarget);
+});
+
+(function () {
+    const saved = sessionStorage.getItem('reportTab');
+    if (saved && saved !== '#pane-ops') {
+        const btn = document.querySelector(`#reportTabs [data-bs-target="${saved}"]`);
+        if (btn) bootstrap.Tab.getOrCreateInstance(btn).show();
+    }
+})();
+</script>
+{% endblock %}

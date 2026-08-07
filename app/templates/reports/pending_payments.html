@@ -1,0 +1,91 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Pending Payments Report{% endblock %}
+{% block report_name %}Pending Payments Report{% endblock %}
+
+{% block report_content %}
+<div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+  <h5 class="mb-0">
+    <i class="bi bi-exclamation-circle-fill text-warning me-2"></i>
+    Pending Payments / Outstanding Balances
+    <span class="badge bg-secondary ms-1">{{ rows|length }}</span>
+  </h5>
+  <div class="d-flex gap-2 align-items-center d-print-none">
+    <form class="d-flex gap-1 align-items-center" action="{{ url_for('reports.pending_payments_report') }}">
+      <select class="form-select form-select-sm" name="status" style="width:130px;">
+        <option value="all"      {% if status_filter == 'all'      %}selected{% endif %}>All</option>
+        <option value="inhouse"  {% if status_filter == 'inhouse'  %}selected{% endif %}>In-House</option>
+        <option value="checkout" {% if status_filter == 'checkout' %}selected{% endif %}>Checked-Out</option>
+      </select>
+      <button class="btn btn-sm btn-warning text-dark">Filter</button>
+      <button class="btn btn-sm btn-outline-success" name="format" value="excel"
+              title="Export Excel"><i class="bi bi-file-earmark-excel"></i></button>
+    </form>
+    <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+      <i class="bi bi-printer me-1"></i>Print
+    </button>
+  </div>
+</div>
+
+{# Total outstanding #}
+<div class="alert alert-warning d-flex align-items-center gap-3 py-2 mb-3">
+  <i class="bi bi-cash-stack fs-4"></i>
+  <div>
+    <strong>Total Outstanding: ₹{{ '{:,.2f}'.format(total_outstanding) }}</strong>
+    <span class="ms-2 text-muted small">across {{ rows|length }} reservations</span>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover table-sm align-middle mb-0 small">
+      <thead class="table-warning">
+        <tr>
+          <th>Booking Ref</th>
+          <th>Guest</th>
+          <th>Phone</th>
+          <th>Room</th>
+          <th>Departure</th>
+          <th>Status</th>
+          <th class="text-end">Total</th>
+          <th class="text-end">Paid</th>
+          <th class="text-end">Outstanding</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        {% set r = row.reservation %}
+        <tr>
+          <td class="fw-semibold text-primary">{{ r.booking_reference or r.id }}</td>
+          <td>{{ r.guest.name if r.guest else '—' }}</td>
+          <td>{{ r.guest.phone if r.guest else '—' }}</td>
+          <td>{{ r.room.room_number if r.room else '—' }}</td>
+          <td>{{ r.departure_date.strftime('%d %b %Y') }}</td>
+          <td>
+            <span class="badge {% if r.status == 'CheckedIn' %}bg-success{% else %}bg-secondary{% endif %}">
+              {{ r.status }}
+            </span>
+          </td>
+          <td class="text-end">₹{{ '{:,.2f}'.format(row.total) }}</td>
+          <td class="text-end">₹{{ '{:,.2f}'.format(row.paid) }}</td>
+          <td class="text-end text-danger fw-semibold">₹{{ '{:,.2f}'.format(row.balance) }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="9" class="text-center text-muted py-4">No outstanding balances found.</td></tr>
+        {% endfor %}
+      </tbody>
+      {% if rows %}
+      <tfoot class="table-warning fw-bold">
+        <tr>
+          <td colspan="6">Total</td>
+          <td class="text-end">₹{{ '{:,.2f}'.format(rows | sum(attribute='total')) }}</td>
+          <td class="text-end">₹{{ '{:,.2f}'.format(rows | sum(attribute='paid')) }}</td>
+          <td class="text-end text-danger">₹{{ '{:,.2f}'.format(total_outstanding) }}</td>
+        </tr>
+      </tfoot>
+      {% endif %}
+    </table>
+  </div>
+</div>
+
+<style>@media print { .d-print-none { display:none !important; } }</style>
+{% endblock %}

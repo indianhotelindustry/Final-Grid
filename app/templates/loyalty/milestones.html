@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Loyalty Milestones — {{ config.HOTEL_NAME }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0"><i class="bi bi-flag me-2"></i>Milestone Bonuses</h5>
+    <a href="{{ url_for('loyalty.dashboard') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+</div>
+
+<!-- Add Form -->
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+        <form method="POST" class="row g-2 align-items-end">
+            <input type="hidden" name="action" value="add">
+            <div class="col-md-3">
+                <label class="form-label small">Name</label>
+                <input type="text" class="form-control form-control-sm" name="name" placeholder="e.g. 5th Stay Bonus" required>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Trigger Type</label>
+                <select class="form-select form-select-sm" name="trigger_type">
+                    <option value="stays">Stays Count</option>
+                    <option value="spend">Lifetime Spend (₹)</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Trigger Value</label>
+                <input type="number" class="form-control form-control-sm" name="trigger_value" min="1" required>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Bonus Points</label>
+                <input type="number" class="form-control form-control-sm" name="bonus_points" value="100" min="1" required>
+            </div>
+            <div class="col-md-1">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="is_recurring" value="1" id="recur">
+                    <label class="form-check-label small" for="recur">Recurring</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-sm btn-primary w-100"><i class="bi bi-plus me-1"></i>Add</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- List -->
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-sm table-hover mb-0">
+            <thead class="table-light">
+                <tr><th>Name</th><th>Trigger</th><th>Bonus</th><th>Recurring</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody>
+            {% for ms in milestones %}
+            <tr>
+                <td class="fw-semibold">{{ ms.name }}</td>
+                <td>{{ ms.trigger_value }} {{ 'stays' if ms.trigger_type == 'stays' else '₹ spent' }}</td>
+                <td>{{ ms.bonus_points }} pts</td>
+                <td>{{ 'Yes' if ms.is_recurring else 'One-time' }}</td>
+                <td>
+                    <form method="POST" class="d-inline">
+                        <input type="hidden" name="action" value="toggle">
+                        <input type="hidden" name="milestone_id" value="{{ ms.id }}">
+                        <button type="submit" class="btn btn-sm btn-{{ 'success' if ms.is_active else 'secondary' }} btn-xs">
+                            {{ 'Active' if ms.is_active else 'Inactive' }}
+                        </button>
+                    </form>
+                </td>
+                <td>
+                    <form method="POST" class="d-inline" onsubmit="return confirm('Delete this milestone?')">
+                        <input type="hidden" name="action" value="delete">
+                        <input type="hidden" name="milestone_id" value="{{ ms.id }}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger btn-xs"><i class="bi bi-trash"></i></button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+            {% if not milestones %}
+            <tr><td colspan="6" class="text-center text-muted py-3">No milestones configured</td></tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

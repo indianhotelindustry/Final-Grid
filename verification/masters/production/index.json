@@ -1,0 +1,2236 @@
+{
+  "app_version": "2.2.18",
+  "business_date": "2026-05-28",
+  "copy_method": "sqlite-backup-api",
+  "counts": {
+    "ADVISORY": 23,
+    "FINANCIAL": 80,
+    "OPERATIONAL": 49,
+    "PUBLIC": 6,
+    "healthy": 144,
+    "total": 158,
+    "unhealthy": 14
+  },
+  "duration_seconds": 11.27,
+  "finished_at": "2026-08-03T11:38:28",
+  "freeze_override": "",
+  "freeze_proof": {
+    "checks": {
+      "app_services_binding": true,
+      "fresh_import_date_today": true,
+      "fresh_import_datetime_now": true,
+      "isinstance_real_date_still_true": true,
+      "isinstance_real_datetime_still_true": true,
+      "module_attr_datetime_now": true,
+      "module_attr_datetime_utcnow": true
+    },
+    "frozen_to": "2026-05-28T12:00:00",
+    "proven": true,
+    "rebound_names": 0
+  },
+  "frozen_at": "2026-05-28T12:00:00",
+  "gaps": [
+    {
+      "endpoint": "main.admin_duplicate_checkin_action",
+      "reason": "not a GET surface",
+      "url": "/admin/duplicate-checkins/action"
+    },
+    {
+      "endpoint": "main.admin_convert_overpay_to_upsell",
+      "reason": "not a GET surface",
+      "url": "/admin/reservation/<int:reservation_id>/convert-overpay-to-upsell"
+    },
+    {
+      "endpoint": "admin_reset.index",
+      "reason": "Destructive by design. Never exercised by the harness, even against a copy, so that a path confusion bug can never destroy data.",
+      "url": "/admin/reset-transactional-data/"
+    },
+    {
+      "endpoint": "admin_reset.execute",
+      "reason": "not a GET surface",
+      "url": "/admin/reset-transactional-data/execute"
+    },
+    {
+      "endpoint": "updater.index",
+      "reason": "Updater. Reaches the network and can stage a release; exercising it from a verification harness is unsafe.",
+      "url": "/admin/update/"
+    },
+    {
+      "endpoint": "updater.apply_update",
+      "reason": "not a GET surface",
+      "url": "/admin/update/apply"
+    },
+    {
+      "endpoint": "updater.trigger_backup",
+      "reason": "not a GET surface",
+      "url": "/admin/update/backup"
+    },
+    {
+      "endpoint": "updater.inspect_package",
+      "reason": "not a GET surface",
+      "url": "/admin/update/inspect"
+    },
+    {
+      "endpoint": "updater.restart_server",
+      "reason": "not a GET surface",
+      "url": "/admin/update/restart"
+    },
+    {
+      "endpoint": "main.voucher_expire",
+      "reason": "not a GET surface",
+      "url": "/admin/voucher/<int:voucher_id>/expire"
+    },
+    {
+      "endpoint": "ai_pricing.single_rate",
+      "reason": "parameterised and not declared in DECLARED_PARAMETERISED",
+      "url": "/ai/pricing/rate/<int:room_type_id>/<target_date>"
+    },
+    {
+      "endpoint": "ai_pricing.update_settings",
+      "reason": "not a GET surface",
+      "url": "/ai/pricing/settings"
+    },
+    {
+      "endpoint": "ai.api_risk_score",
+      "reason": "parameterised and not declared in DECLARED_PARAMETERISED",
+      "url": "/api/ai/anomalies/risk/<int:user_id>"
+    },
+    {
+      "endpoint": "main.ai_guest_profile",
+      "reason": "parameterised and not declared in DECLARED_PARAMETERISED",
+      "url": "/api/ai/guest-profile/<int:guest_id>"
+    },
+    {
+      "endpoint": "ai.api_ai_insights_refresh",
+      "reason": "not a GET surface",
+      "url": "/api/ai/insights/refresh"
+    },
+    {
+      "endpoint": "ai.api_pm_health_detail",
+      "reason": "parameterised and not declared in DECLARED_PARAMETERISED",
+      "url": "/api/ai/predictive-maintenance/health/<int:room_id>"
+    },
+    {
+      "endpoint": "ai.api_pm_complete_schedule",
+      "reason": "not a GET surface",
+      "url": "/api/ai/predictive-maintenance/schedules/<int:sched_id>/complete"
+    },
+    {
+      "endpoint": "ai.api_pm_skip_schedule",
+      "reason": "not a GET surface",
+      "url": "/api/ai/predictive-maintenance/schedules/<int:sched_id>/skip"
+    },
+    {
+      "endpoint": "ai.api_pm_generate_schedules",
+      "reason": "not a GET surface",
+      "url": "/api/ai/predictive-maintenance/schedules/generate"
+    },
+    {
+      "endpoint": "ai.voice_command",
+      "reason": "not a GET surface",
+      "url": "/api/ai/voice"
+    },
+    {
+      "endpoint": "main.api_resolve_alert",
+      "reason": "not a GET surface",
+      "url": "/api/alerts/<int:alert_id>/resolve"
+    },
+    {
+      "endpoint": "main.get_company_credit",
+      "reason": "UNRESOLVED \u2014 no entity matches: lowest company id",
+      "url": "/api/checkin/company/{id}"
+    },
+    {
+      "endpoint": "main.express_checkin_api",
+      "reason": "not a GET surface",
+      "url": "/api/checkin/express/<int:reservation_id>"
+    },
+    {
+      "endpoint": "main.walkin_search_express",
+      "reason": "not a GET surface",
+      "url": "/api/checkin/walkin-search-express"
+    },
+    {
+      "endpoint": "main.adjust_company_credit",
+      "reason": "not a GET surface",
+      "url": "/api/companies/<int:company_id>/adjust-credit"
+    },
+    {
+      "endpoint": "main.company_detail",
+      "reason": "UNRESOLVED \u2014 no entity matches: lowest company id",
+      "url": "/api/companies/{id}"
+    },
+    {
+      "endpoint": "main.dashboard_card_preview",
+      "reason": "parameterised and not declared in DECLARED_PARAMETERISED",
+      "url": "/api/dashboard/card-preview/<card_type>"
+    },
+    {
+      "endpoint": "main.dashboard_mark_clean",
+      "reason": "not a GET surface",
+      "url": "/api/dashboard/rooms/<int:room_id>/mark-clean"
+    },
+    {
+      "endpoint": "main.dashboard_mark_all_clean",
+      "reason": "not a GET surface",
+      "url": "/api/dashboard/rooms/mark-all-clean"
+    },
+    {
+      "endpoint": "folio.transfer_charge",
+      "reason": "not a GET surface",
+      "url": "/api/folio/<int:folio_id>/transfer-charge"
+    },
+    {
+      "endpoint": "folio.transfer_payment",
+      "reason": "not a GET surface",
+      "url": "/api/folio/<int:folio_id>/transfer-payment"
+    },
+    {
+      "endpoint": "main.upload_id_document",
+      "reason": "not a GET surface",
+      "url": "/api/guest/<int:guest_id>/id-document"
+    },
+    {
+      "endpoint": "main.api_update_guest",
+      "reason": "not a GET surface",
+      "url": "/api/guest/<int:guest_id>/update"
+    },
+    {
+      "endpoint": "main.merge_guests",
+      "reason": "not a GET surface",
+      "url": "/api/guests/merge"
+    },
+    {
+      "endpoint": "main.add_payment",
+      "reason": "not a GET surface",
+      "url": "/api/reservation/<int:reservation_id>/add-payment"
+    },
+    {
+      "endpoint": "main.available_rooms_for_reservation",
+      "reason": "parameterised and not declared in DECLARED_PARAMETERISED",
+      "url": "/api/reservation/<int:reservation_id>/available-rooms"
+    },
+    {
+      "endpoint": "folio.create_folio",
+      "reason": "not a GET surface",
+      "url": "/api/reservation/<int:reservation_id>/folios"
+    },
+    {
+      "endpoint": "main.upsell_recommendations",
+      "reason": "parameterised and not declared in DECLARED_PARAMETERISED",
+      "url": "/api/reservation/<int:reservation_id>/upsell"
+    },
+    {
+      "endpoint": "main.api_reservation_move",
+      "reason": "not a GET surface",
+      "url": "/api/reservation/move"
+    },
+    {
+      "endpoint": "main.api_reservation_resize",
+      "reason": "not a GET surface",
+      "url": "/api/reservation/resize"
+    },
+    {
+      "endpoint": "main.bulk_booking_api",
+      "reason": "not a GET surface",
+      "url": "/api/reservations/bulk-booking"
+    },
+    {
+      "endpoint": "main.voucher_redeem",
+      "reason": "not a GET surface",
+      "url": "/api/voucher/<int:voucher_id>/redeem"
+    },
+    {
+      "endpoint": "auth.logout",
+      "reason": "not a GET surface",
+      "url": "/auth/logout"
+    },
+    {
+      "endpoint": "auth.approve_shift",
+      "reason": "not a GET surface",
+      "url": "/auth/shift/<int:shift_id>/approve"
+    },
+    {
+      "endpoint": "auth.shift_handover",
+      "reason": "parameterised and not declared in DECLARED_PARAMETERISED",
+      "url": "/auth/shift/<int:shift_id>/handover"
+    },
+    {
+      "endpoint": "auth.shift_adjustment",
+      "reason": "not a GET surface",
+      "url": "/auth/shift/adjustment"
+    },
+    {
+      "endpoint": "auth.close_shift",
+      "reason": "GET handler with a side effect (closes the open shift). Excluded to keep capture free of state change; shift closure figures are covered by P21 and by /reports/shift-reconciliation.",
+      "url": "/auth/shift/close"
+    },
+    {
+      "endpoint": "auth.start_shift",
+      "reason": "not a GET surface",
+      "url": "/auth/shift/start"
+    },
+    {
+      "endpoint": "auth.edit_user",
+      "reason": "not a GET surface",
+      "url": "/auth/users/<int:user_id>/edit"
+    },
+    {
+      "endpoint": "auth.toggle_user",
+      "reason": "not a GET surface",
+      "url": "/auth/users/<int:user_id>/toggle"
+    },
+    {
+      "endpoint": "auth.create_user",
+      "reason": "not a GET surface",
+      "url": "/auth/users/new"
+    },
+    {
+      "endpoint": "backup.delete",
+      "reason": "not a GET surface",
+      "url": "/backup/delete/<filename>"
+    },
+    {
+      "endpoint": "backup.download",
+      "reason": "Streams a file; content is the backup, not application output. Covered instead by D9 (Backup Restore Verification).",
+      "url": "/backup/download/<filename>"
+    },
+    {
+      "endpoint": "backup.run_now",
+      "reason": "not a GET surface",
+      "url": "/backup/run"
+    },
+    {
+      "endpoint": "billing.create_credit_note",
+      "reason": "not a GET surface",
+      "url": "/billing/credit-note/<int:reservation_id>"
+    },
+    {
+      "endpoint": "billing.approve_void",
+      "reason": "not a GET surface",
+      "url": "/billing/void/approve/<int:void_request_id>"
+    },
+    {
+      "endpoint": "billing.direct_void",
+      "reason": "not a GET surface",
+      "url": "/billing/void/direct/<int:payment_id>"
+    },
+    {
+      "endpoint": "billing.reject_void",
+      "reason": "not a GET surface",
+      "url": "/billing/void/reject/<int:void_request_id>"
+    },
+    {
+      "endpoint": "billing.request_void",
+      "reason": "not a GET surface",
+      "url": "/billing/void/request/<int:payment_id>"
+    },
+    {
+      "endpoint": "booking.check_availability",
+      "reason": "not a GET surface",
+      "url": "/book/check-availability"
+    },
+    {
+      "endpoint": "booking.confirmation",
+      "reason": "Requires a booking reference issued by the public engine. Deferred to D6.",
+      "url": "/book/confirmation/<ref>"
+    },
+    {
+      "endpoint": "booking.create_booking",
+      "reason": "not a GET surface",
+      "url": "/book/create"
+    },
+    {
+      "endpoint": "main.checkout",
+      "reason": "UNRESOLVED \u2014 no entity matches: lowest reservation id with status CheckedIn",
+      "url": "/checkout/{id}"
+    },
+    {
+      "endpoint": "main.settle_credit",
+      "reason": "parameterised and not declared in DECLARED_PARAMETERISED",
+      "url": "/credit/<int:reservation_id>/settle"
+    },
+    {
+      "endpoint": "main.dev_seed_create",
+      "reason": "not a GET surface",
+      "url": "/dev/seed"
+    },
+    {
+      "endpoint": "main.dev_seed_reset",
+      "reason": "not a GET surface",
+      "url": "/dev/seed/reset"
+    },
+    {
+      "endpoint": "feedback.send_link",
+      "reason": "not a GET surface",
+      "url": "/feedback/send/<int:reservation_id>"
+    },
+    {
+      "endpoint": "feedback.submit",
+      "reason": "Requires a single-use guest token. Deferred to D6 (Regression Dataset Framework), which can mint one.",
+      "url": "/feedback/submit/<token>"
+    },
+    {
+      "endpoint": "main.reservation_folio",
+      "reason": "UNRESOLVED \u2014 no entity matches: lowest reservation id with status CheckedIn",
+      "url": "/folio/{id}"
+    },
+    {
+      "endpoint": "grc.download_form_c",
+      "reason": "parameterised and not declared in DECLARED_PARAMETERISED",
+      "url": "/grc/<int:reservation_id>/form-c"
+    },
+    {
+      "endpoint": "grc.download_pdf",
+      "reason": "parameterised and not declared in DECLARED_PARAMETERISED",
+      "url": "/grc/<int:reservation_id>/pdf"
+    },
+    {
+      "endpoint": "grc.save_foreign_info",
+      "reason": "not a GET surface",
+      "url": "/grc/<int:reservation_id>/save-foreign-info"
+    },
+    {
+      "endpoint": "groups.add_room",
+      "reason": "not a GET surface",
+      "url": "/groups/<int:group_id>/add-room"
+    },
+    {
+      "endpoint": "groups.batch_checkin",
+      "reason": "not a GET surface",
+      "url": "/groups/<int:group_id>/batch-checkin"
+    },
+    {
+      "endpoint": "groups.update_status",
+      "reason": "not a GET surface",
+      "url": "/groups/<int:group_id>/update-status"
+    },
+    {
+      "endpoint": "groups.detail",
+      "reason": "UNRESOLVED \u2014 no entity matches: lowest group block id",
+      "url": "/groups/{id}"
+    },
+    {
+      "endpoint": "main.mark_clean",
+      "reason": "not a GET surface",
+      "url": "/housekeeping/<int:room_id>/clean"
+    },
+    {
+      "endpoint": "main.invoice_pdf",
+      "reason": "parameterised and not declared in DECLARED_PARAMETERISED",
+      "url": "/invoice/<int:reservation_id>/pdf"
+    },
+    {
+      "endpoint": "loyalty.api_available_perks",
+      "reason": "parameterised and not declared in DECLARED_PARAMETERISED",
+      "url": "/loyalty/api/available-perks/<int:guest_id>"
+    },
+    {
+      "endpoint": "loyalty.api_redeem",
+      "reason": "not a GET surface",
+      "url": "/loyalty/api/redeem"
+    },
+    {
+      "endpoint": "loyalty.enroll",
+      "reason": "not a GET surface",
+      "url": "/loyalty/enroll/<int:guest_id>"
+    },
+    {
+      "endpoint": "loyalty.member_detail",
+      "reason": "parameterised and not declared in DECLARED_PARAMETERISED",
+      "url": "/loyalty/member/<int:guest_id>"
+    },
+    {
+      "endpoint": "loyalty.adjust_points",
+      "reason": "not a GET surface",
+      "url": "/loyalty/member/<int:guest_id>/adjust"
+    },
+    {
+      "endpoint": "maintenance.resolve",
+      "reason": "not a GET surface",
+      "url": "/maintenance/<int:req_id>/resolve"
+    },
+    {
+      "endpoint": "maintenance.update",
+      "reason": "not a GET surface",
+      "url": "/maintenance/<int:req_id>/update"
+    },
+    {
+      "endpoint": "maintenance.create",
+      "reason": "not a GET surface",
+      "url": "/maintenance/create"
+    },
+    {
+      "endpoint": "main.save_cico_rules",
+      "reason": "not a GET surface",
+      "url": "/masters/cico-rules"
+    },
+    {
+      "endpoint": "main.save_invoice_settings",
+      "reason": "not a GET surface",
+      "url": "/masters/invoice-settings"
+    },
+    {
+      "endpoint": "main.add_payment_mode",
+      "reason": "not a GET surface",
+      "url": "/masters/payment-mode"
+    },
+    {
+      "endpoint": "main.delete_payment_mode",
+      "reason": "not a GET surface",
+      "url": "/masters/payment-mode/<int:pm_id>/delete"
+    },
+    {
+      "endpoint": "main.edit_payment_mode",
+      "reason": "not a GET surface",
+      "url": "/masters/payment-mode/<int:pm_id>/edit"
+    },
+    {
+      "endpoint": "main.save_property",
+      "reason": "not a GET surface",
+      "url": "/masters/property"
+    },
+    {
+      "endpoint": "main.masters_add_room",
+      "reason": "not a GET surface",
+      "url": "/masters/room"
+    },
+    {
+      "endpoint": "main.add_room_type",
+      "reason": "not a GET surface",
+      "url": "/masters/room-type"
+    },
+    {
+      "endpoint": "main.delete_room_type",
+      "reason": "not a GET surface",
+      "url": "/masters/room-type/<int:rt_id>/delete"
+    },
+    {
+      "endpoint": "main.edit_room_type",
+      "reason": "not a GET surface",
+      "url": "/masters/room-type/<int:rt_id>/edit"
+    },
+    {
+      "endpoint": "main.masters_delete_room",
+      "reason": "not a GET surface",
+      "url": "/masters/room/<int:room_id>/delete"
+    },
+    {
+      "endpoint": "main.masters_edit_room",
+      "reason": "not a GET surface",
+      "url": "/masters/room/<int:room_id>/edit"
+    },
+    {
+      "endpoint": "main.masters_toggle_room",
+      "reason": "not a GET surface",
+      "url": "/masters/room/<int:room_id>/toggle"
+    },
+    {
+      "endpoint": "main.bulk_add_rooms",
+      "reason": "not a GET surface",
+      "url": "/masters/rooms/bulk-add"
+    },
+    {
+      "endpoint": "main.update_settings",
+      "reason": "not a GET surface",
+      "url": "/masters/settings"
+    },
+    {
+      "endpoint": "main.night_audit_mark_receivable",
+      "reason": "not a GET surface",
+      "url": "/night-audit/mark-receivable"
+    },
+    {
+      "endpoint": "main.run_night_audit_manual",
+      "reason": "not a GET surface",
+      "url": "/night-audit/run"
+    },
+    {
+      "endpoint": "main.night_audit_settings_save",
+      "reason": "not a GET surface",
+      "url": "/night-audit/settings"
+    },
+    {
+      "endpoint": "noshow.exempt",
+      "reason": "not a GET surface",
+      "url": "/noshow/exempt/<int:reservation_id>"
+    },
+    {
+      "endpoint": "noshow.manual_post",
+      "reason": "not a GET surface",
+      "url": "/noshow/manual/<int:reservation_id>"
+    },
+    {
+      "endpoint": "noshow.unexempt",
+      "reason": "not a GET surface",
+      "url": "/noshow/unexempt/<int:reservation_id>"
+    },
+    {
+      "endpoint": "ota.cancel_booking",
+      "reason": "not a GET surface",
+      "url": "/ota/bookings/<int:reservation_id>/cancel"
+    },
+    {
+      "endpoint": "ota.manual_booking",
+      "reason": "not a GET surface",
+      "url": "/ota/bookings/manual"
+    },
+    {
+      "endpoint": "ota.test_ping",
+      "reason": "not a GET surface",
+      "url": "/ota/test-ping"
+    },
+    {
+      "endpoint": "ota.retry_webhook",
+      "reason": "not a GET surface",
+      "url": "/ota/webhook/retry/<int:log_id>"
+    },
+    {
+      "endpoint": "main.save_app_branding",
+      "reason": "not a GET surface",
+      "url": "/owner/app-branding"
+    },
+    {
+      "endpoint": "main.void_payment",
+      "reason": "not a GET surface",
+      "url": "/payment/<int:payment_id>/void"
+    },
+    {
+      "endpoint": "portal.form",
+      "reason": "Requires a pre-check-in token. Deferred to D6.",
+      "url": "/portal/<token_str>"
+    },
+    {
+      "endpoint": "portal.complete",
+      "reason": "Requires a pre-check-in token. Deferred to D6.",
+      "url": "/portal/<token_str>/complete"
+    },
+    {
+      "endpoint": "portal.submit",
+      "reason": "not a GET surface",
+      "url": "/portal/<token_str>/submit"
+    },
+    {
+      "endpoint": "portal.send_link",
+      "reason": "not a GET surface",
+      "url": "/portal/send/<int:reservation_id>"
+    },
+    {
+      "endpoint": "portal.submissions",
+      "reason": "Requires a pre-check-in token. Deferred to D6.",
+      "url": "/portal/submissions"
+    },
+    {
+      "endpoint": "pos.room_charges_api",
+      "reason": "UNRESOLVED \u2014 no entity matches: lowest reservation id with status CheckedIn",
+      "url": "/pos/api/room-charges/{id}"
+    },
+    {
+      "endpoint": "pos.delete_item",
+      "reason": "not a GET surface",
+      "url": "/pos/items/<int:item_id>/delete"
+    },
+    {
+      "endpoint": "pos.toggle_item",
+      "reason": "not a GET surface",
+      "url": "/pos/items/<int:item_id>/toggle"
+    },
+    {
+      "endpoint": "pos.create_item",
+      "reason": "not a GET surface",
+      "url": "/pos/items/create"
+    },
+    {
+      "endpoint": "pos.post_charge",
+      "reason": "not a GET surface",
+      "url": "/pos/post"
+    },
+    {
+      "endpoint": "main.serve_private_upload",
+      "reason": "Serves uploaded guest documents. Excluded so that guest identity documents are never written into an evidence pack.",
+      "url": "/private-uploads/<path:filepath>"
+    },
+    {
+      "endpoint": "rates.delete",
+      "reason": "not a GET surface",
+      "url": "/rates/<int:plan_id>/delete"
+    },
+    {
+      "endpoint": "rates.edit",
+      "reason": "not a GET surface",
+      "url": "/rates/<int:plan_id>/edit"
+    },
+    {
+      "endpoint": "rates.toggle",
+      "reason": "not a GET surface",
+      "url": "/rates/<int:plan_id>/toggle"
+    },
+    {
+      "endpoint": "rates.create",
+      "reason": "not a GET surface",
+      "url": "/rates/create"
+    },
+    {
+      "endpoint": "reports.night_audit_advance_date",
+      "reason": "not a GET surface",
+      "url": "/reports/night-audit/advance-date"
+    },
+    {
+      "endpoint": "reports.night_audit_complete",
+      "reason": "not a GET surface",
+      "url": "/reports/night-audit/complete"
+    },
+    {
+      "endpoint": "reports.night_audit_reopen",
+      "reason": "not a GET surface",
+      "url": "/reports/night-audit/reopen"
+    },
+    {
+      "endpoint": "reports.night_audit_rerun_skipped",
+      "reason": "not a GET surface",
+      "url": "/reports/night-audit/rerun-skipped"
+    },
+    {
+      "endpoint": "reports.night_audit_run",
+      "reason": "not a GET surface",
+      "url": "/reports/night-audit/run"
+    },
+    {
+      "endpoint": "reports.delete_ota_payout",
+      "reason": "not a GET surface",
+      "url": "/reports/ota-payouts/<int:payout_id>/delete"
+    },
+    {
+      "endpoint": "reports.add_ota_payout",
+      "reason": "not a GET surface",
+      "url": "/reports/ota-payouts/add"
+    },
+    {
+      "endpoint": "main.block_room",
+      "reason": "not a GET surface",
+      "url": "/reservation/<int:reservation_id>/block-room"
+    },
+    {
+      "endpoint": "main.cancel_reservation",
+      "reason": "not a GET surface",
+      "url": "/reservation/<int:reservation_id>/cancel"
+    },
+    {
+      "endpoint": "main.extend_stay",
+      "reason": "not a GET surface",
+      "url": "/reservation/<int:reservation_id>/extend"
+    },
+    {
+      "endpoint": "main.extend_hourly",
+      "reason": "not a GET surface",
+      "url": "/reservation/<int:reservation_id>/extend-hourly"
+    },
+    {
+      "endpoint": "main.add_overstay_charge",
+      "reason": "not a GET surface",
+      "url": "/reservation/<int:reservation_id>/overstay-charge"
+    },
+    {
+      "endpoint": "main.room_change",
+      "reason": "not a GET surface",
+      "url": "/reservation/<int:reservation_id>/room-change"
+    },
+    {
+      "endpoint": "main.shorten_stay",
+      "reason": "not a GET surface",
+      "url": "/reservation/<int:reservation_id>/shorten-stay"
+    },
+    {
+      "endpoint": "main.checkin",
+      "reason": "parameterised and not declared in DECLARED_PARAMETERISED",
+      "url": "/reservations/<int:reservation_id>/checkin"
+    },
+    {
+      "endpoint": "main.block_rooms",
+      "reason": "not a GET surface",
+      "url": "/reservations/block-rooms"
+    },
+    {
+      "endpoint": "main.bulk_booking",
+      "reason": "not a GET surface",
+      "url": "/reservations/bulk-booking"
+    },
+    {
+      "endpoint": "main.update_room_status",
+      "reason": "not a GET surface",
+      "url": "/rooms/<int:room_id>/status"
+    },
+    {
+      "endpoint": "static",
+      "reason": "Static assets. Not application output.",
+      "url": "/static/<path:filename>"
+    },
+    {
+      "endpoint": "main.walkin_full_checkin",
+      "reason": "not a GET surface",
+      "url": "/walkin-full-checkin"
+    },
+    {
+      "endpoint": "webhook.handle_booking",
+      "reason": "not a GET surface",
+      "url": "/webhook/booking"
+    },
+    {
+      "endpoint": "webhook.ping",
+      "reason": "Liveness probe for an external channel manager.",
+      "url": "/webhook/ping"
+    }
+  ],
+  "normalisation_rules": [
+    {
+      "name": "csp_nonce_attr",
+      "pattern": "nonce=\"[A-Za-z0-9+/=_-]{8,}\"",
+      "why": "Content-Security-Policy nonce, regenerated per request by app.__init__._generate_csp_nonce. Carries no application state."
+    },
+    {
+      "name": "csrf_meta",
+      "pattern": "(<meta[^>]*name=\"csrf-token\"[^>]*content=\")[^\"]+(\")",
+      "why": "Flask-WTF CSRF token in the page meta tag. Signed and timestamped, so it differs every render."
+    },
+    {
+      "name": "csrf_input",
+      "pattern": "(name=\"csrf_token\"[^>]*value=\")[^\"]+(\")",
+      "why": "Flask-WTF CSRF token in a hidden form input."
+    }
+  ],
+  "principal": {
+    "role": "Admin",
+    "user_id": 1,
+    "username": "admin"
+  },
+  "pvf_version": "0.2.0",
+  "read_only_verified": true,
+  "source_db": "C:\\Users\\SIPL Server\\Downloads\\DSS\\SukoonPMS\\SukoonPMS\\instance\\pms.db",
+  "source_hash_after": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+  "source_hash_before": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+  "started_at": "2026-08-03T11:38:16",
+  "surface_index": [
+    {
+      "body_sha256": "72949b4fdbd2817dce7296ac75fe399fbfbd43c9a37d29febe2ea84221f6b6ce",
+      "category": "ADVISORY",
+      "figure_count": 5,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "ai.anomaly_dashboard",
+      "url": "/ai/anomalies"
+    },
+    {
+      "body_sha256": "86ae70dd0b82f17e1bd86b3b8479d78e3e6f9c726c66f43dd100d0eb83855feb",
+      "category": "ADVISORY",
+      "figure_count": 11,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "ai.api_ai_insights",
+      "url": "/api/ai/insights"
+    },
+    {
+      "body_sha256": "6a86451ae0dacb3862c8133273b78b8fab4569ae0a2c9bf14545cea625afcfbe",
+      "category": "ADVISORY",
+      "figure_count": 12,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "ai.api_anomalies",
+      "url": "/api/ai/anomalies"
+    },
+    {
+      "body_sha256": "0b77e7c2756d1b443b61230ed55b4de53a610b3567132960b98c68da9d7d6893",
+      "category": "ADVISORY",
+      "figure_count": 64,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "ai.api_ceo_kpi_pack",
+      "url": "/api/ceo/kpi-pack"
+    },
+    {
+      "body_sha256": "908dd5fd75d5384b501cfd511554ce7877b98f475887d6c161f11e2941428798",
+      "category": "ADVISORY",
+      "figure_count": 302,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "ai.api_demand_calendar",
+      "url": "/api/ai/demand-calendar"
+    },
+    {
+      "body_sha256": "018be1ba0b87421e5b6f6a471d556c0c5f5d3b05d231756835ea993491929261",
+      "category": "ADVISORY",
+      "figure_count": 4,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "ai.api_demand_spikes",
+      "url": "/api/ai/demand-spikes"
+    },
+    {
+      "body_sha256": "a785e7c54dfc14d68ce1ba8c36f78c17369df4a78a22524edef98f990cfe3a53",
+      "category": "ADVISORY",
+      "figure_count": 483,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "ai.api_forecast",
+      "url": "/api/ai/forecast"
+    },
+    {
+      "body_sha256": "4b8355eaf454a0d543c70ad584b167e1437b95fc928dc4d6ca9c643b8ff98423",
+      "category": "ADVISORY",
+      "figure_count": 38,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "ai.api_forecast_monthly",
+      "url": "/api/ai/forecast/monthly"
+    },
+    {
+      "body_sha256": "8bab0247f542619d4c200a201d16456756eb23daa88824fc66a5d49326103090",
+      "category": "ADVISORY",
+      "figure_count": 2,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "ai.api_pm_categories",
+      "url": "/api/ai/predictive-maintenance/categories"
+    },
+    {
+      "body_sha256": "496e8063b165d6a7cc06b317edaf137f32f24b0d4f2ac34ee630acfd31d59208",
+      "category": "ADVISORY",
+      "figure_count": 2,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "ai.api_pm_equipment",
+      "url": "/api/ai/predictive-maintenance/equipment"
+    },
+    {
+      "body_sha256": "2a2677796430d1e59321c23de15437b6cd98586ccce38f779990886e90f39689",
+      "category": "ADVISORY",
+      "figure_count": 275,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "ai.api_pm_health",
+      "url": "/api/ai/predictive-maintenance/health"
+    },
+    {
+      "body_sha256": "6f91029d17cafafa5b100e339143f52f71307ab7c7894c8caabf9fbc07881829",
+      "category": "ADVISORY",
+      "figure_count": 3,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "ai.api_pm_predictions",
+      "url": "/api/ai/predictive-maintenance/predictions"
+    },
+    {
+      "body_sha256": "bb4e155c7a9840c61e6df7ba9ac52bca837678fb4cfbfa9d0e5d6cd7aa48830d",
+      "category": "ADVISORY",
+      "figure_count": 2,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "ai.api_pm_schedules",
+      "url": "/api/ai/predictive-maintenance/schedules"
+    },
+    {
+      "body_sha256": "7bdcef34d89492dae5015345748f0144cc9ad0904fad830d5c086c72be2e3660",
+      "category": "ADVISORY",
+      "figure_count": 287,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "ai.api_predictive_maintenance",
+      "url": "/api/ai/predictive-maintenance"
+    },
+    {
+      "body_sha256": "19f1e449cafdd2fb83d6f3cb3430281aab15e01ac4a38a2d13aff26a96627adc",
+      "category": "ADVISORY",
+      "figure_count": 15,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "ai.api_sentiment",
+      "url": "/api/ai/sentiment"
+    },
+    {
+      "body_sha256": "39713a2dbcaf22b10f82e6b228925f1d6507c612a1f579dc65ba2cc4c7721568",
+      "category": "ADVISORY",
+      "figure_count": 5,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "ai.demand_calendar_page",
+      "url": "/ai/demand-calendar"
+    },
+    {
+      "body_sha256": "c1444b3a6feddfc7332aa4d214c672bb6abcc5edadd39d5f675e88d72f6a46a7",
+      "category": "ADVISORY",
+      "figure_count": 5,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "ai.forecast_dashboard",
+      "url": "/ai/forecast"
+    },
+    {
+      "body_sha256": "12dedb2562e53670e3cd4d664dfb595ac8c05fbd6e684222b1155384a35ec6b4",
+      "category": "ADVISORY",
+      "figure_count": 5,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "ai.predictive_maintenance_dashboard",
+      "url": "/ai/predictive-maintenance"
+    },
+    {
+      "body_sha256": "b0ef30f7d6103f517bd3b7912c23f9a404eed6874144a8529e5fc8e33c6b257e",
+      "category": "ADVISORY",
+      "figure_count": 5,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "ai.sentiment_dashboard",
+      "url": "/ai/sentiment"
+    },
+    {
+      "body_sha256": "296cdc8987ab201d06315d94c313bcc7f018929d4da42b6a66eb16e9bedaed1f",
+      "category": "ADVISORY",
+      "figure_count": 984,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "ai_pricing.dashboard",
+      "url": "/ai/pricing/dashboard"
+    },
+    {
+      "body_sha256": "3e88b1a65b542b021774679d05c209981fac3083a20abc5e0bc2bb7752fc152a",
+      "category": "ADVISORY",
+      "figure_count": 15,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "ai_pricing.get_settings",
+      "url": "/ai/pricing/settings"
+    },
+    {
+      "body_sha256": "438f170fc7a6364d0c005add681c41be854d756ddfac78b47cb9cb7ba7707b26",
+      "category": "ADVISORY",
+      "figure_count": 725,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "ai_pricing.recommendations_api",
+      "url": "/ai/pricing/recommendations"
+    },
+    {
+      "body_sha256": "6eaa9e085590df68656b92482b060e6af38f957753365d2f32958c812d98aff7",
+      "category": "OPERATIONAL",
+      "figure_count": 5,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "auth.change_password",
+      "url": "/auth/change-password"
+    },
+    {
+      "body_sha256": "277417c41a4f388148f5d417ab45695967adf8e7ea28bce7ef634adc1e01c419",
+      "category": "OPERATIONAL",
+      "figure_count": 0,
+      "severity": "WARN",
+      "status": 302,
+      "surface_id": "auth.login",
+      "url": "/auth/login"
+    },
+    {
+      "body_sha256": "bab9446dcd1def30d9baef63be329085418a1ee29e8b94b9fa96962a0fbfaa2e",
+      "category": "OPERATIONAL",
+      "figure_count": 6,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "auth.shift_pending_approvals",
+      "url": "/auth/shifts/pending-approvals"
+    },
+    {
+      "body_sha256": "8931f699d96fb6a23698f707bf243b7895a8f8bfb0c9d3760b995dc0916b5eb0",
+      "category": "OPERATIONAL",
+      "figure_count": 5,
+      "severity": "WARN",
+      "status": 500,
+      "surface_id": "auth.shifts",
+      "url": "/auth/shifts"
+    },
+    {
+      "body_sha256": "2c1c1308096e3b8c57c43763b22cacb02f7f0a9c2ab9b7194ca9b2652f0968ef",
+      "category": "OPERATIONAL",
+      "figure_count": 9,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "auth.users",
+      "url": "/auth/users"
+    },
+    {
+      "body_sha256": "356f7c40daa31a5f63d5932cc770f1f849b381e7b636a52e9bade4417f9bde8c",
+      "category": "OPERATIONAL",
+      "figure_count": 7,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "backup.index",
+      "url": "/backup/"
+    },
+    {
+      "body_sha256": "0f48a651af7affdac6f583d949c886de741c8ba511c13f320c874deb7123fa00",
+      "category": "FINANCIAL",
+      "figure_count": 6,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "billing.credit_notes_list",
+      "url": "/billing/credit-notes"
+    },
+    {
+      "body_sha256": "9b23d9fb51640223cd2c522c1dd66aedf084265f7e1c446d39e2255368623d58",
+      "category": "FINANCIAL",
+      "figure_count": 81,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "billing.gst_report",
+      "url": "/billing/gst-report"
+    },
+    {
+      "body_sha256": "6131207a71fe8dfceab2a52d155d0d31039cbba1443523d418e2b184d6eb5360",
+      "category": "FINANCIAL",
+      "figure_count": 122,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "billing.invoice_register",
+      "url": "/billing/invoice-register"
+    },
+    {
+      "body_sha256": "a3a0254e3743fccdd15a2b2fdd84b380d4e80b4bf9ca67e83d93d005af616051",
+      "category": "FINANCIAL",
+      "figure_count": 2,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "billing.void_eligible__any_payment",
+      "url": "/billing/void/eligible/1"
+    },
+    {
+      "body_sha256": "50a3b2e199812b7aaaed67ee1ee471156031901323700bae2f44e6cab5a75a86",
+      "category": "FINANCIAL",
+      "figure_count": 7,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "billing.void_history__any_reservation",
+      "url": "/billing/void/history/1"
+    },
+    {
+      "body_sha256": "26a81bd1bb46e9808940ebb7d29c9f3fcc732fb0be649a6e44018efa3a73a13d",
+      "category": "FINANCIAL",
+      "figure_count": 6,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "billing.void_pending",
+      "url": "/billing/void/pending"
+    },
+    {
+      "body_sha256": "7103b1fd92b6b52605b7b71d915c681719e1dd31cf4bd041fca67c82298ccb2b",
+      "category": "PUBLIC",
+      "figure_count": 1,
+      "severity": "INFO",
+      "status": 400,
+      "surface_id": "booking.availability_api",
+      "url": "/book/api/availability"
+    },
+    {
+      "body_sha256": "c483b130863185fe531efa405ae2618f7c0ecddc572febedad38b32270d4f402",
+      "category": "PUBLIC",
+      "figure_count": 11,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "booking.index",
+      "url": "/book/"
+    },
+    {
+      "body_sha256": "036101d37f9b6007652d675134a823c4d0b531898b4461f3e8c519eba3f8ee30",
+      "category": "PUBLIC",
+      "figure_count": 13,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "booking.rates_api",
+      "url": "/book/api/rates"
+    },
+    {
+      "body_sha256": "ae33f10f01bc982d6af8930f653ae6160206a2d0b214b23752ba33e38732a1e6",
+      "category": "PUBLIC",
+      "figure_count": 6,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "feedback.complete",
+      "url": "/feedback/complete"
+    },
+    {
+      "body_sha256": "fa059cc4889e7c87659df3c11331ed3d7689bb7c02a7d84cf3e78e53902769fa",
+      "category": "OPERATIONAL",
+      "figure_count": 17,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "feedback.dashboard",
+      "url": "/feedback/dashboard"
+    },
+    {
+      "body_sha256": "7c54f803ae24d2c3acc6c16ab0d5061f2e374cae025e239e4fbf5c0d9585e266",
+      "category": "FINANCIAL",
+      "figure_count": 11,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "folio.list_folios__checked_out_reservation",
+      "url": "/api/reservation/1/folios"
+    },
+    {
+      "body_sha256": "bf0d5ac1bd90d4580d4d358121e5f8cdf605c8f6df7a9125c24aaf75677aa839",
+      "category": "OPERATIONAL",
+      "figure_count": 27,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "grc.preview__any_reservation",
+      "url": "/grc/1/preview"
+    },
+    {
+      "body_sha256": "cff6c788719b15d9953957902265b3dc3a47e922352f1d342b9795c11045a522",
+      "category": "OPERATIONAL",
+      "figure_count": 6,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "groups.index",
+      "url": "/groups/"
+    },
+    {
+      "body_sha256": "ac1571b8cf3ad293773c4d406bfb103d3efd5755968830565495f68d81c9b7a7",
+      "category": "OPERATIONAL",
+      "figure_count": 120,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "groups.new_group",
+      "url": "/groups/new"
+    },
+    {
+      "body_sha256": "44ba25e3063b75025fab45388986e0834bbdee3a8072feb3aac1ff8ce5c19a62",
+      "category": "OPERATIONAL",
+      "figure_count": 3,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "loyalty.api_balance__any_guest",
+      "url": "/loyalty/api/balance/1"
+    },
+    {
+      "body_sha256": "6bf2a52624d4a99833c1654a69d063fccec4f9939bec5ae2d277a19e8ff9d969",
+      "category": "FINANCIAL",
+      "figure_count": 9,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "loyalty.config",
+      "url": "/loyalty/config"
+    },
+    {
+      "body_sha256": "ed639659449ba29760a9199958374b4495925a56872396d024b106203038f061",
+      "category": "OPERATIONAL",
+      "figure_count": 18,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "loyalty.dashboard",
+      "url": "/loyalty/"
+    },
+    {
+      "body_sha256": "6500f96ece50607774ab4f6051859656347a04c8964ccb4e5eb8b20690cde8d2",
+      "category": "OPERATIONAL",
+      "figure_count": 11,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "loyalty.members",
+      "url": "/loyalty/members"
+    },
+    {
+      "body_sha256": "a9033ad531baa2af416d194c6d8fa180a557a48da589976b4bc78695614548a2",
+      "category": "FINANCIAL",
+      "figure_count": 9,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "loyalty.milestones",
+      "url": "/loyalty/milestones"
+    },
+    {
+      "body_sha256": "9ffdd3414ca29530f68431beb58650a3700fee6cfa53d2790fce0feb859253d1",
+      "category": "FINANCIAL",
+      "figure_count": 6,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "loyalty.transactions",
+      "url": "/loyalty/transactions"
+    },
+    {
+      "body_sha256": "be0c38afb2cab18addce06fc2d01d609e1b7d7bbcb278a7ebc9cbc55d0dc3d94",
+      "category": "OPERATIONAL",
+      "figure_count": 6,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.admin_duplicate_checkins",
+      "url": "/admin/duplicate-checkins"
+    },
+    {
+      "body_sha256": "971324b597884b34f266eb77c5b9b3f8adbe4d6d9ffccc8047efea87e32f9e9a",
+      "category": "OPERATIONAL",
+      "figure_count": 8,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.admin_lan_access",
+      "url": "/admin/lan-access"
+    },
+    {
+      "body_sha256": "21eedd109dc2c727722de8f69eee6397ba2c9abaf9307f65c800285f1f1082f7",
+      "category": "FINANCIAL",
+      "figure_count": 0,
+      "severity": "BLOCK",
+      "status": 302,
+      "surface_id": "main.advance_receipt__any_reservation",
+      "url": "/advance-receipt/1"
+    },
+    {
+      "body_sha256": "b01277e94698b6991b589071f573aee5e104c76227752a80a71620f4fb21bc96",
+      "category": "ADVISORY",
+      "figure_count": 29,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "main.ai_housekeeping_schedule",
+      "url": "/api/ai/housekeeping-schedule"
+    },
+    {
+      "body_sha256": "aa972469b18028d7af707d66c3425e5f4479d4de47a1443b3de069eb8415ab47",
+      "category": "FINANCIAL",
+      "figure_count": 252,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "main.analytics_data",
+      "url": "/api/analytics/data"
+    },
+    {
+      "body_sha256": "9a095d6c1888c7589add67218abb8ca95d409dd9789a3ae699f1d5583132881b",
+      "category": "OPERATIONAL",
+      "figure_count": 7,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.api_alerts_live",
+      "url": "/api/alerts/live"
+    },
+    {
+      "body_sha256": "cf6657ab26c62f8fe213a1e492d00a8db61fcae3f821ccc83038e4a2ad073baa",
+      "category": "OPERATIONAL",
+      "figure_count": 1,
+      "severity": "WARN",
+      "status": 400,
+      "surface_id": "main.api_cico_preview",
+      "url": "/api/cico/preview"
+    },
+    {
+      "body_sha256": "974e4feba60d3637e5fbe38bad7bc2cabf395e61486ada685d677ac1d7ca68a4",
+      "category": "OPERATIONAL",
+      "figure_count": 3,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.api_staff_performance_today",
+      "url": "/api/staff/performance/today"
+    },
+    {
+      "body_sha256": "76e8ccfeed5305a8346586747e3ad7331bfb1a7337a2cb6c40effffdb308b5a1",
+      "category": "OPERATIONAL",
+      "figure_count": 5,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.app_branding",
+      "url": "/owner/app-branding"
+    },
+    {
+      "body_sha256": "c1e3414afe16728d79c406f51878d8f948a34a575f078073f2115b7ca0a3871e",
+      "category": "FINANCIAL",
+      "figure_count": 5,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "main.ceo_dashboard",
+      "url": "/ceo"
+    },
+    {
+      "body_sha256": "0270aca43a75d2d21f0d75f5c39047be9ad829b87f74a284d1fe3f57642bf6b9",
+      "category": "FINANCIAL",
+      "figure_count": 183,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "main.command_center_data",
+      "url": "/api/dashboard/command-center/data"
+    },
+    {
+      "body_sha256": "692f7a820e6f35b282d12e8006eb2c0e996a975cc8e91f57d9f7e9e24bc529cd",
+      "category": "FINANCIAL",
+      "figure_count": 171,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "main.dashboard",
+      "url": "/dashboard"
+    },
+    {
+      "body_sha256": "0f7ab152ee9ade8cd69db39dc38e2799aa959051586db29d67d78bcfbf11ab19",
+      "category": "FINANCIAL",
+      "figure_count": 9,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "main.dashboard_alerts_summary",
+      "url": "/dashboard/alerts-summary"
+    },
+    {
+      "body_sha256": "2b8f71ef103db0d41f1217118bb41a37f68c8bf1b4cd7fb58072db325f1cfa91",
+      "category": "OPERATIONAL",
+      "figure_count": 0,
+      "severity": "WARN",
+      "status": 302,
+      "surface_id": "main.edit_reservation__any_reservation",
+      "url": "/reservation/1/edit"
+    },
+    {
+      "body_sha256": "ab53c81f1506bbc88359275d5fce62857039dc5fbb53bb237f3ffb59781520cd",
+      "category": "OPERATIONAL",
+      "figure_count": 11,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.find_duplicate_guests",
+      "url": "/api/guests/duplicates"
+    },
+    {
+      "body_sha256": "39620f2e41f8335ad7099c4b4ae50599b915016c3c4a0bf76678fcf64619a44e",
+      "category": "OPERATIONAL",
+      "figure_count": 11,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.get_reservation__any_reservation",
+      "url": "/api/reservation/1"
+    },
+    {
+      "body_sha256": "d2e16163681958cd8d9e31365b668e827b9769a93b4d63c9c3f73dba7a526edf",
+      "category": "OPERATIONAL",
+      "figure_count": 10,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.get_room_tariff__any_room",
+      "url": "/api/room/1/tariff"
+    },
+    {
+      "body_sha256": "280886ab829dae7e1651932d8bedf877f6adab3bc35161c8fdf383027cdd1342",
+      "category": "OPERATIONAL",
+      "figure_count": 253,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.get_vacant_rooms",
+      "url": "/api/rooms/vacant"
+    },
+    {
+      "body_sha256": "853c8189e9badd409a210a936fb888b70140ddd470448bd516c40f68219b11f3",
+      "category": "OPERATIONAL",
+      "figure_count": 0,
+      "severity": "WARN",
+      "status": 302,
+      "surface_id": "main.guest_database",
+      "url": "/guest-database"
+    },
+    {
+      "body_sha256": "950275b004d32816f2b671cce8a91e8510ab0ec18daea1ed88539771a19e3af0",
+      "category": "FINANCIAL",
+      "figure_count": 45,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "main.guest_folio__any_guest",
+      "url": "/guest/1"
+    },
+    {
+      "body_sha256": "62069ec5ee5d797c94302b0d8a905efa9fd84c549b7e45d6972740f0efa6a868",
+      "category": "OPERATIONAL",
+      "figure_count": 23,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.guest_history__any_guest",
+      "url": "/guest/1/history"
+    },
+    {
+      "body_sha256": "53c02f5449c460fc1aecfaa81ace440b4647a63007d80c9e8a2ded9db4b674be",
+      "category": "OPERATIONAL",
+      "figure_count": 10,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.guests_list",
+      "url": "/guests"
+    },
+    {
+      "body_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "category": "OPERATIONAL",
+      "figure_count": 1,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.handle_companies",
+      "url": "/api/companies"
+    },
+    {
+      "body_sha256": "8ca208ba5f4ebdf588e0dcc62cb46db58e27d7470513afe30e677f5aeeea333c",
+      "category": "PUBLIC",
+      "figure_count": 1,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "main.health",
+      "url": "/health"
+    },
+    {
+      "body_sha256": "b131d19fbc43a52383678de50dbbef58bd00a963f140d52f3a77c5a132eeca16",
+      "category": "PUBLIC",
+      "figure_count": 2,
+      "severity": "INFO",
+      "status": 200,
+      "surface_id": "main.health_check",
+      "url": "/api/health"
+    },
+    {
+      "body_sha256": "3210e3137ec3d4a1e92a450965dfdcf013fbb16894bf84a14ca2fc785d4f85f0",
+      "category": "OPERATIONAL",
+      "figure_count": 52,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.hk_mobile",
+      "url": "/hk"
+    },
+    {
+      "body_sha256": "8a76dd31071f104a929d5ee498def4f1f985f6213e7cd89a1eae4ebc68337a4c",
+      "category": "OPERATIONAL",
+      "figure_count": 14,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.housekeeping",
+      "url": "/housekeeping"
+    },
+    {
+      "body_sha256": "277417c41a4f388148f5d417ab45695967adf8e7ea28bce7ef634adc1e01c419",
+      "category": "OPERATIONAL",
+      "figure_count": 0,
+      "severity": "WARN",
+      "status": 302,
+      "surface_id": "main.index",
+      "url": "/"
+    },
+    {
+      "body_sha256": "638d93b254c11aa67c8c8d34c3d9fa7f24441e937bc22b094abec8c2fd1679eb",
+      "category": "FINANCIAL",
+      "figure_count": 52,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "main.invoice__checked_out_reservation",
+      "url": "/invoice/1"
+    },
+    {
+      "body_sha256": "a0f57f4b6e6b6ccee43d250ae747a3b09f0ee8536c8fedc45bc3a8ff05424ba2",
+      "category": "FINANCIAL",
+      "figure_count": 26,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "main.invoice_detail_api__checked_out_reservation",
+      "url": "/api/invoice-detail/1"
+    },
+    {
+      "body_sha256": "44c381b90c912458226f9198887c6f36ba76e6dbcad73946ecaaa9da9f3edfca",
+      "category": "FINANCIAL",
+      "figure_count": 228,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "main.invoice_manager",
+      "url": "/invoice-manager"
+    },
+    {
+      "body_sha256": "9acd89d83f779b6f32d89d7412e966d7494baaf9e11897c8711d43b03744112c",
+      "category": "FINANCIAL",
+      "figure_count": 5,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "main.load_dashboard_tab__analytics",
+      "url": "/api/dashboard/analytics"
+    },
+    {
+      "body_sha256": "e1d34b3cb3b9155cfd2fdcbe47966b357543933bc698d76373a4f52ef659727c",
+      "category": "FINANCIAL",
+      "figure_count": 5,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "main.load_dashboard_tab__command_center",
+      "url": "/api/dashboard/command-center"
+    },
+    {
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "category": "OPERATIONAL",
+      "figure_count": 0,
+      "severity": "WARN",
+      "status": 404,
+      "surface_id": "main.load_tab__booking",
+      "url": "/api/tab/booking"
+    },
+    {
+      "body_sha256": "44f7b5627db44586006fbe32aebf00723d1dcfeb5efa1fd886e84b7c6db5aa96",
+      "category": "OPERATIONAL",
+      "figure_count": 35,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.load_tab__overview",
+      "url": "/api/tab/overview"
+    },
+    {
+      "body_sha256": "a8eade16d8b6cd21ffcde5063aa3bbfc87268f7d4ae1de43e9a6923f782f060d",
+      "category": "OPERATIONAL",
+      "figure_count": 5,
+      "severity": "WARN",
+      "status": 500,
+      "surface_id": "main.load_tab__reservations",
+      "url": "/api/tab/reservations"
+    },
+    {
+      "body_sha256": "9ee654010a86b57668c5074eee4af54b326fbc0a0f099fe6a4936230b793237a",
+      "category": "OPERATIONAL",
+      "figure_count": 89,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.masters",
+      "url": "/masters"
+    },
+    {
+      "body_sha256": "4753c1407d9755412f1b169c522ba34246be532f668191f8664ee8bd9198008c",
+      "category": "OPERATIONAL",
+      "figure_count": 22,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.new_reservation",
+      "url": "/reservations/new"
+    },
+    {
+      "body_sha256": "42289dd32dad207acff8eaff526133cda192d64ce0c187acc9ef73921842bac4",
+      "category": "FINANCIAL",
+      "figure_count": 493,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "main.night_audit",
+      "url": "/night-audit"
+    },
+    {
+      "body_sha256": "fe7660d67e237e3a0cf3e1ec7edd89fccd572bbf105f4562b28e3e549d38c4fd",
+      "category": "OPERATIONAL",
+      "figure_count": 21,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.nightly_rate_inspector__any_reservation",
+      "url": "/reservations/1/nightly-rates"
+    },
+    {
+      "body_sha256": "1e7ee1654d5b273d2e1771d3c2820147d845abf58d85bf3fbddc784b6be60ed5",
+      "category": "FINANCIAL",
+      "figure_count": 20,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "main.reservation_folio__checked_out_reservation",
+      "url": "/folio/1"
+    },
+    {
+      "body_sha256": "d89086cb0f324dfa40c9d10944d271bb4aee95a00ca9fb7facf59a57e4dd9fab",
+      "category": "OPERATIONAL",
+      "figure_count": 113,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.reservations",
+      "url": "/reservations"
+    },
+    {
+      "body_sha256": "818f6a62d492c422a8bc8819d82fae48ef69b74cea6bc0743d9d2f1d31a7141e",
+      "category": "OPERATIONAL",
+      "figure_count": 116,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.room_grid",
+      "url": "/room-grid"
+    },
+    {
+      "body_sha256": "bbcc36c2168b53972ca64bef48031f723ef127e8a7bea2519f284578ff2648c5",
+      "category": "OPERATIONAL",
+      "figure_count": 50,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.rooms",
+      "url": "/rooms"
+    },
+    {
+      "body_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "category": "OPERATIONAL",
+      "figure_count": 1,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.search_guests",
+      "url": "/api/search-guests"
+    },
+    {
+      "body_sha256": "d05502c1bc699325b5242b65998bc475b0f9420b1e6a4a00167d4f81d20bc85a",
+      "category": "OPERATIONAL",
+      "figure_count": 5,
+      "severity": "WARN",
+      "status": 404,
+      "surface_id": "main.setup_wizard",
+      "url": "/setup"
+    },
+    {
+      "body_sha256": "5413f61813dcee10cf27960071457af9c562f59baca445cbf9741ee2af385876",
+      "category": "FINANCIAL",
+      "figure_count": 1,
+      "severity": "BLOCK",
+      "status": 400,
+      "surface_id": "main.voucher_lookup",
+      "url": "/api/voucher/lookup"
+    },
+    {
+      "body_sha256": "901297e0e4a0f1452b9e7fb271734554e1bf0f39d5bd7dbb3b8226b7717ae557",
+      "category": "OPERATIONAL",
+      "figure_count": 99,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "main.walkin_checkin_new",
+      "url": "/checkin/new"
+    },
+    {
+      "body_sha256": "7ebaa1a2a55879d358df72fc11f611567f613550dc7c0d84782a984966291f87",
+      "category": "OPERATIONAL",
+      "figure_count": 51,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "maintenance.index",
+      "url": "/maintenance/"
+    },
+    {
+      "body_sha256": "26aa5c65bff3426b6faffcdafc377d704a986630d7f32c60a72b335e4248b2f5",
+      "category": "OPERATIONAL",
+      "figure_count": 7,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "noshow.pending",
+      "url": "/noshow/pending"
+    },
+    {
+      "body_sha256": "2a5b000467054a8d7da2a298c0d6d46a0e1bc22cfc5e93221fa3122ed169a45d",
+      "category": "FINANCIAL",
+      "figure_count": 13,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "noshow.report",
+      "url": "/noshow/report"
+    },
+    {
+      "body_sha256": "cb9194f848a0c8bf413a4a47017bacadece0cad38d0b598d0194df5797d00a0f",
+      "category": "FINANCIAL",
+      "figure_count": 14,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "ota.bookings",
+      "url": "/ota/bookings"
+    },
+    {
+      "body_sha256": "731b9a19d97a75f2b7738a49ac5cbfb0b3561b60fdc9748ef1a77d36ef9c6fff",
+      "category": "FINANCIAL",
+      "figure_count": 20,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "ota.dashboard",
+      "url": "/ota/"
+    },
+    {
+      "body_sha256": "25e061ea3cbcdf14c5ad3789bc6aa3ca7942d5123712430493e7fe47ec5cb83f",
+      "category": "FINANCIAL",
+      "figure_count": 7,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "ota.settings",
+      "url": "/ota/settings"
+    },
+    {
+      "body_sha256": "876ef1ff93794b2a27083f89b07d80c518d51e5bd3fe0f59bdf92aa9ec4bbdb8",
+      "category": "FINANCIAL",
+      "figure_count": 6,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "ota.webhook_logs",
+      "url": "/ota/webhook/logs"
+    },
+    {
+      "body_sha256": "fa439f5075a32f212627606afc0025ad98eeffa48e90ed0c97611565dd425e75",
+      "category": "OPERATIONAL",
+      "figure_count": 0,
+      "severity": "WARN",
+      "status": 302,
+      "surface_id": "portal.view_submission__any_reservation",
+      "url": "/portal/submissions/1"
+    },
+    {
+      "body_sha256": "3b959126ac9c0bbef9266c58d1594ecb537d5cf5b95f5c5b0667338b57e47081",
+      "category": "FINANCIAL",
+      "figure_count": 20,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "pos.index",
+      "url": "/pos/"
+    },
+    {
+      "body_sha256": "187c2064688b255cf96d5cd0a0d6fc1d030be1d2c0ef3a153b43e3497cda97dd",
+      "category": "FINANCIAL",
+      "figure_count": 14,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "pos.items",
+      "url": "/pos/items"
+    },
+    {
+      "body_sha256": "c68a4a03e244288e82666c09cd4c8085ab15033089b410d54fc77abbfdc7fa90",
+      "category": "OPERATIONAL",
+      "figure_count": 10,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "rates.index",
+      "url": "/rates/"
+    },
+    {
+      "body_sha256": "0d2a29e4d7fa57d42240ba2b4eb29786f7b7a29a9e75dbe25c89a1ec68419f1a",
+      "category": "OPERATIONAL",
+      "figure_count": 62,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "rates.notification_logs",
+      "url": "/rates/notification-logs"
+    },
+    {
+      "body_sha256": "7e597c1226268b16a5a42f63c662763f2643def40b4348c70bc210d83ced6079",
+      "category": "FINANCIAL",
+      "figure_count": 9,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.api_ota_reconciliation_summary",
+      "url": "/reports/api/ota-reconciliation/summary"
+    },
+    {
+      "body_sha256": "bfd6ce7af1461d95e529a941fc6edfe65dffaa79125104bf66058dc299ffa3cc",
+      "category": "FINANCIAL",
+      "figure_count": 5,
+      "severity": "BLOCK",
+      "status": 500,
+      "surface_id": "reports.ar_aging",
+      "url": "/reports/ar-aging"
+    },
+    {
+      "body_sha256": "c475aa4f18f7af6bb9911a3d2233192bc646c1acbf6cce8b0c513fa8df1c0291",
+      "category": "FINANCIAL",
+      "figure_count": 8,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.arrivals",
+      "url": "/reports/arrivals"
+    },
+    {
+      "body_sha256": "b4a7b5331ba3bb87f271499db937f153ebf4b86e4a464ffa9330057658b5393e",
+      "category": "FINANCIAL",
+      "figure_count": 8,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.cancellation_report",
+      "url": "/reports/cancellations"
+    },
+    {
+      "body_sha256": "ce93ca62e4109c9f30835b2b39c0bd4700ea262df08aa6ef5074b4fc01fa35b7",
+      "category": "FINANCIAL",
+      "figure_count": 9,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.company_billing_report",
+      "url": "/reports/company-billing"
+    },
+    {
+      "body_sha256": "556dd5236fda9da655d13442aac08cf246d768f68874cab2f23cb4d76adcf42e",
+      "category": "FINANCIAL",
+      "figure_count": 32,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.credit_aging",
+      "url": "/reports/credit-aging"
+    },
+    {
+      "body_sha256": "96ddd1e86baaca60676553d160d069c228c8a77c12617d7b56fdb330392b8e5c",
+      "category": "FINANCIAL",
+      "figure_count": 23,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.credit_ledger",
+      "url": "/reports/credit-ledger"
+    },
+    {
+      "body_sha256": "c6d1ae53a2f102d635a812775eb35c3e75bc49a34ec9fca8c002e2508382ce05",
+      "category": "FINANCIAL",
+      "figure_count": 52,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.daily_profit_snapshot",
+      "url": "/reports/daily-profit-snapshot"
+    },
+    {
+      "body_sha256": "bfd6ce7af1461d95e529a941fc6edfe65dffaa79125104bf66058dc299ffa3cc",
+      "category": "FINANCIAL",
+      "figure_count": 5,
+      "severity": "BLOCK",
+      "status": 500,
+      "surface_id": "reports.daily_reconciliation",
+      "url": "/reports/daily-reconciliation"
+    },
+    {
+      "body_sha256": "bfd6ce7af1461d95e529a941fc6edfe65dffaa79125104bf66058dc299ffa3cc",
+      "category": "FINANCIAL",
+      "figure_count": 5,
+      "severity": "BLOCK",
+      "status": 500,
+      "surface_id": "reports.daily_reconciliation__date_2026_05_28",
+      "url": "/reports/daily-reconciliation?date=2026-05-28"
+    },
+    {
+      "body_sha256": "a1896496ca7e2e15d961fdd5ad4c7cda7df27ce30becd38c3f33ebf4298d5c5b",
+      "category": "FINANCIAL",
+      "figure_count": 20,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.departures",
+      "url": "/reports/departures"
+    },
+    {
+      "body_sha256": "740da9a3e6d6aa5e9040edd514b80aca6ccacbbc6d0051004a42c6e99134d00d",
+      "category": "FINANCIAL",
+      "figure_count": 40,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.flash_report",
+      "url": "/reports/flash"
+    },
+    {
+      "body_sha256": "740da9a3e6d6aa5e9040edd514b80aca6ccacbbc6d0051004a42c6e99134d00d",
+      "category": "FINANCIAL",
+      "figure_count": 40,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.flash_report__date_2026_05_28",
+      "url": "/reports/flash?date=2026-05-28"
+    },
+    {
+      "body_sha256": "2259fdba65fcb3bdf2abddcf3a3468a0fe4237b1c8b92d21e9ddb600aa7424ac",
+      "category": "FINANCIAL",
+      "figure_count": 119,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.front_office_mis",
+      "url": "/reports/front-office-mis"
+    },
+    {
+      "body_sha256": "2259fdba65fcb3bdf2abddcf3a3468a0fe4237b1c8b92d21e9ddb600aa7424ac",
+      "category": "FINANCIAL",
+      "figure_count": 119,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.front_office_mis__from_date_2026_05_01_to_date_2026_05_28",
+      "url": "/reports/front-office-mis?from_date=2026-05-01&to_date=2026-05-28"
+    },
+    {
+      "body_sha256": "167071cc3c9e20535d7c3e7ecc1f74d56e701ee333bb26fd776806f20adfa598",
+      "category": "FINANCIAL",
+      "figure_count": 9,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.future_bookings_report",
+      "url": "/reports/future-bookings"
+    },
+    {
+      "body_sha256": "602c52cbee1368e19e20dfcebadc5f197f7b1771e01f564ffb0d9e813c351846",
+      "category": "FINANCIAL",
+      "figure_count": 7,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.gstr1_export",
+      "url": "/reports/gstr1-export"
+    },
+    {
+      "body_sha256": "63beb48c6c8d9e5687e8ca59d817fff215cae1fa35fe80bd027eac3a403e2abf",
+      "category": "FINANCIAL",
+      "figure_count": 34,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.guest_history",
+      "url": "/reports/guest-history"
+    },
+    {
+      "body_sha256": "bfd6ce7af1461d95e529a941fc6edfe65dffaa79125104bf66058dc299ffa3cc",
+      "category": "FINANCIAL",
+      "figure_count": 5,
+      "severity": "BLOCK",
+      "status": 500,
+      "surface_id": "reports.guest_report",
+      "url": "/reports/guest-report"
+    },
+    {
+      "body_sha256": "d944098c497f0652b5c6ad6c1f18d36183c0256e0bb63860e4f4dc8f42b8bdcb",
+      "category": "FINANCIAL",
+      "figure_count": 49,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.housekeeping_report",
+      "url": "/reports/housekeeping"
+    },
+    {
+      "body_sha256": "7e43e78f939ba595ef08d97d4affaa7cee94391de7b050cd9415043693f0bb5e",
+      "category": "FINANCIAL",
+      "figure_count": 6,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.index",
+      "url": "/reports/"
+    },
+    {
+      "body_sha256": "c8022f09f039bbbcdd20edf0662f8b5c0ad54177fee2799409b040812a06babd",
+      "category": "FINANCIAL",
+      "figure_count": 9,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.inhouse",
+      "url": "/reports/inhouse"
+    },
+    {
+      "body_sha256": "d9a46fb6368ef625f3ac166dc9fa13f80447ec87974031acc8124d848f52a30c",
+      "category": "FINANCIAL",
+      "figure_count": 218,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.leakage",
+      "url": "/reports/leakage"
+    },
+    {
+      "body_sha256": "3b25bf1cff032325cacabd7c02fda0af4c45cc9804f7165e49bad9a7d84681d8",
+      "category": "FINANCIAL",
+      "figure_count": 7,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.maintenance_report",
+      "url": "/reports/maintenance"
+    },
+    {
+      "body_sha256": "ae290ef5ee990665c5e868f85a4d1e6b1a1e4bebfb2323ba1355add9d195d5f5",
+      "category": "FINANCIAL",
+      "figure_count": 42,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.money_at_risk",
+      "url": "/reports/money-at-risk"
+    },
+    {
+      "body_sha256": "cffd1c73ccc3c06a6a14379dc9ff0c33c0d936a1c7308a2ac1db2b81f0a1073d",
+      "category": "FINANCIAL",
+      "figure_count": 0,
+      "severity": "BLOCK",
+      "status": 302,
+      "surface_id": "reports.night_audit",
+      "url": "/reports/night-audit"
+    },
+    {
+      "body_sha256": "e3635410fea408382b9e413d1c23f8c6738ae019621122dbfeb31f386a2feb96",
+      "category": "FINANCIAL",
+      "figure_count": 7,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.night_audit_history",
+      "url": "/reports/night-audit/history"
+    },
+    {
+      "body_sha256": "a0e99672d5814672fd752d337ef24fc235d4fd4132ab442764d2dfc2576c9257",
+      "category": "FINANCIAL",
+      "figure_count": 401,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.night_audit_snapshot__night_audit_log",
+      "url": "/reports/night-audit/1"
+    },
+    {
+      "body_sha256": "e0487d9998111e9e83b9f06bdee9a65d72816b420087f26d6e67c4ae3dc8d250",
+      "category": "FINANCIAL",
+      "figure_count": 52,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.occupancy",
+      "url": "/reports/occupancy"
+    },
+    {
+      "body_sha256": "e0487d9998111e9e83b9f06bdee9a65d72816b420087f26d6e67c4ae3dc8d250",
+      "category": "FINANCIAL",
+      "figure_count": 52,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.occupancy__start_date_2026_05_01_end_date_2026_05_28",
+      "url": "/reports/occupancy?start_date=2026-05-01&end_date=2026-05-28"
+    },
+    {
+      "body_sha256": "cb0dc15de8c19f40f3017401bc0d388b3448b7ad79fa4e03f47c255efe72d6d9",
+      "category": "FINANCIAL",
+      "figure_count": 30,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.ota_receivables",
+      "url": "/reports/ota-receivables"
+    },
+    {
+      "body_sha256": "f35492b5a9a8835751e765907ae1f49c2f87f4a8c2798221e0dad1c77a4ad9cc",
+      "category": "FINANCIAL",
+      "figure_count": 17,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.ota_reconciliation",
+      "url": "/reports/ota-reconciliation"
+    },
+    {
+      "body_sha256": "bfd6ce7af1461d95e529a941fc6edfe65dffaa79125104bf66058dc299ffa3cc",
+      "category": "FINANCIAL",
+      "figure_count": 5,
+      "severity": "BLOCK",
+      "status": 500,
+      "surface_id": "reports.other_income_report",
+      "url": "/reports/other-income-report"
+    },
+    {
+      "body_sha256": "7d9602401f5e436f649946605735aa655cd99be46ee13f82aff6e77d47713958",
+      "category": "FINANCIAL",
+      "figure_count": 17,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.overstay_control",
+      "url": "/reports/overstay-control"
+    },
+    {
+      "body_sha256": "79d9cb432f4de9936ec52a0553cdbee78ebd68db338554f185b7c653e2289a7a",
+      "category": "FINANCIAL",
+      "figure_count": 50,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.payment_collection",
+      "url": "/reports/payments"
+    },
+    {
+      "body_sha256": "79d9cb432f4de9936ec52a0553cdbee78ebd68db338554f185b7c653e2289a7a",
+      "category": "FINANCIAL",
+      "figure_count": 50,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.payment_collection__start_date_2026_05_01_end_date_2026_05_28",
+      "url": "/reports/payments?start_date=2026-05-01&end_date=2026-05-28"
+    },
+    {
+      "body_sha256": "4d59f2a6f3b5a717caa43905aabece4e4903dd5245057d46d2f7874a2bb46a8e",
+      "category": "FINANCIAL",
+      "figure_count": 13,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.pending_payments_report",
+      "url": "/reports/pending-payments"
+    },
+    {
+      "body_sha256": "bfd6ce7af1461d95e529a941fc6edfe65dffaa79125104bf66058dc299ffa3cc",
+      "category": "FINANCIAL",
+      "figure_count": 5,
+      "severity": "BLOCK",
+      "status": 500,
+      "surface_id": "reports.refund_report",
+      "url": "/reports/refund-report"
+    },
+    {
+      "body_sha256": "ee74f0579529ffd43b3f38b873af703d10560a317ec15858d753ec1c8d9c3367",
+      "category": "FINANCIAL",
+      "figure_count": 53,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.revenue",
+      "url": "/reports/revenue"
+    },
+    {
+      "body_sha256": "ee74f0579529ffd43b3f38b873af703d10560a317ec15858d753ec1c8d9c3367",
+      "category": "FINANCIAL",
+      "figure_count": 53,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.revenue__start_date_2026_05_01_end_date_2026_05_28",
+      "url": "/reports/revenue?start_date=2026-05-01&end_date=2026-05-28"
+    },
+    {
+      "body_sha256": "e8265079a570d953c3a0146fd484184760addc2510de386458f968f5bb241605",
+      "category": "FINANCIAL",
+      "figure_count": 383,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.room_revenue",
+      "url": "/reports/room-revenue"
+    },
+    {
+      "body_sha256": "f371388eb4a8f1463b900f66b82e30c17362679beb8bc6f4c3a9bce0bfed6150",
+      "category": "FINANCIAL",
+      "figure_count": 89,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.room_status_report",
+      "url": "/reports/room-status"
+    },
+    {
+      "body_sha256": "f998a0953ae5b16df574f54dcc19705348c5473213cd17de6a4105561109d6c6",
+      "category": "FINANCIAL",
+      "figure_count": 7,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.shift_reconciliation",
+      "url": "/reports/shift-reconciliation"
+    },
+    {
+      "body_sha256": "589d6f956a932c2462b17cca2d32511862995b12ea04ecde8f12e44125e47bba",
+      "category": "FINANCIAL",
+      "figure_count": 38,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.source_analysis_report",
+      "url": "/reports/source-analysis"
+    },
+    {
+      "body_sha256": "bfd6ce7af1461d95e529a941fc6edfe65dffaa79125104bf66058dc299ffa3cc",
+      "category": "FINANCIAL",
+      "figure_count": 5,
+      "severity": "BLOCK",
+      "status": 500,
+      "surface_id": "reports.tip_report",
+      "url": "/reports/tip-report"
+    },
+    {
+      "body_sha256": "e60e55419d55b708e6334314e3eba4502da19be104431cbf48debc8fa372b05a",
+      "category": "FINANCIAL",
+      "figure_count": 10,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.void_adjustments_report",
+      "url": "/reports/void-adjustments"
+    },
+    {
+      "body_sha256": "c29ad7e5a4e70c5b9cf38554a58a00ffce73f6ccf2cd42383a4c54119f2c8821",
+      "category": "FINANCIAL",
+      "figure_count": 15,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.voucher_ledger",
+      "url": "/reports/voucher-ledger"
+    },
+    {
+      "body_sha256": "dfe4638c00046e6491b8dfa8f2c44cfc562c11671416b2606863d1b423acb9b1",
+      "category": "FINANCIAL",
+      "figure_count": 21,
+      "severity": "BLOCK",
+      "status": 200,
+      "surface_id": "reports.walkin_report",
+      "url": "/reports/walkin"
+    },
+    {
+      "body_sha256": "7403c214e54843304104462df0abdb9424ed83f759122534c9d4b660bdee6ee0",
+      "category": "OPERATIONAL",
+      "figure_count": 6,
+      "severity": "WARN",
+      "status": 200,
+      "surface_id": "webhook.webhook_logs",
+      "url": "/webhook/logs"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "anon_location": "/auth/login?next=%2Fai%2Fpredictive-maintenance",
+  "anon_status": 302,
+  "body_bytes": 47173,
+  "body_sha256": "12dedb2562e53670e3cd4d664dfb595ac8c05fbd6e684222b1155384a35ec6b4",
+  "category": "ADVISORY",
+  "content_type": "text/html",
+  "duration_ms": 6,
+  "endpoint": "ai.predictive_maintenance_dashboard",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 5,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "INFO",
+  "status": 200,
+  "surface_id": "ai.predictive_maintenance_dashboard",
+  "templates": [
+    "ai/predictive_maintenance_dashboard.html"
+  ],
+  "truncations": [],
+  "url": "/ai/predictive-maintenance"
+}

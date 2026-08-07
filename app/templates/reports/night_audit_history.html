@@ -1,0 +1,239 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Night Audit History{% endblock %}
+{% block report_name %}Night Audit History{% endblock %}
+
+{% block report_content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <h5 class="mb-1 fw-bold">
+      <i class="bi bi-clock-history me-2"></i>Night Audit History
+    </h5>
+    <div class="text-muted small">All audit records — click a date to view or manage</div>
+  </div>
+  <a href="{{ url_for('reports.night_audit') }}" class="btn btn-sm btn-outline-dark d-print-none">
+    <i class="bi bi-moon-stars-fill me-1"></i>Open Audit
+  </a>
+</div>
+
+{% set status_cls = {
+  'Completed':  'bg-success',
+  'Warning':    'bg-warning text-dark',
+  'Reopened':   'bg-info text-dark',
+  'InProgress': 'bg-primary',
+  'Pending':    'bg-secondary',
+} %}
+
+{% if logs %}
+<div class="table-responsive">
+  <table class="table table-hover align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>Business Date</th>
+        <th>Status</th>
+        <th class="text-end">Revenue (₹)</th>
+        <th class="text-end">Collected (₹)</th>
+        <th class="text-end">Outstanding (₹)</th>
+        <th class="text-center">Blockers</th>
+        <th class="text-center">Warnings</th>
+        <th class="text-center">Override</th>
+        <th>Completed By</th>
+        <th>Completed At</th>
+        <th class="text-center">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for log in logs %}
+      <tr>
+        <td>
+          <a href="{{ url_for('reports.night_audit', date=log.audit_date.isoformat()) }}"
+             class="fw-semibold text-decoration-none">
+            {{ log.audit_date.strftime('%d %b %Y') }}
+          </a>
+        </td>
+        <td>
+          <span class="badge {{ status_cls.get(log.status, 'bg-secondary') }}">
+            {{ log.status or 'Pending' }}
+          </span>
+          {% if log.override_used %}
+          <span class="badge bg-danger ms-1" title="{{ log.override_reason }}">Override</span>
+          {% endif %}
+        </td>
+        <td class="text-end">₹{{ '{:,.0f}'.format(log.total_revenue or 0) }}</td>
+        <td class="text-end">₹{{ '{:,.0f}'.format(log.total_payments or 0) }}</td>
+        <td class="text-end {{ 'text-danger fw-semibold' if (log.outstanding_amount or 0) > 0 else '' }}">
+          ₹{{ '{:,.0f}'.format(log.outstanding_amount or 0) }}
+        </td>
+        <td class="text-center">
+          {% if log.blocker_count > 0 %}
+          <span class="badge bg-danger">{{ log.blocker_count }}</span>
+          {% else %}
+          <span class="text-success"><i class="bi bi-check-circle"></i></span>
+          {% endif %}
+        </td>
+        <td class="text-center">
+          {% if log.warning_count > 0 %}
+          <span class="badge bg-warning text-dark">{{ log.warning_count }}</span>
+          {% else %}
+          <span class="text-success"><i class="bi bi-check-circle"></i></span>
+          {% endif %}
+        </td>
+        <td class="text-center">
+          {% if log.override_used %}
+          <i class="bi bi-exclamation-triangle-fill text-danger"
+             title="{{ log.override_reason or '' }}"></i>
+          {% else %}
+          <span class="text-muted">—</span>
+          {% endif %}
+        </td>
+        <td class="small">{{ log.run_by.full_name if log.run_by else '—' }}</td>
+        <td class="small">
+          {% if log.completed_at %}
+          {{ log.completed_at.strftime('%d %b %Y %H:%M') }}
+          {% else %}—{% endif %}
+        </td>
+        <td class="text-center">
+          <div class="d-flex gap-1 justify-content-center">
+            <a href="{{ url_for('reports.night_audit', date=log.audit_date.isoformat()) }}"
+               class="btn btn-xs btn-outline-primary" title="View Live">
+              <i class="bi bi-eye"></i>
+            </a>
+            {% if log.snapshot_json %}
+            <a href="{{ url_for('reports.night_audit_snapshot', log_id=log.id) }}"
+               class="btn btn-xs btn-outline-secondary" title="View Snapshot">
+              <i class="bi bi-camera"></i>
+            </a>
+            <a href="{{ url_for('reports.night_audit_snapshot', log_id=log.id, format='json') }}"
+               class="btn btn-xs btn-outline-secondary" title="JSON Export" target="_blank">
+              <i class="bi bi-braces"></i>
+            </a>
+            {% endif %}
+            {# Skipped-audit recovery — Admin-only. Opens a modal that
+               collects a mandatory reason before POSTing to the rerun
+               route. The route handles validation + history redirect. #}
+            {% if log.status == 'Skipped' and current_user.has_role('Admin') %}
+            <button type="button"
+                    class="btn btn-xs btn-warning fw-semibold"
+                    title="Re-run this skipped audit"
+                    data-bs-toggle="modal"
+                    data-bs-target="#fixSkippedModal"
+                    data-audit-date="{{ log.audit_date.isoformat() }}"
+                    data-audit-label="{{ log.audit_date.strftime('%d %b %Y') }}">
+              <i class="bi bi-wrench-adjustable me-1"></i>Fix
+            </button>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+
+      {# Reopen history sub-rows #}
+      {% if log.reopen_logs %}
+      {% for rl in log.reopen_logs %}
+      <tr class="table-warning small">
+        <td colspan="2" class="ps-4 text-muted fst-italic">
+          <i class="bi bi-arrow-counterclockwise me-1"></i>
+          Reopened {{ rl.reopened_at.strftime('%d %b %Y %H:%M') }}
+          by {{ rl.reopened_by.full_name if rl.reopened_by else '#' ~ rl.reopened_by_user_id }}
+        </td>
+        <td colspan="8" class="text-muted fst-italic">
+          Was: <span class="badge bg-secondary">{{ rl.previous_status }}</span>
+          &nbsp;·&nbsp; Reason: {{ rl.reason }}
+        </td>
+        <td></td>
+      </tr>
+      {% endfor %}
+      {% endif %}
+
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="text-center py-5 text-muted">
+  <i class="bi bi-moon-stars fs-1 d-block mb-2"></i>
+  No night audit records found.
+  <br><small>Run a night audit to start building history.</small>
+</div>
+{% endif %}
+
+<style>
+.btn-xs { padding: .15rem .35rem; font-size: .75rem; line-height: 1.2; }
+</style>
+
+{# ── Fix Skipped Day modal — populated by JS data-attributes ──────── #}
+{% if current_user.has_role('Admin') %}
+<div class="modal fade" id="fixSkippedModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form method="POST" action="{{ url_for('reports.night_audit_rerun_skipped') }}"
+          class="modal-content">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="audit_date" id="fixSkippedDate">
+      <div class="modal-header bg-warning-subtle">
+        <h5 class="modal-title">
+          <i class="bi bi-wrench-adjustable me-2"></i>
+          Re-run Skipped Audit — <span id="fixSkippedLabel">—</span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning small mb-3">
+          <i class="bi bi-info-circle-fill me-1"></i>
+          This will re-compute audit metrics for the selected date and
+          post any missing <code>room_rent</code> charges. The original
+          "Skipped (Override)" reason is preserved on record; a new
+          reopen-trail entry captures the reason below.
+        </div>
+        <div class="alert alert-danger small mb-3" id="fixSkippedDownstreamWarning" style="display:none;">
+          <i class="bi bi-exclamation-triangle-fill me-1"></i>
+          <strong>Heads up:</strong> audits already exist for dates AFTER
+          this one. Revenue / outstanding figures on those later days
+          may need review because room_rent will be posted retroactively.
+        </div>
+        <div class="mb-2">
+          <label class="form-label small fw-semibold">Reason for re-running (mandatory)</label>
+          <textarea class="form-control form-control-sm" name="reason" rows="3"
+                    required minlength="8"
+                    placeholder="e.g. Force-closed in emergency on 22 Apr; reconciling billing for guest in Room 204"></textarea>
+          <div class="form-text">Minimum 8 characters. Written to the immutable reopen trail.</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-warning fw-semibold">
+          <i class="bi bi-arrow-clockwise me-1"></i>Re-run Audit
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script nonce="{{ csp_nonce }}">
+(function () {
+    // Map of audit_date → true when a later Completed/Warning audit
+    // exists. Populated server-side on render so the modal can show
+    // the downstream-effects warning without another round-trip.
+    var LATER_EXISTS = {
+    {%- for log in logs -%}
+      {%- set later = logs | selectattr('audit_date', 'gt', log.audit_date)
+                          | selectattr('status', 'in', ['Completed', 'Warning', 'Reopened'])
+                          | list -%}
+      '{{ log.audit_date.isoformat() }}': {{ 'true' if later else 'false' }}{{ '' if loop.last else ',' }}
+    {%- endfor -%}
+    };
+    var modal = document.getElementById('fixSkippedModal');
+    if (!modal) return;
+    modal.addEventListener('show.bs.modal', function (ev) {
+        var btn = ev.relatedTarget;
+        if (!btn) return;
+        var d = btn.getAttribute('data-audit-date') || '';
+        var lbl = btn.getAttribute('data-audit-label') || d;
+        document.getElementById('fixSkippedDate').value = d;
+        document.getElementById('fixSkippedLabel').textContent = lbl;
+        var warn = document.getElementById('fixSkippedDownstreamWarning');
+        if (warn) warn.style.display = LATER_EXISTS[d] ? '' : 'none';
+    });
+})();
+</script>
+{% endif %}
+
+{% endblock report_content %}

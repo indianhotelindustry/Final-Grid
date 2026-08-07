@@ -1,0 +1,37 @@
+{
+  "anon_location": "/auth/login?next=%2Fbackup%2F",
+  "anon_status": 302,
+  "body_bytes": 23940,
+  "body_sha256": "356f7c40daa31a5f63d5932cc770f1f849b381e7b636a52e9bade4417f9bde8c",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 20,
+  "endpoint": "backup.index",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "files[len]": "0",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "logs[len]": "0",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "backup.index",
+  "templates": [
+    "backup/index.html"
+  ],
+  "truncations": [],
+  "url": "/backup/"
+}

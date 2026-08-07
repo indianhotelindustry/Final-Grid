@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Room Management</h2>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2">
+            <div class="col-6 col-md-3">
+                <select name="floor" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Floors</option>
+                    {% for floor in floors %}
+                    <option value="{{ floor }}" {% if request.args.get('floor')|int == floor %}selected{% endif %}>Floor {{ floor }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-6 col-md-3">
+                <select name="status" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Status</option>
+                    <option value="Vacant" {% if request.args.get('status') == 'Vacant' %}selected{% endif %}>Vacant</option>
+                    <option value="Occupied" {% if request.args.get('status') == 'Occupied' %}selected{% endif %}>Occupied</option>
+                    <option value="Dirty" {% if request.args.get('status') == 'Dirty' %}selected{% endif %}>Dirty</option>
+                    <option value="Maintenance" {% if request.args.get('status') == 'Maintenance' %}selected{% endif %}>Maintenance</option>
+                </select>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row g-2">
+    {% for room in rooms %}
+    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+        <div class="card room-card {% if room.status == 'Vacant' %}border-success{% elif room.status == 'Occupied' %}border-danger{% elif room.status == 'Dirty' %}border-warning{% else %}border-secondary{% endif %}">
+            <div class="card-body text-center p-2">
+                <h5 class="mb-1">{{ room.room_number }}</h5>
+                <small class="text-muted d-block mb-2">{{ room.room_type.name }}</small>
+                <span class="badge {% if room.status == 'Vacant' %}bg-success{% elif room.status == 'Occupied' %}bg-danger{% elif room.status == 'Dirty' %}bg-warning{% else %}bg-secondary{% endif %} w-100">
+                    {{ room.status }}
+                </span>
+                <button class="btn btn-sm btn-outline-primary w-100 mt-2" data-bs-toggle="modal" data-bs-target="#statusModal{{ room.id }}">
+                    <i class="bi bi-pencil"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Update Modal -->
+    <div class="modal fade" id="statusModal{{ room.id }}" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Room {{ room.room_number }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="post" action="{{ url_for('main.update_room_status', room_id=room.id) }}">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select name="status" class="form-select" required>
+                                <option value="Vacant" {% if room.status == 'Vacant' %}selected{% endif %}>Vacant</option>
+                                <option value="Occupied" {% if room.status == 'Occupied' %}selected{% endif %}>Occupied</option>
+                                <option value="Dirty" {% if room.status == 'Dirty' %}selected{% endif %}>Dirty</option>
+                                <option value="Maintenance" {% if room.status == 'Maintenance' %}selected{% endif %}>Maintenance</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

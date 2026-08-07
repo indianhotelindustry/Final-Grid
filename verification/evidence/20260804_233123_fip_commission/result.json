@@ -1,0 +1,1325 @@
+{
+  "cleanup": {
+    "baseline_unchanged": true,
+    "copies_left_behind": [],
+    "copies_removed": 38,
+    "production_sha256": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+    "production_unchanged": true
+  },
+  "commissioned": false,
+  "elements": [
+    "positive_injection",
+    "negative_injection",
+    "detection",
+    "evidence",
+    "repeatability",
+    "determinism",
+    "order_independence",
+    "isolation",
+    "cleanup"
+  ],
+  "outcomes": [
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D1_PARITY",
+        "D3_REPLAY",
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-A01",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D1_PARITY, D3_REPLAY, D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Walk-in reservation settled through an OTA receivable head",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-A02",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Corporate booking with no company account behind it",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D1_PARITY",
+        "D3_REPLAY",
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-A03",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D1_PARITY, D3_REPLAY, D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Duplicate payment posted for the same settlement",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D3_REPLAY"
+      ],
+      "fault_id": "FLT-A04",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D3_REPLAY",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "A sold room night has no priced rate row",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-A05",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "GST applied at the wrong rate",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D1_PARITY",
+        "D3_REPLAY",
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-A06",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D1_PARITY, D3_REPLAY, D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Payment posted through a settlement head that does not exist",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D1_PARITY",
+        "D3_REPLAY",
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-A07",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D1_PARITY, D3_REPLAY, D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Guest overpaid with no overpayment record",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-A08",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Room move recorded without releasing the old room",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D1_PARITY",
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-A09",
+      "missed_by": [
+        "D3_REPLAY"
+      ],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D1_PARITY, D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Guest checked out with an unexplained balance",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": false,
+        "determinism": true,
+        "evidence": false,
+        "isolation": false,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": false,
+        "repeatability": true
+      },
+      "detected_by": [],
+      "fault_id": "FLT-A10",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "declared layers did not attribute it: ",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "missing: execution_context",
+        "isolation": "containment was not verified",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "IntegrityError: NOT NULL constraint failed: reservations.credit_amount",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Duplicate reservation for the same stay",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-B01",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Payment referencing a reservation that does not exist",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D1_PARITY",
+        "D3_REPLAY",
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-B02",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D1_PARITY, D3_REPLAY, D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Payment posted with no folio",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D1_PARITY",
+        "D3_REPLAY",
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-B03",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D1_PARITY, D3_REPLAY, D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "A ledger row that a closed day counted has been deleted",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": false,
+        "detection": false,
+        "determinism": false,
+        "evidence": false,
+        "isolation": false,
+        "negative_injection": false,
+        "order_independence": false,
+        "positive_injection": false,
+        "repeatability": false
+      },
+      "detected_by": [],
+      "fault_id": "FLT-B04",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "uncovered \u2014 see reason",
+        "detection": "uncovered \u2014 see reason",
+        "determinism": "uncovered \u2014 see reason",
+        "evidence": "uncovered \u2014 see reason",
+        "isolation": "uncovered \u2014 see reason",
+        "negative_injection": "uncovered \u2014 see reason",
+        "order_independence": "uncovered \u2014 see reason",
+        "positive_injection": "uncovered \u2014 see reason",
+        "repeatability": "uncovered \u2014 see reason"
+      },
+      "title": "Two reservations sharing one invoice number",
+      "uncovered_reason": "No invariant asserts invoice-number uniqueness, and no monetary total moves, so every layer is silent by construction. Injecting it would produce a guaranteed MISS that says nothing the declaration does not already say."
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-B05",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Folio referencing a reservation that does not exist",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-B06",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Tax line pointing at a room night that never happened",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D1_PARITY",
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-B07",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D1_PARITY, D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Money dated beyond the business date",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D3_REPLAY",
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-B08",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D3_REPLAY, D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Priced room night outside the stay it belongs to",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-B09",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Reversal flagged with no original transaction",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-B10",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "A second business date row",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D3_REPLAY",
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-C01",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D3_REPLAY, D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "0 row(s) changed by ENGINE_PATCH",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Cash revenue engine double-counts every collection",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D3_REPLAY"
+      ],
+      "fault_id": "FLT-C02",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D3_REPLAY",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "0 row(s) changed by ENGINE_PATCH",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Accrual extras counted twice",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D1_PARITY",
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-C03",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D1_PARITY, D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "0 row(s) changed by ENGINE_PATCH",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Folio balance drifts by half a rupee",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D3_REPLAY",
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-C04",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D3_REPLAY, D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "0 row(s) changed by ENGINE_PATCH",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Cash engine ignores the date it is asked about",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D1_PARITY",
+        "D3_REPLAY",
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-C05",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D1_PARITY, D3_REPLAY, D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "0 row(s) changed by ENGINE_PATCH",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Night audit occupancy inflated by present-tense leakage",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D1_PARITY"
+      ],
+      "fault_id": "FLT-C06",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D1_PARITY",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "0 row(s) changed by ENGINE_PATCH",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Canonical room-revenue engine bypassed by a 10% inflation",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D3_REPLAY"
+      ],
+      "fault_id": "FLT-C07",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D3_REPLAY",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "0 row(s) changed by ENGINE_PATCH",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "OTA receivable filter excludes everything",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D3_REPLAY"
+      ],
+      "fault_id": "FLT-C08",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D3_REPLAY",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "0 row(s) changed by ENGINE_PATCH",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Accrual room revenue double-counts occupied nights",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D3_REPLAY",
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-C09",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D3_REPLAY, D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "0 row(s) changed by ENGINE_PATCH",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Night audit reports tax twice",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D1_PARITY",
+        "D3_REPLAY",
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-C10",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D1_PARITY, D3_REPLAY, D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "0 row(s) changed by ENGINE_PATCH",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Night audit settlement total diverges from the payments it lists",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D2_GOLDEN"
+      ],
+      "fault_id": "FLT-D01",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D2_GOLDEN",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "0 row(s) changed by CLOCK_SHIFT",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Clock drift: a run executes one day out",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D3_REPLAY",
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-D02",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D3_REPLAY, D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "A frozen night-audit snapshot has been edited",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D1_PARITY",
+        "D3_REPLAY"
+      ],
+      "fault_id": "FLT-D03",
+      "missed_by": [
+        "D4_INVARIANTS"
+      ],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D1_PARITY, D3_REPLAY",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "The stored close total for an audited day has been rewritten",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": false,
+        "detection": false,
+        "determinism": false,
+        "evidence": false,
+        "isolation": false,
+        "negative_injection": false,
+        "order_independence": false,
+        "positive_injection": false,
+        "repeatability": false
+      },
+      "detected_by": [],
+      "fault_id": "FLT-D04",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "uncovered \u2014 see reason",
+        "detection": "uncovered \u2014 see reason",
+        "determinism": "uncovered \u2014 see reason",
+        "evidence": "uncovered \u2014 see reason",
+        "isolation": "uncovered \u2014 see reason",
+        "negative_injection": "uncovered \u2014 see reason",
+        "order_independence": "uncovered \u2014 see reason",
+        "positive_injection": "uncovered \u2014 see reason",
+        "repeatability": "uncovered \u2014 see reason"
+      },
+      "title": "A database backup file is corrupt",
+      "uncovered_reason": "No verification layer reads backup artefacts, and backup_logs stores no checksum \u2014 the schema records filename, size and status only. There is nothing to compare a restored file against, so corruption is undetectable by construction rather than by omission."
+    },
+    {
+      "checks": {
+        "cleanup": false,
+        "detection": false,
+        "determinism": false,
+        "evidence": false,
+        "isolation": false,
+        "negative_injection": false,
+        "order_independence": false,
+        "positive_injection": false,
+        "repeatability": false
+      },
+      "detected_by": [],
+      "fault_id": "FLT-D05",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "uncovered \u2014 see reason",
+        "detection": "uncovered \u2014 see reason",
+        "determinism": "uncovered \u2014 see reason",
+        "evidence": "uncovered \u2014 see reason",
+        "isolation": "uncovered \u2014 see reason",
+        "negative_injection": "uncovered \u2014 see reason",
+        "order_independence": "uncovered \u2014 see reason",
+        "positive_injection": "uncovered \u2014 see reason",
+        "repeatability": "uncovered \u2014 see reason"
+      },
+      "title": "A restored database does not match what was backed up",
+      "uncovered_reason": "Detecting this requires comparing a restored database against a recorded pre-backup fingerprint. Nothing in the framework holds one, so the deletion is simply the new truth and every layer reconciles against it perfectly."
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D2_GOLDEN"
+      ],
+      "fault_id": "FLT-D06",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D2_GOLDEN",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Hotel state code changed, flipping the GST regime",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": false,
+        "detection": false,
+        "determinism": false,
+        "evidence": false,
+        "isolation": false,
+        "negative_injection": false,
+        "order_independence": false,
+        "positive_injection": false,
+        "repeatability": false
+      },
+      "detected_by": [],
+      "fault_id": "FLT-D07",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "uncovered \u2014 see reason",
+        "detection": "uncovered \u2014 see reason",
+        "determinism": "uncovered \u2014 see reason",
+        "evidence": "uncovered \u2014 see reason",
+        "isolation": "uncovered \u2014 see reason",
+        "negative_injection": "uncovered \u2014 see reason",
+        "order_independence": "uncovered \u2014 see reason",
+        "positive_injection": "uncovered \u2014 see reason",
+        "repeatability": "uncovered \u2014 see reason"
+      },
+      "title": "A run executes under a different process environment",
+      "uncovered_reason": "No layer fingerprints the process environment, so a run under a different environment is indistinguishable in the evidence. The gap is in the evidence model rather than in any control."
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D2_GOLDEN"
+      ],
+      "fault_id": "FLT-D08",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D2_GOLDEN",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "An invoice presentation flag was changed after issue",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-D09",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "The business date has been rolled backwards",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D3_REPLAY",
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-D10",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D3_REPLAY, D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "A completed night audit has been reopened and left open",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup_validation": true,
+        "evidence_validation": true,
+        "false_negative_resistance": true,
+        "false_positive_resistance": true,
+        "injection_validation": true,
+        "isolation": true,
+        "parallel_safety": true,
+        "registry_validation": true,
+        "repeatability": true
+      },
+      "detected_by": [],
+      "fault_id": "PLATFORM",
+      "missed_by": [],
+      "notes": {
+        "cleanup_validation": "no seeded copy survived",
+        "evidence_validation": "every one of 36 results carries injection, timestamp and root-cause candidates",
+        "false_negative_resistance": "all 35 covered faults were attributed by a declared layer",
+        "false_positive_resistance": "an unmutated copy moved nothing in any layer",
+        "injection_validation": "an injection that changed no rows was refused",
+        "isolation": "the pristine baseline and production are byte-identical after every injection in this run",
+        "parallel_safety": "4 probes run concurrently agreed with the same probes run serially",
+        "registry_validation": "6/6 malformed declarations refused",
+        "repeatability": "proven per fault by the repeatability and determinism elements of fault commissioning"
+      },
+      "title": "Platform self-verification",
+      "uncovered_reason": ""
+    }
+  ],
+  "passed": 36,
+  "self_checks": [
+    "registry_validation",
+    "injection_validation",
+    "evidence_validation",
+    "cleanup_validation",
+    "repeatability",
+    "isolation",
+    "false_positive_resistance",
+    "false_negative_resistance",
+    "parallel_safety"
+  ],
+  "total": 37
+}

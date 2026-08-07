@@ -1,0 +1,191 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Audit Snapshot — {{ audit_date.strftime('%d %b %Y') }}{% endblock %}
+{% block report_name %}Audit Snapshot — {{ audit_date.strftime('%d %b %Y') }}{% endblock %}
+
+{% block report_content %}
+
+<div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2 d-print-none">
+  <div>
+    <h5 class="mb-1 fw-bold">
+      <i class="bi bi-camera-fill me-2"></i>Audit Snapshot — {{ audit_date.strftime('%d %B %Y') }}
+    </h5>
+    <div class="text-muted small">
+      Frozen at completion · Audit #{{ log.id }}
+      {% if log.run_by %} · Completed by {{ log.run_by.full_name }}{% endif %}
+      {% if log.completed_at %} · {{ log.completed_at.strftime('%d %b %Y %H:%M') }}{% endif %}
+      {% if log.override_used %}
+      · <span class="badge bg-danger">Override Used</span>
+      {% endif %}
+    </div>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('reports.night_audit_snapshot', log_id=log.id, format='json') }}"
+       class="btn btn-sm btn-outline-secondary" target="_blank">
+      <i class="bi bi-braces me-1"></i>JSON
+    </a>
+    <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+      <i class="bi bi-printer me-1"></i>Print
+    </button>
+    <a href="{{ url_for('reports.night_audit_history') }}" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-clock-history me-1"></i>History
+    </a>
+    <a href="{{ url_for('reports.night_audit', date=audit_date.isoformat()) }}"
+       class="btn btn-sm btn-outline-dark">
+      <i class="bi bi-arrow-repeat me-1"></i>Live View
+    </a>
+  </div>
+</div>
+
+{% if not snapshot %}
+<div class="alert alert-warning">
+  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+  No snapshot data stored for this audit record.
+  {% if log.status == 'Completed' %}
+  The snapshot may not have been saved. View the live report instead.
+  {% endif %}
+</div>
+{% else %}
+
+{# ── Snapshot summary cards ──────────────────────────────────────────────── #}
+{% set ctrl = snapshot.get('control', {}) %}
+{% set occ  = snapshot.get('occupancy', {}) %}
+{% set rev  = snapshot.get('revenue', {}) %}
+{% set pay  = snapshot.get('payments', {}) %}
+{% set exc  = snapshot.get('exceptions', {}) %}
+
+<div class="row g-3 mb-4">
+  {% set cards = [
+    ('Occupied', (occ.occupied|string) ~ ' / ' ~ (occ.sellable_rooms|string), 'bg-primary'),
+    ('Occ %',    (occ.occ_pct|string) ~ '%',                                  'bg-info text-dark'),
+    ('Gross Revenue', '₹{:,.0f}'.format(rev.get('gross_revenue', 0)),         'bg-success'),
+    ('Collected',     '₹{:,.0f}'.format(pay.get('total_collected', 0)),       'bg-teal text-white'),
+    ('Outstanding',   '₹{:,.0f}'.format(ctrl.get('total_outstanding', 0)),    'bg-warning text-dark'),
+    ('Blockers',      ctrl.get('blocker_count', 0),                           'bg-danger'),
+    ('Warnings',      ctrl.get('warning_count', 0),                           'bg-orange text-white'),
+    ('Can Close?', 'YES' if ctrl.get('can_close') else 'NO',                  'bg-dark'),
+  ] %}
+  {% for label, val, cls in cards %}
+  <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+    <div class="card border-0 {{ cls }} text-center py-2 shadow-sm">
+      <div class="fw-bold fs-5">{{ val }}</div>
+      <div class="small opacity-90">{{ label }}</div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{# ── Revenue ─────────────────────────────────────────────────────────────── #}
+<div class="row g-3 mb-3">
+  <div class="col-md-5">
+    <div class="card shadow-sm">
+      <div class="card-header fw-semibold bg-light py-2">Revenue (Snapshot)</div>
+      <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+          <tbody>
+            <tr><td>Room Revenue</td><td class="text-end">₹{{ '{:,.2f}'.format(rev.get('room_revenue', 0)) }}</td></tr>
+            <tr><td>Extra Charges</td><td class="text-end">₹{{ '{:,.2f}'.format(rev.get('extra_charges_total', 0)) }}</td></tr>
+            <tr class="text-danger"><td>Discounts</td><td class="text-end">−₹{{ '{:,.2f}'.format(rev.get('discount_total', 0)) }}</td></tr>
+            <tr><td>Tax</td><td class="text-end">₹{{ '{:,.2f}'.format(rev.get('tax_amount', 0)) }}</td></tr>
+            <tr class="fw-bold table-success"><td>Gross Revenue</td><td class="text-end">₹{{ '{:,.2f}'.format(rev.get('gross_revenue', 0)) }}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm">
+      <div class="card-header fw-semibold bg-light py-2">Payments (Snapshot)</div>
+      <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+          {% for mode, v in pay.get('by_mode', {}).items() %}
+          <tr><td>{{ mode }}</td><td class="text-end">₹{{ '{:,.2f}'.format(v.amount if v is mapping else v) }}</td></tr>
+          {% endfor %}
+          <tr class="fw-bold table-success">
+            <td>Total</td><td class="text-end">₹{{ '{:,.2f}'.format(pay.get('total_collected', 0)) }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ── Exceptions ──────────────────────────────────────────────────────────── #}
+{% set blockers = exc.get('blockers', []) %}
+{% set warnings = exc.get('warnings', []) %}
+{% if blockers %}
+<div class="card border-danger shadow-sm mb-3">
+  <div class="card-header bg-danger text-white fw-bold py-2">
+    Blockers at Completion ({{ blockers|length }})
+    {% if log.override_used %}
+    <span class="badge bg-light text-danger ms-2">Override Applied</span>
+    {% endif %}
+  </div>
+  <ul class="list-group list-group-flush">
+    {% for b in blockers %}
+    <li class="list-group-item list-group-item-danger small">
+      <span class="badge bg-danger me-1">{{ b.type }}</span>{{ b.detail }}
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+{% if warnings %}
+<div class="card border-warning shadow-sm mb-3">
+  <div class="card-header bg-warning text-dark fw-bold py-2">Warnings at Completion ({{ warnings|length }})</div>
+  <ul class="list-group list-group-flush">
+    {% for w in warnings %}
+    <li class="list-group-item list-group-item-warning small">
+      <span class="badge bg-warning text-dark me-1">{{ w.type }}</span>{{ w.detail }}
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+{% if not blockers and not warnings %}
+<div class="alert alert-success"><i class="bi bi-check-circle-fill me-2"></i>Clean audit — no blockers or warnings at completion.</div>
+{% endif %}
+
+{# ── Override note ───────────────────────────────────────────────────────── #}
+{% if log.override_used %}
+<div class="alert alert-danger mt-3">
+  <i class="bi bi-exclamation-octagon-fill me-2"></i>
+  <strong>Override was used.</strong> Reason: {{ log.override_reason or '—' }}
+</div>
+{% endif %}
+
+{# ── Reopen history ──────────────────────────────────────────────────────── #}
+{% if log.reopen_logs %}
+<div class="card shadow-sm mt-3">
+  <div class="card-header fw-semibold bg-light py-2">Reopen History</div>
+  <div class="table-responsive">
+    <table class="table table-sm mb-0">
+      <thead class="table-light">
+        <tr><th>Reopened At</th><th>By</th><th>Prior Status</th><th>Reason</th></tr>
+      </thead>
+      <tbody>
+        {% for rl in log.reopen_logs %}
+        <tr>
+          <td>{{ rl.reopened_at.strftime('%d %b %Y %H:%M') }}</td>
+          <td>{{ rl.reopened_by.full_name if rl.reopened_by else '#' ~ rl.reopened_by_user_id }}</td>
+          <td><span class="badge bg-secondary">{{ rl.previous_status }}</span></td>
+          <td>{{ rl.reason }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% endif %}{# /if snapshot #}
+
+<style>
+  .bg-teal   { background-color: #20c997 !important; }
+  .bg-orange { background-color: #fd7e14 !important; }
+  @media print {
+    .d-print-none { display: none !important; }
+    @page { size: A4; margin: 15mm; }
+  }
+</style>
+
+{% endblock report_content %}

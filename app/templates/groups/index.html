@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Group Blocks - {{ config.HOTEL_NAME }}{% endblock %}
+
+{% block content %}
+<!-- Global Secondary Tab Bar -->
+<ul class="nav nav-tabs" role="tablist" id="globalTabs">
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.dashboard') }}"><i class="bi bi-grid-3x3"></i> Dashboard</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.reservations') }}"><i class="bi bi-list-ul"></i> Front Desk</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.housekeeping') }}"><i class="bi bi-brush"></i> Housekeeping</a>
+    </li>
+    {% if current_user.has_role('Admin','Manager','FrontDesk','Accountant') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.invoice_manager') }}"><i class="bi bi-receipt-cutoff"></i> Invoice Manager</a>
+    </li>
+    {% endif %}
+    {% if current_user.has_role('Admin','Manager','FrontDesk','Accountant') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.room_grid') }}"><i class="bi bi-calendar3"></i> Calendar View</a>
+    </li>
+    {% endif %}
+    {% if current_user.has_role('Admin','Manager') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link active" href="{{ url_for('groups.index') }}"><i class="bi bi-people-fill"></i> Group Bookings</a>
+    </li>
+    {% endif %}
+    {% if current_user.has_role('Admin','Manager','Accountant') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.night_audit') }}"><i class="bi bi-moon-stars"></i> Night Audit</a>
+    </li>
+    {% endif %}
+</ul>
+
+<div class="container-fluid py-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0"><i class="bi bi-people-fill me-2"></i>Group Blocks</h4>
+        <a href="{{ url_for('groups.new_group') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>New Group Block
+        </a>
+    </div>
+
+    <!-- Status filter -->
+    <div class="mb-3">
+        <div class="btn-group btn-group-sm" role="group">
+            <a href="{{ url_for('groups.index') }}"
+               class="btn {% if not status_filter %}btn-primary{% else %}btn-outline-primary{% endif %}">All</a>
+            {% for s in ['Tentative','Confirmed','Cancelled','Completed'] %}
+            <a href="{{ url_for('groups.index', status=s) }}"
+               class="btn {% if status_filter == s %}btn-primary{% else %}btn-outline-primary{% endif %}">{{ s }}</a>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if groups %}
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0 align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Group Code</th>
+                        <th>Group Name</th>
+                        <th>Contact</th>
+                        <th>Arrival</th>
+                        <th>Departure</th>
+                        <th class="text-center">Blocked</th>
+                        <th class="text-center">Picked Up</th>
+                        <th>Rate</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for g in groups %}
+                    <tr>
+                        <td><code>{{ g.group_code }}</code></td>
+                        <td class="fw-semibold">{{ g.group_name }}</td>
+                        <td>
+                            {% if g.contact_name %}{{ g.contact_name }}{% endif %}
+                            {% if g.contact_phone %}<br><small class="text-muted">{{ g.contact_phone }}</small>{% endif %}
+                        </td>
+                        <td>{{ g.arrival_date.strftime('%d %b %Y') }}</td>
+                        <td>{{ g.departure_date.strftime('%d %b %Y') }}</td>
+                        <td class="text-center">{{ g.total_rooms }}</td>
+                        <td class="text-center">
+                            <span class="{% if g.picked_up >= g.total_rooms %}text-success fw-bold{% elif g.picked_up > 0 %}text-warning fw-bold{% else %}text-muted{% endif %}">
+                                {{ g.picked_up }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if g.group_rate %}
+                                {{ "{:,.2f}".format(g.group_rate) }}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if g.status == 'Tentative' %}
+                                <span class="badge bg-secondary">Tentative</span>
+                            {% elif g.status == 'Confirmed' %}
+                                <span class="badge bg-success">Confirmed</span>
+                            {% elif g.status == 'Cancelled' %}
+                                <span class="badge bg-danger">Cancelled</span>
+                            {% elif g.status == 'Completed' %}
+                                <span class="badge bg-info">Completed</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('groups.detail', group_id=g.id) }}"
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle me-1"></i>
+        No group blocks found{% if status_filter %} with status "{{ status_filter }}"{% endif %}.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

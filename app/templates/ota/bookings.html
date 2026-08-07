@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% block title %}OTA Bookings — {{ config.HOTEL_NAME }}{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="mb-0"><i class="bi bi-globe me-2 text-primary"></i>OTA Bookings</h4>
+    <a href="{{ url_for('ota.dashboard') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Dashboard
+    </a>
+</div>
+
+<!-- Filters -->
+<form class="row g-2 mb-3" method="GET">
+    <div class="col-sm-6 col-md-2">
+        <input type="date" class="form-control form-control-sm" name="from" value="{{ from_date }}">
+    </div>
+    <div class="col-sm-6 col-md-2">
+        <input type="date" class="form-control form-control-sm" name="to" value="{{ to_date }}">
+    </div>
+    <div class="col-sm-6 col-md-2">
+        <select class="form-select form-select-sm" name="source">
+            <option value="">All Sources</option>
+            {% for src in ota_sources %}
+            <option value="{{ src }}" {% if source_filter == src %}selected{% endif %}>{{ src }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-sm-6 col-md-2">
+        <select class="form-select form-select-sm" name="status">
+            <option value="">All Statuses</option>
+            {% for s in ['Reserved','Confirmed','CheckedIn','CheckedOut','Cancelled','NoShow'] %}
+            <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-sm btn-primary">Filter</button>
+        <a href="{{ url_for('ota.bookings') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+    </div>
+</form>
+
+<!-- Bookings Table -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white py-2 d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">{{ records|length }} booking(s)</span>
+        {% if current_user.has_role('Admin','Manager','FrontDesk') %}
+        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#manualBookingModal">
+            <i class="bi bi-plus-circle me-1"></i>Manual Entry
+        </button>
+        {% endif %}
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle mb-0 small">
+            <thead class="table-light">
+                <tr>
+                    <th>Ref</th><th>OTA ID</th><th>Guest</th><th>Phone</th>
+                    <th>Room Type</th><th>Arrival</th><th>Departure</th>
+                    <th>Nights</th><th>Rate</th><th>Status</th><th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in records %}
+                {% set nights = (r.departure_date - r.arrival_date).days %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('main.invoice', reservation_id=r.id) }}" class="text-decoration-none fw-semibold">
+                            {{ r.booking_reference or r.id }}
+                        </a>
+                    </td>
+                    <td><small class="text-muted">{{ r.ota_booking_id or '—' }}</small></td>
+                    <td>{{ r.guest.name if r.guest else '—' }}</td>
+                    <td><small>{{ r.guest.phone if r.guest else '—' }}</small></td>
+                    <td>{{ r.room_type.name if r.room_type else '—' }}</td>
+                    <td>{{ r.arrival_date.strftime('%d %b %Y') }}</td>
+                    <td>{{ r.departure_date.strftime('%d %b %Y') }}</td>
+                    <td>{{ nights }}</td>
+                    <td>₹{{ '{:,.0f}'.format(r.rate_per_night) }}</td>
+                    <td>
+                        {% set sc = {'Confirmed':'primary','CheckedIn':'success','CheckedOut':'secondary','Cancelled':'danger','NoShow':'warning','Reserved':'info'} %}
+                        <span class="badge bg-{{ sc.get(r.status,'secondary') }}">{{ r.status }}</span>
+                    </td>
+                    <td>
+                        {% if r.status in ('Reserved','Confirmed') and current_user.has_role('Admin','Manager') %}
+                        <form method="POST" action="{{ url_for('ota.cancel_booking', reservation_id=r.id) }}"
+                              onsubmit="return confirm('Cancel {{ r.booking_reference }}?')" class="d-inline">
+                            <button class="btn btn-xs btn-outline-danger btn-sm py-0 px-1">Cancel</button>
+                        </form>
+                        {% endif %}
+                        <a href="{{ url_for('main.checkin', reservation_id=r.id) }}"
+                           class="btn btn-xs btn-outline-primary btn-sm py-0 px-1 {% if r.status != 'Confirmed' %}d-none{% endif %}">
+                            Check-in
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="11" class="text-center text-muted py-4">No OTA bookings found for the selected filters.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Manual Booking Modal -->
+{% if current_user.has_role('Admin','Manager','FrontDesk') %}
+<div class="modal fade" id="manualBookingModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('ota.manual_booking') }}">
+                <div class="modal-header bg-primary text-white py-2">
+                    <h6 class="modal-title"><i class="bi bi-plus-circle me-1"></i>Manual OTA Booking Entry</h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <label class="form-label small mb-1">OTA Source *</label>
+                            <select class="form-select form-select-sm" name="ota_source" required>
+                                {% for src in ota_sources %}
+                                <option>{{ src }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label small mb-1">OTA Booking ID</label>
+                            <input type="text" class="form-control form-control-sm" name="ota_booking_id" placeholder="e.g. BDC-123456">
+                        </div>
+                        <div class="col-sm-3">
+                            <label class="form-label small mb-1">First Name *</label>
+                            <input type="text" class="form-control form-control-sm" name="guest_first_name" required placeholder="First name">
+                        </div>
+                        <div class="col-sm-3">
+                            <label class="form-label small mb-1">Last Name</label>
+                            <input type="text" class="form-control form-control-sm" name="guest_last_name" placeholder="Last name">
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label small mb-1">Phone *</label>
+                            <input type="text" class="form-control form-control-sm" name="guest_phone" required>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label small mb-1">Email</label>
+                            <input type="email" class="form-control form-control-sm" name="guest_email">
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label small mb-1">Room Type *</label>
+                            <select class="form-select form-select-sm" name="room_type_id" required>
+                                {% for rt in room_types %}
+                                <option value="{{ rt.id }}">{{ rt.name }} (₹{{ rt.base_rate }}/night)</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-sm-3">
+                            <label class="form-label small mb-1">Arrival *</label>
+                            <input type="date" class="form-control form-control-sm" name="arrival_date" required>
+                        </div>
+                        <div class="col-sm-3">
+                            <label class="form-label small mb-1">Departure *</label>
+                            <input type="date" class="form-control form-control-sm" name="departure_date" required>
+                        </div>
+                        <div class="col-sm-2">
+                            <label class="form-label small mb-1">Adults</label>
+                            <input type="number" class="form-control form-control-sm" name="adults" value="1" min="1">
+                        </div>
+                        <div class="col-sm-2">
+                            <label class="form-label small mb-1">Children</label>
+                            <input type="number" class="form-control form-control-sm" name="children" value="0" min="0">
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="form-label small mb-1">Rate/Night (₹)</label>
+                            <input type="number" class="form-control form-control-sm" name="rate_per_night" value="0" min="0" step="0.01">
+                            <div class="form-text">Leave 0 to use room type base rate.</div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small mb-1">Special Requests</label>
+                            <input type="text" class="form-control form-control-sm" name="special_requests">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer py-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i>Create Booking
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

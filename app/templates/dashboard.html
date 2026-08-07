@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Global Secondary Tab Bar -->
+<ul class="nav nav-tabs mt-2" role="tablist" id="globalTabs">
+    <li class="nav-item" role="presentation">
+        <a class="nav-link active" href="{{ url_for('main.dashboard') }}"><i class="bi bi-grid-3x3"></i> Dashboard</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.reservations') }}"><i class="bi bi-list-ul"></i> Front Desk</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.housekeeping') }}"><i class="bi bi-brush"></i> Housekeeping</a>
+    </li>
+    {% if current_user.has_role('Admin','Manager','FrontDesk','Accountant') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.invoice_manager') }}"><i class="bi bi-receipt-cutoff"></i> Invoice Manager</a>
+    </li>
+    {% endif %}
+    {% if current_user.has_role('Admin','Manager','FrontDesk','Accountant') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.room_grid') }}"><i class="bi bi-calendar3"></i> Calendar View</a>
+    </li>
+    {% endif %}
+    {% if current_user.has_role('Admin','Manager') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('groups.index') }}"><i class="bi bi-people-fill"></i> Group Bookings</a>
+    </li>
+    {% endif %}
+    {% if current_user.has_role('Admin','Manager','Accountant') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.night_audit') }}"><i class="bi bi-moon-stars"></i> Night Audit</a>
+    </li>
+    {% endif %}
+</ul>
+
+<!-- Local Dashboard Tabs + Compact Alert Strip -->
+<style>
+.dash-tab-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+.dash-alert-pills {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+}
+.dap {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    border: 1px solid transparent;
+    line-height: 1.4;
+    transition: filter .1s;
+}
+.dap:hover { filter: brightness(0.92); text-decoration: none; }
+.dap.danger  { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+.dap.warning { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+.dap.info    { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+</style>
+
+{% set overdue_ct = pending_checkouts|length %}
+{% set _ota_warn = ota_outstanding_total|default(0) > ota_warning_threshold|default(50000) %}
+{% set _has_alerts = (overdue_ct > 0 or pending_payments > 0 or dirty > 0 or pending_arrivals > 0 or show_high_demand_alert or _ota_warn) %}
+
+{# ── Date-scope banner (Apr 2026) ──────────────────────────────────────
+    Shows the THREE date scopes the dashboard mixes so staff never have
+    to guess which date a KPI refers to:
+      * Business Date — what the PMS is currently operating on.
+      * Live Today    — wall-clock today (for live KPIs).
+      * Last Closed   — most recent settled NightAuditLog (default scope).
+    A red flag highlights when business_date is stale (audits skipped /
+    pending) so the operator knows numbers may be drifting. #}
+{% if dashboard_scopes %}
+<style>
+.scope-banner {
+    background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 8px;
+    padding: 8px 12px; margin: 8px 0 10px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+    font-size: 0.82rem;
+}
+.scope-banner.stale { background: #fef2f2; border-color: #fca5a5; }
+.scope-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 10px; border-radius: 20px;
+    background: #fff; border: 1px solid #e5e7eb;
+    font-weight: 600; color: #374151; white-space: nowrap;
+}
+.scope-pill .label { font-size: 0.7rem; font-weight: 500; color: #6b7280; text-transform: uppercase; letter-spacing: 0.04em; }
+.scope-pill.business { border-left: 3px solid #0d6efd; }
+.scope-pill.business.stale { border-color: #dc2626; background: #fee2e2; color: #991b1b; }
+.scope-pill.live     { border-left: 3px solid #f59e0b; }
+.scope-pill.closed   { border-left: 3px solid #16a34a; }
+.scope-pill.closed.missing { border-left-color: #9ca3af; color: #6b7280; }
+.scope-banner .scope-explain {
+    margin-left: auto; color: #6b7280; font-size: 0.74rem;
+    max-width: 360px; line-height: 1.35;
+}
+@media (max-width: 768px) {
+    .scope-banner .scope-explain { max-width: 100%; margin-left: 0; }
+}
+</style>
+<div class="scope-banner {{ 'stale' if dashboard_scopes.is_business_stale else '' }}">
+    <span class="scope-pill business {{ 'stale' if dashboard_scopes.is_business_stale else '' }}"
+          title="PMS current operational date — set by night audit">
+        <span class="label">Business Date</span>
+        <span>{{ dashboard_scopes.business_date_human }}</span>
+        {% if dashboard_scopes.is_business_stale %}
+        <i class="bi bi-exclamation-triangle-fill text-danger ms-1"
+           title="Business date is behind today — audits pending / skipped"></i>
+        {% endif %}
+    </span>
+    <span class="scope-pill closed {{ '' if dashboard_scopes.has_any_closed_audit else 'missing' }}"
+          title="Most recent night audit that's settled — default scope for revenue / occupancy / ADR tiles">
+        <span class="label">Last Closed Audit</span>
+        {% if dashboard_scopes.has_any_closed_audit %}
+        <span>{{ dashboard_scopes.last_closed_human }}</span>
+        {% if dashboard_scopes.days_since_close and dashboard_scopes.days_since_close > 1 %}
+        <span class="badge bg-warning text-dark ms-1" style="font-size:.62rem;">
+            {{ dashboard_scopes.days_since_close }} days ago
+        </span>
+        {% endif %}
+        {% else %}
+        <span>—</span>
+        <small class="text-muted ms-1">(no audits yet)</small>
+        {% endif %}
+    </span>
+    <span class="scope-pill live"
+          title="Today's wall-clock date — drives Live (Unsettled) KPIs">
+        <span class="label">Live Today</span>
+        <span>{{ dashboard_scopes.today_real_human }}</span>
+    </span>
+    <span class="scope-explain">
+        Revenue / Occupancy / ADR default to <strong>Last Closed</strong>.
+        Tiles labelled <em>Live (Unsettled)</em> reflect today's in-progress activity.
+    </span>
+</div>
+{% endif %}
+
+<div class="dash-tab-row">
+    <ul class="nav nav-pills mb-0" id="dashboardTabs">
+        <li class="nav-item">
+            <a class="nav-link active" href="#" data-tab="overview">Dashboard</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#" data-tab="analytics">Analytics</a>
+        </li>
+        {% if current_user.role in ('Admin', 'Manager', 'Accountant') %}
+        <li class="nav-item">
+            <a class="nav-link" href="#" data-tab="command-center">
+                <i class="bi bi-speedometer2 me-1"></i>KPI Command Center
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+
+    {% if _has_alerts %}
+    <div class="dash-alert-pills">
+        {% if overdue_ct > 0 %}
+        <a href="{{ url_for('main.reservations') }}" class="dap danger">
+            <i class="bi bi-clock-history"></i>{{ overdue_ct }} Overdue
+        </a>
+        {% endif %}
+        {% if pending_payments > 0 %}
+        <a href="{{ url_for('main.reservations') }}" class="dap warning">
+            <i class="bi bi-currency-rupee"></i>{{ balance_due_count }} Due &mdash; &#8377;{{ "{:,.0f}".format(pending_payments) }}
+        </a>
+        {% endif %}
+        {% if dirty > 0 %}
+        <a href="{{ url_for('main.housekeeping') }}" class="dap warning">
+            <i class="bi bi-brush-fill"></i>{{ dirty }} Dirty
+        </a>
+        {% endif %}
+        {% if pending_arrivals > 0 %}
+        <a href="{{ url_for('main.reservations') }}" class="dap info">
+            <i class="bi bi-box-arrow-in-right"></i>{{ pending_arrivals }} Pending CI
+        </a>
+        {% endif %}
+        {% if show_high_demand_alert %}
+        <span class="dap warning">
+            <i class="bi bi-fire"></i>High Demand {{ occupancy_pct }}%
+        </span>
+        {% endif %}
+        {% if _ota_warn and current_user.role in ('Admin', 'Manager', 'Accountant') %}
+        <a href="{{ url_for('reports.ota_receivables') }}" class="dap warning">
+            <i class="bi bi-globe"></i>OTA &#8377;{{ "{:,.0f}".format(ota_outstanding_total|default(0)) }} pending
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<div id="dashboardOverview">
+    {% include 'tabs/test_view.html' %}
+</div>
+<div id="dashboardAnalytics" style="display:none;"></div>
+<div id="dashboardCommandCenter" style="display:none;"></div>
+
+<!-- ── Dashboard Card Preview Modal ──────────────────────────────── -->
+<div class="modal fade" id="cardPreviewModal" tabindex="-1" aria-labelledby="cardPreviewTitle" aria-modal="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header py-2 d-flex align-items-center gap-2">
+        <h6 class="modal-title mb-0 fw-bold" id="cardPreviewTitle">Loading…</h6>
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <button id="cardPreviewGoTo2" type="button" class="btn btn-sm btn-outline-secondary d-none" data-bs-dismiss="modal">
+            <i class="bi bi-grid-3x3 me-1"></i>Go to Dashboard
+          </button>
+          <a id="cardPreviewGoTo" href="#" class="btn btn-sm btn-primary">
+            <i class="bi bi-arrow-up-right-square me-1"></i><span id="cardPreviewGoToLabel">Go To Page</span>
+          </a>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-0" id="cardPreviewBody">
+        <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard_modals.js') }}"></script>
+{% if current_user.role in ('Admin', 'Manager') %}
+<script src="{{ url_for('static', filename='js/ai_insights.js') }}" defer></script>
+{% endif %}
+{% endblock %}

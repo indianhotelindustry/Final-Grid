@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+{% block title %}{{ block.group_name }} - Group Detail{% endblock %}
+
+{% block content %}
+<!-- Global Secondary Tab Bar -->
+<ul class="nav nav-tabs" role="tablist" id="globalTabs">
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.dashboard') }}"><i class="bi bi-grid-3x3"></i> Dashboard</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.reservations') }}"><i class="bi bi-list-ul"></i> Front Desk</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.housekeeping') }}"><i class="bi bi-brush"></i> Housekeeping</a>
+    </li>
+    {% if current_user.has_role('Admin','Manager','FrontDesk','Accountant') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.invoice_manager') }}"><i class="bi bi-receipt-cutoff"></i> Invoice Manager</a>
+    </li>
+    {% endif %}
+    {% if current_user.has_role('Admin','Manager','FrontDesk','Accountant') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.room_grid') }}"><i class="bi bi-calendar3"></i> Calendar View</a>
+    </li>
+    {% endif %}
+    {% if current_user.has_role('Admin','Manager') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link active" href="{{ url_for('groups.index') }}"><i class="bi bi-people-fill"></i> Group Bookings</a>
+    </li>
+    {% endif %}
+    {% if current_user.has_role('Admin','Manager','Accountant') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.night_audit') }}"><i class="bi bi-moon-stars"></i> Night Audit</a>
+    </li>
+    {% endif %}
+</ul>
+
+<div class="container-fluid py-3">
+    <div class="d-flex align-items-center mb-3">
+        <a href="{{ url_for('groups.index') }}" class="btn btn-sm btn-outline-secondary me-2">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <h4 class="mb-0"><i class="bi bi-people-fill me-2"></i>{{ block.group_name }}</h4>
+        <span class="ms-2">
+            {% if block.status == 'Tentative' %}
+                <span class="badge bg-secondary">Tentative</span>
+            {% elif block.status == 'Confirmed' %}
+                <span class="badge bg-success">Confirmed</span>
+            {% elif block.status == 'Cancelled' %}
+                <span class="badge bg-danger">Cancelled</span>
+            {% elif block.status == 'Completed' %}
+                <span class="badge bg-info">Completed</span>
+            {% endif %}
+        </span>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <!-- Group Info Card -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-info-circle me-1"></i>Group Information
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-borderless mb-0">
+                        <tr><th class="text-muted" style="width:40%">Code</th><td><code>{{ block.group_code }}</code></td></tr>
+                        <tr><th class="text-muted">Arrival</th><td>{{ block.arrival_date.strftime('%d %b %Y') }}</td></tr>
+                        <tr><th class="text-muted">Departure</th><td>{{ block.departure_date.strftime('%d %b %Y') }}</td></tr>
+                        <tr>
+                            <th class="text-muted">Nights</th>
+                            <td>{{ (block.departure_date - block.arrival_date).days }}</td>
+                        </tr>
+                        <tr><th class="text-muted">Total Rooms</th><td>{{ block.total_rooms }}</td></tr>
+                        <tr>
+                            <th class="text-muted">Picked Up</th>
+                            <td>
+                                <span class="fw-bold {% if picked_up >= block.total_rooms %}text-success{% elif picked_up > 0 %}text-warning{% endif %}">
+                                    {{ picked_up }}
+                                </span>
+                                / {{ block.total_rooms }}
+                                {% if remaining > 0 %}
+                                <small class="text-muted">({{ remaining }} remaining)</small>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Group Rate</th>
+                            <td>{% if block.group_rate %}{{ "{:,.2f}".format(block.group_rate) }}{% else %}<span class="text-muted">Not set (uses room type rate)</span>{% endif %}</td>
+                        </tr>
+                        {% if block.contact_name %}
+                        <tr><th class="text-muted">Contact</th><td>{{ block.contact_name }}</td></tr>
+                        {% endif %}
+                        {% if block.contact_phone %}
+                        <tr><th class="text-muted">Phone</th><td>{{ block.contact_phone }}</td></tr>
+                        {% endif %}
+                        {% if block.contact_email %}
+                        <tr><th class="text-muted">Email</th><td>{{ block.contact_email }}</td></tr>
+                        {% endif %}
+                        {% if block.company %}
+                        <tr><th class="text-muted">Company</th><td>{{ block.company.name }}</td></tr>
+                        {% endif %}
+                        {% if block.billing_instructions %}
+                        <tr><th class="text-muted">Billing</th><td>{{ block.billing_instructions }}</td></tr>
+                        {% endif %}
+                        {% if block.notes %}
+                        <tr><th class="text-muted">Notes</th><td>{{ block.notes }}</td></tr>
+                        {% endif %}
+                    </table>
+                </div>
+                <div class="card-footer">
+                    <form method="POST" action="{{ url_for('groups.update_status', group_id=block.id) }}" class="d-flex gap-2 align-items-center">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <select name="status" class="form-select form-select-sm" style="width:auto;">
+                            {% for s in ['Tentative','Confirmed','Cancelled','Completed'] %}
+                            <option value="{{ s }}" {% if block.status == s %}selected{% endif %}>{{ s }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-outline-primary">Update Status</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Room Form -->
+        <div class="col-lg-8">
+            {% if block.status != 'Cancelled' %}
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-success text-white">
+                    <i class="bi bi-plus-circle me-1"></i>Add Room to Group
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('groups.add_room', group_id=block.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-2">
+                                <label class="form-label form-label-sm">First Name <span class="text-danger">*</span></label>
+                                <input type="text" name="guest_first_name" class="form-control form-control-sm" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label form-label-sm">Last Name</label>
+                                <input type="text" name="guest_last_name" class="form-control form-control-sm">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label form-label-sm">Phone <span class="text-danger">*</span></label>
+                                <input type="tel" name="guest_phone" class="form-control form-control-sm" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label form-label-sm">Room Type</label>
+                                <select name="room_type_id" class="form-select form-select-sm" required>
+                                    {% for rt in room_types %}
+                                    <option value="{{ rt.id }}">{{ rt.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-1">
+                                <label class="form-label form-label-sm">Adults</label>
+                                <input type="number" name="adults" class="form-control form-control-sm" value="1" min="1">
+                            </div>
+                            <div class="col-md-1">
+                                <label class="form-label form-label-sm">Children</label>
+                                <input type="number" name="children" class="form-control form-control-sm" value="0" min="0">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label form-label-sm">Requests</label>
+                                <input type="text" name="special_requests" class="form-control form-control-sm" placeholder="Optional">
+                            </div>
+                            <div class="col-md-1">
+                                <button type="submit" class="btn btn-sm btn-success w-100">
+                                    <i class="bi bi-plus-lg"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Batch Check-in -->
+            {% set confirmed_count = reservations|selectattr('status', 'equalto', 'Confirmed')|list|length %}
+            {% if confirmed_count > 0 %}
+            <div class="mb-3">
+                <form method="POST" action="{{ url_for('groups.batch_checkin', group_id=block.id) }}" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-warning"
+                            onclick="return confirm('Check in {{ confirmed_count }} confirmed reservation(s)?')">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Batch Check-in ({{ confirmed_count }} guests)
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+
+            <!-- Rooming List -->
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <i class="bi bi-list-ul me-1"></i>Rooming List
+                    <span class="badge bg-secondary ms-1">{{ reservations|length }}</span>
+                </div>
+                {% if reservations %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Guest</th>
+                                <th>Phone</th>
+                                <th>Room Type</th>
+                                <th>Room</th>
+                                <th>Rate</th>
+                                <th>Adults/Children</th>
+                                <th>Status</th>
+                                <th>Requests</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in reservations %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td class="fw-semibold">{{ r.guest.name if r.guest else '-' }}</td>
+                                <td>{{ r.guest.phone if r.guest else '-' }}</td>
+                                <td>{{ r.room_type.name if r.room_type else '-' }}</td>
+                                <td>
+                                    {% if r.room %}
+                                        <span class="badge bg-dark">{{ r.room.room_number }}</span>
+                                    {% else %}
+                                        <span class="text-muted">Unassigned</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ "{:,.2f}".format(r.rate_per_night) }}</td>
+                                <td>{{ r.adults }} / {{ r.children }}</td>
+                                <td>
+                                    {% if r.status == 'Confirmed' %}
+                                        <span class="badge bg-primary">Confirmed</span>
+                                    {% elif r.status == 'CheckedIn' %}
+                                        <span class="badge bg-success">Checked In</span>
+                                    {% elif r.status == 'CheckedOut' %}
+                                        <span class="badge bg-secondary">Checked Out</span>
+                                    {% elif r.status == 'Cancelled' %}
+                                        <span class="badge bg-danger">Cancelled</span>
+                                    {% elif r.status == 'Reserved' %}
+                                        <span class="badge bg-warning text-dark">Reserved</span>
+                                    {% else %}
+                                        <span class="badge bg-light text-dark">{{ r.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ r.special_requests or '' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="card-body text-muted">
+                    <i class="bi bi-info-circle me-1"></i>No reservations added yet. Use the form above to add rooms to this group.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

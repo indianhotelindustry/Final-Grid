@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}GSTR-1 JSON Export{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0"><i class="bi bi-file-earmark-code text-primary me-2"></i>GSTR-1 JSON Export</h4>
+    <small class="text-muted">Generate GSTR-1 JSON file for upload to the GST portal.</small>
+  </div>
+</div>
+
+{% if not hotel_gstin %}
+<div class="alert alert-warning">
+  <i class="bi bi-exclamation-triangle me-1"></i>
+  Hotel GSTIN is not configured. Please set it in <strong>Settings</strong> before exporting.
+</div>
+{% endif %}
+
+<div class="card">
+  <div class="card-body">
+    <form method="POST" action="{{ url_for('reports.gstr1_export') }}">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Hotel GSTIN</label>
+          <input type="text" name="gstin" class="form-control" value="{{ hotel_gstin }}"
+                 maxlength="15" minlength="15" required
+                 pattern="[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[0-9A-Z]{1}[Z]{1}[0-9A-Z]{1}"
+                 title="Enter a valid 15-character GSTIN">
+          <div class="form-text">15-character GST Identification Number</div>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Filing Period (MMYYYY)</label>
+          <input type="text" name="fp" class="form-control" value="{{ fp }}"
+                 maxlength="6" minlength="6" required
+                 pattern="[0-1][0-9][0-9]{4}"
+                 placeholder="032026">
+          <div class="form-text">e.g. 032026 for March 2026</div>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">From Date</label>
+          <input type="date" name="from_date" class="form-control"
+                 value="{{ from_date.isoformat() }}" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">To Date</label>
+          <input type="date" name="to_date" class="form-control"
+                 value="{{ to_date.isoformat() }}" required>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-download me-1"></i>Generate &amp; Download JSON
+        </button>
+        <a href="{{ url_for('billing.gst_report') }}" class="btn btn-outline-secondary ms-2">
+          <i class="bi bi-arrow-left me-1"></i>Back to GST Report
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card mt-4">
+  <div class="card-header"><i class="bi bi-info-circle me-1"></i>About GSTR-1 Export</div>
+  <div class="card-body">
+    <p class="mb-2">The generated JSON file contains the following sections per GSTN schema:</p>
+    <ul class="mb-0">
+      <li><strong>B2B</strong> &mdash; Business-to-Business invoices (where billing company has a GSTIN on the check-in record)</li>
+      <li><strong>B2CS</strong> &mdash; Business-to-Consumer (Small) invoices aggregated by GST rate and place of supply</li>
+      <li><strong>CDNR</strong> &mdash; Credit notes issued against B2B invoices</li>
+    </ul>
+    <p class="mt-2 mb-0 text-muted">
+      Upload the downloaded <code>.json</code> file at
+      <a href="https://return.gst.gov.in" target="_blank" rel="noopener">return.gst.gov.in</a>
+      under Returns &rarr; GSTR-1 &rarr; Prepare Online &rarr; Upload JSON.
+    </p>
+  </div>
+</div>
+{% endblock %}

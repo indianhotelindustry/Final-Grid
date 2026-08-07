@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share Your Feedback</title>
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap-icons/font/bootstrap-icons.css') }}">
+    <style>
+        body { background: #f0f4f8; }
+        .star-btn { font-size: 2rem; cursor: pointer; color: #ccc; transition: color .15s; }
+        .star-btn.active, .star-btn:hover { color: #ffc107; }
+        .card { border-radius: 16px; }
+    </style>
+</head>
+<body>
+<div class="container py-5" style="max-width:520px;">
+    <div class="card shadow-sm p-4">
+        <div class="text-center mb-4">
+            <i class="bi bi-building fs-1 text-primary"></i>
+            <h4 class="mt-2 mb-0">How was your stay?</h4>
+            <p class="text-muted small">{{ guest.name }}, Room {{ reservation.room.room_number if reservation.room else '—' }}
+                | {{ reservation.arrival_date.strftime('%d %b') }} – {{ reservation.departure_date.strftime('%d %b %Y') }}</p>
+        </div>
+
+        <form method="POST">
+            <!-- Overall rating -->
+            <div class="mb-4 text-center">
+                <label class="form-label fw-semibold d-block">Overall Rating *</label>
+                <div id="stars" class="d-flex justify-content-center gap-2">
+                    {% for i in range(1,6) %}
+                    <i class="bi bi-star-fill star-btn" data-val="{{ i }}" onclick="setRating({{ i }})"></i>
+                    {% endfor %}
+                </div>
+                <input type="hidden" name="rating" id="ratingInput" required>
+                <div id="ratingLabel" class="text-muted small mt-1"></div>
+            </div>
+
+            <!-- Category ratings -->
+            <div class="row g-2 mb-3">
+                {% for cat, label in [('cleanliness','Cleanliness'),('service','Service'),('food','Food & Beverage'),('value','Value for Money')] %}
+                <div class="col-6">
+                    <label class="form-label small fw-semibold mb-1">{{ label }}</label>
+                    <select name="{{ cat }}" class="form-select form-select-sm">
+                        <option value="">—</option>
+                        {% for i in range(1,6) %}
+                        <option value="{{ i }}">{{ i }} ★</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Comment -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Comments (optional)</label>
+                <textarea name="comment" class="form-control" rows="3"
+                          placeholder="Tell us what you loved or how we can improve…"></textarea>
+            </div>
+
+            <!-- Recommend -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Would you recommend us?</label>
+                <div class="d-flex gap-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="would_recommend" value="1" id="recYes">
+                        <label class="form-check-label" for="recYes">👍 Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="would_recommend" value="0" id="recNo">
+                        <label class="form-check-label" for="recNo">👎 No</label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-2">
+                <i class="bi bi-send me-1"></i>Submit Feedback
+            </button>
+        </form>
+    </div>
+</div>
+<script nonce="{{ csp_nonce }}">
+const labels = ['','Poor','Below Average','Average','Good','Excellent'];
+function setRating(val) {
+    document.getElementById('ratingInput').value = val;
+    document.getElementById('ratingLabel').textContent = labels[val];
+    document.querySelectorAll('.star-btn').forEach((s,i) => {
+        s.classList.toggle('active', i < val);
+    });
+}
+</script>
+</body>
+</html>

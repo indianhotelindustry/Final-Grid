@@ -1,0 +1,532 @@
+{% extends "base.html" %}
+{% block title %}Invoice Manager — {{ config.HOTEL_NAME }}{% endblock %}
+
+{% block content %}
+<!-- Global Secondary Tab Bar -->
+<ul class="nav nav-tabs" role="tablist" id="globalTabs">
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.dashboard') }}"><i class="bi bi-grid-3x3"></i> Dashboard</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.reservations') }}"><i class="bi bi-list-ul"></i> Front Desk</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.housekeeping') }}"><i class="bi bi-brush"></i> Housekeeping</a>
+    </li>
+    {% if current_user.has_role('Admin','Manager','FrontDesk','Accountant') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link active" href="{{ url_for('main.invoice_manager') }}"><i class="bi bi-receipt-cutoff"></i> Invoice Manager</a>
+    </li>
+    {% endif %}
+    {% if current_user.has_role('Admin','Manager','FrontDesk','Accountant') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.room_grid') }}"><i class="bi bi-calendar3"></i> Calendar View</a>
+    </li>
+    {% endif %}
+    {% if current_user.has_role('Admin','Manager') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('groups.index') }}"><i class="bi bi-people-fill"></i> Group Bookings</a>
+    </li>
+    {% endif %}
+    {% if current_user.has_role('Admin','Manager','Accountant') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.night_audit') }}"><i class="bi bi-moon-stars"></i> Night Audit</a>
+    </li>
+    {% endif %}
+</ul>
+
+<style>
+.kpi-card{border:none;border-radius:10px;transition:transform .15s,box-shadow .15s;cursor:pointer}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.kpi-val{font-size:1.35rem;font-weight:700;line-height:1.2}
+.kpi-label{font-size:.72rem;color:#6c757d;text-transform:uppercase;letter-spacing:.5px}
+.exc-strip{display:flex;flex-wrap:wrap;gap:6px;padding:8px 0}
+.exc-pill{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:.75rem;font-weight:600;text-decoration:none;border:1px solid transparent;transition:filter .1s}
+.exc-pill:hover{filter:brightness(.9);text-decoration:none}
+.exc-pill.danger{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
+.exc-pill.warning{background:#fef3c7;color:#92400e;border-color:#fcd34d}
+.exc-pill.info{background:#dbeafe;color:#1e40af;border-color:#93c5fd}
+.inv-table th{font-size:.75rem;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
+.inv-table td{font-size:.82rem;vertical-align:middle}
+.mode-badge{font-size:.68rem;padding:2px 6px}
+.filter-section{background:#f8f9fa;border-radius:8px;padding:12px 16px;margin-bottom:12px}
+.quick-btn{font-size:.72rem;padding:3px 10px;border-radius:12px}
+.quick-btn.active{font-weight:700}
+/* Drawer */
+.inv-drawer{position:fixed;top:0;right:-480px;width:480px;height:100vh;background:#fff;z-index:1060;box-shadow:-4px 0 20px rgba(0,0,0,.15);transition:right .3s ease;overflow-y:auto}
+.inv-drawer.open{right:0}
+.inv-drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:1055;display:none}
+.inv-drawer-overlay.open{display:block}
+.drawer-section{border-bottom:1px solid #e9ecef;padding:12px 16px}
+.drawer-section h6{font-size:.78rem;text-transform:uppercase;color:#6c757d;letter-spacing:.5px;margin-bottom:8px}
+@media print{.d-print-none{display:none!important}.inv-drawer,.inv-drawer-overlay{display:none!important}}
+</style>
+
+<!-- ═══ KPI CARDS ═══ -->
+<div class="row g-2 mt-2 mb-2">
+    {% set cards = [
+        ('Total Invoices', summary.count, '', 'bi-receipt', 'primary', 'tab=all'),
+        ('Gross Billed', '₹{:,.0f}'.format(summary.total_billed), 'Total invoiced', 'bi-calculator', 'dark', 'tab=all'),
+        ('Net Collected', '₹{:,.0f}'.format(summary.total_collected), 'Payments received', 'bi-cash-stack', 'success', 'tab=paid'),
+        ('Outstanding', '₹{:,.0f}'.format(summary.total_pending), 'Pending recovery', 'bi-exclamation-circle', 'danger' if summary.total_pending > 0 else 'secondary', 'tab=pending'),
+        ('Credit Bills', '₹{:,.0f}'.format(summary.total_credit), 'Company credit', 'bi-building', 'info', 'tab=credit'),
+        ('Voided', '₹{:,.0f}'.format(summary.total_voided), 'Reversed payments', 'bi-x-circle', 'secondary', 'tab=voided'),
+        ('Overpayments', '₹{:,.0f}'.format(summary.total_overpaid), 'Excess collected', 'bi-cash-coin', 'warning' if summary.total_overpaid > 0 else 'secondary', 'tab=overpaid'),
+        ('Avg Invoice', '₹{:,.0f}'.format(summary.avg_invoice), 'Per checkout', 'bi-bar-chart', 'primary', 'tab=all'),
+    ] %}
+    {% for label, val, sub, icon, color, filt in cards %}
+    <div class="col-6 col-md-3 col-xl">
+        <a href="{{ url_for('main.invoice_manager', **{filt.split('=')[0]: filt.split('=')[1]}) }}&from={{ from_date }}&to={{ to_date }}"
+           class="card kpi-card shadow-sm h-100 text-decoration-none">
+            <div class="card-body py-2 px-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="kpi-val text-{{ color }}">{{ val }}</div>
+                        <div class="kpi-label">{{ label }}</div>
+                        {% if sub %}<div class="text-muted" style="font-size:.65rem">{{ sub }}</div>{% endif %}
+                    </div>
+                    <i class="bi {{ icon }} text-{{ color }}" style="font-size:1.3rem;opacity:.4"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- ═══ EXCEPTION STRIP ═══ -->
+{% if exceptions %}
+<div class="exc-strip d-print-none">
+    <span class="text-muted" style="font-size:.72rem;font-weight:600;align-self:center"><i class="bi bi-bell me-1"></i>Alerts:</span>
+    {% for ex in exceptions %}
+    <a href="{{ url_for('main.invoice_manager') }}?{{ ex.filter }}&from={{ from_date }}&to={{ to_date }}"
+       class="exc-pill {{ ex.color }}">
+        <i class="bi {{ ex.icon }}"></i> {{ ex.label }}
+    </a>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- ═══ TAB PILLS ═══ -->
+<ul class="nav nav-pills mb-2 d-print-none" style="font-size:.82rem">
+    {% set tabs = [('all','All', summary.count, 'secondary'),
+                   ('pending','Pending', (summary.status_counts.get('Unpaid',0)+summary.status_counts.get('Partial',0)), 'danger'),
+                   ('paid','Paid', summary.status_counts.get('Paid',0), 'success'),
+                   ('credit','Credit', summary.status_counts.get('Credit',0), 'info'),
+                   ('overpaid','Overpaid', summary.status_counts.get('Overpaid',0), 'warning'),
+                   ('voided','Voided', summary.status_counts.get('Voided',0), 'secondary')] %}
+    {% for t, label, ct, color in tabs %}
+    <li class="nav-item">
+        <a class="nav-link py-1 px-3 {% if tab == t %}active{% endif %}"
+           href="{{ url_for('main.invoice_manager', tab=t) }}&from={{ from_date }}&to={{ to_date }}{% if search %}&search={{ search }}{% endif %}{% if room_f %}&room={{ room_f }}{% endif %}">
+            {{ label }}
+            {% if ct %}<span class="badge bg-{{ color if tab != t else 'light text-dark' }} ms-1">{{ ct }}</span>{% endif %}
+        </a>
+    </li>
+    {% endfor %}
+</ul>
+
+<!-- ═══ SMART FILTERS ═══ -->
+<div class="filter-section d-print-none">
+    <form method="GET" action="{{ url_for('main.invoice_manager') }}" id="filterForm">
+        <input type="hidden" name="tab" value="{{ tab }}">
+        <!-- Quick filters -->
+        <div class="d-flex flex-wrap gap-1 mb-2">
+            <span class="text-muted me-1" style="font-size:.72rem;align-self:center">Quick:</span>
+            {% for q, qlabel in [('today','Today'),('yesterday','Yesterday'),('week','Last 7 Days'),('month','This Month')] %}
+            <a href="{{ url_for('main.invoice_manager', quick=q, tab=tab) }}"
+               class="btn btn-sm quick-btn {% if quick == q %}btn-primary active{% else %}btn-outline-secondary{% endif %}">{{ qlabel }}</a>
+            {% endfor %}
+        </div>
+        <div class="row g-2 align-items-end">
+            <div class="col-md-2 col-6">
+                <label class="form-label form-label-sm mb-0">Date Type</label>
+                <select name="date_type" class="form-select form-select-sm">
+                    {% for dt, dl in [('checkout','Checkout Date'),('invoice','Invoice Date'),('arrival','Arrival Date'),('departure','Departure Date')] %}
+                    <option value="{{ dt }}" {% if date_type == dt %}selected{% endif %}>{{ dl }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md col-6">
+                <label class="form-label form-label-sm mb-0">From</label>
+                <input type="date" name="from" class="form-control form-control-sm" value="{{ from_date.isoformat() }}">
+            </div>
+            <div class="col-md col-6">
+                <label class="form-label form-label-sm mb-0">To</label>
+                <input type="date" name="to" class="form-control form-control-sm" value="{{ to_date.isoformat() }}">
+            </div>
+            <div class="col-md col-6">
+                <label class="form-label form-label-sm mb-0">Guest / Phone</label>
+                <input type="text" name="search" class="form-control form-control-sm" value="{{ search }}" placeholder="Name or phone">
+            </div>
+            <div class="col-md col-6">
+                <label class="form-label form-label-sm mb-0">Invoice #</label>
+                <input type="text" name="invoice" class="form-control form-control-sm" value="{{ inv_f }}" placeholder="Invoice or Ref">
+            </div>
+            <div class="col-md col-6">
+                <label class="form-label form-label-sm mb-0">Room</label>
+                <input type="text" name="room" class="form-control form-control-sm" value="{{ room_f }}" placeholder="Room #">
+            </div>
+        </div>
+        <div class="row g-2 mt-1 align-items-end">
+            <div class="col-md col-6">
+                <label class="form-label form-label-sm mb-0">Source</label>
+                <select name="source" class="form-select form-select-sm">
+                    <option value="">All Sources</option>
+                    {% for s in source_list %}
+                    <option value="{{ s }}" {% if source_f == s %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md col-6">
+                <label class="form-label form-label-sm mb-0">Status</label>
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">All Statuses</option>
+                    {% for s in status_options %}
+                    <option value="{{ s }}" {% if status_f == s %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md col-6">
+                <label class="form-label form-label-sm mb-0">Payment Mode</label>
+                <select name="mode" class="form-select form-select-sm">
+                    <option value="">All Modes</option>
+                    {% for pm in payment_modes %}
+                    <option value="{{ pm.name }}" {% if mode_f == pm.name %}selected{% endif %}>{{ pm.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md col-6">
+                <label class="form-label form-label-sm mb-0">Handled By</label>
+                <input type="text" name="staff" class="form-control form-control-sm" value="{{ staff_f }}" placeholder="Staff name">
+            </div>
+            <div class="col-md-auto col-12 d-flex gap-1">
+                <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-funnel me-1"></i>Apply</button>
+                <a href="{{ url_for('main.invoice_manager') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+                <a href="{{ url_for('main.invoice_manager', format='excel', tab=tab) }}&from={{ from_date }}&to={{ to_date }}{% if search %}&search={{ search }}{% endif %}{% if room_f %}&room={{ room_f }}{% endif %}"
+                   class="btn btn-sm btn-outline-success"><i class="bi bi-file-earmark-excel me-1"></i>Excel</a>
+                <button type="button" class="btn btn-sm btn-outline-dark" data-action="print"><i class="bi bi-printer me-1"></i>Print</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Apr 2026 trust fix: always-visible filter-summary banner -->
+{% if filter_summary %}
+<div class="d-flex align-items-center gap-2 small mb-2 px-3 py-2 rounded"
+     style="background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;">
+  <i class="bi bi-funnel-fill"></i>
+  <span>{{ filter_summary }}</span>
+  {% if rows %}
+  <span class="badge bg-primary ms-2">{{ rows|length }} invoice(s)</span>
+  {% endif %}
+  <a href="{{ url_for('main.invoice_manager') }}" class="ms-auto small text-decoration-none">
+    <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
+  </a>
+</div>
+{% endif %}
+
+<!-- ═══ INVOICE TABLE ═══ -->
+{% if rows %}
+<div class="table-responsive">
+    <table class="table table-hover table-striped inv-table mb-0 align-middle" style="font-size:.82rem">
+        <thead class="table-light">
+            <tr>
+                <th>Invoice No.</th>
+                <th>Checkout</th>
+                <th>Guest</th>
+                <th>Room</th>
+                <th>Source</th>
+                <th>Stay</th>
+                <th class="text-end">Room&nbsp;₹</th>
+                <th class="text-end">Extras&nbsp;₹</th>
+                <th class="text-end">Disc&nbsp;₹</th>
+                <th class="text-end">Gross&nbsp;₹</th>
+                <th class="text-end">Paid&nbsp;₹</th>
+                <th class="text-end">Credit&nbsp;₹</th>
+                <th class="text-end">Balance&nbsp;₹</th>
+                <th>Status</th>
+                <th>Payments</th>
+                <th>By</th>
+                <th class="d-print-none">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in rows %}
+            {% set res = r.reservation %}
+            {% set b = r.billing %}
+            <tr>
+                <td>
+                    <a href="#" class="fw-semibold text-decoration-none inv-detail-link"
+                       data-id="{{ res.id }}">
+                        {{ res.invoice_number or res.booking_reference or 'RES-%d'|format(res.id) }}
+                    </a>
+                </td>
+                <td class="text-nowrap">
+                    {{ res.checked_out_at.strftime('%d %b %y') if res.checked_out_at else '—' }}
+                    <br><small class="text-muted">{{ res.checked_out_at.strftime('%H:%M') if res.checked_out_at else '' }}</small>
+                </td>
+                <td>
+                    <div class="fw-semibold">{{ res.guest.name if res.guest else '—' }}</div>
+                    {% if res.guest and res.guest.phone %}
+                    <small class="text-muted">{{ res.guest.phone }}</small>
+                    {% endif %}
+                </td>
+                <td><span class="badge bg-dark">{{ res.room.room_number if res.room else '—' }}</span></td>
+                <td><small>{{ res.source or '—' }}</small></td>
+                <td class="text-nowrap">
+                    <small>{{ res.arrival_date.strftime('%d %b') }} → {{ res.departure_date.strftime('%d %b') }}</small>
+                    <br><small class="text-muted">{{ b.nights }}N</small>
+                </td>
+                <td class="text-end">{{ "{:,.0f}".format(b.room_charges) }}</td>
+                <td class="text-end">{{ "{:,.0f}".format(b.extra_charges) if b.extra_charges else '—' }}</td>
+                <td class="text-end">{% if b.discount %}<span class="text-danger">-{{ "{:,.0f}".format(b.discount) }}</span>{% else %}—{% endif %}</td>
+                <td class="text-end fw-semibold">{{ "{:,.0f}".format(b.gross) }}</td>
+                <td class="text-end text-success">{{ "{:,.0f}".format(b.paid) }}</td>
+                <td class="text-end">{% if b.credit %}<span class="text-info">{{ "{:,.0f}".format(b.credit) }}</span>{% else %}—{% endif %}</td>
+                <td class="text-end {% if b.balance > 0.01 %}text-danger fw-bold{% elif b.balance < -0.01 %}text-warning fw-bold{% endif %}">
+                    {{ "{:,.0f}".format(b.balance) }}
+                </td>
+                <td>
+                    <span class="badge bg-{{ r.status_color }}">{{ r.status }}</span>
+                </td>
+                <td>
+                    {% for mode, amt in r.modes.items() %}
+                    <span class="badge bg-outline-secondary border mode-badge" title="{{ mode }}: ₹{{ '{:,.0f}'.format(amt) }}">
+                        {{ mode[:4] }} {{ "{:,.0f}".format(amt) }}
+                    </span>
+                    {% endfor %}
+                </td>
+                <td><small class="text-muted">{{ r.checkout_by }}</small></td>
+                <td class="d-print-none text-nowrap">
+                    <a href="{{ url_for('main.invoice', reservation_id=res.id) }}" class="btn btn-sm btn-outline-primary py-0 px-1" title="View Invoice">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                    <a href="{{ url_for('main.invoice', reservation_id=res.id) }}" target="_blank" class="btn btn-sm btn-outline-dark py-0 px-1" title="Print">
+                        <i class="bi bi-printer"></i>
+                    </a>
+                    {% if res.guest %}
+                    <a href="{{ url_for('main.guest_folio', guest_id=res.guest.id) }}" class="btn btn-sm btn-outline-secondary py-0 px-1" title="Guest Folio">
+                        <i class="bi bi-folder2-open"></i>
+                    </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <!-- ═══ FOOTER SUMMARY ═══ -->
+        <tfoot class="table-light fw-bold">
+            <tr>
+                <td colspan="6" class="text-end">Totals ({{ footer.count }} invoices)</td>
+                <td class="text-end">—</td>
+                <td class="text-end">—</td>
+                <td class="text-end">—</td>
+                <td class="text-end">{{ "{:,.0f}".format(footer.gross) }}</td>
+                <td class="text-end text-success">{{ "{:,.0f}".format(footer.paid) }}</td>
+                <td class="text-end text-info">{{ "{:,.0f}".format(footer.credit) }}</td>
+                <td class="text-end {% if footer.balance > 0.01 %}text-danger{% endif %}">{{ "{:,.0f}".format(footer.balance) }}</td>
+                <td colspan="4"></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+{% else %}
+{# ── Apr 2026 trust fix: helpful empty-state with diagnostics ── #}
+<div class="text-center py-4 text-muted">
+    <i class="bi bi-receipt-cutoff fs-1 d-block mb-2"></i>
+    <p class="mb-1"><strong>No invoices match these filters.</strong></p>
+    {% if filter_summary %}
+    <p class="small text-muted mb-3">
+      <i class="bi bi-funnel me-1"></i>Active filter: {{ filter_summary }}
+    </p>
+    {% endif %}
+
+    {# Show counts for OTHER date types when current type returns 0.
+       Helps the user discover that their data exists, just not under
+       the date type they picked. #}
+    {% if alt_date_type_counts %}
+    <div class="d-inline-block text-start small mb-3"
+         style="background:#f3f4f6;padding:10px 14px;border-radius:8px;">
+      <div class="fw-semibold mb-1 text-dark">
+        <i class="bi bi-info-circle text-info me-1"></i>Try a different date type:
+      </div>
+      <ul class="mb-0" style="list-style:none;padding-left:0;">
+        {% for _key, _label in [('checkout', 'Checkout Date'),
+                                ('invoice', 'Invoice Date (= Checkout)'),
+                                ('arrival', 'Arrival Date'),
+                                ('departure', 'Departure Date')] %}
+          {% set _cnt = alt_date_type_counts.get(_key, 0) %}
+          {% if _cnt > 0 and _key != date_type %}
+          <li>
+            <a href="{{ url_for('main.invoice_manager',
+                       date_type=_key, **{'from': from_date.isoformat(),
+                       'to': to_date.isoformat(),
+                       'tab': tab, 'search': search, 'room': room_f,
+                       'invoice': inv_f, 'source': source_f, 'mode': mode_f,
+                       'status': status_f, 'staff': staff_f}) }}"
+               class="text-decoration-none">
+              <span class="badge bg-info text-dark">{{ _cnt }}</span>
+              by <strong>{{ _label }}</strong>
+            </a>
+          </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+      {% if alt_date_type_counts.get('lifetime', 0) > 0 %}
+      <div class="small text-muted mt-2">
+        <i class="bi bi-database me-1"></i>
+        {{ alt_date_type_counts.lifetime }} total checked-out folio(s) on file (all time).
+      </div>
+      {% endif %}
+    </div>
+    <br>
+    {% endif %}
+
+    <a href="{{ url_for('main.invoice_manager') }}" class="btn btn-sm btn-primary">
+      <i class="bi bi-arrow-counterclockwise me-1"></i>Reset Filters
+    </a>
+    {% if alt_date_type_counts.get('lifetime', 0) > 0 %}
+    <a href="{{ url_for('main.invoice_manager', date_type='checkout',
+                **{'from': '', 'to': ''}) }}"
+       class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-clock-history me-1"></i>Show last 30 days
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Status legend -->
+<div class="d-flex flex-wrap gap-2 mt-2 mb-3" style="font-size:.72rem">
+    <span class="text-muted">Status:</span>
+    <span><span class="badge bg-success">Paid</span> Fully settled</span>
+    <span><span class="badge bg-warning">Partial</span> Part payment</span>
+    <span><span class="badge bg-danger">Unpaid</span> No payment</span>
+    <span><span class="badge bg-info">Credit</span> Company billed</span>
+    <span><span class="badge bg-purple" style="background:#6f42c1!important">Overpaid</span> Excess payment</span>
+    <span><span class="badge bg-secondary">Voided</span> Reversed</span>
+</div>
+
+<!-- ═══ INVOICE DETAIL DRAWER ═══ -->
+<div class="inv-drawer-overlay" id="drawerOverlay"></div>
+<div class="inv-drawer" id="invoiceDrawer">
+    <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom bg-light">
+        <h6 class="mb-0"><i class="bi bi-receipt me-1"></i>Invoice Detail</h6>
+        <button class="btn btn-sm btn-outline-secondary" id="closeDrawer"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div id="drawerContent">
+        <div class="text-center py-5 text-muted"><i class="bi bi-arrow-repeat spin"></i> Loading...</div>
+    </div>
+</div>
+
+<script nonce="{{ csp_nonce }}">
+(function(){
+    var drawer = document.getElementById('invoiceDrawer');
+    var overlay = document.getElementById('drawerOverlay');
+    var content = document.getElementById('drawerContent');
+
+    function closeDrawer(){ drawer.classList.remove('open'); overlay.classList.remove('open'); }
+    document.getElementById('closeDrawer').addEventListener('click', closeDrawer);
+    overlay.addEventListener('click', closeDrawer);
+
+    document.querySelectorAll('.inv-detail-link').forEach(function(a){
+        a.addEventListener('click', function(e){
+            e.preventDefault();
+            var id = this.dataset.id;
+            drawer.classList.add('open'); overlay.classList.add('open');
+            content.innerHTML = '<div class="text-center py-5 text-muted"><div class="spinner-border spinner-border-sm"></div> Loading...</div>';
+            fetch('/api/invoice-detail/' + id)
+                .then(function(r){ return r.json(); })
+                .then(function(d){ renderDrawer(d, id); })
+                .catch(function(){ content.innerHTML = '<div class="text-center py-4 text-danger">Failed to load details.</div>'; });
+        });
+    });
+
+    function renderDrawer(d, resId){
+        var h = '';
+        // Guest
+        h += '<div class="drawer-section"><h6><i class="bi bi-person me-1"></i>Guest</h6>';
+        h += '<div class="fw-semibold">' + d.guest.name + '</div>';
+        if(d.guest.phone) h += '<small class="text-muted">' + d.guest.phone + '</small><br>';
+        if(d.guest.email) h += '<small class="text-muted">' + d.guest.email + '</small>';
+        h += '</div>';
+
+        // Stay
+        h += '<div class="drawer-section"><h6><i class="bi bi-calendar3 me-1"></i>Stay Info</h6>';
+        h += '<table class="table table-sm table-borderless mb-0" style="font-size:.8rem">';
+        h += '<tr><td class="text-muted" style="width:40%">Invoice</td><td class="fw-semibold">' + d.stay.invoice_number + '</td></tr>';
+        h += '<tr><td class="text-muted">Room</td><td>' + d.stay.room + ' · ' + d.stay.room_type + '</td></tr>';
+        h += '<tr><td class="text-muted">Stay</td><td>' + d.stay.arrival + ' → ' + d.stay.departure + ' (' + d.stay.nights + 'N)</td></tr>';
+        h += '<tr><td class="text-muted">Checkout</td><td>' + d.stay.checked_out_at + '</td></tr>';
+        h += '<tr><td class="text-muted">Source</td><td>' + d.stay.source + '</td></tr>';
+        h += '</table></div>';
+
+        // Billing summary
+        var b = d.billing;
+        h += '<div class="drawer-section"><h6><i class="bi bi-calculator me-1"></i>Settlement Summary</h6>';
+        h += '<table class="table table-sm mb-0" style="font-size:.8rem">';
+        h += '<tr><td>Room Charges</td><td class="text-end">₹' + fmt(b.room_charges) + '</td></tr>';
+        h += '<tr><td>Extra Charges</td><td class="text-end">₹' + fmt(b.extra_charges) + '</td></tr>';
+        if(b.discount > 0) h += '<tr class="text-danger"><td>Discount</td><td class="text-end">-₹' + fmt(b.discount) + '</td></tr>';
+        h += '<tr class="fw-bold border-top"><td>Gross Total</td><td class="text-end">₹' + fmt(b.total) + '</td></tr>';
+        h += '<tr class="text-success"><td>Paid</td><td class="text-end">₹' + fmt(b.paid) + '</td></tr>';
+        if(b.company_credit > 0) h += '<tr class="text-info"><td>Company Credit</td><td class="text-end">₹' + fmt(b.company_credit) + '</td></tr>';
+        var balClass = b.balance > 0.01 ? 'text-danger fw-bold' : (b.balance < -0.01 ? 'text-warning fw-bold' : 'text-success fw-bold');
+        h += '<tr class="border-top ' + balClass + '"><td>Balance</td><td class="text-end">₹' + fmt(b.balance) + '</td></tr>';
+        h += '</table></div>';
+
+        // Company
+        if(d.company.name){
+            h += '<div class="drawer-section"><h6><i class="bi bi-building me-1"></i>Company Billing</h6>';
+            h += '<div class="fw-semibold">' + d.company.name + '</div>';
+            h += '<small class="text-muted">Credit Posted: ₹' + fmt(d.company.credit_posted) + '</small>';
+            if(d.company.billing_ref) h += '<br><small class="text-muted">Ref: ' + d.company.billing_ref + '</small>';
+            h += '</div>';
+        }
+
+        // Extra charges
+        if(d.extras.length){
+            h += '<div class="drawer-section"><h6><i class="bi bi-cart me-1"></i>Extra Charges (' + d.extras.length + ')</h6>';
+            h += '<table class="table table-sm mb-0" style="font-size:.78rem"><thead><tr><th>Item</th><th>Date</th><th class="text-end">₹</th></tr></thead><tbody>';
+            d.extras.forEach(function(e){
+                h += '<tr><td>' + e.description + '</td><td>' + e.date + '</td><td class="text-end">' + fmt(e.amount) + '</td></tr>';
+            });
+            h += '</tbody></table></div>';
+        }
+
+        // Payment history
+        if(d.payments.length){
+            h += '<div class="drawer-section"><h6><i class="bi bi-credit-card me-1"></i>Payment History (' + d.payments.length + ')</h6>';
+            h += '<table class="table table-sm mb-0" style="font-size:.78rem"><thead><tr><th>Mode</th><th>Date</th><th class="text-end">₹</th><th></th></tr></thead><tbody>';
+            d.payments.forEach(function(p){
+                var cls = p.voided ? 'text-decoration-line-through text-muted' : '';
+                h += '<tr class="' + cls + '"><td>' + p.mode + '</td><td>' + p.date + '</td><td class="text-end">' + fmt(p.amount) + '</td>';
+                h += '<td>' + (p.voided ? '<span class="badge bg-secondary">Void</span>' : '') + '</td></tr>';
+                if(p.voided && p.void_reason) h += '<tr><td colspan="4"><small class="text-muted">Reason: ' + p.void_reason + '</small></td></tr>';
+            });
+            h += '</tbody></table></div>';
+        }
+
+        // Audit trail
+        if(d.audit_trail.length){
+            h += '<div class="drawer-section"><h6><i class="bi bi-clock-history me-1"></i>Audit Trail</h6>';
+            h += '<div style="max-height:200px;overflow-y:auto">';
+            d.audit_trail.forEach(function(a){
+                h += '<div class="d-flex justify-content-between mb-1" style="font-size:.75rem">';
+                h += '<span><span class="badge bg-light text-dark border">' + a.action + '</span> ' + a.staff + '</span>';
+                h += '<small class="text-muted">' + a.timestamp + '</small></div>';
+            });
+            h += '</div></div>';
+        }
+
+        // Action buttons
+        h += '<div class="drawer-section text-center">';
+        h += '<a href="/invoice/' + resId + '" class="btn btn-sm btn-primary me-1"><i class="bi bi-eye me-1"></i>Full Invoice</a>';
+        h += '<a href="/invoice/' + resId + '" target="_blank" class="btn btn-sm btn-outline-dark"><i class="bi bi-printer me-1"></i>Print</a>';
+        h += '</div>';
+
+        content.innerHTML = h;
+    }
+
+    function fmt(n){ return Number(n).toLocaleString('en-IN', {minimumFractionDigits:0, maximumFractionDigits:0}); }
+})();
+</script>
+{% endblock %}

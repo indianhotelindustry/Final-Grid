@@ -1,0 +1,291 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Payment Collection Report{% endblock %}
+{% block report_name %}Payment Collection{% endblock %}
+
+{% block report_content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h5 class="mb-0">
+        <i class="bi bi-cash-stack text-secondary me-2"></i>Payment Collection
+        <small class="text-muted fs-6 ms-1">{{ from_date.strftime('%d %b') }} – {{ to_date.strftime('%d %b %Y') }}</small>
+    </h5>
+    <div class="d-flex gap-2 d-print-none">
+        <a href="{{ url_for('reports.payment_collection', format='excel') }}"
+           class="btn btn-sm btn-success">
+            <i class="bi bi-file-earmark-excel me-1"></i>Excel
+        </a>
+        <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i>Print
+        </button>
+    </div>
+</div>
+
+<!-- Date range filter -->
+<form class="d-flex align-items-center gap-2 mb-4 d-print-none">
+    <label class="fw-semibold small">From</label>
+    <input type="date" name="from" class="form-control form-control-sm" style="width:auto;"
+           value="{{ from_date.isoformat() }}">
+    <label class="fw-semibold small">To</label>
+    <input type="date" name="to" class="form-control form-control-sm" style="width:auto;"
+           value="{{ to_date.isoformat() }}">
+    <button class="btn btn-sm btn-primary">Apply</button>
+</form>
+
+{# ── Apr 2026: Purpose split — Advance / Settlement / Credit Recovery / Refund ── #}
+<div class="card border-info shadow-sm mb-3">
+  <div class="card-header py-2 d-flex align-items-center gap-2"
+       style="background:rgba(59,130,246,.08);">
+    <i class="bi bi-tags text-info"></i>
+    <strong>Direct collections — by purpose</strong>
+    <span class="badge bg-light text-muted ms-auto small">Advance ≠ Revenue</span>
+  </div>
+  <div class="card-body py-2">
+    <div class="row g-2 small text-center">
+      <div class="col-6 col-md-3">
+        <div class="text-muted">Advance Received</div>
+        <div class="fw-bold fs-5 text-warning">₹{{ '{:,.0f}'.format(advance_total|default(0)) }}</div>
+        <div class="small text-muted">Liability — future stay</div>
+      </div>
+      <div class="col-6 col-md-3 border-start">
+        <div class="text-muted">Settlement Collected</div>
+        <div class="fw-bold fs-5 text-success">₹{{ '{:,.0f}'.format(settlement_total|default(0)) }}</div>
+        <div class="small text-muted">Cash for stay-period revenue</div>
+      </div>
+      <div class="col-6 col-md-3 border-start">
+        <div class="text-muted">Credit Recovery</div>
+        <div class="fw-bold fs-5" style="color:#92400e;">₹{{ '{:,.0f}'.format(credit_recovery_total|default(0)) }}</div>
+        <div class="small text-muted">Cash against post-checkout receivable</div>
+      </div>
+      <div class="col-6 col-md-3 border-start">
+        <div class="text-muted">Direct Total</div>
+        <div class="fw-bold fs-5">₹{{ '{:,.0f}'.format(direct_total|default(grand_total)) }}</div>
+        <div class="small text-muted">All direct payments in range</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ── Apr 2026: Advance lifecycle — Received / Refund Issued / Net + Forfeit ── #}
+<div class="card border-warning shadow-sm mb-3">
+  <div class="card-header py-2 d-flex align-items-center gap-2"
+       style="background:rgba(245,158,11,.10);">
+    <i class="bi bi-arrow-left-right text-warning"></i>
+    <strong>Advance lifecycle</strong>
+    <span class="badge bg-light text-muted ms-auto small">Booking-date money flow</span>
+  </div>
+  <div class="card-body py-2">
+    <div class="row g-2 small text-center">
+      <div class="col-6 col-md-3">
+        <div class="text-muted">Advance Received</div>
+        <div class="fw-bold fs-5 text-warning">₹{{ '{:,.0f}'.format(advance_total|default(0)) }}</div>
+        <div class="small text-muted">Gross deposits in range</div>
+      </div>
+      <div class="col-6 col-md-3 border-start">
+        <div class="text-muted">Refund Issued</div>
+        <div class="fw-bold fs-5 text-danger">−₹{{ '{:,.0f}'.format(refund_total|default(0)) }}</div>
+        <div class="small text-muted">Cancellation refunds</div>
+      </div>
+      <div class="col-6 col-md-3 border-start">
+        <div class="text-muted">Net Advance</div>
+        <div class="fw-bold fs-5">₹{{ '{:,.0f}'.format(net_advance|default(0)) }}</div>
+        <div class="small text-muted">Received − Refunded</div>
+      </div>
+      <div class="col-6 col-md-3 border-start">
+        <div class="text-muted">Forfeit Income</div>
+        <div class="fw-bold fs-5" style="color:#92400e;">₹{{ '{:,.0f}'.format(forfeit_income_total|default(0)) }}</div>
+        <div class="small text-muted">{{ forfeit_count|default(0) }} cancellation(s) · separate from room revenue</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <!-- Summary cards -->
+    <div class="col-lg-4">
+        <div class="row g-2">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-3">
+                        <div class="fs-3 fw-bold text-success">₹{{ '{:,.0f}'.format(direct_total|default(grand_total)) }}</div>
+                        <div class="text-muted">Direct Collections</div>
+                        <div class="text-muted small">Cash + UPI + Card + Bank</div>
+                    </div>
+                </div>
+            </div>
+            {% if ota_total|default(0) > 0 %}
+            <div class="col-12">
+                <div class="card shadow-sm border-info">
+                    <div class="card-body text-center py-3">
+                        <div class="fs-4 fw-bold text-info">₹{{ '{:,.0f}'.format(ota_total) }}</div>
+                        <div class="text-muted">OTA Receivables Posted</div>
+                        <div class="text-muted small">Owed by OTA (not cash in hand)</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            <div class="col-12">
+                <div class="card shadow-sm bg-light">
+                    <div class="card-body text-center py-2">
+                        <div class="fw-bold">₹{{ '{:,.0f}'.format(grand_total) }}</div>
+                        <div class="text-muted small">Grand Total ({{ payments|length }} txns)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Direct payments by mode -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white fw-semibold py-2"><i class="bi bi-cash-stack me-1 text-success"></i>Direct Payments</div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <tbody>
+                        {% for mode, amt in (by_mode_direct|default(by_mode)).items() %}
+                        <tr>
+                            <td>
+                                {% if mode == 'Cash' %}<i class="bi bi-cash me-1 text-success"></i>
+                                {% elif mode == 'UPI' %}<i class="bi bi-phone me-1 text-primary"></i>
+                                {% elif mode == 'Card' %}<i class="bi bi-credit-card me-1 text-info"></i>
+                                {% else %}<i class="bi bi-wallet me-1"></i>{% endif %}
+                                {{ mode }}
+                            </td>
+                            <td class="text-end fw-semibold">₹{{ '{:,.0f}'.format(amt) }}</td>
+                            <td class="text-end text-muted small">
+                                {{ '{:.1f}'.format(amt / grand_total * 100) if grand_total else 0 }}%
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="3" class="text-muted text-center py-3">No direct payments.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% if by_mode_ota|default({})|length > 0 %}
+        <div class="card shadow-sm mt-2">
+            <div class="card-header bg-white fw-semibold py-2"><i class="bi bi-globe me-1 text-info"></i>OTA Receivables Posted</div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <tbody>
+                        {% for mode, amt in by_mode_ota.items() %}
+                        <tr>
+                            <td><i class="bi bi-globe me-1 text-info"></i>{{ mode }}</td>
+                            <td class="text-end fw-semibold text-info">₹{{ '{:,.0f}'.format(amt) }}</td>
+                            <td class="text-end text-muted small">
+                                {{ '{:.1f}'.format(amt / grand_total * 100) if grand_total else 0 }}%
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Daily trend -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white fw-semibold py-2">Daily Trend</div>
+            <div class="card-body">
+                <canvas id="trendChart" height="140"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detail table -->
+<div class="card shadow-sm">
+    <div class="card-header bg-white fw-semibold py-2">Transaction Detail</div>
+    <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle mb-0 small">
+            <thead class="table-light">
+                <tr>
+                    <th>Date</th>
+                    <th>Reservation</th>
+                    <th>Guest</th>
+                    <th>Room</th>
+                    <th>Mode</th>
+                    <th>Purpose</th>
+                    <th>Reference</th>
+                    <th class="text-end">Amount (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in payments %}
+                {% set _purpose = (p.payment_purpose|default('')|lower) or 'settlement' %}
+                <tr>
+                    <td>{{ p.payment_date.strftime('%d %b %Y') }}</td>
+                    <td class="text-primary fw-semibold">
+                        {{ p.reservation.booking_reference or p.reservation.id if p.reservation else '—' }}
+                    </td>
+                    <td>{{ p.reservation.guest.name if p.reservation and p.reservation.guest else '—' }}</td>
+                    <td>{{ p.reservation.room.room_number if p.reservation and p.reservation.room else '—' }}</td>
+                    <td>
+                        <span class="badge
+                            {% if p.payment_mode and p.payment_mode.name == 'Cash' %}bg-success
+                            {% elif p.payment_mode and p.payment_mode.name == 'UPI' %}bg-primary
+                            {% elif p.payment_mode and p.payment_mode.name == 'Card' %}bg-info text-dark
+                            {% else %}bg-secondary{% endif %}">
+                            {{ p.payment_mode.name if p.payment_mode else '—' }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if _purpose == 'advance' %}<span class="badge bg-warning text-dark">Advance</span>
+                        {% elif _purpose == 'credit_recovery' %}<span class="badge" style="background:#92400e;color:#fff;">Credit Rec.</span>
+                        {% elif _purpose == 'refund' %}<span class="badge bg-danger">Refund</span>
+                        {% else %}<span class="badge bg-success">Settlement</span>{% endif %}
+                    </td>
+                    <td class="text-muted">{{ p.reference_number or '—' }}</td>
+                    <td class="text-end fw-semibold">₹{{ '{:,.2f}'.format(p.amount) }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-4">No payments in this period.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% if payments %}
+            <tfoot class="table-success fw-bold">
+                <tr>
+                    <td colspan="6" class="text-end">Grand Total:</td>
+                    <td class="text-end">₹{{ '{:,.2f}'.format(grand_total) }}</td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+</div>
+
+<style>@media print { .d-print-none { display:none !important; } }</style>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/chartjs/chart.umd.min.js') }}"></script>
+<script nonce="{{ csp_nonce }}">
+const trendData = {{ by_date | tojson }};
+const labels = Object.keys(trendData).map(d => {
+    const dt = new Date(d);
+    return dt.toLocaleDateString('en-IN', {day:'2-digit', month:'short'});
+});
+const values = Object.values(trendData);
+new Chart(document.getElementById('trendChart'), {
+    type: 'bar',
+    data: {
+        labels,
+        datasets: [{
+            label: 'Revenue (₹)',
+            data: values,
+            backgroundColor: 'rgba(25,135,84,0.7)',
+            borderRadius: 4,
+        }]
+    },
+    options: {
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { ticks: { callback: v => '₹' + v.toLocaleString('en-IN') } }
+        }
+    }
+});
+</script>
+{% endblock %}

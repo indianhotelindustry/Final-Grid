@@ -1,0 +1,40 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/guests",
+  "anon_status": 302,
+  "body_bytes": 234515,
+  "body_sha256": "53c02f5449c460fc1aecfaa81ace440b4647a63007d80c9e8a2ded9db4b674be",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 119,
+  "endpoint": "main.guests_list",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "active_stays": "0",
+    "checked_out": "28",
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "guests[type]": "QueryPagination",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "repeat_guests": "0",
+    "total_guests": "28"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "main.guests_list",
+  "templates": [
+    "guest_database.html"
+  ],
+  "truncations": [],
+  "url": "/guests"
+}

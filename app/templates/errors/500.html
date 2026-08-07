@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Server Error{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5 text-center">
+        <div class="display-1 fw-bold text-danger">500</div>
+        <h4 class="mb-3">Something Went Wrong</h4>
+        <p class="text-muted">An unexpected error occurred. The team has been notified. Please try again in a moment.</p>
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary">
+            <i class="bi bi-house me-1"></i>Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

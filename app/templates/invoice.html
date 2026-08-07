@@ -1,0 +1,1201 @@
+{% extends "base.html" %}
+{% block title %}{{ inv.get('invoice_title','TAX INVOICE') }} — {{ reservation.invoice_number or reservation.booking_reference or 'RES-' ~ reservation.id }}{% endblock %}
+
+{% block content %}
+
+{# ── helpers ─────────────────────────────────────────────────────────────── #}
+{% set show_logo        = inv.get('invoice_show_logo','true')            == 'true' %}
+{% set show_signatory   = inv.get('invoice_show_signatory','true')       == 'true' %}
+{% set show_guest_addr  = inv.get('invoice_show_guest_address','true')   == 'true' %}
+{% set show_btype       = inv.get('invoice_show_booking_type','true')    == 'true' %}
+{% set show_payments    = inv.get('invoice_show_payment_summary','true') == 'true' %}
+{% set show_gst         = inv.get('invoice_show_gst_breakdown','true')   == 'true' %}
+{% set show_terms       = inv.get('invoice_show_terms','true')           == 'true' %}
+{% set show_badge       = inv.get('invoice_show_balance_badge','true')   == 'true' %}
+{% set show_cg_note     = inv.get('invoice_show_cg_note','true')         == 'true' %}
+{% set compact_layout   = inv.get('invoice_layout','a4')                 == 'compact' %}
+{% set inv_logo         = inv.get('invoice_logo_filename') %}
+{% set hotel_name       = inv.get('hotel_name') or config.HOTEL_NAME %}
+{% set hotel_addr       = inv.get('hotel_address') or hotel_address %}
+{% set hotel_contact    = inv.get('hotel_contact','') %}
+{% set hotel_email      = inv.get('hotel_email','') %}
+{% set hotel_pan        = inv.get('invoice_pan','') %}
+{% set hotel_cin        = inv.get('hotel_cin','') %}
+{% set hotel_website    = inv.get('hotel_website','') %}
+{% set hotel_state_code = inv.get('hotel_state_code','') %}
+{% set hotel_fssai      = inv.get('hotel_fssai','') %}
+{% set company          = reservation.checkin_record.company if reservation.checkin_record else none %}
+{% set guest            = reservation.guest %}
+{% set guest_name       = (guest.display_name if guest and guest.display_name else (guest.name if guest else '—')) %}
+{# Composed guest locality line — only the parts that exist #}
+{% set _loc_parts       = [] %}
+{% if guest and guest.city %}{% set _loc_parts = _loc_parts + [guest.city] %}{% endif %}
+{% if guest and guest.state %}{% set _loc_parts = _loc_parts + [guest.state] %}{% endif %}
+{% if guest and guest.pin_code %}{% set _loc_parts = _loc_parts + [guest.pin_code] %}{% endif %}
+{% if guest and guest.country and guest.country != 'India' %}{% set _loc_parts = _loc_parts + [guest.country] %}{% endif %}
+{% set guest_locality   = _loc_parts | join(', ') %}
+{% set inv_title        = inv.get('invoice_title','TAX INVOICE') %}
+{% set inv_no           = reservation.invoice_number or reservation.booking_reference or ('INV-%05d' % reservation.id) %}
+{% set inv_date         = reservation.checked_out_at.strftime('%d %b %Y') if reservation.checked_out_at else 'In-House' %}
+{% set inv_time         = reservation.checked_out_at.strftime('%H:%M') if reservation.checked_out_at else '' %}
+{% set thankyou         = inv.get('invoice_thankyou','Thank you for choosing us. We look forward to welcoming you again!') %}
+{% set terms_text       = inv.get('invoice_terms','') %}
+{% set inv_header_text  = inv.get('invoice_header','') %}
+{% set inv_footer_text  = inv.get('invoice_footer','') %}
+
+{# ── nights / hours display ─────────────────────────────────────────────── #}
+{% if reservation.booking_type == 'Hourly' %}
+  {% set duration_label = 'Hours' %}
+  {% set duration_val   = billing.nights %}
+{% else %}
+  {% set duration_label = 'Night' ~ ('s' if billing.nights != 1 else '') %}
+  {% set duration_val   = billing.nights %}
+{% endif %}
+
+{# ── inv_status shorthand ────────────────────────────────────────────────── #}
+{% set is_settled = inv_status == 'Settled' %}
+{% set is_partial = inv_status == 'Partial' %}
+
+{# ── Action bar (screen only) ────────────────────────────────────────────── #}
+<div class="d-flex justify-content-between align-items-center mb-3 d-print-none flex-wrap gap-2">
+  <h5 class="mb-0 fw-bold text-dark">
+    <i class="bi bi-receipt-cutoff text-primary me-2"></i>{{ inv_title }}
+  </h5>
+  <div class="d-flex gap-2 flex-wrap align-items-center">
+    <a href="{{ url_for('main.invoice_pdf', reservation_id=reservation.id) }}"
+       target="_blank"
+       class="btn btn-success btn-sm">
+      <i class="bi bi-file-earmark-pdf me-1"></i>Download PDF
+    </a>
+    <button type="button" data-action="print" class="btn btn-outline-primary btn-sm">
+      <i class="bi bi-printer me-1"></i>Print Invoice
+    </button>
+    {% if reservation.status == 'CheckedOut' %}
+      {% set fb = reservation.feedback[0] if reservation.feedback else none %}
+      {% if not fb or not fb.rating %}
+      <form method="POST" action="{{ url_for('feedback.send_link', reservation_id=reservation.id) }}" class="d-inline">
+        <button type="submit" class="btn btn-warning btn-sm">
+          <i class="bi bi-star me-1"></i>Request Feedback
+        </button>
+      </form>
+      {% else %}
+      <a href="{{ url_for('feedback.dashboard') }}" class="btn btn-outline-success btn-sm">
+        <i class="bi bi-star-fill me-1"></i>{{ fb.rating }}&#9733; Received
+      </a>
+      {% endif %}
+    {% endif %}
+    {% if reservation.guest_id %}
+    <a href="{{ url_for('main.guest_folio', guest_id=reservation.guest_id) }}"
+       class="btn btn-outline-primary btn-sm"
+       title="View complete guest history and visits">
+      <i class="bi bi-person-lines-fill me-1"></i>Guest Profile
+    </a>
+    {% endif %}
+    <a href="{{ url_for('main.guest_folio', guest_id=reservation.guest_id) }}" class="btn btn-outline-dark btn-sm">
+      <i class="bi bi-folder2-open me-1"></i>Folio
+    </a>
+    <a href="{{ url_for('billing.invoice_register') }}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-list-ul me-1"></i>Register
+    </a>
+    <a href="{{ url_for('main.reservations') }}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left me-1"></i>{% if reservation.status == 'CheckedIn' %}Back to Checked-in{% else %}Back to Front Desk{% endif %}
+    </a>
+  </div>
+</div>
+
+{# ── Invoice card ─────────────────────────────────────────────────────────── #}
+<div class="row justify-content-center">
+<div class="{{ 'col-12 col-lg-8' if compact_layout else 'col-12 col-lg-9' }}">
+
+<div class="inv-doc {{ 'inv-doc-compact' if compact_layout else '' }}" id="invoice-card">
+
+  {# Premium top accent bar #}
+  <div class="inv-accent-bar"></div>
+
+  <div class="inv-body">
+
+    {# ── SECTION 1: Header ─────────────────────────────────────────────── #}
+    <div class="inv-header row align-items-start mb-0">
+
+      {# Left: Logo + Hotel identity #}
+      <div class="col-7">
+        {% if show_logo and inv_logo %}
+        <div class="mb-2">
+          <img src="{{ url_for('static', filename='uploads/' ~ inv_logo) }}"
+               alt="{{ hotel_name }}" class="inv-logo">
+        </div>
+        {% endif %}
+        <div class="inv-hotel-name">{{ hotel_name }}</div>
+        {% if inv_header_text %}
+          <p class="inv-meta inv-hotel-tagline mb-1">{{ inv_header_text }}</p>
+        {% endif %}
+        {% if hotel_addr %}
+          <p class="mb-0 inv-meta inv-addr">{{ hotel_addr }}</p>
+        {% endif %}
+        {% if hotel_contact or hotel_email or hotel_website %}
+        <p class="mb-0 inv-meta inv-contact">
+          {% if hotel_contact %}<span class="inv-contact-item">Tel: {{ hotel_contact }}</span>{% endif %}
+          {% if hotel_email %}<span class="inv-contact-item">{{ hotel_email }}</span>{% endif %}
+          {% if hotel_website %}<span class="inv-contact-item">{{ hotel_website }}</span>{% endif %}
+        </p>
+        {% endif %}
+        {% if hotel_gstin or hotel_state_code or hotel_pan or hotel_cin or hotel_fssai %}
+        <p class="mb-0 inv-meta inv-legal-ids">
+          {% if hotel_gstin     %}<span class="inv-legal-chip">GSTIN: {{ hotel_gstin }}</span>{% endif %}
+          {% if hotel_state_code %}<span class="inv-legal-chip">State Code: {{ hotel_state_code }}</span>{% endif %}
+          {% if hotel_pan       %}<span class="inv-legal-chip">PAN: {{ hotel_pan }}</span>{% endif %}
+          {% if hotel_cin       %}<span class="inv-legal-chip">CIN: {{ hotel_cin }}</span>{% endif %}
+          {% if hotel_fssai     %}<span class="inv-legal-chip">FSSAI: {{ hotel_fssai }}</span>{% endif %}
+        </p>
+        {% endif %}
+      </div>
+
+      {# Right: Invoice identity #}
+      <div class="col-5 text-end">
+        <div class="inv-title-badge">{{ inv_title }}</div>
+        <table class="inv-meta-table ms-auto mt-2">
+          <tr>
+            <td class="inv-lbl">Invoice&nbsp;#</td>
+            <td class="inv-val inv-no-val">{{ inv_no }}</td>
+          </tr>
+          <tr>
+            <td class="inv-lbl">Date</td>
+            <td class="inv-val">{{ inv_date }}{% if inv_time %}&ensp;<span class="text-muted">{{ inv_time }}</span>{% endif %}</td>
+          </tr>
+          {% if show_badge %}
+          <tr>
+            <td class="inv-lbl">Status</td>
+            <td class="inv-val">
+              {% if reservation.credit_amount and reservation.credit_amount|float > 0.01 %}
+                <span class="inv-status-chip" style="background:#fef3c7;color:#92400e;border:1px solid #f59e0b;" title="Receivable — credit checkout">&#9888; RECEIVABLE</span>
+              {% elif is_settled %}
+                <span class="inv-status-chip settled">&#10003; Settled</span>
+              {% elif is_partial %}
+                <span class="inv-status-chip partial">&#9654; Partial</span>
+              {% else %}
+                <span class="inv-status-chip unsettled">&#9679; Unpaid</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endif %}
+        </table>
+      </div>
+    </div>
+
+    {# ── Invoice meta strip — corporate reference fields ─────────────────── #}
+    <div class="inv-meta-strip">
+      <div class="inv-ms-item">
+        <span class="inv-ms-lbl">Folio / Reservation</span>
+        <span class="inv-ms-val">#{{ reservation.id }}{% if reservation.booking_reference %} &middot; {{ reservation.booking_reference }}{% endif %}</span>
+      </div>
+      <div class="inv-ms-item">
+        <span class="inv-ms-lbl">Booking Source</span>
+        <span class="inv-ms-val">{{ reservation.ota_channel or reservation.source or 'Walk-in' }}</span>
+      </div>
+      {% if reservation.ota_booking_id %}
+      <div class="inv-ms-item">
+        <span class="inv-ms-lbl">Booking ID</span>
+        <span class="inv-ms-val">{{ reservation.ota_booking_id }}</span>
+      </div>
+      {% endif %}
+      {% if hotel_state_code %}
+      <div class="inv-ms-item">
+        <span class="inv-ms-lbl">Place of Supply</span>
+        <span class="inv-ms-val">State {{ hotel_state_code }}</span>
+      </div>
+      {% endif %}
+      <div class="inv-ms-item">
+        <span class="inv-ms-lbl">Payment Status</span>
+        <span class="inv-ms-val">{{ inv_status }}</span>
+      </div>
+    </div>
+
+    {# ── SECTION 2: Bill To + Stay Details ───────────────────────────────── #}
+    <div class="row inv-section-gap">
+
+      {# Left: Guest + Company billing #}
+      <div class="col-6">
+        <p class="inv-section-label">Bill To</p>
+
+        <p class="inv-guest-name mb-1">{{ guest_name }}</p>
+
+        <div class="inv-party-lines">
+          {% if guest and guest.phone %}
+          <div class="inv-party-line"><span class="inv-pl-lbl">Mobile</span><span class="inv-pl-val">{{ guest.phone }}</span></div>
+          {% endif %}
+          {% if guest and guest.email %}
+          <div class="inv-party-line"><span class="inv-pl-lbl">Email</span><span class="inv-pl-val">{{ guest.email }}</span></div>
+          {% endif %}
+          {% if show_guest_addr and guest and guest.address %}
+          <div class="inv-party-line"><span class="inv-pl-lbl">Address</span><span class="inv-pl-val">{{ guest.address }}</span></div>
+          {% endif %}
+          {% if show_guest_addr and guest_locality %}
+          <div class="inv-party-line"><span class="inv-pl-lbl">&nbsp;</span><span class="inv-pl-val">{{ guest_locality }}</span></div>
+          {% endif %}
+          {% if reservation.billing_state_code %}
+          <div class="inv-party-line"><span class="inv-pl-lbl">State Code</span><span class="inv-pl-val">{{ reservation.billing_state_code }}</span></div>
+          {% endif %}
+        </div>
+
+        {% if company %}
+        <div class="inv-company-block">
+          <p class="inv-subsection-label">Billed to Company</p>
+          <p class="inv-company-name mb-1">{{ company.name }}</p>
+          <div class="inv-party-lines">
+            {% if company.gstin %}
+            <div class="inv-party-line"><span class="inv-pl-lbl">GSTIN</span><span class="inv-pl-val">{{ company.gstin }}</span></div>
+            {% endif %}
+            {% if company.head_office %}
+            <div class="inv-party-line"><span class="inv-pl-lbl">Address</span><span class="inv-pl-val">{{ company.head_office }}</span></div>
+            {% endif %}
+            {% if company.contact_person or company.phone %}
+            <div class="inv-party-line"><span class="inv-pl-lbl">Contact</span><span class="inv-pl-val">{{ company.contact_person or '' }}{% if company.contact_person and company.phone %} &middot; {% endif %}{{ company.phone or '' }}</span></div>
+            {% endif %}
+            {% if company.email %}
+            <div class="inv-party-line"><span class="inv-pl-lbl">Email</span><span class="inv-pl-val">{{ company.email }}</span></div>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+
+        {# Guest navigation links — screen only #}
+        {% if reservation.guest_id %}
+        <div class="inv-guest-nav d-print-none mt-2">
+          <a href="{{ url_for('main.guest_folio', guest_id=reservation.guest_id) }}"
+             class="inv-nav-link" title="View guest identity and summary">
+            <i class="bi bi-person-circle"></i> Guest Profile
+          </a>
+          <a href="{{ url_for('main.guest_history', guest_id=reservation.guest_id) }}"
+             class="inv-nav-link" title="All stays for this guest">
+            <i class="bi bi-calendar3-range"></i> Visit History
+          </a>
+          <a href="{{ url_for('billing.invoice_register', search=reservation.guest.name if reservation.guest else '', tab='all') }}"
+             class="inv-nav-link" title="All invoices for this guest">
+            <i class="bi bi-list-ul"></i> All Invoices
+          </a>
+        </div>
+        {% endif %}
+      </div>
+
+      {# Right: Stay Details #}
+      <div class="col-6">
+        <p class="inv-section-label">Stay Details</p>
+        <table class="inv-meta-table inv-stay-table">
+          <tr>
+            <td class="inv-lbl">Room</td>
+            <td class="inv-val">
+              <span class="inv-room-chip">{{ reservation.room.room_number if reservation.room else '—' }}</span>
+              {% if reservation.room_type %}<span class="inv-room-type">{{ reservation.room_type.name }}</span>{% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td class="inv-lbl">Check-in</td>
+            <td class="inv-val fw-semibold">
+              {{ reservation.arrival_date.strftime('%d %b %Y') }}
+              {% if reservation.checkin_time %}<span class="inv-time-tag">{{ reservation.checkin_time }}</span>{% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td class="inv-lbl">Check-out</td>
+            <td class="inv-val fw-semibold">
+              {{ reservation.departure_date.strftime('%d %b %Y') }}
+              {% if reservation.checkout_time %}<span class="inv-time-tag">{{ reservation.checkout_time }}</span>{% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td class="inv-lbl">Duration</td>
+            <td class="inv-val">
+              <span class="inv-duration-chip">{{ duration_val }} {{ duration_label }}</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="inv-lbl">Guests</td>
+            <td class="inv-val">
+              {{ reservation.adults or 1 }} Adult{{ 's' if (reservation.adults or 1) != 1 else '' }}{% if reservation.children %}, {{ reservation.children }} Child{{ 'ren' if reservation.children != 1 else '' }}{% endif %}
+            </td>
+          </tr>
+          {% if show_btype %}
+          <tr>
+            <td class="inv-lbl">Booking</td>
+            <td class="inv-val">
+              <span class="inv-booking-tag {{ 'hourly' if reservation.booking_type == 'Hourly' else '' }}">{{ reservation.booking_type or 'Regular' }}</span>
+            </td>
+          </tr>
+          {% endif %}
+        </table>
+      </div>
+    </div>
+
+    {# ── SECTION 3 + 4: Charges table with GST ──────────────────────────── #}
+    <p class="inv-section-label">Charges</p>
+    <table class="table table-bordered table-sm align-middle mb-0 inv-table">
+      <thead class="inv-table-head">
+        <tr>
+          <th>Description</th>
+          <th class="text-center" style="width:52px">SAC</th>
+          <th class="text-end" style="width:108px">Taxable (₹)</th>
+          {% if show_gst %}
+            <th class="text-end" style="width:72px">GST %</th>
+            {% if gst.igst > 0 %}
+              <th class="text-end" style="width:84px">IGST (₹)</th>
+            {% else %}
+              <th class="text-end" style="width:84px">CGST (₹)</th>
+              <th class="text-end" style="width:84px">SGST (₹)</th>
+            {% endif %}
+          {% endif %}
+          <th class="text-end" style="width:108px">Total (₹)</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        {# ── Room nights ─────────────────────────────────────────────
+             Single source of truth via `room_lines` (passed by the route).
+             When the night audit has posted room_rent ExtraCharges, those
+             rows drive the display — labels read "Room Rent — DD Mmm".
+             Otherwise the list is synthesised from nightly rates / flat
+             tariff with "Room Accommodation — DD Mmm" labels.
+
+             Per-row GST is looked up from the still-canonical room_night
+             TaxLines (produced by generate_room_tax_lines) keyed by date,
+             so tax math is unchanged — the only difference is the LABEL
+             row by row, plus the guarantee no row is ever doubled.
+        #}
+        {% for rl in (room_lines or []) %}
+          {% set night_key = 'night_' ~ rl.date.isoformat() %}
+          {% set cgst_line = gst.lines | selectattr('charge_source_type','eq','room_night')
+                                       | selectattr('charge_source_id','eq',night_key)
+                                       | selectattr('tax_type','eq','CGST') | first %}
+          {% set igst_line = gst.lines | selectattr('charge_source_type','eq','room_night')
+                                       | selectattr('charge_source_id','eq',night_key)
+                                       | selectattr('tax_type','eq','IGST') | first %}
+          {% set sgst_line = gst.lines | selectattr('charge_source_type','eq','room_night')
+                                       | selectattr('charge_source_id','eq',night_key)
+                                       | selectattr('tax_type','eq','SGST') | first %}
+          {% set tl = cgst_line or igst_line %}
+          <tr>
+            <td>
+              {{ rl.description }}
+            </td>
+            <td class="text-center inv-row-sub">996311</td>
+            <td class="text-end">{{ rl.amount | inr }}</td>
+            {% if show_gst %}
+              <td class="text-end inv-row-sub">
+                {% if tl and tl.is_exempted %}Nil
+                {% elif tl and tl.is_interstate %}{{ '%.0f' | format(tl.tax_rate) }}% IGST
+                {% elif tl %}{{ '%.1f' | format(tl.tax_rate * 2) }}%
+                {% else %}—{% endif %}
+              </td>
+              {% if gst.igst > 0 %}
+                <td class="text-end">
+                  {% if igst_line and not igst_line.is_exempted %}{{ igst_line.tax_amount | inr }}{% else %}—{% endif %}
+                </td>
+              {% else %}
+                <td class="text-end">
+                  {% if cgst_line and not cgst_line.is_exempted %}{{ cgst_line.tax_amount | inr }}{% else %}—{% endif %}
+                </td>
+                <td class="text-end">
+                  {% if sgst_line and not sgst_line.is_exempted %}{{ sgst_line.tax_amount | inr }}{% else %}—{% endif %}
+                </td>
+              {% endif %}
+            {% endif %}
+            <td class="text-end fw-semibold">
+              {% set row_tax = (igst_line.tax_amount if igst_line else 0) | float
+                             + (cgst_line.tax_amount if cgst_line else 0) | float
+                             + (sgst_line.tax_amount if sgst_line else 0) | float %}
+              {{ (rl.amount | float + row_tax) | inr }}
+            </td>
+          </tr>
+        {% endfor %}
+
+        {# ── Extra / POS charges ── #}
+        {# Skip night-audit room_rent rows — room revenue is already
+           shown in the per-night block above; including them here would
+           visually duplicate the room charge on the invoice. #}
+        {% for ec in reservation.extra_charges if (ec.charge_type or '') != 'room_rent' %}
+          {% set ec_lines = gst.lines | selectattr('charge_source_type','eq','extra_charge') | selectattr('charge_source_id','eq',ec.id | string) | list %}
+          {% set ec_cgst  = ec_lines | selectattr('tax_type','eq','CGST') | first %}
+          {% set ec_sgst  = ec_lines | selectattr('tax_type','eq','SGST') | first %}
+          {% set ec_igst  = ec_lines | selectattr('tax_type','eq','IGST') | first %}
+          {% set ec_line  = ec_cgst or ec_igst or (ec_lines | first) %}
+          <tr>
+            <td>{{ ec.description }}<span class="inv-row-sub"> ({{ ec.charge_date.strftime('%d %b') }})</span></td>
+            <td class="text-center inv-row-sub">{{ ec_line.sac_code if ec_line else '—' }}</td>
+            <td class="text-end">{{ ec.amount | inr }}</td>
+            {% if show_gst %}
+              <td class="text-end inv-row-sub">
+                {% if ec_line %}
+                  {% if ec_line.is_exempted %}Nil
+                  {% elif ec_line.is_interstate %}{{ '%.0f' | format(ec_line.tax_rate) }}% IGST
+                  {% else %}{{ '%.1f' | format(ec_line.tax_rate * 2) }}%
+                  {% endif %}
+                {% else %}—{% endif %}
+              </td>
+              {% if gst.igst > 0 %}
+                <td class="text-end">{{ (ec_igst.tax_amount | inr) if ec_igst else '—' }}</td>
+              {% else %}
+                <td class="text-end">{{ (ec_cgst.tax_amount | inr) if ec_cgst else '—' }}</td>
+                <td class="text-end">{{ (ec_sgst.tax_amount | inr) if ec_sgst else '—' }}</td>
+              {% endif %}
+            {% endif %}
+            <td class="text-end fw-semibold">
+              {% set ec_tax = ec_lines | map(attribute='tax_amount') | map('float') | sum %}
+              {{ (ec.amount | float + ec_tax) | inr }}
+            </td>
+          </tr>
+        {% endfor %}
+
+      </tbody>
+
+      {# ── GST Summary footer ── #}
+      {% set _cols = (5 if gst.igst > 0 else 6) if show_gst else 3 %}
+      <tfoot>
+        {% if show_gst %}
+          <tr class="inv-sub-total">
+            <td colspan="{{ _cols }}" class="text-end fw-semibold">Taxable Amount:</td>
+            <td class="text-end fw-semibold">₹{{ gst.taxable_amount | inr }}</td>
+          </tr>
+          {% if gst.cgst > 0 %}
+          <tr class="inv-tax-line">
+            <td colspan="{{ _cols }}" class="text-end text-muted">CGST:</td>
+            <td class="text-end text-muted">₹{{ gst.cgst | inr }}</td>
+          </tr>
+          <tr class="inv-tax-line">
+            <td colspan="{{ _cols }}" class="text-end text-muted">SGST:</td>
+            <td class="text-end text-muted">₹{{ gst.sgst | inr }}</td>
+          </tr>
+          {% endif %}
+          {% if gst.igst > 0 %}
+          <tr class="inv-tax-line">
+            <td colspan="{{ _cols }}" class="text-end text-muted">IGST:</td>
+            <td class="text-end text-muted">₹{{ gst.igst | inr }}</td>
+          </tr>
+          {% endif %}
+          <tr class="inv-sub-total">
+            <td colspan="{{ _cols }}" class="text-end fw-semibold">Total Tax:</td>
+            <td class="text-end fw-semibold">₹{{ gst.total_tax | inr }}</td>
+          </tr>
+        {% endif %}
+        {# Round Off — guarantees displayed grand total = sum of displayed
+           subtotals. With per-line whole-rupee rounding, the displayed
+           taxable + total_tax can drift from the rounded grand total by
+           ±1; this row absorbs that drift so the printed bill ties out.
+           ALWAYS visible (even when ₹0) so staff never wonder "why did
+           the total change?" — the explanation lives on the bill. #}
+        {% set _gt_disp   = gst.grand_total | inr_round %}
+        {% set _gt_pieces = (gst.taxable_amount | inr_round) + (gst.total_tax | inr_round) %}
+        {% set _round_off = _gt_disp - _gt_pieces %}
+        {# v2.2.18 — clearer wording. Same rounding behaviour as before;
+           only the label/value form changed so the adjustment reads as
+           a "from → to" transformation instead of a bare signed delta. #}
+        {% if show_gst %}
+        <tr class="inv-tax-line">
+          {% if _round_off != 0 %}
+          <td colspan="{{ _cols }}" class="text-end text-muted">Rounded:</td>
+          <td class="text-end text-muted">₹{{ _gt_pieces }} &rarr; ₹{{ _gt_disp }}</td>
+          {% else %}
+          <td colspan="{{ _cols }}" class="text-end text-muted">Rounding:</td>
+          <td class="text-end text-muted">₹0 (no adjustment)</td>
+          {% endif %}
+        </tr>
+        {% endif %}
+        <tr class="inv-grand-total-row">
+          <td colspan="{{ _cols }}" class="text-end">Grand Total <span style="font-size:.72rem;font-weight:400;opacity:.8;">(incl. GST, rounded)</span></td>
+          <td class="text-end inv-grand-total-val">₹{{ gst.grand_total | inr }}</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    {# ── SECTION 5: Payment Summary ──────────────────────────────────────── #}
+    {% if show_payments %}
+    <div class="mt-3">
+      <p class="inv-section-label">Payment Details</p>
+      <table class="table table-sm table-bordered inv-table">
+        <thead class="table-light">
+          <tr>
+            <th>Date</th>
+            <th>Mode</th>
+            <th>Reference</th>
+            <th class="text-end">Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in reservation.payments %}
+          <tr class="{{ 'inv-voided-row' if p.is_voided else '' }}">
+            <td>{{ p.payment_date.strftime('%d %b %Y') }}</td>
+            <td>{{ p.payment_mode.name }}</td>
+            <td class="inv-row-sub">
+              {{ p.reference_number or '—' }}
+              {% if p.is_voided %}<span class="badge bg-secondary ms-1" style="font-size:.62rem;">VOID</span>{% endif %}
+            </td>
+            <td class="text-end">{{ p.amount | inr }}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="4" class="text-center text-muted inv-row-sub">No payments recorded.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr class="inv-pay-subtotal">
+            <td colspan="3" class="text-end">Total Charged:</td>
+            <td class="text-end">₹{{ gst.grand_total | inr }}</td>
+          </tr>
+          <tr class="inv-pay-subtotal">
+            <td colspan="3" class="text-end">Amount Paid:</td>
+            <td class="text-end text-success fw-semibold">₹{{ billing.paid | inr }}</td>
+          </tr>
+          {% if billing.company_credit > 0 %}
+          <tr class="inv-pay-subtotal">
+            <td colspan="3" class="text-end">
+              Company Credit
+              {% if reservation.checkin_record and reservation.checkin_record.company %}
+                ({{ reservation.checkin_record.company.name }})
+              {% endif %}:
+            </td>
+            <td class="text-end text-primary fw-semibold">₹{{ billing.company_credit | inr }}</td>
+          </tr>
+          {% endif %}
+          {% if reservation.credit_amount and reservation.credit_amount|float > 0.01 %}
+          {% set _cred_settled = reservation.credit_settled_amount|default(0)|float %}
+          {% set _cred_remaining = (reservation.credit_amount|float) - _cred_settled %}
+          <tr class="inv-pay-subtotal">
+            <td colspan="3" class="text-end" style="color:#92400e;">
+              Receivable (Individual Credit)
+              {% if reservation.credit_reason %}
+                <span class="text-muted" style="font-weight:normal;">— {{ reservation.credit_reason }}</span>
+              {% endif %}:
+            </td>
+            <td class="text-end fw-semibold" style="color:#92400e;">
+              ₹{{ (_cred_remaining if _cred_remaining > 0 else reservation.credit_amount|float) | inr }}
+              {% if _cred_settled > 0.01 and _cred_remaining > 0.01 %}
+              <div class="small text-muted" style="font-weight:normal;">Original ₹{{ reservation.credit_amount|float | inr }} · Recovered ₹{{ _cred_settled | inr }}</div>
+              {% elif _cred_remaining <= 0.01 %}
+              <div class="small text-success" style="font-weight:normal;">Settled</div>
+              {% endif %}
+            </td>
+          </tr>
+          {% endif %}
+          <tr class="inv-pay-balance-row {% if billing.balance > 0.01 %}unpaid{% elif billing.balance < -0.01 %}overpaid{% else %}settled{% endif %}">
+            <td colspan="3" class="text-end fw-bold">
+              {% if billing.balance > 0.01 %}Balance Due:
+              {% elif billing.balance < -0.01 %}Overpaid:
+              {% else %}Settled:{% endif %}
+            </td>
+            <td class="text-end fw-bold">
+              {% if billing.balance > 0.01 %}₹{{ billing.balance | inr }}
+              {% elif billing.balance < -0.01 %}₹{{ billing.balance | abs | inr }}
+              {% else %}<i class="bi bi-check-circle-fill me-1"></i>₹0{% endif %}
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    {% endif %}
+
+    {# ── Rate Breakdown (internal transparency — collapsed by default) ─────
+        Hidden behind a details/summary disclosure. Zero impact on the
+        guest-facing view; staff click to see how the offered rate was
+        built and where GST falls. Not part of the guest-signed PDF by
+        default (see invoice_show_rate_breakdown setting).
+        Hides entirely if no published rate is known. #}
+    {% if rate_breakdown and rate_breakdown.published_rate > 0 %}
+    <details class="inv-rate-breakdown mt-3 d-print-none">
+      <summary class="inv-rate-bd-summary">
+        <i class="bi bi-info-circle me-1"></i>Rate Breakdown <span class="inv-rate-bd-hint">(internal reference — click to expand)</span>
+      </summary>
+      <div class="inv-rate-bd-body">
+        <table class="inv-rate-bd-table">
+          <tbody>
+            <tr>
+              <th scope="row">Published Tariff (per night)</th>
+              <td class="text-end">₹{{ '%.2f' | format(rate_breakdown.published_rate) }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Offered Rate (per night)</th>
+              <td class="text-end fw-semibold">₹{{ '%.2f' | format(rate_breakdown.offered_rate) }}</td>
+            </tr>
+            {% if rate_breakdown.discount_per_night > 0 %}
+            <tr class="inv-rate-bd-discount">
+              <th scope="row">Per-Night Discount</th>
+              <td class="text-end">−₹{{ '%.2f' | format(rate_breakdown.discount_per_night) }}</td>
+            </tr>
+            {% endif %}
+            {% if rate_breakdown.discount_total > 0 %}
+            <tr class="inv-rate-bd-discount">
+              <th scope="row">Stay-level Discount (applied)</th>
+              <td class="text-end">−₹{{ '%.2f' | format(rate_breakdown.discount_total) }}</td>
+            </tr>
+            {% endif %}
+            <tr>
+              <th scope="row">Pricing Type</th>
+              <td class="text-end">
+                <span class="inv-rate-bd-tag {{ 'inclusive' if rate_breakdown.is_gst_inclusive else 'exclusive' }}">
+                  {{ rate_breakdown.gst_type }} of GST
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Nights</th>
+              <td class="text-end">{{ rate_breakdown.nights }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Taxable Amount</th>
+              <td class="text-end">₹{{ '%.2f' | format(rate_breakdown.taxable_amount) }}</td>
+            </tr>
+            <tr>
+              <th scope="row">GST Amount</th>
+              <td class="text-end">₹{{ '%.2f' | format(rate_breakdown.gst_amount) }}</td>
+            </tr>
+            <tr class="inv-rate-bd-grand">
+              <th scope="row">Grand Total</th>
+              <td class="text-end fw-bold">₹{{ '%.2f' | format(rate_breakdown.grand_total) }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="inv-rate-bd-note">
+          Revenue source: <strong>{{ 'Night audit ledger (room_rent)' if rate_breakdown.source == 'room_rent' else 'Tariff × nights' }}</strong>.
+          This block is for internal pricing-review / audit purposes and is
+          not printed on the guest invoice unless explicitly enabled in
+          Settings → Invoice → "Show Rate Breakdown on PDF".
+        </p>
+      </div>
+    </details>
+
+    <style>
+      .inv-rate-breakdown {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        padding: 10px 14px;
+        font-size: 0.82rem;
+      }
+      .inv-rate-bd-summary {
+        cursor: pointer;
+        font-weight: 600;
+        color: #374151;
+        list-style: none;
+        outline: none;
+      }
+      .inv-rate-bd-summary::-webkit-details-marker { display: none; }
+      .inv-rate-bd-summary::before {
+        content: '▸';
+        display: inline-block;
+        margin-right: 6px;
+        transition: transform 120ms ease;
+        color: #6b7280;
+      }
+      details[open] .inv-rate-bd-summary::before { transform: rotate(90deg); }
+      .inv-rate-bd-hint {
+        font-weight: 500;
+        color: #9ca3af;
+        font-size: 0.76rem;
+      }
+      .inv-rate-bd-body { margin-top: 8px; }
+      .inv-rate-bd-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .inv-rate-bd-table th,
+      .inv-rate-bd-table td {
+        padding: 4px 0;
+        border-bottom: 1px dashed #e5e7eb;
+      }
+      .inv-rate-bd-table th {
+        text-align: left;
+        color: #4b5563;
+        font-weight: 500;
+      }
+      .inv-rate-bd-table .inv-rate-bd-discount td,
+      .inv-rate-bd-table .inv-rate-bd-discount th { color: #b45309; }
+      .inv-rate-bd-table tr.inv-rate-bd-grand th,
+      .inv-rate-bd-table tr.inv-rate-bd-grand td {
+        border-bottom: none;
+        border-top: 2px solid #e5e7eb;
+        padding-top: 6px;
+        color: #0f172a;
+      }
+      .inv-rate-bd-tag {
+        display: inline-block;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 1px 8px;
+        border-radius: 10px;
+        letter-spacing: 0.02em;
+      }
+      .inv-rate-bd-tag.inclusive { background: #dcfce7; color: #166534; }
+      .inv-rate-bd-tag.exclusive { background: #dbeafe; color: #1e40af; }
+      .inv-rate-bd-note {
+        margin: 8px 0 0 0;
+        font-size: 0.72rem;
+        color: #6b7280;
+        line-height: 1.4;
+      }
+    </style>
+    {% endif %}
+
+    {# ── SECTION 6: Footer (kept together — never orphaned to page 2) ────── #}
+    <div class="inv-footer">
+    <hr class="inv-divider mt-3">
+
+    {% if thankyou or (show_terms and terms_text) or inv_footer_text %}
+    <div class="row mb-2">
+      <div class="{{ 'col-8' if show_signatory else 'col-12' }}">
+        {% if thankyou %}
+          <p class="inv-thankyou mb-2">{{ thankyou }}</p>
+        {% endif %}
+        {% if show_terms and terms_text %}
+          <p class="inv-terms mb-1">{{ terms_text }}</p>
+        {% endif %}
+        {% if inv_footer_text %}
+          <p class="inv-meta text-muted mb-0">{{ inv_footer_text }}</p>
+        {% endif %}
+      </div>
+      {% if show_signatory %}
+      <div class="col-4 text-end">
+        <p class="inv-meta text-muted mb-0" style="font-size:.72rem">For {{ hotel_name }}</p>
+        <div style="height:40px;"></div>
+        <p class="inv-signatory-line">Authorised Signatory</p>
+      </div>
+      {% endif %}
+    </div>
+    {% elif show_signatory %}
+    <div class="row mb-2">
+      <div class="col-8"></div>
+      <div class="col-4 text-end">
+        <p class="inv-meta text-muted mb-0" style="font-size:.72rem">For {{ hotel_name }}</p>
+        <div style="height:40px;"></div>
+        <p class="inv-signatory-line">Authorised Signatory</p>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if show_cg_note %}
+    <p class="inv-cg-note">
+      &#9733; This is a computer generated invoice. GST charged as per applicable slab on declared tariff.
+      {% if hotel_gstin %} GSTIN: {{ hotel_gstin }}{% endif %}
+    </p>
+    {% endif %}
+
+    </div>{# /inv-footer #}
+
+  </div>{# /inv-body #}
+</div>{# /invoice-card #}
+
+</div>
+</div>
+
+{% endblock %}
+
+
+{% block styles %}
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   INVOICE — PREMIUM STYLES
+═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Document wrapper — NO outer frame ──────────────────────────────────────
+   Screen: white "paper" floating on the app's grey background via a soft
+   shadow (not a border). Print: flat, no border, no shadow. The old
+   .invoice-wrap border + Bootstrap .card border (the "screenshot frame")
+   are both gone. */
+.inv-doc {
+  background: #ffffff;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, .08), 0 10px 28px rgba(15, 23, 42, .07);
+}
+.inv-body { padding: 22px 26px 18px; }
+.inv-doc-compact .inv-body { padding: 18px 20px 15px; }
+
+/* ── Accent bar — premium top stripe ────────────────────────────────────── */
+.inv-accent-bar {
+  height: 4px;
+  background: linear-gradient(90deg, #0d1b2a 0%, #1967d2 60%, #4285f4 100%);
+}
+
+/* ── Hotel name ──────────────────────────────────────────────────────────── */
+.inv-hotel-name {
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: #0d1b2a;
+  letter-spacing: .015em;
+  line-height: 1.25;
+  margin-bottom: 2px;
+}
+.inv-hotel-tagline { color: #6b7280; font-style: italic; }
+
+/* ── Header text ─────────────────────────────────────────────────────────── */
+.inv-addr    { color: #374151; }
+.inv-contact { color: #374151; }
+.inv-contact-item { white-space: nowrap; }
+.inv-contact-item:not(:last-child)::after {
+  content: '\2002\2022\2002';
+  color: #d1d5db;
+}
+
+/* Legal ID chips ─────────────────────────────────────────────────────────── */
+.inv-legal-ids { margin-top: 4px; }
+.inv-legal-chip {
+  display: inline-block;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 3px;
+  padding: 1px 6px;
+  font-size: .7rem;
+  font-weight: 600;
+  color: #374151;
+  margin-right: 4px;
+  letter-spacing: .03em;
+}
+
+/* ── Title badge ─────────────────────────────────────────────────────────── */
+.inv-title-badge {
+  display: inline-block;
+  background: #0d1b2a;
+  color: #fff;
+  font-weight: 700;
+  font-size: .75rem;
+  letter-spacing: .14em;
+  padding: 5px 14px;
+  border-radius: 4px;
+}
+
+/* ── Room chip ───────────────────────────────────────────────────────────── */
+.inv-room-chip {
+  display: inline-block;
+  background: #1967d2;
+  color: #fff;
+  font-size: .72rem;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 4px;
+  letter-spacing: .04em;
+}
+
+/* ── Status chips ────────────────────────────────────────────────────────── */
+.inv-status-chip {
+  display: inline-block;
+  font-size: .68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 3px;
+  letter-spacing: .04em;
+}
+.inv-status-chip.settled   { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+.inv-status-chip.partial   { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+.inv-status-chip.unsettled { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+/* ── Meta tables ─────────────────────────────────────────────────────────── */
+.inv-meta-table {
+  border-collapse: collapse;
+  font-size: .8rem;
+}
+.inv-meta-table .inv-lbl {
+  color: #6b7280;
+  padding-right: 10px;
+  padding-bottom: 3px;
+  white-space: nowrap;
+  vertical-align: top;
+}
+.inv-meta-table .inv-val {
+  color: #111827;
+  padding-bottom: 3px;
+}
+.inv-stay-table .inv-val { font-size: .82rem; }
+
+/* Time tag in stay details */
+.inv-time-tag {
+  font-size: .72rem;
+  color: #6b7280;
+  margin-left: 4px;
+}
+
+/* Duration chip */
+.inv-duration-chip {
+  display: inline-block;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: .72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 3px;
+  border: 1px solid #bfdbfe;
+}
+
+/* ── Section label ───────────────────────────────────────────────────────── */
+.inv-section-label {
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  margin-bottom: 6px;
+}
+
+/* ── Body small text ─────────────────────────────────────────────────────── */
+.inv-meta { font-size: .78rem; color: #374151; }
+
+/* ── Guest name ──────────────────────────────────────────────────────────── */
+.inv-guest-name { font-size: 1rem; color: #0d1b2a; letter-spacing: .01em; }
+
+/* ── Guest contact lines ─────────────────────────────────────────────────── */
+.inv-guest-contacts { margin-top: 4px; }
+.inv-contact-line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: .78rem;
+  color: #374151;
+  line-height: 1.6;
+}
+.inv-contact-line i { font-size: .7rem; flex-shrink: 0; }
+
+/* ── Guest navigation links ──────────────────────────────────────────────── */
+.inv-guest-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.inv-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: .7rem;
+  font-weight: 600;
+  color: #1967d2;
+  background: #e8f0fe;
+  border: 1px solid #c5d9fc;
+  padding: 3px 9px;
+  border-radius: 4px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background .12s, color .12s;
+}
+.inv-nav-link:hover {
+  background: #1967d2;
+  color: #fff;
+  border-color: #1967d2;
+}
+.inv-nav-link i { font-size: .68rem; }
+
+/* ── Divider ─────────────────────────────────────────────────────────────── */
+.inv-divider { border: none; border-top: 1px solid #e5e7eb; margin: 9px 0; opacity: 1; }
+
+/* ── Section vertical rhythm ─────────────────────────────────────────────── */
+.inv-section-gap { margin-bottom: 12px; }
+
+/* ── Invoice meta strip — corporate reference fields ─────────────────────── */
+.inv-meta-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 28px;
+  padding: 8px 0;
+  margin: 9px 0;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+.inv-ms-item { display: flex; flex-direction: column; line-height: 1.3; }
+.inv-ms-lbl {
+  font-size: .58rem;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: #9ca3af;
+}
+.inv-ms-val { font-size: .8rem; font-weight: 600; color: #111827; }
+
+/* ── Bill-To / Company party lines ───────────────────────────────────────── */
+.inv-party-lines { margin-top: 3px; }
+.inv-party-line {
+  display: flex;
+  gap: 8px;
+  font-size: .78rem;
+  color: #374151;
+  line-height: 1.55;
+}
+.inv-pl-lbl {
+  flex: 0 0 64px;
+  color: #9ca3af;
+  font-size: .7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  padding-top: 1px;
+}
+.inv-pl-val { flex: 1; color: #1f2937; }
+
+/* ── Company billing sub-block ───────────────────────────────────────────── */
+.inv-company-block {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed #d1d5db;
+}
+.inv-subsection-label {
+  font-size: .6rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #1967d2;
+  margin-bottom: 3px;
+}
+.inv-company-name { font-size: .9rem; font-weight: 700; color: #0d1b2a; }
+
+/* ── Room type tag in stay details ───────────────────────────────────────── */
+.inv-room-type { font-size: .76rem; color: #4b5563; margin-left: 6px; }
+
+/* ── Booking tag ─────────────────────────────────────────────────────────── */
+.inv-booking-tag {
+  display: inline-block;
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  font-size: .64rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: 1px 7px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+.inv-booking-tag.hourly { background: #e7f0f7; color: #1d6fa4; border-color: #bcd9ea; }
+
+/* ── Invoice number value ────────────────────────────────────────────────── */
+.inv-no-val { font-size: .9rem; font-weight: 700; color: #1967d2; letter-spacing: .01em; }
+
+/* ── Footer keep-together block ──────────────────────────────────────────── */
+.inv-footer { page-break-inside: avoid; break-inside: avoid; }
+
+/* ── Charges table ───────────────────────────────────────────────────────── */
+.inv-table { font-size: .8rem; }
+.inv-table-head th {
+  background: #1a202c !important;
+  color: #f9fafb !important;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  border-color: #2d3748 !important;
+  padding: 8px 10px;
+}
+.inv-row-sub { font-size: .72rem; color: #6b7280; }
+
+/* Subtotal / tax rows */
+.inv-sub-total td { background: #f9fafb; font-size: .8rem; padding: 5px 8px; }
+.inv-tax-line td  { font-size: .75rem; padding: 3px 8px; }
+
+/* Grand total — dominant */
+.inv-grand-total-row td {
+  background: #0d1b2a !important;
+  color: #fff !important;
+  padding: 10px 12px;
+  border-color: #0d1b2a !important;
+  font-weight: 700;
+  font-size: .88rem;
+}
+.inv-grand-total-val {
+  font-size: 1.05rem !important;
+  letter-spacing: .01em;
+}
+
+/* ── Payment table ───────────────────────────────────────────────────────── */
+.inv-voided-row td { text-decoration: line-through; color: #9ca3af; }
+.inv-pay-subtotal td { background: #f9fafb; font-size: .8rem; padding: 5px 8px; font-weight: 500; }
+.inv-pay-balance-row td { padding: 8px 10px; font-size: .85rem; }
+.inv-pay-balance-row.settled   { background: #d1fae5; color: #065f46; }
+.inv-pay-balance-row.unpaid    { background: #fee2e2; color: #991b1b; }
+.inv-pay-balance-row.overpaid  { background: #eff6ff; color: #1d4ed8; }
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+.inv-thankyou {
+  font-size: .82rem;
+  font-style: italic;
+  color: #374151;
+  line-height: 1.5;
+}
+.inv-terms {
+  font-size: .72rem;
+  color: #6b7280;
+  white-space: pre-line;
+  line-height: 1.55;
+}
+.inv-signatory-line {
+  font-size: .75rem;
+  font-weight: 600;
+  color: #374151;
+  border-top: 1px solid #9ca3af;
+  display: inline-block;
+  padding-top: 4px;
+  min-width: 140px;
+  margin: 0;
+}
+.inv-cg-note {
+  font-size: .65rem;
+  color: #9ca3af;
+  text-align: center;
+  margin-top: 8px;
+  margin-bottom: 0;
+  letter-spacing: .01em;
+}
+
+/* ═══ PRINT STYLES — single clean A4 page ═══════════════════════════════════ */
+@media print {
+  @page { size: A4 portrait; margin: 12mm; }
+
+  /* Hide all app chrome — only the invoice document prints */
+  .navbar, .sidebar, nav,
+  .breadcrumb, .breadcrumb-item,
+  .nav-tabs, .tab-content > .tab-pane:not(.active),
+  .d-print-none,
+  .inv-guest-nav,
+  .btn, button,
+  footer, .footer       { display: none !important; }
+
+  body                  { font-size: 10.5px; background: #fff !important; margin: 0; padding: 0; }
+
+  .container, .container-fluid, .container-lg, .container-xl { max-width: 100% !important; padding: 0 !important; }
+  .row                  { margin: 0 !important; }
+  .col-12, [class*="col-"] { padding: 0 !important; }
+
+  /* No frame, no shadow — the page margin is the only boundary */
+  .inv-doc              { box-shadow: none !important; border: none !important; border-radius: 0 !important; }
+  .inv-body             { padding: 0 !important; }
+  .inv-accent-bar       { height: 3px; background: #0d1b2a !important; print-color-adjust: exact; }
+
+  /* Tightened vertical rhythm so the whole invoice holds one page */
+  .inv-divider          { margin: 6px 0; }
+  .inv-meta-strip       { margin: 6px 0; padding: 5px 0; gap: 3px 20px; }
+  .inv-section-gap      { margin-bottom: 8px; }
+  .inv-company-block    { margin-top: 7px; padding-top: 6px; }
+
+  .inv-table            { font-size: 9.3px; }
+  .inv-table-head th    { font-size: 8.4px; padding: 5px 8px;
+                          background: #1a202c !important; color: #f9fafb !important;
+                          print-color-adjust: exact; }
+  .inv-meta             { font-size: 9px; }
+  .inv-meta-table       { font-size: 9px; }
+  .inv-stay-table       { font-size: 9px; }
+  .inv-ms-val           { font-size: 9px; }
+  .inv-party-line       { font-size: 9px; }
+  .inv-thankyou         { font-size: 9px; }
+  .inv-terms            { font-size: 8.3px; }
+  .inv-hotel-name       { font-size: 1rem; }
+  .inv-logo             { height: 40px; }
+  .inv-guest-name       { font-size: .9rem; }
+  .inv-company-name     { font-size: .82rem; }
+  .inv-cg-note          { font-size: 7px; }
+
+  .inv-grand-total-row td { background: #0d1b2a !important; color: #fff !important; print-color-adjust: exact; }
+  .inv-pay-balance-row.settled  { background: #d1fae5 !important; print-color-adjust: exact; }
+  .inv-pay-balance-row.unpaid   { background: #fee2e2 !important; print-color-adjust: exact; }
+  .inv-pay-balance-row.overpaid { background: #eff6ff !important; print-color-adjust: exact; }
+  .inv-status-chip, .inv-legal-chip,
+  .inv-duration-chip, .inv-room-chip, .inv-booking-tag { print-color-adjust: exact; }
+
+  /* Keep each table row and the whole footer from splitting across pages */
+  .inv-table tbody tr   { page-break-inside: avoid; }
+  .inv-footer           { page-break-inside: avoid; }
+}
+
+/* ── Logo ────────────────────────────────────────────────────────────────── */
+.inv-logo { height: 52px; max-width: 200px; object-fit: contain; }
+</style>
+{% endblock %}

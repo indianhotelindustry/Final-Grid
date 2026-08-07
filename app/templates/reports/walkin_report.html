@@ -1,0 +1,69 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Walk-in Report — {{ report_date.strftime('%d %b %Y') }}{% endblock %}
+{% block report_name %}Walk-in Report{% endblock %}
+
+{% block report_content %}
+<div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+  <h5 class="mb-0">
+    <i class="bi bi-person-walking text-info me-2"></i>
+    Walk-ins — {{ report_date.strftime('%d %B %Y') }}
+    <span class="badge bg-secondary ms-1">{{ records|length }}</span>
+  </h5>
+  <div class="d-flex gap-2 d-print-none">
+    <form class="d-flex gap-1 align-items-center" action="{{ url_for('reports.walkin_report') }}">
+      <input type="date" class="form-control form-control-sm" name="date"
+             value="{{ report_date.isoformat() }}">
+      <button class="btn btn-sm btn-info text-dark">Go</button>
+      <button class="btn btn-sm btn-outline-success" name="format" value="excel"
+              title="Export Excel"><i class="bi bi-file-earmark-excel"></i></button>
+    </form>
+    <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+      <i class="bi bi-printer me-1"></i>Print
+    </button>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover table-sm align-middle mb-0 small">
+      <thead class="table-info">
+        <tr>
+          <th>Booking Ref</th>
+          <th>Guest</th>
+          <th>Phone</th>
+          <th>Room</th>
+          <th>Type</th>
+          <th>Departure</th>
+          <th>Nights</th>
+          <th>Rate/Night</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in records %}
+        {% set nights = (r.departure_date - r.arrival_date).days %}
+        <tr>
+          <td class="fw-semibold text-primary">{{ r.booking_reference or r.id }}</td>
+          <td>{{ r.guest.name if r.guest else '—' }}</td>
+          <td>{{ r.guest.phone if r.guest else '—' }}</td>
+          <td>{% if r.room %}<strong>{{ r.room.room_number }}</strong>{% else %}<span class="text-muted">Unassigned</span>{% endif %}</td>
+          <td>{{ r.room_type.name if r.room_type else '—' }}</td>
+          <td>{{ r.departure_date.strftime('%d %b %Y') }}</td>
+          <td class="text-center">{{ nights }}</td>
+          <td>₹{{ '{:,.0f}'.format(r.rate_per_night) }}</td>
+          <td>
+            <span class="badge {% if r.status == 'CheckedIn' %}bg-success{% elif r.status == 'CheckedOut' %}bg-secondary{% else %}bg-primary{% endif %}">
+              {{ r.status }}
+            </span>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="9" class="text-center text-muted py-4">No walk-ins for this date.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>@media print { .d-print-none { display:none !important; } }</style>
+{% endblock %}

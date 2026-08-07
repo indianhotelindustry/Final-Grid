@@ -1,0 +1,294 @@
+====================================================================================================
+DSBC FRONTLINE — FINANCIAL INVARIANT ENGINE COMMISSIONING
+Wave 0 Deliverable 4 — Principle 9 / Principle 11
+====================================================================================================
+Result: 26/26 COMMISSIONED
+
+[PASS] INV-A01  (engine patch)
+    Settlement identity: grand total - payments - company credit = balance
+      ok   positive_case        baseline status HOLDS over 28 row(s), 0 violation(s)
+      ok   negative_case        status HOLDS -> VIOLATED
+      ok   fault_injection      app.services.calculate_stay_amount return value 'balance' moved by 1000.0 inside the commissioning subprocess only
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+
+[PASS] INV-A02  (data seed)
+    Every financial row belongs to a folio
+      ok   positive_case        baseline status VIOLATED over 40 row(s), 40 violation(s)
+      ok   negative_case        already violated on live data; violations 40 -> 41
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+      blast radius: INV-B03: VIOLATED/1 -> VIOLATED/3
+
+[PASS] INV-A03  (data seed)
+    Charges summed over folios equal charges summed over reservations
+      ok   positive_case        baseline status VIOLATED over 5 row(s), 5 violation(s)
+      ok   negative_case        already violated on live data; violations 5 -> 6
+      ok   fault_injection      2 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+      blast radius: INV-B01: HOLDS/0 -> VIOLATED/1; INV-B03: VIOLATED/1 -> VIOLATED/2
+
+[PASS] INV-A04  (data seed)
+    Daily collections equal the direct payments recorded for the day
+      ok   positive_case        baseline status HOLDS over 35 row(s), 0 violation(s)
+      ok   negative_case        status HOLDS -> VIOLATED
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+      blast radius: INV-D03: HOLDS/0 -> VIOLATED/1
+
+[PASS] INV-A05  (data seed)
+    Every stored tax line equals its taxable base times its rate
+      ok   positive_case        baseline status HOLDS over 66 row(s), 0 violation(s)
+      ok   negative_case        status HOLDS -> VIOLATED
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+      blast radius: INV-B03: VIOLATED/1 -> VIOLATED/2
+
+[PASS] INV-A06  (data seed)
+    A guest who has paid more than they owe has an overpayment record
+      ok   positive_case        baseline status VACUOUS over 0 row(s), 0 violation(s)
+      ok   negative_case        status VACUOUS -> VIOLATED
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+      blast radius: INV-A02: VIOLATED/40 -> VIOLATED/41; INV-B01: HOLDS/0 -> VIOLATED/1; INV-B03: VIOLATED/1 -> VIOLATED/3
+
+[PASS] INV-B01  (data seed)
+    No financial row was created into a business date after that date closed
+      ok   positive_case        baseline status HOLDS over 17 row(s), 0 violation(s)
+      ok   negative_case        status HOLDS -> VIOLATED
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+      blast radius: INV-A02: VIOLATED/40 -> VIOLATED/41; INV-A06: VACUOUS/0 -> VIOLATED/1; INV-B03: VIOLATED/1 -> VIOLATED/3
+
+[PASS] INV-B02  (data seed)
+    Every frozen night-audit snapshot matches its stored hash
+      ok   positive_case        baseline status HOLDS over 1 row(s), 0 violation(s)
+      ok   negative_case        status HOLDS -> VIOLATED
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+
+[PASS] INV-B03  (data seed)
+    Recomputing a closed day reproduces the figures it reported
+      ok   positive_case        baseline status VIOLATED over 8 row(s), 1 violation(s)
+      ok   negative_case        already violated on live data; violations 1 -> 2
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+      blast radius: INV-B02: HOLDS/0 -> VIOLATED/1
+
+[PASS] INV-B04  (data seed)
+    Exactly one business date exists and no activity is dated beyond it
+      ok   positive_case        baseline status HOLDS over 1 row(s), 0 violation(s)
+      ok   negative_case        status HOLDS -> VIOLATED
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+
+[PASS] INV-B05  (data seed)
+    Night audits form an unbroken sequence up to the business date
+      ok   positive_case        baseline status HOLDS over 1 row(s), 0 violation(s)
+      ok   negative_case        status HOLDS -> VIOLATED
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+      blast radius: INV-B01: HOLDS/0 -> VACUOUS/0; INV-B03: VIOLATED/1 -> VIOLATED/8
+
+[PASS] INV-B06  (data seed)
+    A payment is never dated outside the stay it belongs to
+      ok   positive_case        baseline status HOLDS over 35 row(s), 0 violation(s)
+      ok   negative_case        status HOLDS -> VIOLATED
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+      blast radius: INV-B03: VIOLATED/1 -> VIOLATED/3
+
+[PASS] INV-C01  (data seed)
+    A walk-in reservation is never settled through an OTA receivable
+      ok   positive_case        baseline status VIOLATED over 5 row(s), 5 violation(s)
+      ok   negative_case        already violated on live data; violations 5 -> 6
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+      blast radius: INV-B03: VIOLATED/1 -> VIOLATED/3; INV-C05: VIOLATED/5 -> VIOLATED/6
+
+[PASS] INV-C02  (data seed)
+    A checked-out reservation is settled, or its balance is explained
+      ok   positive_case        baseline status HOLDS over 28 row(s), 0 violation(s)
+      ok   negative_case        status HOLDS -> VIOLATED
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+      blast radius: INV-A02: VIOLATED/40 -> VIOLATED/41; INV-A03: VIOLATED/5 -> VIOLATED/6
+
+[PASS] INV-C03  (data seed)
+    Every financial event belongs to a reservation that exists
+      ok   positive_case        baseline status HOLDS over 106 row(s), 0 violation(s)
+      ok   negative_case        status HOLDS -> VIOLATED
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+
+[PASS] INV-C04  (data seed)
+    No room is occupied by two reservations on the same night
+      ok   positive_case        baseline status VIOLATED over 30 row(s), 1 violation(s)
+      ok   negative_case        already violated on live data; violations 1 -> 3
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+      blast radius: INV-B03: VIOLATED/1 -> VIOLATED/4; INV-C02: HOLDS/0 -> VIOLATED/1
+
+[PASS] INV-C05  (data seed)
+    An OTA settlement identifies the agent it will be collected from
+      ok   positive_case        baseline status VIOLATED over 5 row(s), 5 violation(s)
+      ok   negative_case        already violated on live data; violations 5 -> 6
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+      blast radius: INV-C01: VIOLATED/5 -> VIOLATED/6
+
+[PASS] INV-C06  (data seed)
+    Corporate credit is backed by a company account that exists
+      ok   positive_case        baseline status VACUOUS over 0 row(s), 0 violation(s)
+      ok   negative_case        status VACUOUS -> VIOLATED
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+
+[PASS] INV-D01  (data seed)
+    Every folio references a reservation that exists
+      ok   positive_case        baseline status HOLDS over 28 row(s), 0 violation(s)
+      ok   negative_case        status HOLDS -> VIOLATED
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+
+[PASS] INV-D02  (data seed)
+    Every correction and reversal references the transaction it corrects
+      ok   positive_case        baseline status VACUOUS over 0 row(s), 0 violation(s)
+      ok   negative_case        status VACUOUS -> VIOLATED
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+      blast radius: INV-B03: VIOLATED/1 -> VIOLATED/2
+
+[PASS] INV-D03  (data seed)
+    Every payment references a payment mode that exists
+      ok   positive_case        baseline status HOLDS over 35 row(s), 0 violation(s)
+      ok   negative_case        status HOLDS -> VIOLATED
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+      blast radius: INV-A04: HOLDS/0 -> VIOLATED/1
+
+[PASS] INV-D04  (data seed)
+    Every tax line names the charge it was raised on
+      ok   positive_case        baseline status HOLDS over 66 row(s), 0 violation(s)
+      ok   negative_case        status HOLDS -> VIOLATED
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+
+[PASS] INV-D05  (data seed)
+    Every void request and credit note references what it cancels
+      ok   positive_case        baseline status VACUOUS over 0 row(s), 0 violation(s)
+      ok   negative_case        status VACUOUS -> VIOLATED
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+
+[PASS] INV-D06  (data seed)
+    Every priced room night belongs to a stay that covers that night
+      ok   positive_case        baseline status HOLDS over 30 row(s), 0 violation(s)
+      ok   negative_case        status HOLDS -> VIOLATED
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+      blast radius: INV-D04: HOLDS/0 -> VIOLATED/2
+
+[PASS] NULL-CONTROL  (none)
+    Identical data must produce identical results
+      ok   determinism          no invariant moved on unmutated data
+
+[PASS] WRITE-CONTROL  (none)
+    The engine performs zero database writes
+      ok   evidence             0 write statement(s) counted across the whole registry
+

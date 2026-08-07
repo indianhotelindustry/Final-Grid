@@ -1,0 +1,84 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Occupancy — {{ report_date.strftime('%d %b %Y') }}{% endblock %}
+{% block report_name %}Occupancy Report{% endblock %}
+
+{% block report_content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h5 class="mb-0"><i class="bi bi-grid text-primary me-2"></i>
+        Occupancy — {{ report_date.strftime('%d %B %Y') }}
+    </h5>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('reports.occupancy', date=report_date.isoformat(), format='excel') }}"
+           class="btn btn-sm btn-primary">
+            <i class="bi bi-file-earmark-excel me-1"></i>Excel
+        </a>
+        <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i>Print
+        </button>
+    </div>
+</div>
+
+<!-- KPI row -->
+<div class="row g-2 mb-3">
+    {% for label, val, cls in [
+        ('Total Rooms', total, 'bg-secondary'),
+        ('Occupied', occupied, 'bg-danger'),
+        ('Vacant', vacant, 'bg-success'),
+        ('Dirty', dirty, 'bg-warning text-dark'),
+        ('Maintenance', maintenance, 'bg-info text-dark'),
+        ('Occupancy %', occupancy_pct|string + '%', 'bg-primary'),
+    ] %}
+    <div class="col-auto">
+        <div class="card border-0 {{ cls }} text-white px-3 py-2 shadow-sm">
+            <div class="fw-bold fs-5">{{ val }}</div>
+            <div class="small">{{ label }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Progress bar -->
+<div class="progress mb-3" style="height:20px;">
+    <div class="progress-bar bg-danger" style="width:{{ (occupied/total*100) if total else 0 }}%">Occupied</div>
+    <div class="progress-bar bg-warning text-dark" style="width:{{ (dirty/total*100) if total else 0 }}%">Dirty</div>
+    <div class="progress-bar bg-info text-dark" style="width:{{ (maintenance/total*100) if total else 0 }}%">Maint.</div>
+    <div class="progress-bar bg-success" style="width:{{ (vacant/total*100) if total else 0 }}%">Vacant</div>
+</div>
+
+<!-- Room-by-room table -->
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0 small">
+            <thead class="table-light">
+                <tr>
+                    <th>Room</th><th>Floor</th><th>Type</th><th>Status</th>
+                    <th>Current Guest</th><th>Check-out</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for room in rooms %}
+                {% set active = room.reservations | selectattr('status','eq','CheckedIn') | first if room.reservations else none %}
+                <tr>
+                    <td class="fw-semibold">{{ room.room_number }}</td>
+                    <td>{{ room.floor }}</td>
+                    <td>{{ room.room_type.name if room.room_type else '—' }}</td>
+                    <td>
+                        <span class="badge
+                            {% if room.status == 'Occupied' %}bg-danger
+                            {% elif room.status == 'Dirty' %}bg-warning text-dark
+                            {% elif room.status == 'Maintenance' %}bg-info text-dark
+                            {% else %}bg-success{% endif %}">
+                            {{ room.status }}
+                        </span>
+                    </td>
+                    <td>{{ active.guest.name if active and active.guest else '—' }}</td>
+                    <td>{{ active.departure_date.strftime('%d %b') if active else '—' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>@media print { .btn, nav, .navbar { display:none !important; } }</style>
+{% endblock %}

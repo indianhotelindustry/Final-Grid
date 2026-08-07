@@ -1,0 +1,263 @@
+<!-- Occupancy & Revenue KPIs -->
+<div class="row g-2 mb-2">
+    <div class="col-6 col-md-2">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-2">
+                <div class="text-muted" style="font-size: 0.7rem;">Live Occupancy</div>
+                <h4 class="mb-0 text-primary">{{ occupancy_pct }}%</h4>
+                <small class="text-muted" style="font-size: 0.65rem;">{{ occupied }}/{{ sellable_rooms|default(total_rooms) }} sellable</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-2">
+                <div class="text-muted" style="font-size: 0.7rem;">Cash Revenue</div>
+                <h4 class="mb-0 text-success">₹{{ "{:,.0f}".format(today_revenue) }}</h4>
+                <small class="text-muted" style="font-size: 0.65rem;">{{ occupied }} occupied</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-2">
+                <div class="text-muted" style="font-size: 0.7rem;">Yesterday Revenue</div>
+                <h4 class="mb-0 text-success">₹{{ "{:,.0f}".format(yesterday_revenue) }}</h4>
+                <small class="text-muted" style="font-size: 0.65rem;">Previous day</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-2">
+                <div class="text-muted" style="font-size: 0.7rem;">MTD Revenue</div>
+                <h4 class="mb-0 text-success">₹{{ "{:,.0f}".format(mtd_revenue) }}</h4>
+                <small class="text-muted" style="font-size: 0.65rem;">Month to date</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-2">
+                <div class="text-muted" style="font-size: 0.7rem;">Avg Room Rate</div>
+                {% if occupied > 0 %}<h4 class="mb-0">₹{{ "{:,.0f}".format(avg_rate) }}</h4>
+                {% else %}<h4 class="mb-0 text-muted">—</h4>{% endif %}
+                <small class="text-muted" style="font-size: 0.65rem;">ARR</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-2">
+                <div class="text-muted" style="font-size: 0.7rem;">RevPAR</div>
+                <h4 class="mb-0">₹{{ "{:,.0f}".format(revpar) }}</h4>
+                <small class="text-muted" style="font-size: 0.65rem;">Revenue per room</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Guest Movement KPIs -->
+<div class="row g-2 mb-2">
+    <div class="col-3 col-md">
+        <div class="card border-0 bg-light">
+            <div class="card-body p-2 text-center">
+                <div class="text-muted" style="font-size: 0.65rem;">Arrivals</div>
+                <h5 class="mb-0 text-info">{{ arrivals_today }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 col-md">
+        <div class="card border-0 bg-light">
+            <div class="card-body p-2 text-center">
+                <div class="text-muted" style="font-size: 0.65rem;">Departures</div>
+                <h5 class="mb-0 text-warning">{{ departures_today }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 col-md">
+        <div class="card border-0 bg-light">
+            <div class="card-body p-2 text-center">
+                <div class="text-muted" style="font-size: 0.65rem;">Today Check-ins</div>
+                <h5 class="mb-0 text-success">{{ today_checkins }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 col-md">
+        <div class="card border-0 bg-light">
+            <div class="card-body p-2 text-center">
+                <div class="text-muted" style="font-size: 0.65rem;">Previous Stay Guests</div>
+                <h5 class="mb-0">{{ stayovers }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 col-md">
+        <div class="card border-0 bg-light">
+            <div class="card-body p-2 text-center">
+                <div class="text-muted" style="font-size: 0.65rem;">In-House (Live)</div>
+                <h5 class="mb-0 text-danger">{{ occupied }}</h5>
+                <small class="text-muted" style="font-size: 0.6rem;">= {{ today_checkins }} + {{ stayovers }}</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Booking Source Breakdown (today's check-ins) -->
+<div class="row g-2 mb-2">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-2">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <div class="text-muted fw-semibold" style="font-size: 0.7rem;">Booking Source — Today's Check-ins ({{ today_checkins }})</div>
+                    {% if source_mismatch %}
+                    <span class="badge bg-warning text-dark" style="font-size:0.6rem;" title="OTA + Walk-in + Calling do not add up to today's check-ins">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>Source Mismatch
+                    </span>
+                    {% endif %}
+                </div>
+                <div class="row g-1 text-center">
+                    <div class="col-4">
+                        <div class="p-1 rounded {% if source_mismatch %}bg-warning bg-opacity-10{% else %}bg-primary bg-opacity-10{% endif %}">
+                            <div class="fw-bold {% if source_mismatch %}text-warning{% else %}text-primary{% endif %}">{{ ota_bookings }}</div>
+                            <div style="font-size:0.6rem;" class="text-muted">OTA</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-1 rounded {% if source_mismatch %}bg-warning bg-opacity-10{% else %}bg-success bg-opacity-10{% endif %}">
+                            <div class="fw-bold {% if source_mismatch %}text-warning{% else %}text-success{% endif %}">{{ walkin_bookings }}</div>
+                            <div style="font-size:0.6rem;" class="text-muted">Walk-in</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-1 rounded {% if source_mismatch %}bg-warning bg-opacity-10{% else %}bg-info bg-opacity-10{% endif %}">
+                            <div class="fw-bold {% if source_mismatch %}text-warning{% else %}text-info{% endif %}">{{ calling_bookings }}</div>
+                            <div style="font-size:0.6rem;" class="text-muted">Calling</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Room Status Grid -->
+<div class="row g-2 mb-2">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-2">
+                <div class="text-muted mb-1" style="font-size: 0.7rem;">Room Status</div>
+                <div class="row g-1">
+                    <div class="col-3">
+                        <div class="text-center p-1 bg-success bg-opacity-10 rounded">
+                            <div class="fw-bold text-success">{{ vacant_clean }}</div>
+                            <div style="font-size: 0.65rem;">Vacant Clean</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="text-center p-1 bg-danger bg-opacity-10 rounded">
+                            <div class="fw-bold text-danger">{{ occupied }}</div>
+                            <div style="font-size: 0.65rem;">Occupied</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="text-center p-1 bg-warning bg-opacity-10 rounded">
+                            <div class="fw-bold text-warning">{{ dirty }}</div>
+                            <div style="font-size: 0.65rem;">Dirty</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="text-center p-1 bg-secondary bg-opacity-10 rounded">
+                            <div class="fw-bold text-secondary">{{ room_block }}</div>
+                            <div style="font-size: 0.65rem;">Blocked</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Operational KPIs -->
+<div class="row g-2 mb-2">
+    <div class="col-6 col-md-3">
+        <div class="card border-0 border-start border-primary border-3">
+            <div class="card-body p-2">
+                <div class="text-muted" style="font-size: 0.65rem;">Checked In</div>
+                <h5 class="mb-0">{{ checked_in_today }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 border-start border-success border-3">
+            <div class="card-body p-2">
+                <div class="text-muted" style="font-size: 0.65rem;">Checked Out</div>
+                <h5 class="mb-0">{{ checked_out_today }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 border-start border-info border-3">
+            <div class="card-body p-2">
+                <div class="text-muted" style="font-size: 0.65rem;">Walk-Ins</div>
+                <h5 class="mb-0">{{ walk_in_today }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 border-start border-warning border-3">
+            <div class="card-body p-2">
+                <div class="text-muted" style="font-size: 0.65rem;">Reservations</div>
+                <h5 class="mb-0">{{ daily_reservations }}</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alerts & Pending Actions -->
+<div class="row g-2">
+    <div class="col-12 col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-2">
+                <h6 class="mb-0 fw-bold" style="font-size: 0.85rem;">Pending Actions</h6>
+            </div>
+            <div class="card-body p-2">
+                {% if pending_checkouts or balance_dues %}
+                    {% if pending_checkouts %}
+                    <div class="alert alert-danger py-1 px-2 mb-1" style="font-size: 0.75rem;">
+                        <i class="bi bi-exclamation-triangle"></i> <strong>{{ pending_checkouts|length }}</strong> Overdue Checkout(s)
+                    </div>
+                    {% endif %}
+                    {% if balance_dues %}
+                    <div class="alert alert-warning py-1 px-2 mb-1" style="font-size: 0.75rem;">
+                        <i class="bi bi-currency-rupee"></i> <strong>{{ balance_dues|length }}</strong> Balance Due(s) - ₹{{ "{:,.0f}".format(total_balance_due) }}
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center text-muted py-2">
+                        <i class="bi bi-check-circle"></i>
+                        <div style="font-size: 0.7rem;">No pending actions</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-2">
+                <h6 class="mb-0 fw-bold" style="font-size: 0.85rem;">Housekeeping</h6>
+            </div>
+            <div class="card-body p-2">
+                {% if dirty > 0 %}
+                    <div class="alert alert-warning py-1 px-2 mb-1" style="font-size: 0.75rem;">
+                        <i class="bi bi-brush"></i> <strong>{{ dirty }}</strong> Room(s) Need Cleaning
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-2">
+                        <i class="bi bi-check-circle"></i>
+                        <div style="font-size: 0.7rem;">All rooms clean</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,39 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/admin/lan-access",
+  "anon_status": 302,
+  "body_bytes": 24773,
+  "body_sha256": "971324b597884b34f266eb77c5b9b3f8adbe4d6d9ffccc8047efea87e32f9e9a",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 10,
+  "endpoint": "main.admin_lan_access",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "allow_lan_on_disk": "False",
+    "allow_lan_running": "False",
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "restart_required": "False"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_input": 1,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "main.admin_lan_access",
+  "templates": [
+    "admin/lan_access.html"
+  ],
+  "truncations": [],
+  "url": "/admin/lan-access"
+}

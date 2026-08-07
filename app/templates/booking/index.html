@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0d6efd">
+    <title>Book a Room — {{ hotel_name }}</title>
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap-icons/font/bootstrap-icons.css') }}">
+    <style>
+        :root { --brand: #0d6efd; }
+        body { background: #f0f4f8; }
+        .hero {
+            background: linear-gradient(135deg, var(--brand) 0%, #0a58ca 100%);
+            color: #fff;
+            padding: 3rem 1rem 5rem;
+            text-align: center;
+        }
+        .hero h1 { font-size: clamp(1.6rem, 4vw, 2.5rem); font-weight: 800; }
+        .hero p { opacity: .85; }
+        .booking-card {
+            margin: -3rem auto 2rem;
+            max-width: 900px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 8px 40px rgba(0,0,0,.12);
+            padding: 2rem;
+        }
+        .room-card { border-radius: 12px; transition: box-shadow .2s; }
+        .room-card:hover { box-shadow: 0 4px 20px rgba(13,110,253,.15); }
+        .avail-badge { font-size: .75rem; }
+        .step-indicator { font-size: .8rem; color: #6c757d; margin-bottom: .5rem; }
+        #step2 { display: none; }
+        .form-label { font-weight: 600; font-size: .875rem; }
+        footer { text-align: center; color: #adb5bd; font-size: .8rem; padding: 2rem 0; }
+    </style>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body>
+
+    <!-- Hero -->
+    <div class="hero">
+        <div class="mb-2"><i class="bi bi-building" style="font-size:2rem;"></i></div>
+        <h1>{{ hotel_name }}</h1>
+        <p class="mb-0">Book directly with us for the best rate</p>
+    </div>
+
+    <div class="container">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="booking-card p-3" style="margin-top: -2rem; margin-bottom: 1rem;">
+            {% for cat, msg in messages %}
+            <div class="alert alert-{{ cat }} mb-0 py-2">{{ msg }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Step 1: Date + Room Selection -->
+        <div class="booking-card" id="step1">
+            <div class="step-indicator"><i class="bi bi-1-circle-fill text-primary me-1"></i>Step 1 of 2 — Select Dates &amp; Room</div>
+            <h5 class="mb-3 fw-bold">Check Availability</h5>
+
+            <div class="row g-3 mb-3">
+                <div class="col-sm-6">
+                    <label class="form-label">Check-in Date</label>
+                    <input type="date" class="form-control" id="arrival_date"
+                           min="{{ today }}" value="{{ today }}" required>
+                </div>
+                <div class="col-sm-6">
+                    <label class="form-label">Check-out Date</label>
+                    <input type="date" class="form-control" id="departure_date"
+                           min="{{ tomorrow }}" value="{{ tomorrow }}" required>
+                </div>
+                <div class="col-sm-6">
+                    <label class="form-label">Adults</label>
+                    <select class="form-select" id="adults_select">
+                        <option value="1">1 Adult</option>
+                        <option value="2" selected>2 Adults</option>
+                        <option value="3">3 Adults</option>
+                        <option value="4">4 Adults</option>
+                    </select>
+                </div>
+                <div class="col-sm-6">
+                    <label class="form-label">Children</label>
+                    <select class="form-select" id="children_select">
+                        <option value="0" selected>No children</option>
+                        <option value="1">1 Child</option>
+                        <option value="2">2 Children</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn btn-primary px-4" id="checkBtn" onclick="checkAvailability()">
+                <i class="bi bi-search me-1"></i>Check Availability
+            </button>
+
+            <!-- Results -->
+            <div id="availResults" class="mt-4" style="display:none;"></div>
+        </div>
+
+        <!-- Step 2: Guest Details -->
+        <div class="booking-card" id="step2">
+            <div class="step-indicator"><i class="bi bi-2-circle-fill text-primary me-1"></i>Step 2 of 2 — Your Details</div>
+            <h5 class="mb-3 fw-bold">Complete Your Booking</h5>
+
+            <!-- Selected room summary -->
+            <div class="alert alert-primary py-2 d-flex justify-content-between align-items-center" id="selectedSummary">
+                <div id="summaryText"></div>
+                <button class="btn btn-sm btn-outline-primary" onclick="goBack()">
+                    <i class="bi bi-arrow-left"></i> Change
+                </button>
+            </div>
+
+            <form method="POST" action="{{ url_for('booking.create_booking') }}" id="bookingForm">
+                <input type="hidden" name="arrival_date" id="f_arrival">
+                <input type="hidden" name="departure_date" id="f_departure">
+                <input type="hidden" name="room_type_id" id="f_room_type_id">
+                <input type="hidden" name="adults" id="f_adults">
+                <input type="hidden" name="children" id="f_children">
+
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <label class="form-label">First Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="guest_first_name"
+                               placeholder="As per ID" required>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" class="form-control" name="guest_last_name"
+                               placeholder="As per ID">
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">+91</span>
+                            <input type="tel" class="form-control" name="guest_phone"
+                                   placeholder="10-digit mobile" pattern="[0-9]{10}" required>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-control" name="guest_email"
+                               placeholder="For confirmation (optional)">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Special Requests</label>
+                        <textarea class="form-control" name="special_requests" rows="2"
+                                  placeholder="Early check-in, high floor, etc."></textarea>
+                    </div>
+                </div>
+
+                <div class="alert alert-info mt-3 py-2">
+                    <i class="bi bi-info-circle me-1"></i>
+                    <strong>Payment at hotel.</strong> No advance payment required to confirm your booking.
+                    Our team will contact you to confirm.
+                </div>
+
+                <div class="d-flex gap-2 mt-3">
+                    <button type="submit" class="btn btn-success px-4">
+                        <i class="bi bi-check-circle me-1"></i>Confirm Booking
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="goBack()">
+                        <i class="bi bi-arrow-left me-1"></i>Back
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <footer>
+        &copy; {{ hotel_name }} &bull; Powered by Sukoon PMS
+    </footer>
+
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script nonce="{{ csp_nonce }}">
+        let selectedRoomTypeId = null;
+
+        // Set min dates dynamically
+        document.getElementById('arrival_date').addEventListener('change', function () {
+            const dep = document.getElementById('departure_date');
+            const next = new Date(this.value);
+            next.setDate(next.getDate() + 1);
+            dep.min = next.toISOString().split('T')[0];
+            if (dep.value <= this.value) dep.value = next.toISOString().split('T')[0];
+        });
+
+        async function checkAvailability() {
+            const arrival = document.getElementById('arrival_date').value;
+            const departure = document.getElementById('departure_date').value;
+            const btn = document.getElementById('checkBtn');
+
+            if (!arrival || !departure) { alert('Please select both dates.'); return; }
+
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Checking...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('{{ url_for("booking.check_availability") }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `arrival_date=${arrival}&departure_date=${departure}`
+                });
+                const data = await res.json();
+
+                if (!data.success) {
+                    showResultsError(data.error);
+                    return;
+                }
+
+                renderResults(data.results, data.nights, arrival, departure);
+            } catch (e) {
+                showResultsError('Connection error. Please try again.');
+            } finally {
+                btn.innerHTML = '<i class="bi bi-search me-1"></i>Check Availability';
+                btn.disabled = false;
+            }
+        }
+
+        function renderResults(results, nights, arrival, departure) {
+            const el = document.getElementById('availResults');
+            el.style.display = 'block';
+
+            const fmt = d => new Date(d + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+            const available = results.filter(r => r.available > 0);
+            if (!available.length) {
+                el.innerHTML = `<div class="alert alert-warning">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    No rooms available for <strong>${fmt(arrival)}</strong> to <strong>${fmt(departure)}</strong>.
+                    Please try different dates.
+                </div>`;
+                return;
+            }
+
+            let html = `<hr><h6 class="fw-bold mb-3">
+                <i class="bi bi-calendar-check me-1 text-success"></i>
+                Available Rooms — ${fmt(arrival)} to ${fmt(departure)} (${nights} night${nights > 1 ? 's' : ''})
+            </h6><div class="row g-3">`;
+
+            for (const r of results) {
+                const badge = r.available > 3
+                    ? `<span class="badge bg-success avail-badge"><i class="bi bi-check-circle"></i> ${r.available} rooms left</span>`
+                    : r.available > 0
+                    ? `<span class="badge bg-warning text-dark avail-badge"><i class="bi bi-exclamation-circle"></i> Only ${r.available} left!</span>`
+                    : `<span class="badge bg-danger avail-badge">Sold out</span>`;
+
+                const btnHtml = r.available > 0
+                    ? `<button class="btn btn-primary w-100 mt-2"
+                            onclick="selectRoom(${Number(r.id)}, '${escapeHtml(r.name)}', ${Number(r.rate_per_night)}, ${Number(r.total)}, ${nights}, '${escapeHtml(arrival)}', '${escapeHtml(departure)}')">
+                            <i class="bi bi-arrow-right-circle me-1"></i>Select This Room
+                       </button>`
+                    : `<button class="btn btn-secondary w-100 mt-2" disabled>Not Available</button>`;
+
+                html += `<div class="col-sm-6 col-lg-4">
+                    <div class="card room-card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="fw-bold mb-0">${escapeHtml(r.name)}</h6>
+                                ${badge}
+                            </div>
+                            <p class="text-muted small mb-2">${escapeHtml(r.description || 'Comfortable room with modern amenities.')}</p>
+                            <div class="d-flex justify-content-between align-items-end mt-auto">
+                                <div>
+                                    <div class="fw-bold text-primary">₹${r.rate_per_night.toLocaleString('en-IN')}<small class="text-muted fw-normal">/night</small></div>
+                                    <small class="text-success fw-semibold">Total: ₹${r.total.toLocaleString('en-IN')}</small>
+                                </div>
+                                <small class="text-muted">${nights} night${nights > 1 ? 's' : ''}</small>
+                            </div>
+                            ${btnHtml}
+                        </div>
+                    </div>
+                </div>`;
+            }
+
+            html += '</div>';
+            el.innerHTML = html;
+        }
+
+        function showResultsError(msg) {
+            const el = document.getElementById('availResults');
+            el.style.display = 'block';
+            el.innerHTML = `<div class="alert alert-danger"><i class="bi bi-x-circle me-1"></i>${escapeHtml(msg)}</div>`;
+        }
+
+        function selectRoom(id, name, rate, total, nights, arrival, departure) {
+            selectedRoomTypeId = id;
+            document.getElementById('f_room_type_id').value = id;
+            document.getElementById('f_arrival').value = arrival;
+            document.getElementById('f_departure').value = departure;
+            document.getElementById('f_adults').value = document.getElementById('adults_select').value;
+            document.getElementById('f_children').value = document.getElementById('children_select').value;
+
+            const fmt = d => new Date(d + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+            document.getElementById('summaryText').innerHTML =
+                `<strong>${escapeHtml(name)}</strong> &bull; ${fmt(arrival)} → ${fmt(departure)} &bull;
+                 ${nights} night${nights > 1 ? 's' : ''} &bull;
+                 <span class="text-success fw-bold">₹${Number(total).toLocaleString('en-IN')}</span>`;
+
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goBack() {
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('step1').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+    <script nonce="{{ csp_nonce }}">
+    (function () {
+        const token = document.querySelector('meta[name="csrf-token"]').content;
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('form[method="post"],form[method="POST"]').forEach(function (f) {
+                if (!f.querySelector('input[name="csrf_token"]')) {
+                    const inp = document.createElement('input');
+                    inp.type = 'hidden'; inp.name = 'csrf_token'; inp.value = token;
+                    f.prepend(inp);
+                }
+            });
+        });
+        const _fetch = window.fetch;
+        window.fetch = function (url, opts) {
+            opts = opts || {};
+            if (opts.method && opts.method.toUpperCase() !== 'GET') {
+                opts.headers = opts.headers || {};
+                opts.headers['X-CSRFToken'] = token;
+            }
+            return _fetch(url, opts);
+        };
+    })();
+    </script>
+</body>
+</html>

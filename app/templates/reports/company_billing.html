@@ -1,0 +1,122 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Company / Direct Billing Report{% endblock %}
+{% block report_name %}Company Billing Report{% endblock %}
+
+{% block report_content %}
+<div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+  <h5 class="mb-0">
+    <i class="bi bi-building text-dark me-2"></i>
+    Company / Direct Billing
+  </h5>
+  <div class="d-flex gap-2 align-items-center d-print-none">
+    <form class="d-flex gap-1 align-items-center flex-wrap" action="{{ url_for('reports.company_billing_report') }}">
+      <select class="form-select form-select-sm" name="company_id" style="width:160px;">
+        <option value="">All Companies</option>
+        {% for c in companies %}
+        <option value="{{ c.id }}" {% if company_id_filter == c.id %}selected{% endif %}>
+          {{ c.name }}
+        </option>
+        {% endfor %}
+      </select>
+      <input type="date" class="form-control form-control-sm" name="from"
+             value="{{ from_date.isoformat() }}">
+      <span class="small">→</span>
+      <input type="date" class="form-control form-control-sm" name="to"
+             value="{{ to_date.isoformat() }}">
+      <button class="btn btn-sm btn-dark">View</button>
+      <button class="btn btn-sm btn-outline-success" name="format" value="excel"
+              title="Export Excel"><i class="bi bi-file-earmark-excel"></i></button>
+    </form>
+    <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+      <i class="bi bi-printer me-1"></i>Print
+    </button>
+  </div>
+</div>
+
+<div class="text-muted small mb-3">
+  Period: {{ from_date.strftime('%d %b %Y') }} — {{ to_date.strftime('%d %b %Y') }}
+  · {{ rows|length }} records
+</div>
+
+{# Summary by company #}
+{% if rows %}
+{% set company_totals = {} %}
+{% for row in rows %}
+  {% set co = row.checkin.company.name if row.checkin.company else 'Unknown' %}
+  {% if co not in company_totals %}
+    {% set _ = company_totals.update({co: {'count': 0, 'total': 0, 'balance': 0}}) %}
+  {% endif %}
+  {% set _ = company_totals[co].update({'count': company_totals[co].count + 1,
+                                        'total': company_totals[co].total + row.total,
+                                        'balance': company_totals[co].balance + row.balance}) %}
+{% endfor %}
+
+<div class="row g-3 mb-4">
+  {% for co_name, totals in company_totals.items() %}
+  <div class="col-sm-6 col-lg-3">
+    <div class="card border-start border-4 border-dark shadow-sm">
+      <div class="card-body py-2 px-3">
+        <div class="fw-semibold small">{{ co_name }}</div>
+        <div class="small text-muted">{{ totals.count }} stays</div>
+        <div class="fw-bold">₹{{ '{:,.0f}'.format(totals.total) }}</div>
+        {% if totals.balance > 0 %}
+        <div class="small text-danger">Outstanding: ₹{{ '{:,.0f}'.format(totals.balance) }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover table-sm align-middle mb-0 small">
+      <thead class="table-dark">
+        <tr>
+          <th>Booking Ref</th>
+          <th>Guest</th>
+          <th>Company</th>
+          <th>Check-in</th>
+          <th>Check-out</th>
+          <th class="text-end">Total</th>
+          <th class="text-end">Paid</th>
+          <th class="text-end">Balance</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr class="{{ 'table-warning' if row.balance > 0 else '' }}">
+          <td class="fw-semibold text-primary">
+            {{ row.reservation.booking_reference or row.reservation.id }}
+          </td>
+          <td>{{ row.reservation.guest.name if row.reservation.guest else '—' }}</td>
+          <td>{{ row.checkin.company.name if row.checkin.company else '—' }}</td>
+          <td>{{ row.checkin.checkin_date.strftime('%d %b %Y') }}</td>
+          <td>{{ row.reservation.departure_date.strftime('%d %b %Y') }}</td>
+          <td class="text-end">₹{{ '{:,.2f}'.format(row.total) }}</td>
+          <td class="text-end">₹{{ '{:,.2f}'.format(row.paid) }}</td>
+          <td class="text-end {{ 'text-danger fw-semibold' if row.balance > 0 else 'text-success' }}">
+            ₹{{ '{:,.2f}'.format(row.balance) }}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="text-center text-muted py-4">No company billing records found.</td></tr>
+        {% endfor %}
+      </tbody>
+      {% if rows %}
+      <tfoot class="table-dark fw-bold">
+        <tr>
+          <td colspan="5">Total</td>
+          <td class="text-end">₹{{ '{:,.2f}'.format(rows | sum(attribute='total')) }}</td>
+          <td class="text-end">₹{{ '{:,.2f}'.format(rows | sum(attribute='paid')) }}</td>
+          <td class="text-end">₹{{ '{:,.2f}'.format(rows | sum(attribute='balance')) }}</td>
+        </tr>
+      </tfoot>
+      {% endif %}
+    </table>
+  </div>
+</div>
+
+<style>@media print { .d-print-none { display:none !important; } }</style>
+{% endblock %}

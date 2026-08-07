@@ -1,0 +1,1980 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<style>
+/* ═══════════════════════════════════════════════════
+   GUEST PROFILE — TABBED LAYOUT
+═══════════════════════════════════════════════════ */
+.gp-page { max-width: 960px; margin: 0 auto; }
+
+/* ─── Identity card ─────────────────────────────── */
+.gp-identity-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.07);
+    overflow: hidden;
+    margin-bottom: 14px;
+}
+.gp-header-band {
+    background: linear-gradient(100deg, #0d1b2a 0%, #1e3a5f 100%);
+    padding: 20px 24px;
+    display: flex; align-items: flex-start; gap: 20px; flex-wrap: wrap;
+}
+/* Square white avatar card */
+.gp-avatar-wrap {
+    flex-shrink: 0;
+    width: 78px; height: 78px;
+    background: #fff;
+    border-radius: 10px;
+    border: 2px solid rgba(255,255,255,.9);
+    box-shadow: 0 3px 10px rgba(0,0,0,.2);
+    display: flex; align-items: center; justify-content: center;
+}
+.gp-initials {
+    font-size: 1.55rem; font-weight: 800;
+    color: #1967d2; letter-spacing: -.02em; line-height: 1;
+    user-select: none;
+}
+.gp-guest-name { font-size: 1.3rem; font-weight: 700; color: #fff; line-height: 1.2; letter-spacing: -.01em; }
+.gp-folio-chip {
+    display: inline-block; background: rgba(255,255,255,.15);
+    color: rgba(255,255,255,.88); font-size: .67rem; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 4px; margin-top: 5px;
+}
+.gp-company-line { font-size: .8rem; color: rgba(255,255,255,.65); margin-top: 5px; }
+.gp-repeat-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(34,197,94,.18); color: #86efac;
+    font-size: .65rem; font-weight: 700;
+    border: 1px solid rgba(134,239,172,.3);
+    padding: 2px 7px; border-radius: 20px; margin-top: 6px;
+}
+/* Contact row */
+.gp-contact-row {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+}
+.gp-contact-cell {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 18px;
+    border-right: 1px solid #f1f5f9; border-top: 1px solid #f1f5f9;
+}
+.gp-contact-cell:last-child { border-right: none; }
+.gp-ci {
+    width: 30px; height: 30px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .8rem; flex-shrink: 0;
+}
+.gp-ci.phone { background: #eff6ff; color: #1d4ed8; }
+.gp-ci.email { background: #f0fdf4; color: #166534; }
+.gp-ci.id    { background: #fefce8; color: #854d0e; }
+.gp-ci.addr  { background: #faf5ff; color: #6b21a8; }
+.gp-clabel { font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #94a3b8; margin-bottom: 1px; }
+.gp-cval   { font-size: .82rem; font-weight: 500; color: #1e293b; line-height: 1.3; word-break: break-all; }
+.gp-cval a { color: inherit; text-decoration: none; }
+.gp-cval a:hover { color: #1967d2; }
+
+/* ─── Metrics row ───────────────────────────────── */
+.gp-metrics-row {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 12px; margin-bottom: 6px;
+}
+.gp-metric-card {
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 10px;
+    padding: 13px 16px; box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    display: flex; align-items: center; gap: 12px;
+}
+.gp-metric-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .95rem; flex-shrink: 0;
+}
+.gp-metric-icon.blue  { background: #eff6ff; color: #1d4ed8; }
+.gp-metric-icon.slate { background: #f1f5f9; color: #334155; }
+.gp-metric-icon.green { background: #f0fdf4; color: #166534; }
+.gp-metric-icon.red   { background: #fef2f2; color: #991b1b; }
+.gp-mval   { font-size: 1.15rem; font-weight: 800; color: #0f172a; line-height: 1; }
+.gp-mval.blue  { color: #1d4ed8; }
+.gp-mval.green { color: #166534; }
+.gp-mval.red   { color: #991b1b; }
+.gp-mlabel { font-size: .67rem; color: #64748b; margin-top: 3px; font-weight: 500; }
+
+/* ─── Tab bar ────────────────────────────────────── */
+.gp-tab-bar {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px 10px 0 0;
+    border-bottom: none;
+    margin-top: 16px;
+    display: flex; align-items: stretch; flex-wrap: wrap;
+    overflow: hidden;
+}
+.gp-tab {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 11px 20px;
+    font-size: .8rem; font-weight: 600; color: #64748b;
+    cursor: pointer; border: none; background: transparent;
+    border-bottom: 3px solid transparent;
+    border-right: 1px solid #f1f5f9;
+    transition: color .15s, border-color .15s, background .15s;
+    white-space: nowrap;
+    text-decoration: none;
+}
+.gp-tab:last-of-type { border-right: none; }
+.gp-tab i { font-size: .75rem; }
+.gp-tab:hover { color: #1967d2; background: #f8faff; border-bottom-color: #bfdbfe; }
+.gp-tab.active {
+    color: #1967d2; border-bottom-color: #1967d2;
+    background: #f0f7ff; font-weight: 700;
+}
+.gp-tab-back {
+    margin-left: auto; font-size: .75rem; font-weight: 500;
+    color: #94a3b8; padding: 11px 16px; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 5px;
+    border-left: 1px solid #f1f5f9; white-space: nowrap;
+}
+.gp-tab-back:hover { color: #475569; }
+
+/* ─── Tab panels container ──────────────────────── */
+.gp-panels {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    padding: 22px;
+}
+.gp-panel { display: none; }
+.gp-panel.active { display: block; }
+
+/* ─── Overview grid ─────────────────────────────── */
+.gp-overview-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+}
+.gp-info-card {
+    border: 1px solid #e9ecef; border-radius: 8px; overflow: hidden;
+}
+.gp-card-head {
+    padding: 9px 14px; background: #f8fafc;
+    border-bottom: 1px solid #e9ecef;
+    font-size: .65rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: .09em;
+    color: #64748b; display: flex; align-items: center; gap: 6px;
+}
+.gp-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 14px; border-bottom: 1px solid #f8fafc; font-size: .82rem;
+}
+.gp-row:last-child { border-bottom: none; }
+.gp-rkey { color: #64748b; font-weight: 500; }
+.gp-rval { font-weight: 600; color: #1e293b; text-align: right; }
+
+/* ─── History table ─────────────────────────────── */
+.gp-history-table thead th {
+    font-size: .68rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .05em; background: #f8fafc; color: #475569;
+    border-bottom: 2px solid #e2e8f0; padding: 9px 12px; white-space: nowrap;
+}
+.gp-history-table tbody td {
+    padding: 9px 12px; font-size: .82rem;
+    border-bottom: 1px solid #f1f5f9; vertical-align: middle;
+}
+.gp-history-table tbody tr:last-child td { border-bottom: none; }
+.gp-history-table tbody tr:hover { background: #f8faff; }
+
+/* ─── Latest Invoice panel ──────────────────────── */
+.gp-inv-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    flex-wrap: wrap; gap: 12px; margin-bottom: 16px;
+}
+.gp-inv-no {
+    font-size: 1rem; font-weight: 700; color: #1967d2;
+}
+.gp-inv-table thead th {
+    font-size: .7rem; font-weight: 700; background: #1a202c; color: #f9fafb;
+    text-transform: uppercase; letter-spacing: .04em;
+    padding: 8px 12px; border-color: #2d3748;
+}
+.gp-inv-table tbody td { font-size: .82rem; padding: 8px 12px; border-color: #f1f5f9; }
+.gp-inv-grand { background: #0d1b2a !important; color: #fff !important; font-weight: 700; }
+.gp-inv-grand td { border-color: #0d1b2a !important; padding: 9px 12px; }
+
+/* ─── Latest Folio panel ────────────────────────── */
+.gp-folio-tiles {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px; margin-bottom: 18px;
+}
+.gp-folio-tile {
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+    padding: 10px 12px;
+}
+.gp-tile-lbl { font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #94a3b8; margin-bottom: 3px; }
+.gp-tile-val { font-size: .85rem; font-weight: 600; color: #1e293b; }
+
+/* Balance block */
+.gp-balance-block {
+    border-radius: 8px; padding: 14px 18px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 10px; margin-top: 14px;
+}
+.gp-balance-block.settled  { background: #d1fae5; border: 1px solid #6ee7b7; }
+.gp-balance-block.due      { background: #fee2e2; border: 1px solid #fca5a5; }
+.gp-balance-block.overpaid { background: #eff6ff; border: 1px solid #bfdbfe; }
+.gp-bal-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.gp-bal-label.settled  { color: #065f46; }
+.gp-bal-label.due      { color: #991b1b; }
+.gp-bal-label.overpaid { color: #1d4ed8; }
+.gp-bal-amount { font-size: 1.4rem; font-weight: 800; }
+.gp-bal-amount.settled  { color: #065f46; }
+.gp-bal-amount.due      { color: #991b1b; }
+.gp-bal-amount.overpaid { color: #1d4ed8; }
+
+/* ─── Shared: status chips ──────────────────────── */
+.sp {
+    display: inline-flex; align-items: center;
+    padding: 2px 7px; border-radius: 20px;
+    font-size: .67rem; font-weight: 700;
+}
+.sp.ci  { background: #dcfce7; color: #166534; }
+.sp.co  { background: #dbeafe; color: #1d4ed8; }
+.sp.res { background: #fef9c3; color: #854d0e; }
+.sp.ns  { background: #fee2e2; color: #991b1b; }
+.sp.can { background: #f1f5f9; color: #475569; }
+
+/* Balance chip in history table */
+.bal-chip {
+    display: inline-block; padding: 2px 7px; border-radius: 4px;
+    font-size: .68rem; font-weight: 700;
+}
+.bal-chip.due     { background: #fee2e2; color: #991b1b; }
+.bal-chip.settled { background: #d1fae5; color: #065f46; }
+.bal-chip.partial { background: #fef3c7; color: #92400e; }
+
+/* Row actions */
+.row-act {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 3px 8px; border-radius: 5px; font-size: .7rem; font-weight: 600;
+    text-decoration: none; border: 1px solid transparent; transition: all .12s;
+}
+.row-act.folio   { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+.row-act.folio:hover   { background: #1d4ed8; color: #fff; }
+.row-act.invoice { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
+.row-act.invoice:hover { background: #166534; color: #fff; }
+
+/* Panel action btn */
+.gp-panel-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 7px; font-size: .78rem; font-weight: 600;
+    text-decoration: none; border: 1px solid #d1d5db;
+    color: #374151; background: #fff; transition: all .12s;
+}
+.gp-panel-btn:hover { background: #f9fafb; }
+.gp-panel-btn.primary { background: #1967d2; color: #fff; border-color: #1967d2; }
+.gp-panel-btn.primary:hover { background: #1558b0; }
+
+/* Voided row */
+.voided-row td { text-decoration: line-through; color: #9ca3af; }
+
+/* Empty */
+.gp-empty { text-align: center; padding: 40px 20px; color: #94a3b8; }
+.gp-empty i { font-size: 2rem; display: block; margin-bottom: 8px; }
+
+/* ─── All Folios panel ──────────────────────────── */
+.gp-folio-card {
+    border: 1px solid #e2e8f0; border-radius: 9px; overflow: hidden;
+    margin-bottom: 12px;
+}
+.gp-folio-card-head {
+    background: #f8fafc; border-bottom: 1px solid #e2e8f0;
+    padding: 10px 16px; display: flex; align-items: center;
+    flex-wrap: wrap; gap: 10px;
+}
+.gp-folio-dates { font-size: .82rem; font-weight: 600; color: #1e293b; }
+.gp-folio-sub   { font-size: .72rem; color: #64748b; }
+.gp-folio-card-body {
+    padding: 12px 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 10px;
+}
+.gp-fc-item { }
+.gp-fc-lbl { font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #94a3b8; margin-bottom: 2px; }
+.gp-fc-val { font-size: .82rem; font-weight: 600; color: #1e293b; }
+.gp-fc-val.due      { color: #991b1b; }
+.gp-fc-val.settled  { color: #166534; }
+.gp-fc-val.overpaid { color: #1d4ed8; }
+.gp-folio-card-foot {
+    border-top: 1px solid #f1f5f9; padding: 8px 16px;
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+}
+
+/* ─── Documents panel ───────────────────────────── */
+.gp-doc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+}
+.gp-doc-card {
+    border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,.05);
+}
+.gp-doc-head {
+    padding: 10px 14px; display: flex; align-items: center;
+    justify-content: space-between; gap: 8px;
+    background: #f8fafc; border-bottom: 1px solid #e2e8f0;
+}
+.gp-doc-type-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: .7rem; font-weight: 700; letter-spacing: .03em;
+    padding: 3px 9px; border-radius: 20px;
+}
+.gp-doc-type-badge.aadhar   { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+.gp-doc-type-badge.passport { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.gp-doc-type-badge.dl       { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+.gp-doc-type-badge.voter    { background: #faf5ff; color: #6b21a8; border: 1px solid #e9d5ff; }
+.gp-doc-type-badge.pan      { background: #fefce8; color: #854d0e; border: 1px solid #fde68a; }
+.gp-doc-type-badge.other    { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+.gp-doc-number {
+    font-size: .76rem; font-weight: 600; color: #1e293b;
+    font-family: monospace; letter-spacing: .04em;
+}
+.gp-doc-body { padding: 12px 14px; }
+.gp-doc-images {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;
+}
+.gp-doc-img-wrap {
+    border: 1px solid #e2e8f0; border-radius: 7px; overflow: hidden;
+    background: #f8fafc; aspect-ratio: 16/10; position: relative;
+    display: flex; align-items: center; justify-content: center;
+}
+.gp-doc-img-wrap img {
+    width: 100%; height: 100%; object-fit: cover;
+    display: block; cursor: zoom-in;
+    transition: opacity .15s;
+}
+.gp-doc-img-wrap img:hover { opacity: .88; }
+.gp-doc-img-label {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,.45); color: #fff;
+    font-size: .58rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .06em; text-align: center; padding: 2px 0;
+}
+.gp-doc-img-placeholder {
+    text-align: center; color: #cbd5e1; font-size: .7rem;
+    padding: 12px; width: 100%;
+}
+.gp-doc-img-placeholder i { font-size: 1.3rem; display: block; margin-bottom: 3px; }
+.gp-doc-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: .7rem; color: #64748b;
+}
+.gp-vstatus {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 2px 7px; border-radius: 20px; font-size: .65rem; font-weight: 700;
+}
+.gp-vstatus.verified { background: #d1fae5; color: #065f46; }
+.gp-vstatus.pending  { background: #fef3c7; color: #92400e; }
+.gp-vstatus.rejected { background: #fee2e2; color: #991b1b; }
+
+/* Lightbox */
+#gp-lightbox {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,.82);
+    z-index: 9999; align-items: center; justify-content: center; cursor: zoom-out;
+}
+#gp-lightbox.open { display: flex; }
+#gp-lightbox img { max-width: 92vw; max-height: 88vh; border-radius: 8px; box-shadow: 0 8px 40px rgba(0,0,0,.6); }
+
+/* ─── Profile Tab ────────────────────────────────────────────── */
+.pf-actions-bar {
+    display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+    margin-bottom: 18px;
+}
+.pf-layout {
+    display: grid; grid-template-columns: 1fr 310px; gap: 16px; align-items: start;
+}
+.pf-section {
+    border: 1px solid #e2e8f0; border-radius: 9px; overflow: hidden; margin-bottom: 14px;
+}
+.pf-section:last-child { margin-bottom: 0; }
+.pf-section-head {
+    padding: 9px 16px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;
+    font-size: .63rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: .1em; color: #64748b;
+    display: flex; align-items: center; gap: 6px;
+}
+/* View-mode rows */
+.pf-row {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 9px 16px; border-bottom: 1px solid #f8fafc; font-size: .82rem; gap: 16px;
+}
+.pf-row:last-child { border-bottom: none; }
+.pf-key { color: #64748b; font-weight: 500; flex-shrink: 0; min-width: 110px; }
+.pf-val { font-weight: 600; color: #1e293b; text-align: right; word-break: break-word; }
+.pf-val a { color: inherit; text-decoration: none; }
+.pf-val a:hover { color: #1967d2; }
+.pf-val.empty { color: #cbd5e1; font-weight: 400; font-style: italic; }
+/* Edit-mode form */
+.pf-edit-body { padding: 14px 16px; display: none; }
+.pf-ig { margin-bottom: 10px; }
+.pf-ig:last-child { margin-bottom: 0; }
+.pf-lbl {
+    display: block; font-size: .62rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .06em; color: #64748b; margin-bottom: 4px;
+}
+.pf-inp {
+    width: 100%; padding: 7px 10px; border: 1px solid #d1d5db; border-radius: 6px;
+    font-size: .82rem; color: #1e293b; background: #fff; transition: border-color .15s;
+    box-sizing: border-box;
+}
+.pf-inp:focus { outline: none; border-color: #1967d2; box-shadow: 0 0 0 3px rgba(25,103,210,.08); }
+.pf-inp-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+/* Action buttons */
+.pf-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 16px; border-radius: 7px; font-size: .78rem; font-weight: 600;
+    cursor: pointer; border: 1px solid; transition: all .13s; text-decoration: none;
+    white-space: nowrap;
+}
+.pf-btn.edit   { background:#fff; color:#374151; border-color:#d1d5db; }
+.pf-btn.edit:hover { background:#f9fafb; }
+.pf-btn.pdf    { background:#0d1b2a; color:#fff; border-color:#0d1b2a; }
+.pf-btn.pdf:hover  { background:#1e3a5f; }
+.pf-btn.save   { background:#166534; color:#fff; border-color:#166534; }
+.pf-btn.save:hover { background:#14532d; }
+.pf-btn.cancel { background:#fff; color:#374151; border-color:#d1d5db; }
+.pf-btn.cancel:hover { background:#f9fafb; }
+/* Save bar */
+.pf-save-bar {
+    display: none; gap: 10px; flex-wrap: wrap;
+    margin-top: 16px; padding-top: 14px; border-top: 1px solid #e2e8f0;
+}
+/* Inline alert */
+.pf-alert {
+    display: none; padding: 8px 14px; border-radius: 6px; font-size: .8rem;
+    font-weight: 600; margin-bottom: 12px;
+}
+.pf-alert.success { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+.pf-alert.error   { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+/* Profile photo */
+.pf-photo-box {
+    padding: 20px 16px; display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.pf-photo-img {
+    width: 110px; height: 110px; border-radius: 10px; object-fit: cover;
+    border: 2px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,.1);
+}
+.pf-photo-initials {
+    width: 110px; height: 110px; border-radius: 10px;
+    background: #eff6ff; color: #1d4ed8;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; font-weight: 800; letter-spacing: -.02em;
+    border: 2px solid #bfdbfe;
+}
+.pf-photo-note { font-size: .68rem; color: #94a3b8; text-align: center; line-height: 1.5; }
+/* Meta summary */
+.pf-meta-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 9px 16px; border-bottom: 1px solid #f8fafc; font-size: .8rem;
+}
+.pf-meta-row:last-child { border-bottom: none; }
+.pf-meta-key { color: #64748b; font-weight: 500; }
+.pf-meta-val { font-weight: 700; color: #1e293b; }
+/* ID images inside profile */
+.pf-id-imgs {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 12px 16px;
+}
+.pf-id-img-box {
+    border: 1px solid #e2e8f0; border-radius: 7px; overflow: hidden;
+    aspect-ratio: 16/10; background: #f8fafc;
+    display: flex; align-items: center; justify-content: center; position: relative;
+}
+.pf-id-img-box img {
+    width: 100%; height: 100%; object-fit: cover; cursor: zoom-in;
+    transition: opacity .13s;
+}
+.pf-id-img-box img:hover { opacity: .88; }
+.pf-id-img-lbl {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,.45); color: #fff;
+    font-size: .58rem; font-weight: 700; text-transform: uppercase;
+    text-align: center; padding: 2px;
+}
+.pf-id-no-img {
+    text-align: center; color: #cbd5e1; font-size: .68rem; padding: 8px; width: 100%;
+}
+.pf-id-no-img i { font-size: 1.1rem; display: block; margin-bottom: 2px; }
+
+/* ─── Print / PDF styles ─────────────────────────────────────── */
+@media print {
+    /* Step 1: make everything invisible (but keep layout) */
+    body * { visibility: hidden; }
+
+    /* Step 2: make the print wrapper and all its contents visible */
+    #pf-print-wrap,
+    #pf-print-wrap * { visibility: visible; }
+
+    /* Step 3: override inline display:none and pin to top-left */
+    #pf-print-wrap {
+        display:  block !important;
+        position: fixed;
+        inset: 0;
+        padding: 28px 32px;
+        background: #fff;
+        box-sizing: border-box;
+        overflow: visible;
+    }
+
+    @page { margin: 1.2cm; }
+
+    .pf-print-logo  { font-size: .9rem; font-weight: 800; color: #0d1b2a; margin-bottom: 3px; }
+    .pf-print-title { font-size: 1.4rem; font-weight: 800; color: #0d1b2a; margin-bottom: 2px; line-height: 1.2; }
+    .pf-print-sub   {
+        font-size: .75rem; color: #64748b; margin-bottom: 18px;
+        border-bottom: 2px solid #0d1b2a; padding-bottom: 10px;
+    }
+    .pf-print-grid  { display: grid; grid-template-columns: 1fr 180px; gap: 24px; margin-bottom: 16px; }
+    .pf-print-section { margin-bottom: 14px; break-inside: avoid; }
+    .pf-print-section h4 {
+        font-size: .6rem; font-weight: 800; text-transform: uppercase;
+        letter-spacing: .09em; color: #64748b;
+        border-bottom: 1px solid #e2e8f0; padding-bottom: 3px; margin: 0 0 7px;
+    }
+    .pf-print-row   { display: flex; gap: 8px; font-size: .76rem; margin-bottom: 4px; }
+    .pf-print-key   { color: #64748b; font-weight: 500; width: 100px; flex-shrink: 0; }
+    .pf-print-val   { font-weight: 600; color: #1e293b; }
+    .pf-print-photo {
+        width: 110px; height: 110px; border-radius: 8px;
+        object-fit: cover; border: 1px solid #e2e8f0; display: block; margin-bottom: 8px;
+    }
+    .pf-print-photo-init {
+        width: 110px; height: 110px; border-radius: 8px;
+        background: #eff6ff; color: #1d4ed8;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.8rem; font-weight: 800; border: 1px solid #bfdbfe; margin-bottom: 8px;
+    }
+    .pf-print-id-imgs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; }
+    .pf-print-id-img  { width: 100%; border-radius: 5px; border: 1px solid #e2e8f0; }
+    .pf-print-id-lbl  { font-size: .58rem; color: #64748b; text-align: center; margin-top: 2px; }
+    .pf-print-footer  {
+        font-size: .65rem; color: #94a3b8;
+        border-top: 1px solid #e2e8f0; padding-top: 7px; margin-top: 16px;
+    }
+}
+
+/* ─── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 640px) {
+    .gp-metrics-row  { grid-template-columns: repeat(2,1fr); }
+    .gp-overview-grid { grid-template-columns: 1fr; }
+    .gp-header-band  { flex-direction: column; gap: 12px; }
+    .gp-tab          { padding: 10px 12px; font-size: .75rem; }
+    .gp-doc-grid     { grid-template-columns: 1fr; }
+    .pf-layout       { grid-template-columns: 1fr; }
+    .pf-inp-2col     { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{# ── Initials ──────────────────────────────────────────────────── #}
+{% set np = guest.name.split() %}
+{% set initials = (np[0][0] ~ np[-1][0])|upper if np|length >= 2 else guest.name[:2]|upper %}
+
+<div class="container-fluid pb-5">
+<div class="gp-page">
+
+{# ═══════════════════════════════════════════════════
+   IDENTITY CARD
+═══════════════════════════════════════════════════ #}
+<div class="gp-identity-card">
+    <div class="gp-header-band">
+        <div class="gp-avatar-wrap" title="{{ guest.name }}">
+            <span class="gp-initials">{{ initials }}</span>
+        </div>
+        <div class="flex-grow-1">
+            <div class="gp-guest-name">{{ guest.name }}</div>
+            <div><span class="gp-folio-chip">F{{ '%04d' % guest.id }}</span></div>
+            {% if guest.company %}
+            <div class="gp-company-line"><i class="bi bi-building me-1"></i>{{ guest.company }}</div>
+            {% endif %}
+            {% if total_visits > 1 %}
+            <div><span class="gp-repeat-chip"><i class="bi bi-arrow-repeat"></i> Repeat Guest &bull; {{ total_visits }} visits</span></div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="gp-contact-row">
+        <div class="gp-contact-cell">
+            <div class="gp-ci phone"><i class="bi bi-telephone-fill"></i></div>
+            <div>
+                <div class="gp-clabel">Phone</div>
+                <div class="gp-cval"><a href="tel:{{ guest.phone }}">{{ guest.phone }}</a></div>
+            </div>
+        </div>
+        <div class="gp-contact-cell">
+            <div class="gp-ci email"><i class="bi bi-envelope-fill"></i></div>
+            <div>
+                <div class="gp-clabel">Email</div>
+                <div class="gp-cval">
+                    {% if guest.email %}<a href="mailto:{{ guest.email }}">{{ guest.email }}</a>
+                    {% else %}<span style="color:#94a3b8;font-size:.78rem">Not provided</span>{% endif %}
+                </div>
+            </div>
+        </div>
+        {% if guest.id_proof_type or guest.id_proof_number %}
+        <div class="gp-contact-cell">
+            <div class="gp-ci id"><i class="bi bi-card-text"></i></div>
+            <div>
+                <div class="gp-clabel">{{ guest.id_proof_type or 'ID Proof' }}</div>
+                <div class="gp-cval">{{ guest.id_proof_number or '—' }}</div>
+            </div>
+        </div>
+        {% endif %}
+        {% if guest.address %}
+        <div class="gp-contact-cell">
+            <div class="gp-ci addr"><i class="bi bi-geo-alt-fill"></i></div>
+            <div>
+                <div class="gp-clabel">Address</div>
+                <div class="gp-cval">{{ guest.address }}</div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{# ═══════════════════════════════════════════════════
+   METRICS
+═══════════════════════════════════════════════════ #}
+<div class="gp-metrics-row">
+    <div class="gp-metric-card">
+        <div class="gp-metric-icon blue"><i class="bi bi-calendar-check"></i></div>
+        <div><div class="gp-mval blue">{{ total_visits }}</div><div class="gp-mlabel">Total Visits</div></div>
+    </div>
+    <div class="gp-metric-card">
+        <div class="gp-metric-icon slate"><i class="bi bi-currency-rupee"></i></div>
+        <div><div class="gp-mval">₹{{ '{:,.0f}'.format(lifetime_spend) }}</div><div class="gp-mlabel">Lifetime Spend</div></div>
+    </div>
+    <div class="gp-metric-card">
+        <div class="gp-metric-icon green"><i class="bi bi-check-circle"></i></div>
+        <div><div class="gp-mval green">₹{{ '{:,.0f}'.format(total_paid_all) }}</div><div class="gp-mlabel">Total Paid</div></div>
+    </div>
+    <div class="gp-metric-card">
+        {% if outstanding_bal > 0.01 %}
+        <div class="gp-metric-icon red"><i class="bi bi-exclamation-circle"></i></div>
+        <div><div class="gp-mval red">₹{{ '{:,.0f}'.format(outstanding_bal) }}</div><div class="gp-mlabel">Outstanding</div></div>
+        {% else %}
+        <div class="gp-metric-icon green"><i class="bi bi-shield-check"></i></div>
+        <div><div class="gp-mval green" style="font-size:.9rem"><i class="bi bi-check-lg"></i> Clear</div><div class="gp-mlabel">No Outstanding</div></div>
+        {% endif %}
+    </div>
+</div>
+
+{# ═══════════════════════════════════════════════════
+   TAB BAR
+═══════════════════════════════════════════════════ #}
+<div class="gp-tab-bar">
+    <button class="gp-tab active" data-tab="profile">
+        <i class="bi bi-person-vcard"></i> Profile
+    </button>
+    <button class="gp-tab" data-tab="history">
+        <i class="bi bi-calendar3-range"></i> Visit History
+    </button>
+    {% if last_stay %}
+    <button class="gp-tab" data-tab="invoice">
+        <i class="bi bi-receipt"></i> Latest Invoice
+    </button>
+    <button class="gp-tab" data-tab="folio">
+        <i class="bi bi-wallet2"></i> Latest Folio
+    </button>
+    {% endif %}
+    <button class="gp-tab" data-tab="allfolios">
+        <i class="bi bi-journals"></i> All Folios
+    </button>
+    <button class="gp-tab" data-tab="documents">
+        <i class="bi bi-file-earmark-person"></i> Documents
+        {% if guest.id_documents %}<span style="background:#1967d2;color:#fff;font-size:.6rem;padding:1px 5px;border-radius:10px;margin-left:2px">{{ guest.id_documents|length }}</span>{% endif %}
+    </button>
+    <a class="gp-tab-back" href="{{ url_for('main.guest_database') }}">
+        <i class="bi bi-arrow-left"></i> Guest Database
+    </a>
+</div>
+
+{# ═══════════════════════════════════════════════════
+   TAB PANELS
+═══════════════════════════════════════════════════ #}
+<div class="gp-panels">
+
+    {# ── PANEL 1: Profile ────────────────────────── #}
+    {# Resolve profile photo from latest check-in record #}
+    {% set latest_ci = (guest.checkin_records | sort(attribute='created_at', reverse=True) | list | first) if guest.checkin_records else none %}
+    {% set photo_path = latest_ci.guest_photo_path if latest_ci and latest_ci.guest_photo_path else none %}
+    {# Resolve primary ID document (most recent) #}
+    {% set primary_doc = (guest.id_documents | sort(attribute='created_at', reverse=True) | list | first) if guest.id_documents else none %}
+
+    <div class="gp-panel active" id="panel-profile">
+
+        {# Alert strip #}
+        <div class="pf-alert" id="pf-alert"></div>
+
+        {# ── Actions bar (view mode) ── #}
+        <div class="pf-actions-bar" id="pf-view-actions">
+            <button class="pf-btn edit" id="pf-update-btn" type="button">
+                <i class="bi bi-pencil-square"></i> Update Profile
+            </button>
+            <button class="pf-btn pdf" id="pf-pdf-btn" type="button">
+                <i class="bi bi-file-pdf"></i> Download PDF
+            </button>
+        </div>
+
+        {# ── Two-column layout ── #}
+        <div class="pf-layout">
+
+            {# ══ LEFT COLUMN ══ #}
+            <div>
+
+                {# A. Basic Information #}
+                <div class="pf-section">
+                    <div class="pf-section-head"><i class="bi bi-person"></i> Basic Information</div>
+
+                    {# View mode #}
+                    <div id="pf-view-basic">
+                        {% set _np = guest.name.split(' ', 1) %}
+                        <div class="pf-row"><span class="pf-key">First Name</span>
+                            <span class="pf-val" id="pf-d-firstname">{{ _np[0] }}</span></div>
+                        <div class="pf-row"><span class="pf-key">Last Name</span>
+                            <span class="pf-val" id="pf-d-lastname">{{ _np[1] if _np|length > 1 else '—' }}</span></div>
+                        <div class="pf-row"><span class="pf-key">Mobile</span>
+                            <span class="pf-val" id="pf-d-phone"><a href="tel:{{ guest.phone }}">{{ guest.phone }}</a></span></div>
+                        <div class="pf-row"><span class="pf-key">Email</span>
+                            <span class="pf-val {% if not guest.email %}empty{% endif %}" id="pf-d-email">{{ guest.email or 'Not provided' }}</span></div>
+                        <div class="pf-row"><span class="pf-key">Company</span>
+                            <span class="pf-val {% if not guest.company %}empty{% endif %}" id="pf-d-company">{{ guest.company or '—' }}</span></div>
+                        <div class="pf-row"><span class="pf-key">Address</span>
+                            <span class="pf-val {% if not guest.address %}empty{% endif %}" id="pf-d-address" style="max-width:200px">{{ guest.address or '—' }}</span></div>
+                    </div>
+
+                    {# Edit mode #}
+                    <div class="pf-edit-body" id="pf-edit-basic">
+                        {% set _ep = guest.name.split(' ', 1) %}
+                        <div class="pf-ig">
+                            <label class="pf-lbl">First Name *</label>
+                            <input class="pf-inp" id="pf-i-firstname" type="text" value="{{ _ep[0] }}" placeholder="First name">
+                        </div>
+                        <div class="pf-ig">
+                            <label class="pf-lbl">Last Name</label>
+                            <input class="pf-inp" id="pf-i-lastname" type="text" value="{{ _ep[1] if _ep|length > 1 else '' }}" placeholder="Last name">
+                        </div>
+                        <div class="pf-ig">
+                            <label class="pf-lbl">Mobile *</label>
+                            <input class="pf-inp" id="pf-i-phone" type="tel" value="{{ guest.phone }}" placeholder="10-digit mobile">
+                        </div>
+                        <div class="pf-ig">
+                            <label class="pf-lbl">Email</label>
+                            <input class="pf-inp" id="pf-i-email" type="email" value="{{ guest.email or '' }}" placeholder="email@example.com">
+                        </div>
+                        <div class="pf-ig">
+                            <label class="pf-lbl">Company</label>
+                            <input class="pf-inp" id="pf-i-company" type="text" value="{{ guest.company or '' }}" placeholder="Company name">
+                        </div>
+                        <div class="pf-ig">
+                            <label class="pf-lbl">Address</label>
+                            <textarea class="pf-inp" id="pf-i-address" rows="2" placeholder="Street address">{{ guest.address or '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                {# B. ID Verification #}
+                <div class="pf-section">
+                    <div class="pf-section-head"><i class="bi bi-shield-check"></i> ID Verification</div>
+
+                    {# View mode #}
+                    <div id="pf-view-id">
+                        <div class="pf-row"><span class="pf-key">ID Type</span>
+                            <span class="pf-val {% if not guest.id_proof_type %}empty{% endif %}" id="pf-d-idtype">{{ guest.id_proof_type or 'Not set' }}</span></div>
+                        <div class="pf-row"><span class="pf-key">ID Number</span>
+                            <span class="pf-val {% if not guest.id_proof_number %}empty{% endif %}" id="pf-d-idnum" style="font-family:monospace;font-size:.8rem">{{ guest.id_proof_number or '—' }}</span></div>
+                    </div>
+
+                    {# Edit mode #}
+                    <div class="pf-edit-body" id="pf-edit-id">
+                        <div class="pf-inp-2col">
+                            <div class="pf-ig">
+                                <label class="pf-lbl">ID Type</label>
+                                <select class="pf-inp" id="pf-i-idtype">
+                                    <option value="">— Select —</option>
+                                    {% for opt in ['Aadhaar','Passport','Driving Licence','Voter ID','PAN Card','Other'] %}
+                                    <option value="{{ opt }}" {{ 'selected' if guest.id_proof_type == opt }}>{{ opt }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="pf-ig">
+                                <label class="pf-lbl">ID Number</label>
+                                <input class="pf-inp" id="pf-i-idnum" type="text"
+                                       value="{{ guest.id_proof_number or '' }}" placeholder="Document number">
+                            </div>
+                        </div>
+                    </div>
+
+                    {# ID images — from most recent document upload #}
+                    {% if primary_doc %}
+                    <div class="pf-id-imgs">
+                        <div class="pf-id-img-box">
+                            {% if primary_doc.front_image_path %}
+                            <img src="{{ url_for('main.serve_private_upload', filepath=primary_doc.front_image_path) }}"
+                                 alt="ID Front" loading="lazy" onclick="gpLightbox(this.src)">
+                            <div class="pf-id-img-lbl">Front</div>
+                            {% else %}
+                            <div class="pf-id-no-img"><i class="bi bi-image"></i>No front</div>
+                            {% endif %}
+                        </div>
+                        <div class="pf-id-img-box">
+                            {% if primary_doc.back_image_path %}
+                            <img src="{{ url_for('main.serve_private_upload', filepath=primary_doc.back_image_path) }}"
+                                 alt="ID Back" loading="lazy" onclick="gpLightbox(this.src)">
+                            <div class="pf-id-img-lbl">Back</div>
+                            {% else %}
+                            <div class="pf-id-no-img"><i class="bi bi-image"></i>No back</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div style="padding:0 16px 10px;font-size:.68rem;color:#94a3b8">
+                        {{ primary_doc.document_type }} &bull;
+                        <span style="font-family:monospace">{{ primary_doc.document_number }}</span> &bull;
+                        Uploaded {{ primary_doc.created_at.strftime('%d %b %Y') }} &bull;
+                        {% set vs = primary_doc.verification_status | lower %}
+                        <span class="gp-vstatus {{ vs }}">{{ primary_doc.verification_status }}</span>
+                        &bull; <a href="#" class="pf-goto-docs" style="color:#1967d2;font-weight:600">Manage all documents →</a>
+                    </div>
+                    {% else %}
+                    <div style="padding:10px 16px 12px;font-size:.75rem;color:#94a3b8">
+                        <i class="bi bi-upload me-1"></i>No ID images uploaded. &nbsp;
+                        <a href="#" class="pf-goto-docs" style="color:#1967d2;font-weight:600">Go to Documents tab →</a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {# C-b. Company / Corporate Billing #}
+                <div class="pf-section">
+                    <div class="pf-section-head"><i class="bi bi-building"></i> Company / Corporate Billing</div>
+
+                    {# View mode #}
+                    <div id="pf-view-corporate">
+                        <div class="pf-row">
+                            <span class="pf-key">Company</span>
+                            <span class="pf-val {% if not guest.company %}empty{% endif %}">{{ guest.company or '—' }}</span>
+                        </div>
+                        <div class="pf-row">
+                            <span class="pf-key">Last Billing</span>
+                            <span class="pf-val" style="font-size:.77rem">
+                                {% if latest_ci and latest_ci.billing_responsibility == 'Company' and latest_ci.company %}
+                                    <span class="sp res">Corporate</span>&nbsp;{{ latest_ci.company.name }}
+                                    {% if latest_ci.company_billing_ref %}&nbsp;&bull;&nbsp;Ref: <em>{{ latest_ci.company_billing_ref }}</em>{% endif %}
+                                {% else %}
+                                    Guest (Self-pay)
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% if latest_ci and latest_ci.company and latest_ci.billing_responsibility == 'Company' %}
+                        <div class="pf-row">
+                            <span class="pf-key">Credit Available</span>
+                            <span class="pf-val" style="font-size:.77rem;color:#166534">
+                                ₹{{ '{:,.0f}'.format(latest_ci.company.credit_limit - latest_ci.company.credit_used) }}
+                                <span class="text-muted" style="font-weight:400">(Limit ₹{{ '{:,.0f}'.format(latest_ci.company.credit_limit) }})</span>
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {# Edit mode #}
+                    <div class="pf-edit-body" id="pf-edit-corporate">
+                        <div class="pf-ig">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="pf-corp-toggle"
+                                       {% if latest_ci and latest_ci.billing_responsibility == 'Company' %}checked{% endif %}>
+                                <label class="form-check-label" for="pf-corp-toggle"
+                                       style="font-size:.8rem;font-weight:600;color:#374151">
+                                    Bill to Company (Corporate Account)
+                                </label>
+                            </div>
+                        </div>
+                        <div id="pf-corp-fields" style="display:{% if latest_ci and latest_ci.billing_responsibility == 'Company' %}block{% else %}none{% endif %}">
+                            <div class="pf-ig">
+                                <label class="pf-lbl">Company *</label>
+                                <select class="pf-inp" id="pf-corp-select">
+                                    <option value="">— Select Company —</option>
+                                    {% for c in companies %}
+                                    <option value="{{ c.id }}" data-name="{{ c.name }}"
+                                            data-limit="{{ c.credit_limit }}" data-used="{{ c.credit_used }}"
+                                            {% if latest_ci and latest_ci.company_id == c.id %}selected{% endif %}>
+                                        {{ c.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="pf-ig" id="pf-corp-credit"
+                                 style="display:none;background:#f0f9ff;border:1px solid #bfdbfe;border-radius:6px;padding:8px 12px;font-size:.78rem"></div>
+                            <div class="pf-ig">
+                                <label class="pf-lbl">Billing Reference</label>
+                                <input class="pf-inp" id="pf-corp-ref" type="text"
+                                       value="{{ latest_ci.company_billing_ref if latest_ci and latest_ci.company_billing_ref else '' }}"
+                                       placeholder="PO number, work order, or reference">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {# D. Additional Details #}
+                <div class="pf-section">
+                    <div class="pf-section-head"><i class="bi bi-globe-asia-australia"></i> Additional Details</div>
+
+                    {# View mode #}
+                    <div id="pf-view-additional">
+                        <div class="pf-row"><span class="pf-key">Country</span>
+                            <span class="pf-val {% if not guest.country %}empty{% endif %}" id="pf-d-country">{{ guest.country or '—' }}</span></div>
+                        <div class="pf-row"><span class="pf-key">State</span>
+                            <span class="pf-val {% if not guest.state %}empty{% endif %}" id="pf-d-state">{{ guest.state or '—' }}</span></div>
+                        <div class="pf-row"><span class="pf-key">City</span>
+                            <span class="pf-val {% if not guest.city %}empty{% endif %}" id="pf-d-city">{{ guest.city or '—' }}</span></div>
+                        <div class="pf-row"><span class="pf-key">Pin Code</span>
+                            <span class="pf-val {% if not guest.pin_code %}empty{% endif %}" id="pf-d-pincode">{{ guest.pin_code or '—' }}</span></div>
+                    </div>
+
+                    {# Edit mode #}
+                    <div class="pf-edit-body" id="pf-edit-additional">
+                        <div class="pf-ig">
+                            <label class="pf-lbl">Country / Nationality</label>
+                            <input class="pf-inp" id="pf-i-country" type="text" value="{{ guest.country or 'India' }}" placeholder="India">
+                        </div>
+                        <div class="pf-inp-2col">
+                            <div class="pf-ig">
+                                <label class="pf-lbl">State</label>
+                                <input class="pf-inp" id="pf-i-state" type="text" value="{{ guest.state or '' }}" placeholder="State">
+                            </div>
+                            <div class="pf-ig">
+                                <label class="pf-lbl">City</label>
+                                <input class="pf-inp" id="pf-i-city" type="text" value="{{ guest.city or '' }}" placeholder="City">
+                            </div>
+                        </div>
+                        <div class="pf-ig">
+                            <label class="pf-lbl">Pin Code</label>
+                            <input class="pf-inp" id="pf-i-pincode" type="text" value="{{ guest.pin_code or '' }}" placeholder="6-digit pin">
+                        </div>
+                    </div>
+                </div>
+
+            </div>{# /left column #}
+
+            {# ══ RIGHT COLUMN ══ #}
+            <div>
+
+                {# C. Profile Photo #}
+                <div class="pf-section">
+                    <div class="pf-section-head"><i class="bi bi-camera"></i> Profile Photo</div>
+                    <div class="pf-photo-box">
+                        {% if photo_path %}
+                        <img class="pf-photo-img" src="{{ url_for('static', filename=photo_path) }}"
+                             alt="{{ guest.name }}" onclick="gpLightbox(this.src)" style="cursor:zoom-in">
+                        {% else %}
+                        <div class="pf-photo-initials">{{ initials }}</div>
+                        {% endif %}
+                        <div class="pf-photo-note">
+                            {% if photo_path %}
+                            Photo captured at check-in<br>
+                            <span style="font-size:.62rem">{{ latest_ci.checkin_date.strftime('%d %b %Y') if latest_ci and latest_ci.checkin_date else '' }}</span>
+                            {% else %}
+                            No photo on record.<br>
+                            <span style="font-size:.62rem">Captured automatically during express check-in.</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {# E. System Metadata #}
+                <div class="pf-section">
+                    <div class="pf-section-head"><i class="bi bi-database"></i> Account Summary</div>
+                    <div class="pf-meta-row">
+                        <span class="pf-meta-key">Guest Since</span>
+                        <span class="pf-meta-val">{{ guest.created_at.strftime('%d %b %Y') if guest.created_at else '—' }}</span>
+                    </div>
+                    <div class="pf-meta-row">
+                        <span class="pf-meta-key">Folio ID</span>
+                        <span class="pf-meta-val" style="font-family:monospace;font-size:.78rem">F{{ '%04d' % guest.id }}</span>
+                    </div>
+                    <div class="pf-meta-row">
+                        <span class="pf-meta-key">Total Visits</span>
+                        <span class="pf-meta-val" style="color:#1d4ed8">{{ total_visits }}</span>
+                    </div>
+                    <div class="pf-meta-row">
+                        <span class="pf-meta-key">Lifetime Spend</span>
+                        <span class="pf-meta-val">₹{{ '{:,.0f}'.format(lifetime_spend) }}</span>
+                    </div>
+                    <div class="pf-meta-row">
+                        <span class="pf-meta-key">Total Paid</span>
+                        <span class="pf-meta-val" style="color:#166534">₹{{ '{:,.0f}'.format(total_paid_all) }}</span>
+                    </div>
+                    {% if outstanding_bal > 0.01 %}
+                    <div class="pf-meta-row">
+                        <span class="pf-meta-key">Outstanding</span>
+                        <span class="pf-meta-val" style="color:#991b1b">₹{{ '{:,.0f}'.format(outstanding_bal) }}</span>
+                    </div>
+                    {% endif %}
+                    {% if last_stay %}
+                    <div class="pf-meta-row">
+                        <span class="pf-meta-key">Last Stay</span>
+                        <span class="pf-meta-val" style="font-size:.76rem">
+                            {{ last_stay.arrival_date.strftime('%d %b %Y') }}
+                        </span>
+                    </div>
+                    <div class="pf-meta-row">
+                        <span class="pf-meta-key">Guest Type</span>
+                        <span class="pf-meta-val">
+                            {% if total_visits > 1 %}<span class="sp ci">Repeat</span>
+                            {% else %}<span class="sp can">First-time</span>{% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+
+            </div>{# /right column #}
+
+        </div>{# /pf-layout #}
+
+        {# ── Document Upload (always visible, collapsible) ── #}
+        <div class="pf-section" style="margin-top:14px">
+            <div class="pf-section-head" id="pf-doc-toggle-head" style="cursor:pointer;user-select:none">
+                <i class="bi bi-cloud-upload"></i> Upload / Update ID Document
+                {% if primary_doc %}
+                    {% set _fn = primary_doc.front_image_path %}
+                    {% set _bn = primary_doc.back_image_path %}
+                    {% if _fn and _bn %}
+                    <span style="background:#d1fae5;color:#065f46;font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;text-transform:none">
+                        <i class="bi bi-check2-all"></i> Both sides uploaded
+                    </span>
+                    {% elif _fn or _bn %}
+                    <span style="background:#fef3c7;color:#92400e;font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;text-transform:none">
+                        <i class="bi bi-exclamation-circle"></i> Partial — {{ 'Back' if _fn else 'Front' }} pending
+                    </span>
+                    {% endif %}
+                {% endif %}
+                <i class="bi bi-chevron-down ms-auto" id="pf-doc-chevron" style="transition:transform .2s"></i>
+            </div>
+
+            <div id="pf-doc-body" style="display:none">
+                <div style="padding:14px 16px">
+                    <div class="pf-alert" id="pf-doc-alert"></div>
+
+                    {# Status banner — only when partially uploaded #}
+                    {% if primary_doc %}
+                    <input type="hidden" id="pf-doc-existing-id" value="{{ primary_doc.id }}">
+                    {% set _has_front = primary_doc.front_image_path %}
+                    {% set _has_back  = primary_doc.back_image_path %}
+                    {% if _has_front and _has_back %}
+                    <div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:7px;padding:9px 14px;font-size:.77rem;margin-bottom:12px;display:flex;gap:8px;align-items:center">
+                        <i class="bi bi-check-circle-fill" style="color:#065f46;font-size:1rem"></i>
+                        <span><strong>Both sides already uploaded</strong> for <strong>{{ primary_doc.document_type }}</strong>
+                        ({{ primary_doc.document_number }}).
+                        Use the file inputs below to <em>replace</em> either image.</span>
+                    </div>
+                    {% else %}
+                    <div style="background:#fef3c7;border:1px solid #fde68a;border-radius:7px;padding:9px 14px;font-size:.77rem;margin-bottom:12px;display:flex;gap:8px;align-items:flex-start">
+                        <i class="bi bi-exclamation-circle-fill" style="color:#92400e;font-size:1rem;margin-top:1px"></i>
+                        <span>
+                            <strong>Partially uploaded</strong> — <strong>{{ primary_doc.document_type }}</strong>
+                            ({{ primary_doc.document_number }}, saved {{ primary_doc.created_at.strftime('%d %b %Y') }}).<br>
+                            {% if not _has_front %}<strong style="color:#991b1b">Front image is missing.</strong>{% endif %}
+                            {% if not _has_back  %}<strong style="color:#991b1b">Back image is missing.</strong>{% endif %}
+                            Upload the missing side below to complete the record.
+                        </span>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <input type="hidden" id="pf-doc-existing-id" value="">
+                    {% endif %}
+
+                    {# Type + Number row — pre-filled if existing doc #}
+                    <div class="pf-inp-2col" style="margin-bottom:12px">
+                        <div class="pf-ig">
+                            <label class="pf-lbl">Document Type *</label>
+                            <select class="pf-inp" id="pf-doc-type">
+                                <option value="">— Select —</option>
+                                {% for opt in ['Aadhaar','Passport','Driving Licence','Voter ID','PAN Card','Other'] %}
+                                <option value="{{ opt }}"
+                                    {% if primary_doc and primary_doc.document_type == opt %}selected{% endif %}>
+                                    {{ opt }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="pf-ig">
+                            <label class="pf-lbl">Document Number *</label>
+                            <input class="pf-inp" id="pf-doc-number" type="text"
+                                   value="{{ primary_doc.document_number if primary_doc else '' }}"
+                                   placeholder="e.g. XXXX XXXX XXXX">
+                        </div>
+                    </div>
+
+                    {# Front + Back image slots #}
+                    <div class="pf-inp-2col" style="margin-bottom:14px">
+
+                        {# ── Front ── #}
+                        <div class="pf-ig">
+                            {% if primary_doc and primary_doc.front_image_path %}
+                            <label class="pf-lbl" style="color:#065f46">
+                                <i class="bi bi-check-circle-fill me-1"></i>Front — Already Uploaded
+                            </label>
+                            <div style="position:relative;margin-bottom:6px" class="pf-doc-lb-wrap"
+                                 data-src="{{ url_for('main.serve_private_upload', filepath=primary_doc.front_image_path) }}">
+                                <img src="{{ url_for('main.serve_private_upload', filepath=primary_doc.front_image_path) }}"
+                                     style="max-width:100%;max-height:90px;border-radius:6px;border:2px solid #6ee7b7;display:block;cursor:zoom-in">
+                                <span style="position:absolute;bottom:0;left:0;right:0;background:rgba(6,95,70,.75);color:#fff;font-size:.58rem;font-weight:700;text-transform:uppercase;text-align:center;padding:2px;border-radius:0 0 5px 5px">
+                                    ✓ Front Uploaded
+                                </span>
+                            </div>
+                            <div style="font-size:.67rem;color:#64748b;margin-bottom:4px">
+                                <i class="bi bi-arrow-repeat me-1"></i>Select file below to <em>replace</em>
+                            </div>
+                            {% else %}
+                            <label class="pf-lbl">
+                                Front Image&ensp;<span style="color:#991b1b;font-weight:700;font-size:.72rem;text-transform:none">✗ Not uploaded yet</span>
+                            </label>
+                            {% endif %}
+                            <input class="pf-inp" id="pf-doc-front" type="file"
+                                   accept="image/jpeg,image/png,image/webp,.pdf" style="padding:5px 8px">
+                            <div id="pf-front-preview" style="margin-top:4px;display:none">
+                                <img id="pf-front-img" style="max-width:100%;max-height:70px;border-radius:5px;border:1px solid #bfdbfe">
+                            </div>
+                        </div>
+
+                        {# ── Back ── #}
+                        <div class="pf-ig">
+                            {% if primary_doc and primary_doc.back_image_path %}
+                            <label class="pf-lbl" style="color:#065f46">
+                                <i class="bi bi-check-circle-fill me-1"></i>Back — Already Uploaded
+                            </label>
+                            <div style="position:relative;margin-bottom:6px" class="pf-doc-lb-wrap"
+                                 data-src="{{ url_for('main.serve_private_upload', filepath=primary_doc.back_image_path) }}">
+                                <img src="{{ url_for('main.serve_private_upload', filepath=primary_doc.back_image_path) }}"
+                                     style="max-width:100%;max-height:90px;border-radius:6px;border:2px solid #6ee7b7;display:block;cursor:zoom-in">
+                                <span style="position:absolute;bottom:0;left:0;right:0;background:rgba(6,95,70,.75);color:#fff;font-size:.58rem;font-weight:700;text-transform:uppercase;text-align:center;padding:2px;border-radius:0 0 5px 5px">
+                                    ✓ Back Uploaded
+                                </span>
+                            </div>
+                            <div style="font-size:.67rem;color:#64748b;margin-bottom:4px">
+                                <i class="bi bi-arrow-repeat me-1"></i>Select file below to <em>replace</em>
+                            </div>
+                            {% else %}
+                            <label class="pf-lbl">
+                                Back Image&ensp;<span style="color:#991b1b;font-weight:700;font-size:.72rem;text-transform:none">✗ Not uploaded yet</span>
+                            </label>
+                            {% endif %}
+                            <input class="pf-inp" id="pf-doc-back" type="file"
+                                   accept="image/jpeg,image/png,image/webp,.pdf" style="padding:5px 8px">
+                            <div id="pf-back-preview" style="margin-top:4px;display:none">
+                                <img id="pf-back-img" style="max-width:100%;max-height:70px;border-radius:5px;border:1px solid #bfdbfe">
+                            </div>
+                        </div>
+
+                    </div>{# /pf-inp-2col #}
+
+                    <button class="pf-btn save" id="pf-doc-upload-btn" type="button">
+                        <i class="bi bi-cloud-upload"></i>
+                        {% if primary_doc %}Update Document{% else %}Upload Document{% endif %}
+                    </button>
+                    <span style="font-size:.7rem;color:#94a3b8;margin-left:10px">
+                        All documents appear in the <strong>Documents</strong> tab.
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        {# ── Save bar (edit mode only) ── #}
+        <div class="pf-save-bar" id="pf-save-bar">
+            <button class="pf-btn save" id="pf-save-btn" type="button">
+                <i class="bi bi-check2-circle"></i> Save Changes
+            </button>
+            <button class="pf-btn cancel" id="pf-cancel-btn" type="button">
+                <i class="bi bi-x-lg"></i> Cancel
+            </button>
+        </div>
+
+    </div>{# /panel-profile #}
+
+    {# ── Hidden print wrapper (only visible during @media print) ── #}
+    <div id="pf-print-wrap" style="display:none">
+        <div class="pf-print-logo">{{ config.HOTEL_NAME }}</div>
+        <div class="pf-print-title">{{ guest.name }}</div>
+        <div class="pf-print-sub">Guest Profile &bull; F{{ '%04d' % guest.id }}</div>
+        <div class="pf-print-grid">
+            <div>
+                <div class="pf-print-section">
+                    <h4>Basic Information</h4>
+                    <div class="pf-print-row"><span class="pf-print-key">Mobile</span><span class="pf-print-val">{{ guest.phone }}</span></div>
+                    <div class="pf-print-row"><span class="pf-print-key">Email</span><span class="pf-print-val">{{ guest.email or '—' }}</span></div>
+                    <div class="pf-print-row"><span class="pf-print-key">Company</span><span class="pf-print-val">{{ guest.company or '—' }}</span></div>
+                    <div class="pf-print-row"><span class="pf-print-key">Address</span><span class="pf-print-val">{{ guest.address or '—' }}</span></div>
+                </div>
+                <div class="pf-print-section">
+                    <h4>Location</h4>
+                    <div class="pf-print-row"><span class="pf-print-key">Country</span><span class="pf-print-val">{{ guest.country or '—' }}</span></div>
+                    <div class="pf-print-row"><span class="pf-print-key">State</span><span class="pf-print-val">{{ guest.state or '—' }}</span></div>
+                    <div class="pf-print-row"><span class="pf-print-key">City</span><span class="pf-print-val">{{ guest.city or '—' }}</span></div>
+                    <div class="pf-print-row"><span class="pf-print-key">Pin Code</span><span class="pf-print-val">{{ guest.pin_code or '—' }}</span></div>
+                </div>
+                <div class="pf-print-section">
+                    <h4>ID Verification</h4>
+                    <div class="pf-print-row"><span class="pf-print-key">ID Type</span><span class="pf-print-val">{{ guest.id_proof_type or '—' }}</span></div>
+                    <div class="pf-print-row"><span class="pf-print-key">ID Number</span><span class="pf-print-val">{{ guest.id_proof_number or '—' }}</span></div>
+                    {% if primary_doc %}
+                    <div class="pf-print-id-imgs">
+                        {% if primary_doc.front_image_path %}
+                        <div>
+                            <img class="pf-print-id-img" src="{{ url_for('main.serve_private_upload', filepath=primary_doc.front_image_path) }}" alt="ID Front">
+                            <div class="pf-print-id-lbl">Front</div>
+                        </div>
+                        {% endif %}
+                        {% if primary_doc.back_image_path %}
+                        <div>
+                            <img class="pf-print-id-img" src="{{ url_for('main.serve_private_upload', filepath=primary_doc.back_image_path) }}" alt="ID Back">
+                            <div class="pf-print-id-lbl">Back</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div>
+                <div class="pf-print-section">
+                    <h4>Profile Photo</h4>
+                    {% if photo_path %}
+                    <img class="pf-print-photo" src="{{ url_for('static', filename=photo_path) }}" alt="{{ guest.name }}">
+                    {% else %}
+                    <div class="pf-print-photo-init">{{ initials }}</div>
+                    {% endif %}
+                </div>
+                <div class="pf-print-section">
+                    <h4>Account Summary</h4>
+                    <div class="pf-print-row"><span class="pf-print-key">Guest Since</span><span class="pf-print-val">{{ guest.created_at.strftime('%d %b %Y') if guest.created_at else '—' }}</span></div>
+                    <div class="pf-print-row"><span class="pf-print-key">Total Visits</span><span class="pf-print-val">{{ total_visits }}</span></div>
+                    <div class="pf-print-row"><span class="pf-print-key">Lifetime Spend</span><span class="pf-print-val">₹{{ '{:,.0f}'.format(lifetime_spend) }}</span></div>
+                    <div class="pf-print-row"><span class="pf-print-key">Total Paid</span><span class="pf-print-val">₹{{ '{:,.0f}'.format(total_paid_all) }}</span></div>
+                    {% if outstanding_bal > 0.01 %}
+                    <div class="pf-print-row"><span class="pf-print-key">Outstanding</span><span class="pf-print-val">₹{{ '{:,.0f}'.format(outstanding_bal) }}</span></div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="pf-print-footer">Printed from {{ config.HOTEL_NAME }} PMS &bull; {{ guest.name }} &bull; F{{ '%04d' % guest.id }}</div>
+    </div>
+
+    {# ── PANEL 2: Visit History ──────────────────── #}
+    <div class="gp-panel" id="panel-history">
+        {% if history_rows %}
+        {# Summary ribbon #}
+        {% set tb = history_rows | map(attribute='billing') | map(attribute='total') | sum %}
+        {% set tp = history_rows | map(attribute='billing') | map(attribute='paid')  | sum %}
+        <div class="d-flex gap-3 flex-wrap mb-3" style="font-size:.8rem">
+            <span class="text-muted">{{ history_rows|length }} stays</span>
+            <span>Total: <strong>₹{{ '{:,.0f}'.format(tb) }}</strong></span>
+            <span class="text-success">Paid: <strong>₹{{ '{:,.0f}'.format(tp) }}</strong></span>
+        </div>
+        <div class="table-responsive">
+        <table class="table gp-history-table mb-0">
+            <thead>
+                <tr>
+                    <th>Dates</th>
+                    <th>Room</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th class="text-end">Charged</th>
+                    <th class="text-end">Paid</th>
+                    <th class="text-end">Balance</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in history_rows %}
+                {% set res = row.reservation %}
+                {% set b   = row.billing %}
+                {% set s   = res.status %}
+                {% set nights = (res.departure_date - res.arrival_date).days %}
+                <tr>
+                    <td>
+                        <div class="fw-semibold" style="white-space:nowrap">{{ res.arrival_date.strftime('%d %b %Y') }}</div>
+                        <div class="text-muted" style="font-size:.72rem">→ {{ res.departure_date.strftime('%d %b %Y') }}</div>
+                        <div class="text-muted" style="font-size:.7rem">{{ nights }}N</div>
+                    </td>
+                    <td>{{ res.room.room_number if res.room else '—' }}</td>
+                    <td style="font-size:.78rem">{{ res.room_type.name }}</td>
+                    <td>
+                        <span class="sp {% if s=='CheckedIn' %}ci{% elif s=='CheckedOut' %}co{% elif s in ('Reserved','Confirmed') %}res{% elif s=='NoShow' %}ns{% else %}can{% endif %}">{{ s }}</span>
+                    </td>
+                    <td class="text-end fw-semibold">₹{{ '{:,.0f}'.format(b.total) }}</td>
+                    <td class="text-end text-success fw-semibold">₹{{ '{:,.0f}'.format(b.paid) }}</td>
+                    <td class="text-end">
+                        {% if b.balance > 0.01 %}<span class="bal-chip due">₹{{ '{:,.0f}'.format(b.balance) }}</span>
+                        {% elif b.balance < -0.01 %}<span class="bal-chip partial">Overpaid</span>
+                        {% else %}<span class="bal-chip settled">Settled</span>{% endif %}
+                    </td>
+                    <td class="text-center">
+                        <div class="d-flex gap-1 justify-content-center">
+                            <a href="{{ url_for('main.reservation_folio', reservation_id=res.id) }}" class="row-act folio"><i class="bi bi-wallet2"></i> Folio</a>
+                            <a href="{{ url_for('main.invoice', reservation_id=res.id) }}" class="row-act invoice"><i class="bi bi-receipt"></i> Invoice</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        {% else %}
+        <div class="gp-empty"><i class="bi bi-calendar-x"></i>No visits recorded.</div>
+        {% endif %}
+    </div>
+
+    {# ── PANEL 3: Latest Invoice ─────────────────── #}
+    <div class="gp-panel" id="panel-invoice">
+        {% if last_stay and latest_billing %}
+        <div class="gp-inv-header">
+            <div>
+                <div class="text-muted" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;font-weight:700">Latest Invoice</div>
+                {% if last_stay.invoice_number %}
+                <div class="gp-inv-no">{{ last_stay.invoice_number }}</div>
+                {% else %}
+                <div class="gp-inv-no text-muted" style="font-size:.85rem">Not yet generated</div>
+                {% endif %}
+                <div style="font-size:.78rem;color:#64748b;margin-top:3px">
+                    {{ last_stay.arrival_date.strftime('%d %b %Y') }} — {{ last_stay.departure_date.strftime('%d %b %Y') }}
+                    &bull; {{ last_stay.room_type.name }}
+                    {% if last_stay.room %}&bull; Room {{ last_stay.room.room_number }}{% endif %}
+                </div>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{{ url_for('main.invoice', reservation_id=last_stay.id) }}" class="gp-panel-btn primary">
+                    <i class="bi bi-receipt"></i> Open Full Invoice
+                </a>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+        <table class="table table-bordered table-sm gp-inv-table mb-0">
+            <thead><tr><th>Description</th><th class="text-end" style="width:130px">Amount (₹)</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td>
+                        Room Accommodation
+                        <span style="font-size:.72rem;color:#64748b">
+                            ({{ (last_stay.departure_date - last_stay.arrival_date).days }}
+                            {{ 'hr' if last_stay.booking_type == 'Hourly' else 'nights' }}
+                            × ₹{{ '{:,.0f}'.format(last_stay.rate_per_night) }})
+                        </span>
+                    </td>
+                    <td class="text-end fw-semibold">₹{{ '{:,.2f}'.format(latest_billing.room_charges) }}</td>
+                </tr>
+                {# Skip night-audit room_rent rows — room revenue is the
+                   row above; without this filter each night would show
+                   twice on the folio. #}
+                {% for ec in last_stay.extra_charges if (ec.charge_type or '') != 'room_rent' %}
+                <tr>
+                    <td>{{ ec.description }}
+                        {% if ec.charge_type == 'early_checkin' %}<span class="badge bg-info text-dark ms-1" style="font-size:.65rem;">Early CI</span>
+                        {% elif ec.charge_type == 'late_checkout' %}<span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">Late CO</span>
+                        {% endif %}
+                        <span style="font-size:.72rem;color:#64748b">({{ ec.charge_date.strftime('%d %b') }})</span>
+                    </td>
+                    <td class="text-end fw-semibold">₹{{ '{:,.2f}'.format(ec.amount) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr><td class="text-end fw-semibold" style="background:#f8fafc">Sub-total:</td><td class="text-end fw-semibold" style="background:#f8fafc">₹{{ '{:,.2f}'.format(latest_billing.total) }}</td></tr>
+                {% if latest_billing.gst_amount > 0 %}
+                <tr><td class="text-end text-muted" style="background:#f8fafc; font-size:.82rem">GST:</td><td class="text-end text-muted" style="background:#f8fafc; font-size:.82rem">₹{{ '{:,.2f}'.format(latest_billing.gst_amount) }}</td></tr>
+                {% endif %}
+                <tr><td class="text-end fw-semibold" style="background:#f8fafc">Amount Paid:</td><td class="text-end text-success fw-semibold" style="background:#f8fafc">₹{{ '{:,.2f}'.format(latest_billing.paid) }}</td></tr>
+                <tr class="gp-inv-grand"><td class="text-end">Grand Total</td><td class="text-end" style="font-size:1rem">₹{{ '{:,.2f}'.format(latest_billing.grand_total) }}</td></tr>
+            </tfoot>
+        </table>
+        </div>
+
+        {% set bc = 'settled' if latest_billing.balance <= 0.01 and latest_billing.balance >= -0.01 else 'due' if latest_billing.balance > 0.01 else 'overpaid' %}
+        <div class="gp-balance-block {{ bc }}">
+            <div>
+                <div class="gp-bal-label {{ bc }}">
+                    {% if bc == 'settled' %}<i class="bi bi-check-circle-fill me-1"></i>Payment Settled
+                    {% elif bc == 'due' %}<i class="bi bi-exclamation-circle-fill me-1"></i>Balance Due
+                    {% else %}<i class="bi bi-info-circle-fill me-1"></i>Overpaid{% endif %}
+                </div>
+                <div class="gp-bal-amount {{ bc }}">
+                    {% if bc == 'settled' %}₹0.00
+                    {% elif bc == 'due' %}₹{{ '{:,.2f}'.format(latest_billing.balance) }}
+                    {% else %}₹{{ '{:,.2f}'.format(latest_billing.balance | abs) }}{% endif %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="gp-empty"><i class="bi bi-receipt"></i>No invoice available yet.</div>
+        {% endif %}
+    </div>
+
+    {# ── PANEL 4: Latest Folio ──────────────────── #}
+    <div class="gp-panel" id="panel-folio">
+        {% if last_stay and latest_billing %}
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+            <div>
+                <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8">Latest Folio</div>
+                <div style="font-size:.82rem;color:#64748b">
+                    {{ last_stay.arrival_date.strftime('%d %b %Y') }} — {{ last_stay.departure_date.strftime('%d %b %Y') }}
+                    &bull; {{ last_stay.room_type.name }}
+                </div>
+            </div>
+            <a href="{{ url_for('main.reservation_folio', reservation_id=last_stay.id) }}" class="gp-panel-btn primary">
+                <i class="bi bi-wallet2"></i> Open Full Folio
+            </a>
+        </div>
+
+        {# Stay tiles #}
+        <div class="gp-folio-tiles">
+            <div class="gp-folio-tile">
+                <div class="gp-tile-lbl">Check-in</div>
+                <div class="gp-tile-val">{{ last_stay.arrival_date.strftime('%d %b %Y') }}</div>
+            </div>
+            <div class="gp-folio-tile">
+                <div class="gp-tile-lbl">Check-out</div>
+                <div class="gp-tile-val">{{ last_stay.departure_date.strftime('%d %b %Y') }}</div>
+            </div>
+            <div class="gp-folio-tile">
+                <div class="gp-tile-lbl">Duration</div>
+                <div class="gp-tile-val">{{ (last_stay.departure_date - last_stay.arrival_date).days }}N</div>
+            </div>
+            <div class="gp-folio-tile">
+                <div class="gp-tile-lbl">Room</div>
+                <div class="gp-tile-val">{{ last_stay.room.room_number if last_stay.room else '—' }}</div>
+            </div>
+            <div class="gp-folio-tile">
+                <div class="gp-tile-lbl">Room Charges</div>
+                <div class="gp-tile-val">₹{{ '{:,.0f}'.format(latest_billing.room_charges) }}</div>
+            </div>
+            <div class="gp-folio-tile">
+                <div class="gp-tile-lbl">Extra Charges</div>
+                <div class="gp-tile-val">₹{{ '{:,.0f}'.format(latest_billing.extra_charges) }}</div>
+            </div>
+        </div>
+
+        {# Payments #}
+        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#94a3b8;margin-bottom:8px">Payments</div>
+        <div class="table-responsive">
+        <table class="table table-sm table-bordered mb-0" style="font-size:.82rem">
+            <thead class="table-light">
+                <tr><th>Date</th><th>Mode</th><th>Reference</th><th class="text-end">Amount</th></tr>
+            </thead>
+            <tbody>
+                {% for p in last_stay.payments %}
+                <tr class="{{ 'voided-row' if p.is_voided else '' }}">
+                    <td>{{ p.payment_date.strftime('%d %b %Y') }}</td>
+                    <td>{{ p.payment_mode.name }}</td>
+                    <td class="text-muted" style="font-size:.75rem">
+                        {{ p.reference_number or '—' }}
+                        {% if p.is_voided %}<span class="badge bg-secondary ms-1" style="font-size:.58rem">VOID</span>{% endif %}
+                    </td>
+                    <td class="text-end fw-semibold">₹{{ '{:,.2f}'.format(p.amount) }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="text-center text-muted">No payments recorded.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+
+        {% set bc = 'settled' if latest_billing.balance <= 0.01 and latest_billing.balance >= -0.01 else 'due' if latest_billing.balance > 0.01 else 'overpaid' %}
+        <div class="gp-balance-block {{ bc }}">
+            <div>
+                <div class="gp-bal-label {{ bc }}">
+                    {% if bc == 'settled' %}<i class="bi bi-check-circle-fill me-1"></i>Fully Settled
+                    {% elif bc == 'due' %}<i class="bi bi-exclamation-circle-fill me-1"></i>Balance Due
+                    {% else %}<i class="bi bi-info-circle-fill me-1"></i>Overpaid{% endif %}
+                </div>
+                <div class="gp-bal-amount {{ bc }}">
+                    {% if bc == 'settled' %}₹0.00
+                    {% elif bc == 'due' %}₹{{ '{:,.2f}'.format(latest_billing.balance) }}
+                    {% else %}₹{{ '{:,.2f}'.format(latest_billing.balance | abs) }}{% endif %}
+                </div>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{{ url_for('main.invoice', reservation_id=last_stay.id) }}" class="gp-panel-btn">
+                    <i class="bi bi-receipt"></i> Invoice
+                </a>
+                <a href="{{ url_for('main.reservation_folio', reservation_id=last_stay.id) }}" class="gp-panel-btn primary">
+                    <i class="bi bi-wallet2"></i> Full Folio
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div class="gp-empty"><i class="bi bi-wallet2"></i>No folio data available.</div>
+        {% endif %}
+    </div>
+
+
+    {# ── PANEL 5: All Folios ─────────────────────── #}
+    <div class="gp-panel" id="panel-allfolios">
+        {% if history_rows %}
+        {% for row in history_rows %}
+        {% set res = row.reservation %}
+        {% set b   = row.billing %}
+        {% set s   = res.status %}
+        {% set nights = (res.departure_date - res.arrival_date).days %}
+        {% set bc = 'settled' if b.balance <= 0.01 and b.balance >= -0.01 else 'due' if b.balance > 0.01 else 'overpaid' %}
+        <div class="gp-folio-card">
+            <div class="gp-folio-card-head">
+                <div>
+                    <div class="gp-folio-dates">
+                        {{ res.arrival_date.strftime('%d %b %Y') }} &rarr; {{ res.departure_date.strftime('%d %b %Y') }}
+                    </div>
+                    <div class="gp-folio-sub">
+                        {{ nights }}&nbsp;{{ 'hr' if res.booking_type == 'Hourly' else ('Night' if nights == 1 else 'Nights') }}
+                        &bull; {{ res.room_type.name }}
+                        {% if res.room %}&bull; Room {{ res.room.room_number }}{% endif %}
+                    </div>
+                </div>
+                <span class="sp ms-auto {% if s=='CheckedIn' %}ci{% elif s=='CheckedOut' %}co{% elif s in ('Reserved','Confirmed') %}res{% elif s=='NoShow' %}ns{% else %}can{% endif %}">{{ s }}</span>
+                {% if res.invoice_number %}
+                <span style="font-size:.68rem;color:#1967d2;font-weight:700;font-family:monospace">{{ res.invoice_number }}</span>
+                {% endif %}
+            </div>
+            <div class="gp-folio-card-body">
+                <div class="gp-fc-item">
+                    <div class="gp-fc-lbl">Room Charges</div>
+                    <div class="gp-fc-val">₹{{ '{:,.0f}'.format(b.room_charges) }}</div>
+                </div>
+                <div class="gp-fc-item">
+                    <div class="gp-fc-lbl">Extra Charges</div>
+                    <div class="gp-fc-val">₹{{ '{:,.0f}'.format(b.extra_charges) }}</div>
+                </div>
+                <div class="gp-fc-item">
+                    <div class="gp-fc-lbl">Total</div>
+                    <div class="gp-fc-val fw-bold">₹{{ '{:,.0f}'.format(b.total) }}</div>
+                </div>
+                <div class="gp-fc-item">
+                    <div class="gp-fc-lbl">Paid</div>
+                    <div class="gp-fc-val settled">₹{{ '{:,.0f}'.format(b.paid) }}</div>
+                </div>
+                <div class="gp-fc-item">
+                    <div class="gp-fc-lbl">Balance</div>
+                    <div class="gp-fc-val {{ bc }}">
+                        {% if bc == 'settled' %}Settled
+                        {% elif bc == 'due' %}₹{{ '{:,.0f}'.format(b.balance) }} Due
+                        {% else %}₹{{ '{:,.0f}'.format(b.balance|abs) }} Overpaid{% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="gp-folio-card-foot">
+                <a href="{{ url_for('main.reservation_folio', reservation_id=res.id) }}" class="row-act folio">
+                    <i class="bi bi-wallet2"></i> View Folio
+                </a>
+                <a href="{{ url_for('main.invoice', reservation_id=res.id) }}" class="row-act invoice">
+                    <i class="bi bi-receipt"></i> Invoice
+                </a>
+                {% if bc == 'due' %}
+                <span class="ms-auto" style="font-size:.72rem">
+                    <span class="bal-chip due">₹{{ '{:,.0f}'.format(b.balance) }} outstanding</span>
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="gp-empty"><i class="bi bi-journals"></i>No folios available yet.</div>
+        {% endif %}
+    </div>
+
+    {# ── PANEL 6: Documents ──────────────────────── #}
+    <div class="gp-panel" id="panel-documents">
+        {% set docs = guest.id_documents | sort(attribute='created_at', reverse=True) %}
+
+        {# Primary ID from guest profile #}
+        {% if guest.id_proof_type or guest.id_proof_number %}
+        <div class="d-flex align-items-center gap-2 mb-3 p-3"
+             style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:.82rem">
+            <i class="bi bi-person-badge text-primary"></i>
+            <span class="text-muted">Primary ID on profile:</span>
+            <strong>{{ guest.id_proof_type or '—' }}</strong>
+            <span class="text-muted">&bull;</span>
+            <span style="font-family:monospace;font-size:.8rem">{{ guest.id_proof_number or '—' }}</span>
+        </div>
+        {% endif %}
+
+        {% if docs %}
+        <div class="gp-doc-grid">
+            {% for doc in docs %}
+            {% set dtype = doc.document_type | lower %}
+            {% set badge_cls = 'aadhar' if 'aadhar' in dtype or 'aadhaar' in dtype else
+                               'passport' if 'passport' in dtype else
+                               'dl' if 'driv' in dtype or ' dl' in dtype or dtype == 'dl' else
+                               'voter' if 'voter' in dtype else
+                               'pan' if 'pan' in dtype else 'other' %}
+            <div class="gp-doc-card">
+                <div class="gp-doc-head">
+                    <span class="gp-doc-type-badge {{ badge_cls }}">
+                        <i class="bi bi-{% if badge_cls=='aadhar' %}fingerprint{% elif badge_cls=='passport' %}globe{% elif badge_cls=='dl' %}car-front{% elif badge_cls=='voter' %}person-check{% elif badge_cls=='pan' %}credit-card{% else %}file-earmark-text{% endif %}"></i>
+                        {{ doc.document_type }}
+                    </span>
+                    {% set vs = doc.verification_status | lower %}
+                    <span class="gp-vstatus {% if vs=='verified' %}verified{% elif vs=='rejected' %}rejected{% else %}pending{% endif %}">
+                        <i class="bi bi-{% if vs=='verified' %}check-circle-fill{% elif vs=='rejected' %}x-circle-fill{% else %}clock{% endif %}"></i>
+                        {{ doc.verification_status }}
+                    </span>
+                </div>
+                <div class="gp-doc-body">
+                    <div class="gp-doc-number mb-2">{{ doc.document_number }}</div>
+                    <div class="gp-doc-images">
+                        {# Front image #}
+                        <div class="gp-doc-img-wrap">
+                            {% if doc.front_image_path %}
+                            <img src="{{ url_for('main.serve_private_upload', filepath=doc.front_image_path) }}"
+                                 alt="Front" loading="lazy"
+                                 onclick="gpLightbox(this.src)">
+                            <div class="gp-doc-img-label">Front</div>
+                            {% else %}
+                            <div class="gp-doc-img-placeholder">
+                                <i class="bi bi-image"></i>No front image
+                            </div>
+                            {% endif %}
+                        </div>
+                        {# Back image #}
+                        <div class="gp-doc-img-wrap">
+                            {% if doc.back_image_path %}
+                            <img src="{{ url_for('main.serve_private_upload', filepath=doc.back_image_path) }}"
+                                 alt="Back" loading="lazy"
+                                 onclick="gpLightbox(this.src)">
+                            <div class="gp-doc-img-label">Back</div>
+                            {% else %}
+                            <div class="gp-doc-img-placeholder">
+                                <i class="bi bi-image"></i>No back image
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="gp-doc-meta">
+                        <span><i class="bi bi-calendar3 me-1"></i>{{ doc.created_at.strftime('%d %b %Y') }}</span>
+                        {% if doc.front_image_path or doc.back_image_path %}
+                        <span><i class="bi bi-paperclip me-1"></i>{{ (1 if doc.front_image_path else 0) + (1 if doc.back_image_path else 0) }} image(s)</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="gp-empty">
+            <i class="bi bi-file-earmark-person"></i>
+            No documents uploaded yet.<br>
+            <span style="font-size:.78rem">Upload documents during check-in or via the express check-in flow.</span>
+        </div>
+        {% endif %}
+    </div>
+
+</div>{# /gp-panels #}
+
+{# ── Lightbox ────────────────────────────────────────────────── #}
+<div id="gp-lightbox" onclick="this.classList.remove('open')">
+    <img id="gp-lightbox-img" src="" alt="Document">
+</div>
+
+</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script nonce="{{ csp_nonce }}">
+(function () {
+
+    /* ── Tab switching ── */
+    const tabs   = document.querySelectorAll('.gp-tab[data-tab]');
+    const panels = document.querySelectorAll('.gp-panel');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const target = tab.dataset.tab;
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            panels.forEach(p => p.classList.remove('active'));
+            const panel = document.getElementById('panel-' + target);
+            if (panel) panel.classList.add('active');
+        });
+    });
+
+    /* ── Lightbox ── */
+    window.gpLightbox = function (src) {
+        document.getElementById('gp-lightbox-img').src = src;
+        document.getElementById('gp-lightbox').classList.add('open');
+    };
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') document.getElementById('gp-lightbox').classList.remove('open');
+    });
+
+    /* ── Profile edit mode ── */
+    const EDIT_VIEWS  = ['pf-view-basic', 'pf-view-id', 'pf-view-corporate', 'pf-view-additional'];
+    const EDIT_BODIES = ['pf-edit-basic', 'pf-edit-id', 'pf-edit-corporate', 'pf-edit-additional'];
+
+    function pfEnterEdit() {
+        EDIT_VIEWS.forEach(id  => document.getElementById(id).style.display  = 'none');
+        EDIT_BODIES.forEach(id => document.getElementById(id).style.display  = 'block');
+        document.getElementById('pf-save-bar').style.display     = 'flex';
+        document.getElementById('pf-view-actions').style.display = 'none';
+    }
+
+    function pfCancelEdit() {
+        EDIT_BODIES.forEach(id => document.getElementById(id).style.display  = 'none');
+        EDIT_VIEWS.forEach(id  => document.getElementById(id).style.display  = '');
+        document.getElementById('pf-save-bar').style.display     = 'none';
+        document.getElementById('pf-view-actions').style.display = '';
+    }
+
+    function pfSaveChanges() {
+        const btn  = document.getElementById('pf-save-btn');
+        const orig = btn.innerHTML;
+
+        const firstName = document.getElementById('pf-i-firstname').value.trim();
+        const lastName  = document.getElementById('pf-i-lastname').value.trim();
+        const name      = lastName ? firstName + ' ' + lastName : firstName;
+        const phone = document.getElementById('pf-i-phone').value.trim();
+        if (!firstName) { pfShowAlert('First name is required.', 'error'); return; }
+        if (!phone) { pfShowAlert('Mobile number is required.', 'error'); return; }
+
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving…';
+        btn.disabled  = true;
+
+        const corpToggle = document.getElementById('pf-corp-toggle');
+        const corpSelect = document.getElementById('pf-corp-select');
+        const corpRef    = document.getElementById('pf-corp-ref');
+        const isCorp     = corpToggle ? corpToggle.checked : false;
+        const corpId     = corpSelect ? corpSelect.value : '';
+
+        const payload = {
+            name,
+            phone,
+            email          : document.getElementById('pf-i-email').value.trim(),
+            company        : document.getElementById('pf-i-company').value.trim(),
+            address        : document.getElementById('pf-i-address').value.trim(),
+            country        : document.getElementById('pf-i-country').value.trim(),
+            state          : document.getElementById('pf-i-state').value.trim(),
+            city           : document.getElementById('pf-i-city').value.trim(),
+            pin_code       : document.getElementById('pf-i-pincode').value.trim(),
+            id_proof_type  : document.getElementById('pf-i-idtype').value.trim(),
+            id_proof_number: document.getElementById('pf-i-idnum').value.trim(),
+            // Corporate billing
+            is_corporate        : isCorp,
+            company_id          : corpId || null,
+            company_billing_ref : corpRef ? corpRef.value.trim() : '',
+        };
+
+        fetch('/api/guest/{{ guest.id }}/update', {
+            method : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body   : JSON.stringify(payload)
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                _set('pf-d-firstname', firstName,  false);
+                _set('pf-d-lastname',  lastName || '—', !lastName);
+                _set('pf-d-phone',   payload.phone,                       false);
+                _set('pf-d-email',   payload.email    || 'Not provided',  !payload.email);
+                _set('pf-d-company', payload.company  || '—',             !payload.company);
+                _set('pf-d-address', payload.address  || '—',             !payload.address);
+                _set('pf-d-idtype',  payload.id_proof_type   || 'Not set',!payload.id_proof_type);
+                _set('pf-d-idnum',   payload.id_proof_number || '—',      !payload.id_proof_number);
+                _set('pf-d-country', payload.country  || '—',             !payload.country);
+                _set('pf-d-state',   payload.state    || '—',             !payload.state);
+                _set('pf-d-city',    payload.city     || '—',             !payload.city);
+                _set('pf-d-pincode', payload.pin_code || '—',             !payload.pin_code);
+                const nameEl = document.querySelector('.gp-guest-name');
+                if (nameEl) nameEl.textContent = payload.name;
+                pfCancelEdit();
+                pfShowAlert('Profile updated successfully!', 'success');
+            } else {
+                pfShowAlert(data.error || 'Update failed. Please try again.', 'error');
+            }
+        })
+        .catch(() => pfShowAlert('Network error. Please try again.', 'error'))
+        .finally(() => { btn.innerHTML = orig; btn.disabled = false; });
+    }
+
+    function _set(id, text, isEmpty) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = text;
+        el.classList.toggle('empty', isEmpty);
+    }
+
+    function pfShowAlert(msg, type) {
+        const el = document.getElementById('pf-alert');
+        if (!el) return;
+        el.textContent   = msg;
+        el.className     = 'pf-alert ' + type;
+        el.style.display = 'block';
+        setTimeout(() => { el.style.display = 'none'; }, 4000);
+    }
+
+    /* ── Wire up all profile buttons via addEventListener ── */
+    document.addEventListener('DOMContentLoaded', function () {
+        const updateBtn = document.getElementById('pf-update-btn');
+        const pdfBtn    = document.getElementById('pf-pdf-btn');
+        const saveBtn   = document.getElementById('pf-save-btn');
+        const cancelBtn = document.getElementById('pf-cancel-btn');
+
+        if (updateBtn) updateBtn.addEventListener('click', pfEnterEdit);
+        if (pdfBtn)    pdfBtn.addEventListener('click', function () { window.print(); });
+        if (saveBtn)   saveBtn.addEventListener('click', pfSaveChanges);
+        if (cancelBtn) cancelBtn.addEventListener('click', pfCancelEdit);
+
+        // "Go to Documents" links
+        document.querySelectorAll('.pf-goto-docs').forEach(function (el) {
+            el.addEventListener('click', function (e) {
+                e.preventDefault();
+                const docsTab = document.querySelector('.gp-tab[data-tab="documents"]');
+                if (docsTab) docsTab.click();
+            });
+        });
+
+        /* ── Company / Corporate Billing ── */
+        const corpToggle = document.getElementById('pf-corp-toggle');
+        const corpFields = document.getElementById('pf-corp-fields');
+        const corpSelect = document.getElementById('pf-corp-select');
+        const corpCredit = document.getElementById('pf-corp-credit');
+
+        if (corpToggle) {
+            corpToggle.addEventListener('change', function () {
+                corpFields.style.display = this.checked ? 'block' : 'none';
+                if (!this.checked && corpCredit) corpCredit.style.display = 'none';
+            });
+        }
+
+        if (corpSelect) {
+            corpSelect.addEventListener('change', function () {
+                const opt = this.options[this.selectedIndex];
+                if (!opt || !opt.value) { corpCredit.style.display = 'none'; return; }
+                const limit = parseFloat(opt.dataset.limit || 0);
+                const used  = parseFloat(opt.dataset.used  || 0);
+                const avail = limit - used;
+                corpCredit.style.display = 'block';
+                corpCredit.innerHTML =
+                    '<i class="bi bi-building me-1 text-primary"></i><strong>' + opt.text + '</strong>' +
+                    '&ensp;|&ensp;Limit: <strong>₹' + limit.toLocaleString('en-IN') + '</strong>' +
+                    '&ensp;Used: <strong>₹' + used.toLocaleString('en-IN') + '</strong>' +
+                    '&ensp;Available: <strong style="color:' + (avail > 0 ? '#166534' : '#991b1b') + '">' +
+                    '₹' + avail.toLocaleString('en-IN') + '</strong>';
+                // Also auto-fill guest company text field if empty
+                const compInput = document.getElementById('pf-i-company');
+                if (compInput && !compInput.value.trim()) compInput.value = opt.text;
+            });
+            // Trigger on load if already selected
+            if (corpSelect.value) corpSelect.dispatchEvent(new Event('change'));
+        }
+
+        /* ── Document Upload ── */
+        // Collapsible toggle
+        const docHead    = document.getElementById('pf-doc-toggle-head');
+        const docBody    = document.getElementById('pf-doc-body');
+        const docChevron = document.getElementById('pf-doc-chevron');
+        if (docHead) {
+            docHead.addEventListener('click', function () {
+                const open = docBody.style.display !== 'none';
+                docBody.style.display = open ? 'none' : 'block';
+                docChevron.style.transform = open ? '' : 'rotate(180deg)';
+            });
+        }
+
+        // Image preview on file select
+        function previewFile(inputId, imgId, wrapId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            input.addEventListener('change', function () {
+                const file = this.files[0];
+                if (!file || !file.type.startsWith('image/')) return;
+                const wrap = document.getElementById(wrapId);
+                const img  = document.getElementById(imgId);
+                const reader = new FileReader();
+                reader.onload = function (e) { img.src = e.target.result; wrap.style.display = 'block'; };
+                reader.readAsDataURL(file);
+            });
+        }
+        previewFile('pf-doc-front', 'pf-front-img', 'pf-front-preview');
+        previewFile('pf-doc-back',  'pf-back-img',  'pf-back-preview');
+
+        // Upload button
+        const docUploadBtn = document.getElementById('pf-doc-upload-btn');
+        const docAlert     = document.getElementById('pf-doc-alert');
+
+        function showDocAlert(msg, type) {
+            if (!docAlert) return;
+            docAlert.textContent   = msg;
+            docAlert.className     = 'pf-alert ' + type;
+            docAlert.style.display = 'block';
+            setTimeout(function () { docAlert.style.display = 'none'; }, 5000);
+        }
+
+        if (docUploadBtn) {
+            docUploadBtn.addEventListener('click', function () {
+                const docType      = document.getElementById('pf-doc-type').value;
+                const docNumber    = document.getElementById('pf-doc-number').value.trim();
+                const frontFile    = document.getElementById('pf-doc-front').files[0];
+                const backFile     = document.getElementById('pf-doc-back').files[0];
+                const existingIdEl = document.getElementById('pf-doc-existing-id');
+                const existingId   = existingIdEl ? existingIdEl.value : '';
+
+                if (!docType)   { showDocAlert('Please select a document type.', 'error'); return; }
+                if (!docNumber) { showDocAlert('Document number is required.', 'error'); return; }
+                if (!frontFile && !backFile) {
+                    showDocAlert('Please select at least one image to upload.', 'error'); return;
+                }
+
+                const origHtml = docUploadBtn.innerHTML;
+                docUploadBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Uploading…';
+                docUploadBtn.disabled = true;
+
+                const fd = new FormData();
+                fd.append('document_type',   docType);
+                fd.append('document_number', docNumber);
+                if (frontFile)  fd.append('front_image', frontFile);
+                if (backFile)   fd.append('back_image',  backFile);
+                if (existingId) fd.append('existing_doc_id', existingId);
+
+                fetch('/api/guest/{{ guest.id }}/id-document', { method: 'POST', body: fd })
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    if (data.success) {
+                        // Build status message based on what's now complete
+                        var msg = 'Document updated. ';
+                        if (data.front_uploaded && data.back_uploaded) {
+                            msg += 'Both front and back images are now on record.';
+                        } else if (data.front_uploaded) {
+                            msg += 'Front uploaded. Back image is still pending.';
+                        } else if (data.back_uploaded) {
+                            msg += 'Back uploaded. Front image is still pending.';
+                        }
+                        showDocAlert(msg, 'success');
+                        // Clear file inputs + previews; refresh page after short delay
+                        document.getElementById('pf-doc-front').value = '';
+                        document.getElementById('pf-doc-back').value  = '';
+                        document.getElementById('pf-front-preview').style.display = 'none';
+                        document.getElementById('pf-back-preview').style.display  = 'none';
+                        setTimeout(function () { window.location.reload(); }, 2000);
+                    } else {
+                        showDocAlert(data.error || 'Upload failed. Please try again.', 'error');
+                    }
+                })
+                .catch(function () { showDocAlert('Network error. Please try again.', 'error'); })
+                .finally(function () { docUploadBtn.innerHTML = origHtml; docUploadBtn.disabled = false; });
+            });
+        }
+
+        // Lightbox for existing uploaded thumbnails in the upload section
+        document.querySelectorAll('.pf-doc-lb-wrap').forEach(function (wrap) {
+            wrap.addEventListener('click', function () {
+                var src = this.dataset.src;
+                if (src) gpLightbox(src);
+            });
+        });
+    });
+
+})();
+</script>
+{% endblock %}

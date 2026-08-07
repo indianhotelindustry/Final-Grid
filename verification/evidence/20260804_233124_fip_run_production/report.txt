@@ -1,0 +1,187 @@
+====================================================================================================
+DSBC FRONTLINE — FAULT INJECTION PLATFORM RUN
+Production Verification Framework, Wave 0 Deliverable 5
+====================================================================================================
+Started         : 2026-08-04T23:31:24
+Duration        : 270.5s
+PVF             : v0.4.0
+Mode            : BATCH
+Layers swept    : D1_PARITY, D2_GOLDEN, D3_REPLAY, D4_INVARIANTS (parallel)
+VERDICT         : ERROR
+
+----------------------------------------------------------------------------------------------------
+ISOLATION — verified, not asserted
+----------------------------------------------------------------------------------------------------
+Production      : C:\Users\SIPL Server\Downloads\DSS\SukoonPMS\SukoonPMS\instance\pms.db
+  sha256 before : f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c
+  sha256 after  : f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c
+  unchanged     : True
+Baseline sha256 : d630f730a91133916ee3f76878c2cdd2b7930ec9ad745e571f81be78cdd08413
+  unchanged     : True
+Copies removed  : 36
+Copies remaining: 0
+Isolation       : VERIFIED
+
+----------------------------------------------------------------------------------------------------
+SUMMARY
+----------------------------------------------------------------------------------------------------
+  registered              : 40
+  challenged              : 40
+  detected                : 35
+  MISSED                  : 4
+  errors                  : 1
+  uncovered (not injected): 4
+
+  attributions per layer:
+      D1_PARITY         13
+      D2_GOLDEN          3
+      D3_REPLAY         19
+      D4_INVARIANTS     26
+
+----------------------------------------------------------------------------------------------------
+DETECTION MATRIX
+----------------------------------------------------------------------------------------------------
+ATTR = attributed at the declared target      MISS = expected, silent
+UNAT = moved, but not where declared          unex = undeclared layer moved
+ --  = correctly silent (this is what makes attribution possible)
+
+FAULT      SEV            D1     D2     D3     D4   TITLE
+FLT-A01    CRITICAL     ATTR   unex   ATTR   ATTR   Walk-in reservation settled through an OTA r
+FLT-A02    HIGH          --    unex    --    ATTR   Corporate booking with no company account be
+FLT-A03    CRITICAL     ATTR   unex   ATTR   ATTR   Duplicate payment posted for the same settle
+FLT-A04    HIGH          --    unex   ATTR   unex   A sold room night has no priced rate row
+FLT-A05    CRITICAL      --    unex   unex   ATTR   GST applied at the wrong rate
+FLT-A06    CRITICAL     ATTR   unex   ATTR   ATTR   Payment posted through a settlement head tha
+FLT-A07    HIGH         ATTR   unex   ATTR   ATTR   Guest overpaid with no overpayment record
+FLT-A08    HIGH         unex   unex   unex   ATTR   Room move recorded without releasing the old
+FLT-A09    HIGH         ATTR   unex   UNAT   ATTR   Guest checked out with an unexplained balanc
+FLT-A10    HIGH           .      .      .      .    Duplicate reservation for the same stay
+FLT-B01    CRITICAL     unex   unex   unex   ATTR   Payment referencing a reservation that does 
+FLT-B02    HIGH         ATTR   unex   ATTR   ATTR   Payment posted with no folio
+FLT-B03    CRITICAL     ATTR   unex   ATTR   ATTR   A ledger row that a closed day counted has b
+FLT-B04    HIGH           .      .      .      .    Two reservations sharing one invoice number
+FLT-B05    CRITICAL      --    unex    --    ATTR   Folio referencing a reservation that does no
+FLT-B06    HIGH         unex   unex   unex   ATTR   Tax line pointing at a room night that never
+FLT-B07    CRITICAL     ATTR   unex   unex   ATTR   Money dated beyond the business date
+FLT-B08    HIGH          --    unex   ATTR   ATTR   Priced room night outside the stay it belong
+FLT-B09    CRITICAL     unex   unex   unex   ATTR   Reversal flagged with no original transactio
+FLT-B10    CRITICAL      --     --     --    ATTR   A second business date row
+FLT-C01    CRITICAL     unex   unex   ATTR   ATTR   Cash revenue engine double-counts every coll
+FLT-C02    CRITICAL     unex   unex   ATTR    --    Accrual extras counted twice
+FLT-C03    CRITICAL     ATTR   unex   unex   ATTR   Folio balance drifts by half a rupee
+FLT-C04    CRITICAL     unex   unex   ATTR   ATTR   Cash engine ignores the date it is asked abo
+FLT-C05    CRITICAL     ATTR   unex   ATTR   ATTR   Night audit occupancy inflated by present-te
+FLT-C06    CRITICAL     ATTR   unex   unex   unex   Canonical room-revenue engine bypassed by a 
+FLT-C07    HIGH          --    unex   ATTR    --    OTA receivable filter excludes everything
+FLT-C08    CRITICAL     unex   unex   ATTR    --    Accrual room revenue double-counts occupied 
+FLT-C09    CRITICAL      --    unex   ATTR   ATTR   Night audit reports tax twice
+FLT-C10    CRITICAL     ATTR   unex   ATTR   ATTR   Night audit settlement total diverges from t
+FLT-D01    HIGH          --    ATTR    --     --    Clock drift: a run executes one day out
+FLT-D02    CRITICAL      --     --    ATTR   ATTR   A frozen night-audit snapshot has been edite
+FLT-D03    CRITICAL     ATTR   unex   ATTR   MISS   The stored close total for an audited day ha
+FLT-D04    CRITICAL       .      .      .      .    A database backup file is corrupt
+FLT-D05    CRITICAL       .      .      .      .    A restored database does not match what was 
+FLT-D06    HIGH          --    ATTR    --     --    Hotel state code changed, flipping the GST r
+FLT-D07    MEDIUM         .      .      .      .    A run executes under a different process env
+FLT-D08    MEDIUM        --    ATTR    --     --    An invoice presentation flag was changed aft
+FLT-D09    CRITICAL     unex   unex   unex   ATTR   The business date has been rolled backwards
+FLT-D10    CRITICAL      --    unex   ATTR   ATTR   A completed night audit has been reopened an
+
+----------------------------------------------------------------------------------------------------
+VERIFICATION GAPS — the output of this deliverable
+----------------------------------------------------------------------------------------------------
+Each entry is a defect this framework would NOT catch in production,
+or would notice without being able to say what happened.
+
+  [CRITICAL] FLT-D03  The stored close total for an audited day has been rewritten
+      D4_INVARIANTS    MISSED
+          did not move: INV-B03
+      caught anyway by: D1_PARITY, D3_REPLAY
+      reports affected in production: main.dashboard,
+      reports.night_audit_history
+      where to look: A manual correction applied to the log rather than the
+      data, A reopen-and-partially-rerun cycle, A migration that recalculated
+      stored aggregates
+
+  [HIGH] FLT-A09  Guest checked out with an unexplained balance
+      D3_REPLAY        UNATTRIBUTED
+          did not move: rc:RC07
+          moved elsewhere: date:2026-05-27, date:2026-05-28
+      caught anyway by: D1_PARITY, D4_INVARIANTS
+      reports affected in production: ai.api_ai_insights,
+      billing.invoice_register, main.command_center_data, main.dashboard,
+      main.invoice_manager, reports.departures
+      where to look: A checkout route that warns about a balance but does not
+      block, Charges posted after the guest departed, A credit arrangement
+      agreed verbally and never recorded
+
+----------------------------------------------------------------------------------------------------
+BLAST RADIUS — undeclared layers that moved
+----------------------------------------------------------------------------------------------------
+Recorded, never counted as success. A platform in which every layer
+moves for every fault can attribute nothing.
+
+  FLT-A01      D2_GOLDEN
+  FLT-A02      D2_GOLDEN
+  FLT-A03      D2_GOLDEN
+  FLT-A04      D2_GOLDEN, D4_INVARIANTS
+  FLT-A05      D2_GOLDEN, D3_REPLAY
+  FLT-A06      D2_GOLDEN
+  FLT-A07      D2_GOLDEN
+  FLT-A08      D1_PARITY, D2_GOLDEN, D3_REPLAY
+  FLT-A09      D2_GOLDEN
+  FLT-B01      D1_PARITY, D2_GOLDEN, D3_REPLAY
+  FLT-B02      D2_GOLDEN
+  FLT-B03      D2_GOLDEN
+  FLT-B05      D2_GOLDEN
+  FLT-B06      D1_PARITY, D2_GOLDEN, D3_REPLAY
+  FLT-B07      D2_GOLDEN, D3_REPLAY
+  FLT-B08      D2_GOLDEN
+  FLT-B09      D1_PARITY, D2_GOLDEN, D3_REPLAY
+  FLT-C01      D1_PARITY, D2_GOLDEN
+  FLT-C02      D1_PARITY, D2_GOLDEN
+  FLT-C03      D2_GOLDEN, D3_REPLAY
+  FLT-C04      D1_PARITY, D2_GOLDEN
+  FLT-C05      D2_GOLDEN
+  FLT-C06      D2_GOLDEN, D3_REPLAY, D4_INVARIANTS
+  FLT-C07      D2_GOLDEN
+  FLT-C08      D1_PARITY, D2_GOLDEN
+  FLT-C09      D2_GOLDEN
+  FLT-C10      D2_GOLDEN
+  FLT-D03      D2_GOLDEN
+  FLT-D09      D1_PARITY, D2_GOLDEN, D3_REPLAY
+  FLT-D10      D2_GOLDEN
+
+----------------------------------------------------------------------------------------------------
+ERRORS — a fault that could not be exercised proves nothing
+----------------------------------------------------------------------------------------------------
+  FLT-A10      IntegrityError: NOT NULL constraint failed: reservations.credit_amount
+
+----------------------------------------------------------------------------------------------------
+UNCOVERED — no layer of the current framework can detect these
+----------------------------------------------------------------------------------------------------
+  FLT-B04      Two reservations sharing one invoice number
+        No invariant asserts invoice-number uniqueness, and no monetary total moves, so
+        every layer is silent by construction. Injecting it would produce a guaranteed
+        MISS that says nothing the declaration does not already say.
+        tracked against: D4 — add an invariant asserting invoice_number uniqueness among finalised invoices. Registered here so the gap is tracked.
+  FLT-D04      A database backup file is corrupt
+        No verification layer reads backup artefacts, and backup_logs stores no checksum
+        — the schema records filename, size and status only. There is nothing to compare
+        a restored file against, so corruption is undetectable by construction rather
+        than by omission.
+        tracked against: D9 — Backup Restore Verification. It will need a checksum column, or an out-of-band manifest, before it can detect this at all.
+  FLT-D05      A restored database does not match what was backed up
+        Detecting this requires comparing a restored database against a recorded
+        pre-backup fingerprint. Nothing in the framework holds one, so the deletion is
+        simply the new truth and every layer reconciles against it perfectly.
+        tracked against: D9 — Backup Restore Verification, which must fingerprint before backup and re-verify after restore for this to be detectable.
+  FLT-D07      A run executes under a different process environment
+        No layer fingerprints the process environment, so a run under a different
+        environment is indistinguishable in the evidence. The gap is in the evidence
+        model rather than in any control.
+        tracked against: D7 — Certification Engine, which must record an environment fingerprint in every certificate for this to be visible.
+
+====================================================================================================
+VERDICT: ERROR
+====================================================================================================

@@ -1,0 +1,446 @@
+{% extends "base.html" %}
+{% block title %}Guest Sentiment Dashboard - {{ config.HOTEL_NAME }}{% endblock %}
+
+{% block styles %}
+<style>
+    .sentiment-gauge { position: relative; width: 100%; max-width: 280px; margin: 0 auto; }
+    .gauge-bar { display: flex; height: 28px; border-radius: 14px; overflow: hidden; }
+    .gauge-pos { background: #28a745; transition: width .5s; }
+    .gauge-neu { background: #ffc107; transition: width .5s; }
+    .gauge-neg { background: #dc3545; transition: width .5s; }
+    .gauge-labels { display: flex; justify-content: space-between; font-size: .75rem; margin-top: 4px; }
+
+    .score-display { font-size: 2.5rem; font-weight: 700; line-height: 1; }
+    .score-positive { color: #28a745; }
+    .score-neutral { color: #ffc107; }
+    .score-negative { color: #dc3545; }
+
+    .topic-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .topic-label { width: 90px; font-size: .85rem; text-align: right; flex-shrink: 0; }
+    .topic-track { flex-grow: 1; height: 22px; background: #e9ecef; border-radius: 11px; overflow: hidden; position: relative; }
+    .topic-fill { height: 100%; border-radius: 11px; transition: width .5s; min-width: 2px; }
+    .topic-value { position: absolute; right: 8px; top: 2px; font-size: .75rem; font-weight: 600; }
+
+    .insight-card { border-left: 4px solid #6c757d; transition: box-shadow .15s; }
+    .insight-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.1); }
+    .insight-card.sev-HIGH { border-left-color: #dc3545; }
+    .insight-card.sev-MEDIUM { border-left-color: #ffc107; }
+    .insight-card.sev-LOW { border-left-color: #0dcaf0; }
+
+    .keyword-pos { background: #d4edda; color: #155724; padding: 1px 6px; border-radius: 4px; font-size: .8rem; margin: 1px; display: inline-block; }
+    .keyword-neg { background: #f8d7da; color: #721c24; padding: 1px 6px; border-radius: 4px; font-size: .8rem; margin: 1px; display: inline-block; }
+
+    .word-cloud { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; padding: 10px; }
+    .wc-word { padding: 2px 8px; border-radius: 6px; cursor: default; transition: transform .1s; }
+    .wc-word:hover { transform: scale(1.1); }
+    .wc-positive { background: #e8f5e9; color: #2e7d32; }
+    .wc-negative { background: #ffebee; color: #c62828; }
+    .wc-neutral { background: #f5f5f5; color: #424242; }
+
+    .neg-review-card { border: 1px solid #f5c6cb; border-radius: 8px; padding: 12px; margin-bottom: 8px; background: #fff; }
+    .neg-review-rating { font-size: 1.1rem; }
+    .star-filled { color: #ffc107; }
+    .star-empty { color: #dee2e6; }
+
+    .stat-card { text-align: center; padding: 16px 10px; border-radius: 10px; }
+    .stat-card .value { font-size: 1.8rem; font-weight: 700; line-height: 1.1; }
+    .stat-card .label { font-size: .8rem; color: #6c757d; }
+
+    .trend-chart-container { position: relative; height: 220px; }
+    .trend-bar-group { display: flex; align-items: flex-end; gap: 2px; height: 180px; }
+    .trend-bar { min-width: 30px; border-radius: 4px 4px 0 0; transition: height .4s; cursor: default; position: relative; }
+    .trend-bar:hover { opacity: .85; }
+    .trend-labels { display: flex; gap: 2px; margin-top: 4px; }
+    .trend-label { min-width: 30px; font-size: .7rem; text-align: center; color: #6c757d; }
+
+    #loadingSpinner { display: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3 py-3">
+    <!-- Header -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-3 gap-2">
+        <div>
+            <h4 class="mb-0"><i class="bi bi-emoji-smile me-2"></i>Guest Sentiment Dashboard</h4>
+            <small class="text-muted">AI-powered analysis of guest feedback and reviews</small>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <select id="daysPeriod" class="form-select form-select-sm" style="width:auto;">
+                <option value="30">Last 30 days</option>
+                <option value="60">Last 60 days</option>
+                <option value="90" selected>Last 90 days</option>
+                <option value="180">Last 180 days</option>
+                <option value="365">Last year</option>
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="loadData()">
+                <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading spinner -->
+    <div id="loadingSpinner" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-2 text-muted">Analyzing guest sentiment...</p>
+    </div>
+
+    <!-- Dashboard content (hidden until loaded) -->
+    <div id="dashboardContent" style="display:none;">
+
+        <!-- Row 1: Key Stats -->
+        <div class="row g-2 mb-3">
+            <div class="col-6 col-md">
+                <div class="stat-card bg-white border shadow-sm">
+                    <div class="value" id="avgRating">--</div>
+                    <div class="label">Avg Rating</div>
+                </div>
+            </div>
+            <div class="col-6 col-md">
+                <div class="stat-card bg-white border shadow-sm">
+                    <div class="value" id="totalReviews">--</div>
+                    <div class="label">Total Reviews</div>
+                </div>
+            </div>
+            <div class="col-6 col-md">
+                <div class="stat-card bg-white border shadow-sm">
+                    <div class="value score-positive" id="positivePct">--</div>
+                    <div class="label">Positive</div>
+                </div>
+            </div>
+            <div class="col-6 col-md">
+                <div class="stat-card bg-white border shadow-sm">
+                    <div class="value score-negative" id="negativePct">--</div>
+                    <div class="label">Negative</div>
+                </div>
+            </div>
+            <div class="col-6 col-md">
+                <div class="stat-card bg-white border shadow-sm">
+                    <div class="value text-primary" id="recommendPct">--</div>
+                    <div class="label">Would Recommend</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 2: Sentiment Gauge + Topic Scores -->
+        <div class="row g-3 mb-3">
+            <!-- Sentiment Gauge -->
+            <div class="col-md-5">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h6 class="card-title mb-3"><i class="bi bi-speedometer2 me-1"></i>Overall Sentiment</h6>
+                        <div class="text-center mb-3">
+                            <div class="score-display" id="sentimentScore">--</div>
+                            <small class="text-muted" id="sentimentLabel">Loading...</small>
+                        </div>
+                        <div class="sentiment-gauge">
+                            <div class="gauge-bar">
+                                <div class="gauge-pos" id="gaugePos" style="width:33%"></div>
+                                <div class="gauge-neu" id="gaugeNeu" style="width:34%"></div>
+                                <div class="gauge-neg" id="gaugeNeg" style="width:33%"></div>
+                            </div>
+                            <div class="gauge-labels">
+                                <span class="text-success" id="gaugePosLabel">Positive</span>
+                                <span class="text-warning" id="gaugeNeuLabel">Neutral</span>
+                                <span class="text-danger" id="gaugeNegLabel">Negative</span>
+                            </div>
+                        </div>
+                        <!-- Word Cloud -->
+                        <h6 class="mt-4 mb-2"><i class="bi bi-chat-dots me-1"></i>Keyword Cloud</h6>
+                        <div class="word-cloud" id="wordCloud"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Topic Scores -->
+            <div class="col-md-7">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h6 class="card-title mb-3"><i class="bi bi-bar-chart me-1"></i>Topic Scores</h6>
+                        <div id="topicBars"></div>
+
+                        <!-- Trend Chart -->
+                        <h6 class="mt-4 mb-2"><i class="bi bi-graph-up me-1"></i>Sentiment Trend</h6>
+                        <div class="trend-chart-container">
+                            <div class="trend-bar-group" id="trendBars"></div>
+                            <div class="trend-labels" id="trendLabels"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 3: Actionable Insights -->
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h6 class="card-title mb-3"><i class="bi bi-lightbulb me-1"></i>Actionable Insights</h6>
+                        <div id="insightsList">
+                            <p class="text-muted">No insights available yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Negative Reviews -->
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h6 class="card-title mb-3"><i class="bi bi-exclamation-triangle me-1"></i>Recent Negative Reviews</h6>
+                        <div id="negativeReviews">
+                            <p class="text-muted">No negative reviews found.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function starsHtml(rating) {
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+        html += i <= rating
+            ? '<i class="bi bi-star-fill star-filled"></i>'
+            : '<i class="bi bi-star star-empty"></i>';
+    }
+    return html;
+}
+
+function scoreColor(score) {
+    if (score >= 0.2) return 'score-positive';
+    if (score <= -0.2) return 'score-negative';
+    return 'score-neutral';
+}
+
+function topicColor(score) {
+    if (score >= 0.2) return '#28a745';
+    if (score >= 0) return '#ffc107';
+    return '#dc3545';
+}
+
+function renderTopicBars(topics) {
+    const container = document.getElementById('topicBars');
+    const order = ['cleanliness', 'service', 'room', 'food', 'value', 'location'];
+    const icons = {
+        cleanliness: 'bi-droplet', service: 'bi-person-check', room: 'bi-house-door',
+        food: 'bi-cup-hot', value: 'bi-currency-rupee', location: 'bi-geo-alt'
+    };
+
+    let html = '';
+    order.forEach(topic => {
+        const raw = topics[topic] || 0;
+        // Map -1..1 to 0..100 for display
+        const pct = Math.round((raw + 1) / 2 * 100);
+        const color = topicColor(raw);
+        const label = topic.charAt(0).toUpperCase() + topic.slice(1);
+        html += `
+        <div class="topic-bar">
+            <div class="topic-label"><i class="bi ${icons[topic] || 'bi-circle'} me-1"></i>${label}</div>
+            <div class="topic-track">
+                <div class="topic-fill" style="width:${pct}%;background:${color};"></div>
+                <span class="topic-value" style="color:${color};">${raw > 0 ? '+' : ''}${raw.toFixed(2)}</span>
+            </div>
+        </div>`;
+    });
+    container.innerHTML = html;
+}
+
+function renderTrend(trend) {
+    const barsEl = document.getElementById('trendBars');
+    const labelsEl = document.getElementById('trendLabels');
+
+    if (!trend || !trend.length) {
+        barsEl.innerHTML = '<p class="text-muted">Not enough data</p>';
+        labelsEl.innerHTML = '';
+        return;
+    }
+
+    // Normalize scores to bar heights
+    const maxHeight = 160;
+    let barsHtml = '', labelsHtml = '';
+
+    trend.forEach(t => {
+        const normalized = (t.avg_score + 1) / 2; // 0 to 1
+        const h = Math.max(4, Math.round(normalized * maxHeight));
+        const color = topicColor(t.avg_score);
+        const monthLabel = t.month.substring(5); // MM from YYYY-MM
+        barsHtml += `<div class="trend-bar" style="height:${h}px;background:${color};flex:1;"
+                      title="${t.month}: score ${t.avg_score.toFixed(2)}, ${t.count} reviews"></div>`;
+        labelsHtml += `<div class="trend-label" style="flex:1;">${monthLabel}</div>`;
+    });
+
+    barsEl.innerHTML = barsHtml;
+    labelsEl.innerHTML = labelsHtml;
+}
+
+function renderWordCloud(words) {
+    const container = document.getElementById('wordCloud');
+    if (!words || !words.length) {
+        container.innerHTML = '<span class="text-muted">No keyword data</span>';
+        return;
+    }
+
+    const maxCount = Math.max(...words.map(w => w.count));
+    let html = '';
+    words.forEach(w => {
+        const size = 0.7 + (w.count / maxCount) * 0.9; // 0.7rem to 1.6rem
+        const cls = w.sentiment === 'positive' ? 'wc-positive'
+                  : w.sentiment === 'negative' ? 'wc-negative' : 'wc-neutral';
+        html += `<span class="wc-word ${cls}" style="font-size:${size}rem;"
+                  title="${w.word}: ${w.count} mentions (${w.sentiment})">${w.word}</span>`;
+    });
+    container.innerHTML = html;
+}
+
+function renderInsights(insights) {
+    const container = document.getElementById('insightsList');
+    if (!insights || !insights.length) {
+        container.innerHTML = '<p class="text-muted">No actionable insights at this time. More reviews needed.</p>';
+        return;
+    }
+
+    let html = '';
+    insights.forEach(ins => {
+        const sevClass = `sev-${ins.severity}`;
+        const icon = ins.severity === 'HIGH' ? 'bi-exclamation-triangle-fill text-danger'
+                   : ins.severity === 'MEDIUM' ? 'bi-info-circle-fill text-warning'
+                   : 'bi-check-circle-fill text-info';
+        html += `
+        <div class="card insight-card ${sevClass} mb-2">
+            <div class="card-body py-2 px-3">
+                <div class="d-flex align-items-start gap-2">
+                    <i class="bi ${icon} mt-1"></i>
+                    <div>
+                        <span class="badge bg-secondary mb-1" style="font-size:.7rem;">${ins.category}</span>
+                        <p class="mb-0" style="font-size:.88rem;">${ins.insight}</p>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    });
+    container.innerHTML = html;
+}
+
+function renderNegativeReviews(reviews) {
+    const container = document.getElementById('negativeReviews');
+    if (!reviews || !reviews.length) {
+        container.innerHTML = '<p class="text-muted">No negative reviews in this period.</p>';
+        return;
+    }
+
+    let html = '';
+    reviews.forEach(r => {
+        // Highlight negative keywords in comment
+        let comment = escapeHtml(r.comment || 'No comment');
+        (r.negative_keywords || []).forEach(kw => {
+            const re = new RegExp('\\b' + escapeRegex(kw) + '\\b', 'gi');
+            comment = comment.replace(re, `<span class="keyword-neg">${kw}</span>`);
+        });
+
+        const topics = (r.topics || []).map(t =>
+            `<span class="badge bg-light text-dark border" style="font-size:.7rem;">${t}</span>`
+        ).join(' ');
+
+        html += `
+        <div class="neg-review-card">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <div>
+                    <strong>${escapeHtml(r.guest_name)}</strong>
+                    <small class="text-muted ms-2">Room ${escapeHtml(r.room_number)}</small>
+                </div>
+                <div class="neg-review-rating">${starsHtml(r.rating)}</div>
+            </div>
+            <p class="mb-1" style="font-size:.88rem;">${comment}</p>
+            <div class="d-flex flex-wrap gap-1 align-items-center">
+                ${topics}
+                <small class="text-muted ms-auto">${r.submitted_at}</small>
+            </div>
+        </div>`;
+    });
+    container.innerHTML = html;
+}
+
+function escapeHtml(text) {
+    const d = document.createElement('div');
+    d.textContent = text;
+    return d.innerHTML;
+}
+
+function escapeRegex(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function loadData() {
+    const days = document.getElementById('daysPeriod').value;
+    const spinner = document.getElementById('loadingSpinner');
+    const content = document.getElementById('dashboardContent');
+
+    spinner.style.display = 'block';
+    content.style.display = 'none';
+
+    fetch(`/api/ai/sentiment?days=${days}`)
+        .then(r => r.json())
+        .then(data => {
+            spinner.style.display = 'none';
+            content.style.display = 'block';
+
+            if (data.status !== 'ok') {
+                content.innerHTML = `<div class="alert alert-danger">Failed: ${data.error || 'Unknown error'}</div>`;
+                return;
+            }
+
+            const d = data.dashboard;
+
+            // Stats
+            document.getElementById('avgRating').textContent = d.avg_rating ? d.avg_rating.toFixed(1) : '--';
+            document.getElementById('totalReviews').textContent = d.total_reviews || 0;
+            document.getElementById('positivePct').textContent = d.positive_pct ? d.positive_pct.toFixed(0) + '%' : '--';
+            document.getElementById('negativePct').textContent = d.negative_pct ? d.negative_pct.toFixed(0) + '%' : '--';
+            document.getElementById('recommendPct').textContent = d.recommend_pct ? d.recommend_pct.toFixed(0) + '%' : '--';
+
+            // Sentiment score
+            const scoreEl = document.getElementById('sentimentScore');
+            const labelEl = document.getElementById('sentimentLabel');
+            const score = d.avg_score || 0;
+            scoreEl.textContent = (score > 0 ? '+' : '') + score.toFixed(2);
+            scoreEl.className = 'score-display ' + scoreColor(score);
+            labelEl.textContent = score >= 0.2 ? 'Positive Overall' : score <= -0.2 ? 'Needs Attention' : 'Neutral';
+
+            // Gauge
+            document.getElementById('gaugePos').style.width = (d.positive_pct || 0) + '%';
+            document.getElementById('gaugeNeu').style.width = (d.neutral_pct || 0) + '%';
+            document.getElementById('gaugeNeg').style.width = (d.negative_pct || 0) + '%';
+            document.getElementById('gaugePosLabel').textContent = (d.positive_pct || 0).toFixed(0) + '% Positive';
+            document.getElementById('gaugeNeuLabel').textContent = (d.neutral_pct || 0).toFixed(0) + '% Neutral';
+            document.getElementById('gaugeNegLabel').textContent = (d.negative_pct || 0).toFixed(0) + '% Negative';
+
+            // Topic bars
+            renderTopicBars(d.topic_scores || {});
+
+            // Trend
+            renderTrend(d.trend || []);
+
+            // Word cloud
+            renderWordCloud(d.word_cloud_data || []);
+
+            // Insights
+            renderInsights(data.insights || []);
+
+            // Negative reviews
+            renderNegativeReviews(d.recent_negative || []);
+        })
+        .catch(err => {
+            spinner.style.display = 'none';
+            content.style.display = 'block';
+            content.innerHTML = `<div class="alert alert-danger">Network error: ${err.message}</div>`;
+        });
+}
+
+document.addEventListener('DOMContentLoaded', loadData);
+</script>
+{% endblock %}

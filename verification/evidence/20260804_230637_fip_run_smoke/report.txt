@@ -1,0 +1,93 @@
+====================================================================================================
+DSBC FRONTLINE — FAULT INJECTION PLATFORM RUN
+Production Verification Framework, Wave 0 Deliverable 5
+====================================================================================================
+Started         : 2026-08-04T23:06:37
+Duration        : 36.5s
+PVF             : v0.4.0
+Mode            : BATCH
+Layers swept    : D1_PARITY, D2_GOLDEN, D3_REPLAY, D4_INVARIANTS (parallel)
+VERDICT         : INCOMPLETE
+
+----------------------------------------------------------------------------------------------------
+ISOLATION — verified, not asserted
+----------------------------------------------------------------------------------------------------
+Production      : C:\Users\SIPL Server\Downloads\DSS\SukoonPMS\SukoonPMS\instance\pms.db
+  sha256 before : f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c
+  sha256 after  : f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c
+  unchanged     : True
+Baseline sha256 : d630f730a91133916ee3f76878c2cdd2b7930ec9ad745e571f81be78cdd08413
+  unchanged     : True
+Copies removed  : 1
+Copies remaining: 0
+Isolation       : VERIFIED
+
+----------------------------------------------------------------------------------------------------
+SUMMARY
+----------------------------------------------------------------------------------------------------
+  registered              : 1
+  challenged              : 1
+  detected                : 1
+  MISSED                  : 0
+  errors                  : 0
+  uncovered (not injected): 4
+
+  attributions per layer:
+      D1_PARITY          1
+      D2_GOLDEN          0
+      D3_REPLAY          1
+      D4_INVARIANTS      1
+
+----------------------------------------------------------------------------------------------------
+DETECTION MATRIX
+----------------------------------------------------------------------------------------------------
+ATTR = attributed at the declared target      MISS = expected, silent
+UNAT = moved, but not where declared          unex = undeclared layer moved
+ --  = correctly silent (this is what makes attribution possible)
+
+FAULT      SEV            D1     D2     D3     D4   TITLE
+FLT-A01    CRITICAL     ATTR   unex   ATTR   ATTR   Walk-in reservation settled through an OTA r
+
+----------------------------------------------------------------------------------------------------
+VERIFICATION GAPS — the output of this deliverable
+----------------------------------------------------------------------------------------------------
+  (none — every declared layer attributed every fault it was expected to see)
+
+----------------------------------------------------------------------------------------------------
+BLAST RADIUS — undeclared layers that moved
+----------------------------------------------------------------------------------------------------
+Recorded, never counted as success. A platform in which every layer
+moves for every fault can attribute nothing.
+
+  FLT-A01      D2_GOLDEN
+
+----------------------------------------------------------------------------------------------------
+UNCOVERED — no layer of the current framework can detect these
+----------------------------------------------------------------------------------------------------
+  FLT-B04      Two reservations sharing one invoice number
+        No invariant asserts invoice-number uniqueness, and no monetary total moves, so
+        every layer is silent by construction. Injecting it would produce a guaranteed
+        MISS that says nothing the declaration does not already say.
+        tracked against: D4 — add an invariant asserting invoice_number uniqueness among finalised invoices. Registered here so the gap is tracked.
+  FLT-D04      A database backup file is corrupt
+        No verification layer reads backup artefacts, and backup_logs stores no checksum
+        — the schema records filename, size and status only. There is nothing to compare
+        a restored file against, so corruption is undetectable by construction rather
+        than by omission.
+        tracked against: D9 — Backup Restore Verification. It will need a checksum column, or an out-of-band manifest, before it can detect this at all.
+  FLT-D05      A restored database does not match what was backed up
+        Detecting this requires comparing a restored database against a recorded
+        pre-backup fingerprint. Nothing in the framework holds one, so the deletion is
+        simply the new truth and every layer reconciles against it perfectly.
+        tracked against: D9 — Backup Restore Verification, which must fingerprint before backup and re-verify after restore for this to be detectable.
+  FLT-D07      A run executes under a different process environment
+        No layer fingerprints the process environment, so a run under a different
+        environment is indistinguishable in the evidence. The gap is in the evidence
+        model rather than in any control.
+        tracked against: D7 — Certification Engine, which must record an environment fingerprint in every certificate for this to be visible.
+
+====================================================================================================
+VERDICT: INCOMPLETE
+Every challenged fault was detected, but coverage is not complete: see the gap
+report and the uncovered list above.
+====================================================================================================

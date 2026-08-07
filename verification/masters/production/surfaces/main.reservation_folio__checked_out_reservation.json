@@ -1,0 +1,54 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/folio/1",
+  "anon_status": 302,
+  "body_bytes": 34523,
+  "body_sha256": "1e7ee1654d5b273d2e1771d3c2820147d845abf58d85bf3fbddc784b6be60ed5",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 25,
+  "endpoint": "main.reservation_folio",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "billing.balance": "200",
+    "billing.company_credit": "0",
+    "billing.discount": "0",
+    "billing.extra_charges": "190.48",
+    "billing.grand_total": "2200",
+    "billing.gst_amount": "104.76",
+    "billing.nights": "2",
+    "billing.paid": "2000",
+    "billing.room_charges": "1904.76",
+    "billing.round_off": "0",
+    "billing.rounded_grand_total": "2200",
+    "billing.settlement_balance": "200",
+    "billing.total": "2095.24",
+    "billing[len]": "13",
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "reservation[type]": "Reservation"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "Folio ledger for a settled stay.",
+  "origin": "declared",
+  "params": {
+    "id": 1,
+    "resolver": "checked_out_reservation",
+    "rule": "lowest reservation id with status CheckedOut"
+  },
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "main.reservation_folio__checked_out_reservation",
+  "templates": [
+    "reservation_folio.html"
+  ],
+  "truncations": [],
+  "url": "/folio/1"
+}

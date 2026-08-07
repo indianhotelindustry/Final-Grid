@@ -1,0 +1,965 @@
+{
+  "app_version": "2.2.18",
+  "copy_method": "sqlite-backup-api",
+  "counts": {
+    "AGREED": 10,
+    "DIVERGED": 6,
+    "NOT_IMPLEMENTED": 3,
+    "SINGLE_SOURCE": 1,
+    "VACUOUS": 2
+  },
+  "duration_seconds": 4.46,
+  "finished_at": "2026-08-03T10:00:33",
+  "mode": "compare",
+  "overall": "FAIL",
+  "pvf_version": "0.1.0",
+  "quantities": [
+    {
+      "detail": {
+        "by_source": {
+          "Walk-in": 28
+        },
+        "by_status": {
+          "CheckedOut": 28
+        }
+      },
+      "divergences": [],
+      "duration_ms": 0,
+      "error": "",
+      "implementations": {
+        "reservations.count": 28
+      },
+      "label": "Reservation count and status distribution",
+      "note": "Census \u2014 establishes the denominator for every other quantity.",
+      "policy": "EXACT",
+      "quantity_id": "P01",
+      "severity": "BLOCK",
+      "verdict": "SINGLE_SOURCE"
+    },
+    {
+      "detail": {
+        "by_category": {
+          "Other Income": "0.30",
+          "late_checkout": "729.55"
+        },
+        "count": 5,
+        "reversal_rows": 0
+      },
+      "divergences": [],
+      "duration_ms": 2,
+      "error": "",
+      "implementations": {
+        "raw sum(amount)": "729.85",
+        "signed sum (correction-aware)": "729.85"
+      },
+      "label": "Charge count and total by category",
+      "note": "Raw and signed agree only while no reversal rows exist. Reversal count is reported so the agreement is not mistaken for proof that signing works.",
+      "policy": "EXACT",
+      "quantity_id": "P02",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "D2_single_night_total": "35026.64",
+        "per_reservation": {
+          "1": {
+            "d1_canonical": "1904.76",
+            "d2_single_night": "952.38",
+            "d3_rate_x_nights": "1904.76",
+            "has_room_rent": false,
+            "nights": 2
+          },
+          "10": {
+            "d1_canonical": "1619.19",
+            "d2_single_night": "1619.19",
+            "d3_rate_x_nights": "1619.19",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "11": {
+            "d1_canonical": "1535.23",
+            "d2_single_night": "1535.23",
+            "d3_rate_x_nights": "1535.23",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "12": {
+            "d1_canonical": "2476.20",
+            "d2_single_night": "1238.10",
+            "d3_rate_x_nights": "2476.20",
+            "has_room_rent": false,
+            "nights": 2
+          },
+          "13": {
+            "d1_canonical": "952.38",
+            "d2_single_night": "952.38",
+            "d3_rate_x_nights": "952.38",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "14": {
+            "d1_canonical": "1238.10",
+            "d2_single_night": "1238.10",
+            "d3_rate_x_nights": "1238.10",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "15": {
+            "d1_canonical": "761.90",
+            "d2_single_night": "761.90",
+            "d3_rate_x_nights": "761.90",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "16": {
+            "d1_canonical": "1142.86",
+            "d2_single_night": "1142.86",
+            "d3_rate_x_nights": "1142.86",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "17": {
+            "d1_canonical": "1619.19",
+            "d2_single_night": "1619.19",
+            "d3_rate_x_nights": "1619.19",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "18": {
+            "d1_canonical": "1142.86",
+            "d2_single_night": "1142.86",
+            "d3_rate_x_nights": "1142.86",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "19": {
+            "d1_canonical": "1142.86",
+            "d2_single_night": "1142.86",
+            "d3_rate_x_nights": "1142.86",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "2": {
+            "d1_canonical": "1142.86",
+            "d2_single_night": "1142.86",
+            "d3_rate_x_nights": "1142.86",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "20": {
+            "d1_canonical": "1142.86",
+            "d2_single_night": "1142.86",
+            "d3_rate_x_nights": "1142.86",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "21": {
+            "d1_canonical": "1238.10",
+            "d2_single_night": "1238.10",
+            "d3_rate_x_nights": "1238.10",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "22": {
+            "d1_canonical": "1238.10",
+            "d2_single_night": "1238.10",
+            "d3_rate_x_nights": "1238.10",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "23": {
+            "d1_canonical": "1428.57",
+            "d2_single_night": "1428.57",
+            "d3_rate_x_nights": "1428.57",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "24": {
+            "d1_canonical": "1142.86",
+            "d2_single_night": "1142.86",
+            "d3_rate_x_nights": "1142.86",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "25": {
+            "d1_canonical": "1238.10",
+            "d2_single_night": "1238.10",
+            "d3_rate_x_nights": "1238.10",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "26": {
+            "d1_canonical": "1238.10",
+            "d2_single_night": "1238.10",
+            "d3_rate_x_nights": "1238.10",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "27": {
+            "d1_canonical": "1428.57",
+            "d2_single_night": "1428.57",
+            "d3_rate_x_nights": "1428.57",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "28": {
+            "d1_canonical": "1457.27",
+            "d2_single_night": "1457.27",
+            "d3_rate_x_nights": "1457.27",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "3": {
+            "d1_canonical": "1238.10",
+            "d2_single_night": "1238.10",
+            "d3_rate_x_nights": "1238.10",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "4": {
+            "d1_canonical": "1142.86",
+            "d2_single_night": "1142.86",
+            "d3_rate_x_nights": "1142.86",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "5": {
+            "d1_canonical": "1238.10",
+            "d2_single_night": "1238.10",
+            "d3_rate_x_nights": "1238.10",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "6": {
+            "d1_canonical": "1428.57",
+            "d2_single_night": "1428.57",
+            "d3_rate_x_nights": "1428.57",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "7": {
+            "d1_canonical": "1367.14",
+            "d2_single_night": "1367.14",
+            "d3_rate_x_nights": "1367.14",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "8": {
+            "d1_canonical": "1142.86",
+            "d2_single_night": "1142.86",
+            "d3_rate_x_nights": "1142.86",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "9": {
+            "d1_canonical": "1428.57",
+            "d2_single_night": "1428.57",
+            "d3_rate_x_nights": "1428.57",
+            "has_room_rent": false,
+            "nights": 1
+          }
+        },
+        "reservations_with_room_rent_rows": 0
+      },
+      "divergences": [],
+      "duration_ms": 25,
+      "error": "",
+      "implementations": {
+        "D1 canonical (get_room_revenue)": "37217.12",
+        "D3 report style (rate x nights)": "37217.12"
+      },
+      "label": "Room revenue per reservation (3 definitions)",
+      "note": "D1 and D3 can only agree while zero room_rent ledger rows exist. Reservations carrying room_rent rows: 0. This is the trap Wave 1 disarms.",
+      "policy": "EXACT",
+      "quantity_id": "P03",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "per_date": {
+          "2026-05-27": {
+            "kpi_helpers": "17664.44",
+            "night_audit": "17664.44",
+            "posted_room_rent": "0.0"
+          },
+          "2026-05-28": {
+            "kpi_helpers": "19552.68",
+            "night_audit": "19552.68",
+            "posted_room_rent": "0.0"
+          }
+        },
+        "posted_room_rent_total": "0.0"
+      },
+      "divergences": [],
+      "duration_ms": 150,
+      "error": "",
+      "implementations": {
+        "NightAuditService.revenue_summary": "37217.12",
+        "kpi_helpers.get_accrual_room_revenue": "37217.12"
+      },
+      "label": "Room revenue per business date",
+      "note": "Ledger-posted room rent is ZERO across all dates, so the two tariff-based implementations agree by default. Agreement here is not evidence that they would agree once posting is active.",
+      "policy": "EXACT",
+      "quantity_id": "P04",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "category_source_counts": {
+          "charge_category": 2,
+          "description_parsed": 3
+        },
+        "per_date": {
+          "2026-05-27": {
+            "kpi_helpers": "0.15",
+            "night_audit": "0.15",
+            "night_audit_by_category": {
+              "Other Income \u2014 nnn": "0.15"
+            }
+          },
+          "2026-05-28": {
+            "kpi_helpers": "729.7",
+            "night_audit": "729.7",
+            "night_audit_by_category": {
+              "Late Check-out \u2014 01": "729.55",
+              "Other Income \u2014 other": "0.15"
+            }
+          }
+        }
+      },
+      "divergences": [],
+      "duration_ms": 3,
+      "error": "",
+      "implementations": {
+        "NightAuditService.revenue_summary": "729.85",
+        "kpi_helpers.get_accrual_extras": "729.85"
+      },
+      "label": "Ancillary revenue by category",
+      "note": "Night audit derives its category from the description string; charge_category is populated on 2 of 5 rows. Totals may agree while categorisation diverges.",
+      "policy": "EXACT",
+      "quantity_id": "P05",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "distinct_sources": 33,
+        "inflation_factor": "2.00",
+        "per_date": {
+          "2026-05-27": {
+            "gst_report_deduped": "17664.44",
+            "night_audit_raw": "35328.88"
+          },
+          "2026-05-28": {
+            "gst_report_deduped": "20282.23",
+            "night_audit_raw": "40564.46"
+          }
+        },
+        "tax_line_count": 66
+      },
+      "divergences": [
+        {
+          "delta": "-17664.44",
+          "impl_a": "gst_service.get_gst_report",
+          "impl_b": "NightAuditService.tax_snapshot",
+          "scope": "2026-05-27",
+          "value_a": "17664.44",
+          "value_b": "35328.88"
+        },
+        {
+          "delta": "-20282.23",
+          "impl_a": "gst_service.get_gst_report",
+          "impl_b": "NightAuditService.tax_snapshot",
+          "scope": "2026-05-28",
+          "value_a": "20282.23",
+          "value_b": "40564.46"
+        }
+      ],
+      "duration_ms": 5,
+      "error": "",
+      "implementations": {
+        "deduplicated by charge source": "37946.67",
+        "raw sum of all tax lines": "75893.34"
+      },
+      "label": "Taxable base (deduplicated vs raw)",
+      "note": "CGST and SGST each carry the full taxable value of one supply. Summing both double-counts the base.",
+      "policy": "RUPEE",
+      "quantity_id": "P06",
+      "severity": "BLOCK",
+      "verdict": "DIVERGED"
+    },
+    {
+      "detail": {
+        "by_component": {
+          "CGST": "948.62",
+          "SGST": "948.62"
+        }
+      },
+      "divergences": [],
+      "duration_ms": 12,
+      "error": "",
+      "implementations": {
+        "live compute_stay_gst": "1897.28",
+        "stored TaxLine rows": "1897.24"
+      },
+      "label": "Tax by component (CGST / SGST / IGST)",
+      "note": "Stored tax is the authority per Article VI \u00a71. The live figure is what calculate_stay_amount uses for balance, so divergence here is an invoice-versus-balance gap.",
+      "policy": "RUPEE",
+      "quantity_id": "P07",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "reservations_with_discount": 0,
+        "suppressed_by_csa": []
+      },
+      "divergences": [],
+      "duration_ms": 32,
+      "error": "",
+      "implementations": {
+        "NightAuditService.discount_total": "0.0",
+        "calculate_stay_amount.discount": "0.0",
+        "reservations.discount_amount field": "0.00"
+      },
+      "label": "Discount applied per reservation",
+      "note": "calculate_stay_amount suppresses the discount when nightly rows or room_rent rows exist; the night audit always applies it. Divergence appears only once those rows exist.",
+      "policy": "EXACT",
+      "quantity_id": "P08",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "payment_count": 35,
+        "reversal_rows": 0,
+        "voided_count": 0
+      },
+      "divergences": [],
+      "duration_ms": 131,
+      "error": "",
+      "implementations": {
+        "raw ORM sum": "39644.29",
+        "raw SQL func.sum": "39644.29",
+        "signed (signed_payment_amount)": "39644.29",
+        "via calculate_stay_amount": "39644.29"
+      },
+      "label": "Payments total (signed vs raw)",
+      "note": "0 reversal rows exist. Signed and raw agree only while that count is zero \u2014 the agreement proves nothing about correction handling.",
+      "policy": "EXACT",
+      "quantity_id": "P09",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "by_category": {
+          "direct_payment": "31666.37",
+          "ota_receivable": "7977.92"
+        },
+        "by_mode": {
+          "Cash": "9265.87",
+          "EaseMyTrip Paid": "1611.99",
+          "Goibibo Paid": "1700.15",
+          "MMT Paid": "3230.28",
+          "Other OTA Paid": "1435.50",
+          "UPI": "22400.50"
+        },
+        "by_purpose": {
+          "settlement": "39644.29"
+        }
+      },
+      "divergences": [],
+      "duration_ms": 2,
+      "error": "",
+      "implementations": {
+        "ORM by category (direct_payment)": "31666.37",
+        "kpi_helpers.get_cash_revenue summed": "31666.37"
+      },
+      "label": "Payments by mode and purpose",
+      "note": "Category split determines what counts as cash collected.",
+      "policy": "EXACT",
+      "quantity_id": "P10",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "night_audit_total_refunds": "0.0",
+        "refund_row_count": 0,
+        "void_count": 0
+      },
+      "divergences": [],
+      "duration_ms": 7,
+      "error": "",
+      "implementations": {
+        "payment_purpose = refund (true refunds)": "0",
+        "voided payments (what night audit calls refunds)": "0"
+      },
+      "label": "Refunds, separated from voids",
+      "note": "A void asserts an entry should not have existed; a refund asserts money left the business. The night audit reports voids as refunds (Article VIII \u00a75).",
+      "policy": "EXACT",
+      "quantity_id": "P11",
+      "severity": "BLOCK",
+      "verdict": "VACUOUS"
+    },
+    {
+      "detail": {
+        "cases": [
+          {
+            "balance": "-0.5",
+            "grand_total": "1435.5",
+            "paid": "1436.0",
+            "reservation": 7,
+            "rounded_grand_total": "1436.0",
+            "settlement_balance": "0.0"
+          },
+          {
+            "balance": "0.15",
+            "grand_total": "1700.3",
+            "paid": "1700.15",
+            "reservation": 10,
+            "rounded_grand_total": "1700.0",
+            "settlement_balance": "-0.15"
+          },
+          {
+            "balance": "0.0",
+            "grand_total": "1611.99",
+            "paid": "1611.99",
+            "reservation": 11,
+            "rounded_grand_total": "1612.0",
+            "settlement_balance": "0.01"
+          },
+          {
+            "balance": "0.01",
+            "grand_total": "2860.01",
+            "paid": "2860.0",
+            "reservation": 12,
+            "rounded_grand_total": "2860.0",
+            "settlement_balance": "0.0"
+          },
+          {
+            "balance": "0.15",
+            "grand_total": "1700.3",
+            "paid": "1700.15",
+            "reservation": 17,
+            "rounded_grand_total": "1700.0",
+            "settlement_balance": "-0.15"
+          },
+          {
+            "balance": "0.15",
+            "grand_total": "1836.15",
+            "paid": "1836.0",
+            "reservation": 28,
+            "rounded_grand_total": "1836.0",
+            "settlement_balance": "0.0"
+          }
+        ],
+        "reservations_disagreeing": 6
+      },
+      "divergences": [
+        {
+          "delta": "-0.5",
+          "impl_a": "balance (unrounded basis)",
+          "impl_b": "settlement_balance (invoiced basis)",
+          "scope": "reservation 7",
+          "value_a": "-0.5",
+          "value_b": "0.0"
+        },
+        {
+          "delta": "0.30",
+          "impl_a": "balance (unrounded basis)",
+          "impl_b": "settlement_balance (invoiced basis)",
+          "scope": "reservation 10",
+          "value_a": "0.15",
+          "value_b": "-0.15"
+        },
+        {
+          "delta": "-0.01",
+          "impl_a": "balance (unrounded basis)",
+          "impl_b": "settlement_balance (invoiced basis)",
+          "scope": "reservation 11",
+          "value_a": "0.0",
+          "value_b": "0.01"
+        },
+        {
+          "delta": "0.01",
+          "impl_a": "balance (unrounded basis)",
+          "impl_b": "settlement_balance (invoiced basis)",
+          "scope": "reservation 12",
+          "value_a": "0.01",
+          "value_b": "0.0"
+        },
+        {
+          "delta": "0.30",
+          "impl_a": "balance (unrounded basis)",
+          "impl_b": "settlement_balance (invoiced basis)",
+          "scope": "reservation 17",
+          "value_a": "0.15",
+          "value_b": "-0.15"
+        },
+        {
+          "delta": "0.15",
+          "impl_a": "balance (unrounded basis)",
+          "impl_b": "settlement_balance (invoiced basis)",
+          "scope": "reservation 28",
+          "value_a": "0.15",
+          "value_b": "0.0"
+        }
+      ],
+      "duration_ms": 32,
+      "error": "",
+      "implementations": {
+        "balance (unrounded grand total)": "199.96",
+        "settlement_balance (invoiced total)": "199.71"
+      },
+      "label": "Outstanding per reservation (2 bases)",
+      "note": "Article IV \u00a71 permits exactly one amount owed per reservation. 6 reservations currently carry two.",
+      "policy": "EXACT",
+      "quantity_id": "P12",
+      "severity": "BLOCK",
+      "verdict": "DIVERGED"
+    },
+    {
+      "detail": {
+        "by_balance": {
+          "overpaid": 1,
+          "owing": 4,
+          "settled": 23
+        },
+        "by_settlement": {
+          "overpaid": 2,
+          "owing": 1,
+          "settled": 25
+        }
+      },
+      "divergences": [
+        {
+          "delta": "classification differs",
+          "impl_a": "status by balance",
+          "impl_b": "status by settlement_balance",
+          "scope": "reservation 7",
+          "value_a": "overpaid",
+          "value_b": "settled"
+        },
+        {
+          "delta": "classification differs",
+          "impl_a": "status by balance",
+          "impl_b": "status by settlement_balance",
+          "scope": "reservation 10",
+          "value_a": "owing",
+          "value_b": "overpaid"
+        },
+        {
+          "delta": "classification differs",
+          "impl_a": "status by balance",
+          "impl_b": "status by settlement_balance",
+          "scope": "reservation 17",
+          "value_a": "owing",
+          "value_b": "overpaid"
+        },
+        {
+          "delta": "classification differs",
+          "impl_a": "status by balance",
+          "impl_b": "status by settlement_balance",
+          "scope": "reservation 28",
+          "value_a": "owing",
+          "value_b": "settled"
+        }
+      ],
+      "duration_ms": 32,
+      "error": "",
+      "implementations": {
+        "by balance basis": "{'overpaid': 1, 'owing': 4, 'settled': 23}",
+        "by settlement basis": "{'overpaid': 2, 'owing': 1, 'settled': 25}"
+      },
+      "label": "Settlement status distribution",
+      "note": "A reservation classified differently by the two bases can appear in two contradictory exception lists.",
+      "policy": "EXACT",
+      "quantity_id": "P13",
+      "severity": "BLOCK",
+      "verdict": "DIVERGED"
+    },
+    {
+      "detail": {
+        "folio_count": 28,
+        "folio_paid": "0.0",
+        "reservation_paid": "39644.29",
+        "total_charges": 5,
+        "total_payments": 35,
+        "unrouted_charges": 5,
+        "unrouted_payments": 35
+      },
+      "divergences": [
+        {
+          "delta": "-729.85",
+          "impl_a": "sum over folios (charges)",
+          "impl_b": "sum over reservations (charges)",
+          "scope": "charge partition",
+          "value_a": "0.0",
+          "value_b": "729.85"
+        }
+      ],
+      "duration_ms": 93,
+      "error": "",
+      "implementations": {
+        "sum over folios (charges)": "0.0",
+        "sum over reservations (charges)": "729.85"
+      },
+      "label": "Folio balances / partition integrity",
+      "note": "5 charges and 35 payments carry folio_id = NULL. Article V \u00a73 requires every row to belong to a folio.",
+      "policy": "EXACT",
+      "quantity_id": "P14",
+      "severity": "BLOCK",
+      "verdict": "DIVERGED"
+    },
+    {
+      "detail": {
+        "audit_log_count": 1,
+        "fields_compared_per_date": [
+          "total_revenue",
+          "accrual_revenue",
+          "occupancy_count",
+          "reconciliation_difference"
+        ],
+        "per_date": {
+          "2026-05-27": {
+            "accrual_revenue": {
+              "recomputed": "17664.59",
+              "stored": "17664.59"
+            },
+            "occupancy_count": {
+              "recomputed": "14.0",
+              "stored": "14.0"
+            },
+            "reconciliation_difference": {
+              "recomputed": "0.0",
+              "stored": "0.00"
+            },
+            "snapshot_valid": true,
+            "status": "Warning",
+            "total_revenue (cash)": {
+              "recomputed": "16100.5",
+              "stored": "16100.50"
+            }
+          }
+        }
+      },
+      "divergences": [],
+      "duration_ms": 44,
+      "error": "",
+      "implementations": {
+        "recomputed NightAuditService (\u03a3 compared fields)": "33779.09",
+        "stored NightAuditLog (\u03a3 compared fields)": "33779.09"
+      },
+      "label": "Night audit \u2014 stored vs recomputed sections",
+      "note": "Stored close figures compared against a fresh read-only recomputation. Note the recomputed reconciliation_difference is structurally incapable of being positive (Phase 2 INV-09), so agreement on that field is not evidence the control works.",
+      "policy": "EXACT",
+      "quantity_id": "P15",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {},
+      "divergences": [],
+      "duration_ms": 0,
+      "error": "",
+      "implementations": {},
+      "label": "Daily report totals",
+      "note": "Report totals are produced by Flask route handlers and require an authenticated test client. Deferred to D2 (Golden Master Framework), which builds that harness. Reported as NOT_IMPLEMENTED rather than skipped so it cannot be mistaken for agreement.",
+      "policy": "RUPEE",
+      "quantity_id": "P16",
+      "severity": "BLOCK",
+      "verdict": "NOT_IMPLEMENTED"
+    },
+    {
+      "detail": {},
+      "divergences": [],
+      "duration_ms": 0,
+      "error": "",
+      "implementations": {},
+      "label": "MIS aggregates",
+      "note": "MIS is rendered through a route handler. Deferred to D2.",
+      "policy": "RUPEE",
+      "quantity_id": "P17",
+      "severity": "WARN",
+      "verdict": "NOT_IMPLEMENTED"
+    },
+    {
+      "detail": {},
+      "divergences": [],
+      "duration_ms": 0,
+      "error": "",
+      "implementations": {},
+      "label": "Executive dashboard tiles",
+      "note": "Dashboard context is built inside a route handler requiring an authenticated session. Deferred to D2.",
+      "policy": "RUPEE",
+      "quantity_id": "P18",
+      "severity": "BLOCK",
+      "verdict": "NOT_IMPLEMENTED"
+    },
+    {
+      "detail": {
+        "occupied_room_nights_over_activity_window": 29,
+        "room_status_occupied_count": 0,
+        "sellable_rooms": 39,
+        "snapshot": {
+          "anomaly": false,
+          "occupied": 0,
+          "orphan_checked_in": 0,
+          "pct": 0.0,
+          "sellable": 39,
+          "total": 39
+        }
+      },
+      "divergences": [],
+      "duration_ms": 19,
+      "error": "",
+      "implementations": {
+        "kpi_helpers.get_occupied_count": 0,
+        "occupancy_engine.occupied_rooms": 0
+      },
+      "label": "Occupancy and rooms sold",
+      "note": "occupancy_engine is already canonical (Phase 2 \u00a73). Room.status reports 0 occupied and is recorded for drift detection only, never as an implementation.",
+      "policy": "EXACT",
+      "quantity_id": "P19",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "night_audit_adr_by_date": {
+          "2026-05-27": "1261.75",
+          "2026-05-28": "1303.51"
+        },
+        "revpar_from_kpi_helpers": "0.0"
+      },
+      "divergences": [
+        {
+          "delta": "-1283.35",
+          "impl_a": "kpi_helpers.get_adr (AVG rate_per_night, no date scope)",
+          "impl_b": "room revenue / occupied room-nights (date-scoped)",
+          "scope": "ADR",
+          "value_a": "0.0",
+          "value_b": "1283.35"
+        }
+      ],
+      "duration_ms": 7,
+      "error": "",
+      "implementations": {
+        "kpi_helpers.get_adr (AVG rate_per_night, no date scope)": "0.0",
+        "room revenue / occupied room-nights (date-scoped)": "1283.35"
+      },
+      "label": "ADR and RevPAR (multiple definitions)",
+      "note": "kpi_helpers.get_adr takes NO date parameter \u2014 it averages the tariffs of currently checked-in reservations, so any historical ADR is actually today's ADR.",
+      "policy": "EXACT",
+      "quantity_id": "P20",
+      "severity": "BLOCK",
+      "verdict": "DIVERGED"
+    },
+    {
+      "detail": {
+        "shift_count": 0,
+        "shifts": [],
+        "total_declared": "0",
+        "total_variance": "0"
+      },
+      "divergences": [],
+      "duration_ms": 0,
+      "error": "",
+      "implementations": {
+        "recomputed calculate_expected_cash": "0",
+        "stored Shift.expected_cash": "0"
+      },
+      "label": "Cash position and variance",
+      "note": "Cash control cannot be verified without shift data. 0 shifts exist.",
+      "policy": "EXACT",
+      "quantity_id": "P21",
+      "severity": "BLOCK",
+      "verdict": "VACUOUS"
+    },
+    {
+      "detail": {
+        "company_credit_used_total": "0.0",
+        "get_ota_pending_error": "",
+        "individual_credit_outstanding": "200.00",
+        "misclassified_ota_head_count": 5,
+        "misclassified_ota_head_total": "7977.92",
+        "misclassified_rows": [
+          {
+            "amount": "1435.50",
+            "head": "Other OTA Paid",
+            "ota_payment_status": "pay_at_hotel",
+            "payment": 7,
+            "reservation": 7,
+            "source": "Walk-in"
+          },
+          {
+            "amount": "1700.15",
+            "head": "MMT Paid",
+            "ota_payment_status": "pay_at_hotel",
+            "payment": 10,
+            "reservation": 10,
+            "source": "Walk-in"
+          },
+          {
+            "amount": "1611.99",
+            "head": "EaseMyTrip Paid",
+            "ota_payment_status": "pay_at_hotel",
+            "payment": 11,
+            "reservation": 11,
+            "source": "Walk-in"
+          },
+          {
+            "amount": "1700.15",
+            "head": "Goibibo Paid",
+            "ota_payment_status": "pay_at_hotel",
+            "payment": 19,
+            "reservation": 17,
+            "source": "Walk-in"
+          },
+          {
+            "amount": "1530.13",
+            "head": "MMT Paid",
+            "ota_payment_status": "pay_at_hotel",
+            "payment": 33,
+            "reservation": 28,
+            "source": "Walk-in"
+          }
+        ],
+        "ota_payout_rows": 0
+      },
+      "divergences": [
+        {
+          "delta": "7977.92",
+          "impl_a": "compute_ota_outstanding (gross)",
+          "impl_b": "get_ota_pending (net of payouts)",
+          "scope": "OTA receivable",
+          "value_a": "7977.92",
+          "value_b": "0.0"
+        }
+      ],
+      "duration_ms": 17,
+      "error": "",
+      "implementations": {
+        "compute_ota_outstanding (gross)": "7977.92",
+        "get_ota_pending (net of payouts)": "0.0"
+      },
+      "label": "Receivables \u2014 OTA, corporate, individual",
+      "note": "Gross and net agree only while zero payouts exist. 5 payments totalling 7977.92 sit on OTA receivable heads against non-OTA bookings (Article IV \u00a76).",
+      "policy": "EXACT",
+      "quantity_id": "P22",
+      "severity": "BLOCK",
+      "verdict": "DIVERGED"
+    }
+  ],
+  "read_only_verified": true,
+  "source_db": "C:\\Users\\SIPL Server\\Downloads\\DSS\\SukoonPMS\\SukoonPMS\\instance\\pms.db",
+  "source_hash_after": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+  "source_hash_before": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+  "source_size_bytes": 733184,
+  "started_at": "2026-08-03T10:00:29"
+}

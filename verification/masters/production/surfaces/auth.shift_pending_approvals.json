@@ -1,0 +1,36 @@
+{
+  "anon_location": "/auth/login?next=%2Fauth%2Fshifts%2Fpending-approvals",
+  "anon_status": 302,
+  "body_bytes": 22208,
+  "body_sha256": "bab9446dcd1def30d9baef63be329085418a1ee29e8b94b9fa96962a0fbfaa2e",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 19,
+  "endpoint": "auth.shift_pending_approvals",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending[len]": "0",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "auth.shift_pending_approvals",
+  "templates": [
+    "auth/shift_pending_approvals.html"
+  ],
+  "truncations": [],
+  "url": "/auth/shifts/pending-approvals"
+}

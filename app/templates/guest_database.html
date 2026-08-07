@@ -1,0 +1,894 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<style>
+/* ── Layout ───────────────────────────────────────────────────── */
+.gdb-layout {
+    display: flex;
+    gap: 0;
+    align-items: flex-start;
+    transition: all 0.3s ease;
+}
+.gdb-table-wrap {
+    flex: 1;
+    min-width: 0;
+    transition: all 0.3s ease;
+}
+.gdb-panel {
+    width: 0;
+    overflow: hidden;
+    transition: width 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+    flex-shrink: 0;
+}
+.gdb-panel.open {
+    width: 360px;
+    opacity: 1;
+    margin-left: 16px;
+}
+
+/* ── Summary Cards ────────────────────────────────────────────── */
+.summary-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    border: 1px solid #f0f0f0;
+}
+.summary-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; flex-shrink: 0;
+}
+.summary-icon.blue   { background: #e8f0fe; color: #1967d2; }
+.summary-icon.green  { background: #e6f4ea; color: #188038; }
+.summary-icon.orange { background: #fce8e6; color: #d93025; }
+.summary-icon.purple { background: #f3e8fd; color: #7627bb; }
+.summary-value { font-size: 1.6rem; font-weight: 700; line-height: 1; color: #1a1a2e; }
+.summary-label { font-size: 0.75rem; color: #6c757d; margin-top: 2px; }
+
+/* ── Search/Filter Bar ────────────────────────────────────────── */
+.filter-bar .form-control,
+.filter-bar .form-select {
+    border-radius: 8px; border-color: #dee2e6; font-size: 0.875rem;
+}
+.filter-bar .form-control:focus,
+.filter-bar .form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.2rem rgba(13,110,253,.15);
+}
+
+/* ── Table ────────────────────────────────────────────────────── */
+.gdb-table thead th {
+    font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.04em; color: #6c757d;
+    background: #f8f9fa; border-bottom: 2px solid #e9ecef;
+    padding: 10px 12px; white-space: nowrap;
+}
+.gdb-table tbody td {
+    padding: 10px 12px; vertical-align: middle;
+    font-size: 0.875rem; border-bottom: 1px solid #f3f4f6;
+}
+.gdb-table tbody tr { cursor: pointer; transition: background 0.15s; }
+.gdb-table tbody tr:hover  { background: #f0f4ff; }
+.gdb-table tbody tr.selected { background: #e8f0fe !important; }
+
+/* ── Status Badges ────────────────────────────────────────────── */
+.status-badge {
+    display: inline-block; padding: 3px 9px; border-radius: 20px;
+    font-size: 0.72rem; font-weight: 600; white-space: nowrap;
+}
+.status-badge.checkedin   { background: #e6f4ea; color: #188038; }
+.status-badge.checkedout  { background: #e8f0fe; color: #1967d2; }
+.status-badge.reserved    { background: #fff8e1; color: #b45309; }
+.status-badge.noshow      { background: #fce8e6; color: #d93025; }
+.status-badge.cancelled   { background: #f1f3f4; color: #6c757d; }
+
+/* ── Action Buttons ───────────────────────────────────────────── */
+.action-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 9px; border-radius: 6px;
+    font-size: 0.73rem; font-weight: 500;
+    text-decoration: none; border: 1px solid transparent;
+    cursor: pointer; transition: all 0.15s; white-space: nowrap;
+    background: none;
+}
+.action-btn.view     { background:#e8f0fe; color:#1967d2; border-color:#c5d9fc; }
+.action-btn.view:hover { background:#1967d2; color:#fff; }
+
+/* Share dropdown trigger */
+.action-btn.share     { background:#f1f3f4; color:#3c4043; border-color:#dadce0; }
+.action-btn.share:hover { background:#3c4043; color:#fff; }
+.share-wrap { position: relative; display: inline-flex; }
+.share-dropdown {
+    display: none; position: absolute; top: calc(100% + 4px); left: 0;
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.12); z-index: 1050; min-width: 160px;
+    overflow: hidden;
+}
+.share-dropdown.open { display: block; }
+.share-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 14px; font-size: 0.8rem; font-weight: 500;
+    color: #3c4043; text-decoration: none; cursor: pointer;
+    transition: background 0.12s; border: none; background: none; width: 100%;
+}
+.share-item:hover { background: #f8f9fa; color: #1a1a2e; }
+.share-item.wa  { color: #128c7e; }
+.share-item.wa:hover  { background: #e6f4f0; }
+.share-item.mail { color: #1967d2; }
+.share-item.mail:hover { background: #e8f0fe; }
+
+/* Remind button */
+.action-btn.remind {
+    background: #fff8e1; color: #b45309;
+    border-color: #ffe082; font-weight: 600;
+}
+.action-btn.remind:hover { background: #f59f00; color: #fff; border-color: #f59f00; }
+.action-btn.remind[disabled],
+.action-btn.remind.settled {
+    background: #f1f3f4; color: #adb5bd; border-color: #e9ecef;
+    cursor: not-allowed; pointer-events: none;
+}
+
+/* Amount column: unpaid highlight */
+.amount-unpaid  { color: #d93025; font-weight: 700; }
+.unpaid-badge {
+    display: inline-block; padding: 1px 6px; border-radius: 10px;
+    background: #fce8e6; color: #d93025; font-size: 0.65rem;
+    font-weight: 700; margin-left: 4px; vertical-align: middle;
+}
+
+/* ── Detail Panel ─────────────────────────────────────────────── */
+.gdb-panel-inner {
+    background: #fff; border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.1); border: 1px solid #e9ecef;
+    position: sticky; top: 80px;
+    max-height: calc(100vh - 100px); overflow-y: auto;
+}
+.panel-header {
+    background: linear-gradient(135deg, #1967d2 0%, #0d4ea6 100%);
+    color: #fff; padding: 16px 18px; border-radius: 10px 10px 0 0;
+    display: flex; justify-content: space-between; align-items: flex-start;
+}
+.panel-body { padding: 16px 18px; }
+.panel-label {
+    font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.04em; color: #6c757d; margin-bottom: 2px;
+}
+.panel-val { font-size: 0.875rem; font-weight: 500; color: #1a1a2e; margin-bottom: 12px; }
+.panel-section { margin-bottom: 18px; }
+.panel-section-title {
+    font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; color: #1967d2;
+    border-bottom: 2px solid #e8f0fe; padding-bottom: 6px; margin-bottom: 12px;
+}
+.stay-item {
+    background: #f8f9fa; border-radius: 8px; padding: 10px 12px;
+    margin-bottom: 8px; font-size: 0.8rem; border-left: 3px solid #dee2e6;
+}
+.stay-item.ci  { border-left-color: #188038; }
+.stay-item.co  { border-left-color: #1967d2; }
+.stay-item.ns  { border-left-color: #d93025; }
+.stay-item.can { border-left-color: #adb5bd; }
+.stay-item.res { border-left-color: #b45309; }
+
+/* Balance row in panel */
+.panel-balance-row {
+    display: flex; justify-content: space-between; align-items: center;
+    background: #fff8e1; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px;
+    border: 1px solid #ffe082;
+}
+.panel-balance-row.settled { background: #e6f4ea; border-color: #b7e0c3; }
+.panel-balance-label { font-size: 0.75rem; font-weight: 600; color: #6c757d; }
+.panel-balance-val { font-size: 1rem; font-weight: 700; }
+.panel-balance-val.due     { color: #d93025; }
+.panel-balance-val.cleared { color: #188038; }
+
+/* ── Visits Badge ─────────────────────────────────────────────── */
+.visits-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: #e8f0fe; color: #1967d2; font-size: 0.8rem; font-weight: 700;
+}
+.visits-badge.repeat { background: #f3e8fd; color: #7627bb; }
+
+/* ── Misc ─────────────────────────────────────────────────────── */
+.panel-close-btn {
+    background: rgba(255,255,255,.2); border: none; color: #fff;
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 1rem; flex-shrink: 0; transition: background 0.15s;
+}
+.panel-close-btn:hover { background: rgba(255,255,255,.35); }
+.gdb-empty { text-align: center; padding: 60px 20px; color: #adb5bd; }
+.gdb-empty i { font-size: 3rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid pb-4">
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <div>
+            <h2 class="mb-0 fw-bold"><i class="bi bi-people-fill text-primary"></i> Guest Database</h2>
+            <small class="text-muted">Manage guest profiles and stay history</small>
+        </div>
+        <div class="d-flex gap-2">
+            <div class="btn-group" role="group">
+                <a href="{{ url_for('main.guest_database', sort='recent', search=search) }}"
+                   class="btn btn-sm {% if sort_by == 'recent' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                    <i class="bi bi-clock-history"></i> Recent
+                </a>
+                <a href="{{ url_for('main.guest_database', sort='name', search=search) }}"
+                   class="btn btn-sm {% if sort_by == 'name' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                    <i class="bi bi-sort-alpha-down"></i> Name
+                </a>
+                <a href="{{ url_for('main.guest_database', sort='visits', search=search) }}"
+                   class="btn btn-sm {% if sort_by == 'visits' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                    <i class="bi bi-graph-up"></i> Visits
+                </a>
+            </div>
+            <a href="{{ url_for('main.walkin_checkin_new') }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-circle"></i> New Check-in
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary Bar -->
+    <div class="row g-3 mb-3">
+        <div class="col-6 col-sm-3">
+            <div class="summary-card">
+                <div class="summary-icon blue"><i class="bi bi-people"></i></div>
+                <div>
+                    <div class="summary-value">{{ total_guests }}</div>
+                    <div class="summary-label">Total Guests</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-sm-3">
+            <div class="summary-card">
+                <div class="summary-icon green"><i class="bi bi-door-open"></i></div>
+                <div>
+                    <div class="summary-value">{{ active_stays }}</div>
+                    <div class="summary-label">Active Stays</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-sm-3">
+            <div class="summary-card">
+                <div class="summary-icon orange"><i class="bi bi-box-arrow-right"></i></div>
+                <div>
+                    <div class="summary-value">{{ checked_out }}</div>
+                    <div class="summary-label">Checked Out</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-sm-3">
+            <div class="summary-card">
+                <div class="summary-icon purple"><i class="bi bi-arrow-repeat"></i></div>
+                <div>
+                    <div class="summary-value">{{ repeat_guests }}</div>
+                    <div class="summary-label">Repeat Guests</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body py-2">
+            <form method="GET" class="filter-bar d-flex gap-2 flex-wrap align-items-center">
+                <input type="hidden" name="sort" value="{{ sort_by }}">
+                <div class="flex-grow-1" style="min-width:220px">
+                    <input type="text" name="search" class="form-control form-control-sm"
+                           placeholder="&#128269; Search name, phone, email, company..."
+                           value="{{ search }}">
+                </div>
+                <select id="statusFilter" class="form-select form-select-sm" style="width:150px">
+                    <option value="">All Status</option>
+                    <option value="CheckedIn">Checked-in</option>
+                    <option value="CheckedOut">Checked-out</option>
+                    <option value="Reserved">Reserved</option>
+                    <option value="NoShow">No-show</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+                <select id="visitsFilter" class="form-select form-select-sm" style="width:130px">
+                    <option value="">All Visits</option>
+                    <option value="1">1 Visit</option>
+                    <option value="2">2+ Visits</option>
+                    <option value="5">5+ Visits</option>
+                </select>
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="bi bi-search"></i> Search
+                </button>
+                {% if search %}
+                <a href="{{ url_for('main.guest_database', sort=sort_by) }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-x-circle"></i> Clear
+                </a>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Layout: Table + Detail Panel -->
+    {% if guests.items %}
+    <div class="gdb-layout">
+
+        <!-- Table -->
+        <div class="gdb-table-wrap">
+            <div class="card border-0 shadow-sm">
+                <div class="table-responsive">
+                    <table class="table gdb-table mb-0" id="guestTable">
+                        <thead>
+                            <tr>
+                                <th style="width:20%">Guest Name</th>
+                                <th style="width:13%">Phone</th>
+                                <th style="width:12%">Last Visit</th>
+                                <th style="width:6%" class="text-center">Visits</th>
+                                <th style="width:11%">Status</th>
+                                <th style="width:11%" class="text-end">Balance</th>
+                                <th style="width:27%" class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="guestTableBody">
+                            {% for guest in guests.items %}
+                            {% set latest = guest.reservations | sort(attribute='arrival_date', reverse=True) | first if guest.reservations else None %}
+                            {% set cur_status = latest.status if latest else '' %}
+                            {% set visit_count = guest.reservations | length %}
+
+                            {# ── Compute latest reservation balance ── #}
+                            {% if latest %}
+                                {% set b = namespace(paid=0, extra=0) %}
+                                {% for p in latest.payments %}
+                                    {% if not p.is_voided %}
+                                        {% set b.paid = b.paid + p.amount %}
+                                    {% endif %}
+                                {% endfor %}
+                                {# Skip night-audit room_rent rows — l_total
+                                   below already adds rate_per_night × nights,
+                                   so summing them here would double-count the
+                                   room charge in the guest's outstanding total. #}
+                                {% for ec in latest.extra_charges if (ec.charge_type or '') != 'room_rent' %}
+                                    {% set b.extra = b.extra + ec.amount %}
+                                {% endfor %}
+                                {% set l_nights = (latest.departure_date - latest.arrival_date).days %}
+                                {% set l_total  = (latest.rate_per_night * l_nights) + b.extra %}
+                                {% set l_balance = l_total - b.paid %}
+                                {% set has_invoice = latest.invoice_number is not none and latest.invoice_number != '' %}
+                                {% set show_remind = has_invoice and l_balance > 0.01 %}
+                                {% set invoice_url = url_for('main.invoice', reservation_id=latest.id, _external=True) %}
+                            {% else %}
+                                {% set l_balance = 0 %}
+                                {% set has_invoice = false %}
+                                {% set show_remind = false %}
+                                {% set invoice_url = '' %}
+                            {% endif %}
+
+                            <tr class="guest-row"
+                                data-guest-id="{{ guest.id }}"
+                                data-status="{{ cur_status }}"
+                                data-visits="{{ visit_count }}"
+                                data-phone="{{ guest.phone }}"
+                                data-email="{{ guest.email or '' }}"
+                                data-name="{{ guest.name }}"
+                                data-balance="{{ l_balance | round(2) }}"
+                                data-has-invoice="{{ '1' if has_invoice else '0' }}"
+                                data-invoice-url="{{ invoice_url }}"
+                                data-show-remind="{{ '1' if show_remind else '0' }}">
+
+                                <td>
+                                    <div class="fw-semibold">{{ guest.name }}</div>
+                                    {% if guest.company %}
+                                    <div class="text-muted" style="font-size:0.75rem">{{ guest.company }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="tel:{{ guest.phone }}" class="text-decoration-none text-body"
+                                       onclick="event.stopPropagation()">{{ guest.phone }}</a>
+                                </td>
+                                <td>
+                                    {% if latest %}
+                                    {{ latest.arrival_date.strftime('%d %b %Y') }}
+                                    {% else %}
+                                    <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <span class="visits-badge {% if visit_count > 1 %}repeat{% endif %}">{{ visit_count }}</span>
+                                </td>
+                                <td>
+                                    {% if cur_status == 'CheckedIn' %}
+                                        <span class="status-badge checkedin"><i class="bi bi-circle-fill" style="font-size:.45rem;vertical-align:middle"></i> Checked-in</span>
+                                    {% elif cur_status == 'CheckedOut' %}
+                                        <span class="status-badge checkedout"><i class="bi bi-circle-fill" style="font-size:.45rem;vertical-align:middle"></i> Checked-out</span>
+                                    {% elif cur_status == 'Reserved' %}
+                                        <span class="status-badge reserved"><i class="bi bi-circle-fill" style="font-size:.45rem;vertical-align:middle"></i> Reserved</span>
+                                    {% elif cur_status == 'NoShow' %}
+                                        <span class="status-badge noshow"><i class="bi bi-circle-fill" style="font-size:.45rem;vertical-align:middle"></i> No-show</span>
+                                    {% elif cur_status == 'Cancelled' %}
+                                        <span class="status-badge cancelled"><i class="bi bi-circle-fill" style="font-size:.45rem;vertical-align:middle"></i> Cancelled</span>
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    {% if latest %}
+                                        {% if l_balance > 0.01 %}
+                                            <span class="amount-unpaid">₹{{ l_balance | int }}</span>
+                                            <span class="unpaid-badge">Due</span>
+                                        {% else %}
+                                            <span class="text-success fw-semibold">Settled</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+
+                                {# ── Actions ── #}
+                                <td class="text-center" onclick="event.stopPropagation()">
+                                    <div class="d-flex gap-1 justify-content-center align-items-center flex-wrap">
+
+                                        {# Compute advance / future-stay state for receipt-vs-invoice routing #}
+                                        {% set _is_future = latest and cur_status in ('Reserved', 'Confirmed', 'Overbooked') %}
+                                        {% set _has_invoice = latest and cur_status in ('CheckedIn', 'CheckedOut') %}
+                                        {% set _adv_gross = (latest.payments | rejectattr('is_voided') | selectattr('payment_purpose', 'equalto', 'advance') | map(attribute='amount') | map('float') | sum) if latest else 0 %}
+                                        {% set _adv_refunded = (latest.payments | rejectattr('is_voided') | selectattr('payment_purpose', 'equalto', 'refund') | map(attribute='amount') | map('float') | sum) if latest else 0 %}
+                                        {% set _adv_net = _adv_gross - _adv_refunded %}
+
+                                        {# 1. Document button — Tax Invoice only after stay; Receipt or Booking before #}
+                                        {% if _has_invoice %}
+                                        <a href="{{ url_for('main.invoice', reservation_id=latest.id) }}"
+                                           class="action-btn view"
+                                           title="Tax Invoice (stay generated)">
+                                            <i class="bi bi-receipt"></i> Invoice
+                                        </a>
+                                        {% elif _is_future and _adv_net > 0.005 %}
+                                        <a href="{{ url_for('main.advance_receipt', reservation_id=latest.id) }}"
+                                           class="action-btn view"
+                                           style="background:#fef3c7;color:#92400e;border-color:#f59e0b;"
+                                           title="Advance Receipt — not a tax invoice">
+                                            <i class="bi bi-cash-coin"></i> Receipt
+                                        </a>
+                                        {% elif _is_future %}
+                                        <a href="{{ url_for('main.advance_receipt', reservation_id=latest.id) }}"
+                                           class="action-btn view"
+                                           style="background:#e0e7ff;color:#3730a3;border-color:#a5b4fc;"
+                                           title="Booking confirmation — no advance on file">
+                                            <i class="bi bi-calendar-check"></i> Booking
+                                        </a>
+                                        {% endif %}
+
+                                        {# 1b. Cancel — visible for active future bookings #}
+                                        {% if _is_future %}
+                                        <a href="{{ url_for('main.reservations') }}?cancel_res={{ latest.id }}"
+                                           class="action-btn"
+                                           style="background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;"
+                                           title="Cancel booking{% if _adv_net > 0.005 %} (advance ₹{{ '%.0f'|format(_adv_net) }} on file){% endif %}">
+                                            <i class="bi bi-x-circle"></i> Cancel
+                                        </a>
+                                        {% endif %}
+
+                                        {# 2. Share dropdown #}
+                                        {% if latest and has_invoice %}
+                                        <div class="share-wrap" id="sw-{{ guest.id }}">
+                                            <button class="action-btn share"
+                                                    onclick="toggleShare(event, '{{ guest.id }}')">
+                                                <i class="bi bi-share"></i> Share <i class="bi bi-chevron-down" style="font-size:.6rem"></i>
+                                            </button>
+                                            <div class="share-dropdown" id="sd-{{ guest.id }}">
+                                                <button class="share-item wa"
+                                                        onclick="shareWhatsApp(event, '{{ guest.phone }}', '{{ guest.name }}', {{ l_balance | round(2) }}, '{{ invoice_url }}')">
+                                                    <i class="bi bi-whatsapp"></i> WhatsApp
+                                                </button>
+                                                {% if guest.email %}
+                                                <button class="share-item mail"
+                                                        onclick="shareEmail(event, '{{ guest.email }}', '{{ guest.name }}', {{ l_balance | round(2) }}, '{{ invoice_url }}')">
+                                                    <i class="bi bi-envelope"></i> Email
+                                                </button>
+                                                {% endif %}
+                                                <a href="{{ url_for('main.invoice', reservation_id=latest.id) }}"
+                                                   class="share-item" target="_blank">
+                                                    <i class="bi bi-box-arrow-up-right"></i> Open Invoice
+                                                </a>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+
+                                        {# 3. Payment Reminder #}
+                                        {% if latest %}
+                                            {% if show_remind %}
+                                            <button class="action-btn remind"
+                                                    onclick="sendReminder(event, '{{ guest.phone }}', '{{ guest.name }}', {{ l_balance | round(2) }}, '{{ invoice_url }}')"
+                                                    title="Send WhatsApp payment reminder">
+                                                <i class="bi bi-cash-coin"></i> Remind
+                                            </button>
+                                            {% elif has_invoice and l_balance <= 0.01 %}
+                                            <button class="action-btn remind settled"
+                                                    title="Already settled — no outstanding balance"
+                                                    tabindex="-1">
+                                                <i class="bi bi-check-circle"></i> Settled
+                                            </button>
+                                            {% endif %}
+                                        {% endif %}
+
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Hidden guest detail data for side panel -->
+                            <div class="d-none guest-detail-data" id="gdata-{{ guest.id }}">
+                                <div class="panel-guest-name">{{ guest.name }}</div>
+                                <div class="panel-guest-sub">{{ guest.company or '' }}</div>
+                                <div class="panel-guest-status">{{ cur_status }}</div>
+                                <div class="panel-guest-visits">{{ visit_count }}</div>
+                                <div class="panel-guest-folio">{{ url_for('main.guest_folio', guest_id=guest.id) }}</div>
+                                <div class="panel-guest-phone">{{ guest.phone }}</div>
+                                <div class="panel-guest-email">{{ guest.email or '' }}</div>
+                                <div class="panel-guest-balance">{{ l_balance | round(2) }}</div>
+                                <div class="panel-guest-has-invoice">{{ '1' if has_invoice else '0' }}</div>
+                                <div class="panel-guest-show-remind">{{ '1' if show_remind else '0' }}</div>
+                                {% if latest %}
+                                <div class="panel-guest-invoice">{{ url_for('main.invoice', reservation_id=latest.id) }}</div>
+                                <div class="panel-guest-invoice-ext">{{ invoice_url }}</div>
+                                {% else %}
+                                <div class="panel-guest-invoice"></div>
+                                <div class="panel-guest-invoice-ext"></div>
+                                {% endif %}
+
+                                <!-- Guest info fields -->
+                                <dl class="panel-info-list">
+                                    <div><dt>Phone</dt><dd>{{ guest.phone }}</dd></div>
+                                    <div><dt>Email</dt><dd>{{ guest.email or '—' }}</dd></div>
+                                    <div><dt>Company</dt><dd>{{ guest.company or '—' }}</dd></div>
+                                    <div><dt>Address</dt><dd>{{ guest.address or '—' }}</dd></div>
+                                    <div><dt>ID Type</dt><dd>{{ guest.id_proof_type or '—' }}</dd></div>
+                                    <div><dt>ID Number</dt><dd>{{ guest.id_proof_number or '—' }}</dd></div>
+                                    <div><dt>Folio</dt><dd>F{{ '%04d' % guest.id }}</dd></div>
+                                </dl>
+
+                                <!-- Stay history -->
+                                <div class="panel-stays">
+                                    {% for res in guest.reservations | sort(attribute='arrival_date', reverse=True) | list %}
+                                    {% if loop.index <= 6 %}
+                                    {% set s_class = 'ci' if res.status == 'CheckedIn' else 'co' if res.status == 'CheckedOut' else 'ns' if res.status == 'NoShow' else 'can' if res.status == 'Cancelled' else 'res' %}
+                                    <div class="stay-item {{ s_class }}">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <div class="fw-semibold">{{ res.arrival_date.strftime('%d %b') }} – {{ res.departure_date.strftime('%d %b %Y') }}</div>
+                                                <div class="text-muted">{{ res.room_type.name }} &middot; {{ (res.departure_date - res.arrival_date).days }}N</div>
+                                            </div>
+                                            <span class="status-badge {% if res.status == 'CheckedIn' %}checkedin{% elif res.status == 'CheckedOut' %}checkedout{% elif res.status == 'NoShow' %}noshow{% elif res.status == 'Cancelled' %}cancelled{% else %}reserved{% endif %}" style="font-size:0.65rem">
+                                                {{ res.status }}
+                                            </span>
+                                        </div>
+                                        {% set sn = (res.departure_date - res.arrival_date).days %}
+                                        <div class="mt-1 text-muted">{% if sn > 0 %}₹{{ (res.rate_per_night * sn) | int }}{% else %}—{% endif %}</div>
+                                    </div>
+                                    {% endif %}
+                                    {% else %}
+                                    <p class="text-muted" style="font-size:0.8rem">No stay history.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            {% if guests.pages > 1 %}
+            <nav class="mt-3">
+                <ul class="pagination justify-content-center mb-0" style="gap:.25rem">
+                    {% if guests.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('main.guest_database', page=guests.prev_num, search=search, sort=sort_by) }}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% for page_num in guests.iter_pages() %}
+                        {% if page_num %}
+                            {% if page_num == guests.page %}
+                            <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                            {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('main.guest_database', page=page_num, search=search, sort=sort_by) }}">{{ page_num }}</a>
+                            </li>
+                            {% endif %}
+                        {% else %}
+                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if guests.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('main.guest_database', page=guests.next_num, search=search, sort=sort_by) }}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+
+        <!-- Detail Panel -->
+        <div class="gdb-panel" id="guestPanel">
+            <div class="gdb-panel-inner">
+                <div class="panel-header">
+                    <div>
+                        <div class="fw-bold fs-6" id="panelName">Guest Name</div>
+                        <div style="font-size:0.78rem;opacity:.8" id="panelSub"></div>
+                        <div class="mt-1" id="panelStatus"></div>
+                    </div>
+                    <button class="panel-close-btn" id="panelClose" title="Close">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                <div class="panel-body">
+                    <!-- Balance row -->
+                    <div id="panelBalanceRow"></div>
+
+                    <!-- Actions -->
+                    <div class="d-flex gap-2 mb-3 flex-wrap" id="panelActions"></div>
+
+                    <!-- Guest Info -->
+                    <div class="panel-section">
+                        <div class="panel-section-title"><i class="bi bi-person-vcard"></i> Guest Info</div>
+                        <div id="panelInfo"></div>
+                    </div>
+
+                    <!-- Stay History -->
+                    <div class="panel-section">
+                        <div class="panel-section-title"><i class="bi bi-calendar3"></i> Stay History</div>
+                        <div id="panelStays"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="card border-0 shadow-sm">
+        <div class="card-body gdb-empty">
+            <i class="bi bi-inbox d-block mb-2"></i>
+            <p class="text-muted mb-0">
+                {% if search %}No guests found matching "{{ search }}"{% else %}No guests in database yet{% endif %}
+            </p>
+            {% if search %}
+            <a href="{{ url_for('main.guest_database') }}" class="btn btn-outline-primary btn-sm mt-3">Clear Search</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const HOTEL_NAME = {{ app_display_name | tojson }};
+/* ─── WhatsApp reminder message builder ──────────────────────── */
+function buildReminderMsg(name, balance, invoiceUrl) {
+    return 'Dear ' + name + ',\n\n'
+        + 'This is a gentle reminder that \u20b9' + Math.round(balance)
+        + ' is pending for your recent stay at ' + HOTEL_NAME + '.\n'
+        + 'You can view your invoice here: ' + invoiceUrl + '\n\n'
+        + 'Kindly clear the payment at your convenience.\n'
+        + 'Thank you!';
+}
+
+/* Strip non-digit chars and prepend 91 if needed */
+function normalisePhone(phone) {
+    const digits = phone.replace(/\D/g, '');
+    if (digits.startsWith('91') && digits.length === 12) return digits;
+    if (digits.length === 10) return '91' + digits;
+    return digits;
+}
+
+function sendReminder(e, phone, name, balance, invoiceUrl) {
+    e.stopPropagation();
+    const msg = buildReminderMsg(name, balance, invoiceUrl);
+    const url = 'https://wa.me/' + normalisePhone(phone) + '?text=' + encodeURIComponent(msg);
+    window.open(url, '_blank');
+}
+
+/* ─── Share helpers ───────────────────────────────────────────── */
+function shareWhatsApp(e, phone, name, balance, invoiceUrl) {
+    e.stopPropagation();
+    const msg = 'Invoice from ' + HOTEL_NAME + ' for ' + name + ': ' + invoiceUrl;
+    const url = 'https://wa.me/' + normalisePhone(phone) + '?text=' + encodeURIComponent(msg);
+    window.open(url, '_blank');
+    closeAllShareDropdowns();
+}
+
+function shareEmail(e, email, name, balance, invoiceUrl) {
+    e.stopPropagation();
+    const subject = encodeURIComponent('Invoice – ' + HOTEL_NAME);
+    const body    = encodeURIComponent(
+        'Dear ' + name + ',\n\nPlease find your invoice here:\n' + invoiceUrl
+        + '\n\nThank you for staying with us.\n\n' + HOTEL_NAME
+    );
+    window.location.href = 'mailto:' + email + '?subject=' + subject + '&body=' + body;
+    closeAllShareDropdowns();
+}
+
+function toggleShare(e, guestId) {
+    e.stopPropagation();
+    const dd = document.getElementById('sd-' + guestId);
+    const isOpen = dd.classList.contains('open');
+    closeAllShareDropdowns();
+    if (!isOpen) dd.classList.add('open');
+}
+
+function closeAllShareDropdowns() {
+    document.querySelectorAll('.share-dropdown.open').forEach(d => d.classList.remove('open'));
+}
+
+/* Close dropdowns when clicking outside */
+document.addEventListener('click', closeAllShareDropdowns);
+
+/* ─── Detail Panel ────────────────────────────────────────────── */
+(function () {
+    const panel       = document.getElementById('guestPanel');
+    const panelClose  = document.getElementById('panelClose');
+    const panelName   = document.getElementById('panelName');
+    const panelSub    = document.getElementById('panelSub');
+    const panelStatus = document.getElementById('panelStatus');
+    const panelActions = document.getElementById('panelActions');
+    const panelBalRow  = document.getElementById('panelBalanceRow');
+    const panelInfo   = document.getElementById('panelInfo');
+    const panelStays  = document.getElementById('panelStays');
+
+    const statusBadge = {
+        CheckedIn:  '<span class="status-badge checkedin"><i class="bi bi-circle-fill" style="font-size:.4rem;vertical-align:middle"></i> Checked-in</span>',
+        CheckedOut: '<span class="status-badge checkedout"><i class="bi bi-circle-fill" style="font-size:.4rem;vertical-align:middle"></i> Checked-out</span>',
+        Reserved:   '<span class="status-badge reserved"><i class="bi bi-circle-fill" style="font-size:.4rem;vertical-align:middle"></i> Reserved</span>',
+        NoShow:     '<span class="status-badge noshow"><i class="bi bi-circle-fill" style="font-size:.4rem;vertical-align:middle"></i> No-show</span>',
+        Cancelled:  '<span class="status-badge cancelled"><i class="bi bi-circle-fill" style="font-size:.4rem;vertical-align:middle"></i> Cancelled</span>',
+    };
+
+    function openPanel(guestId) {
+        const data = document.getElementById('gdata-' + guestId);
+        if (!data) return;
+
+        const name       = data.querySelector('.panel-guest-name').textContent.trim();
+        const sub        = data.querySelector('.panel-guest-sub').textContent.trim();
+        const status     = data.querySelector('.panel-guest-status').textContent.trim();
+        const phone      = data.querySelector('.panel-guest-phone').textContent.trim();
+        const email      = data.querySelector('.panel-guest-email').textContent.trim();
+        const balance    = parseFloat(data.querySelector('.panel-guest-balance').textContent.trim()) || 0;
+        const hasInvoice = data.querySelector('.panel-guest-has-invoice').textContent.trim() === '1';
+        const showRemind = data.querySelector('.panel-guest-show-remind').textContent.trim() === '1';
+        const invoiceUrl = data.querySelector('.panel-guest-invoice').textContent.trim();
+        const invoiceExt = data.querySelector('.panel-guest-invoice-ext').textContent.trim();
+        const folioUrl   = data.querySelector('.panel-guest-folio').textContent.trim();
+
+        panelName.textContent = name;
+        panelSub.textContent  = sub || ('Folio #' + String(guestId).padStart(4, '0'));
+        panelStatus.innerHTML = statusBadge[status] || '';
+
+        /* Balance row */
+        if (invoiceUrl) {
+            const settled = balance <= 0.01;
+            panelBalRow.innerHTML = `
+                <div class="panel-balance-row ${settled ? 'settled' : ''}">
+                    <span class="panel-balance-label">${settled ? 'Payment Status' : 'Outstanding Balance'}</span>
+                    <span class="panel-balance-val ${settled ? 'cleared' : 'due'}">
+                        ${settled ? '<i class="bi bi-check-circle-fill"></i> Settled' : '₹' + Math.round(balance) + ' Due'}
+                    </span>
+                </div>`;
+        } else {
+            panelBalRow.innerHTML = '';
+        }
+
+        /* Action buttons */
+        let html = '';
+        if (invoiceUrl) {
+            html += `<a href="${invoiceUrl}" class="action-btn view"><i class="bi bi-receipt"></i> View Invoice</a>`;
+        }
+        if (hasInvoice) {
+            html += `<button class="action-btn share" style="position:relative"
+                         onclick="(function(e){
+                             e.stopPropagation();
+                             const m='Invoice from '+HOTEL_NAME+' for ${name.replace(/'/g,"\\'")}:'
+                                 +' ${invoiceExt}';
+                             window.open('https://wa.me/${normalisePhoneJS(phone)}?text='+encodeURIComponent(m),'_blank');
+                         })(event)">
+                         <i class="bi bi-whatsapp"></i> Share
+                     </button>`;
+            if (email) {
+                html += `<button class="action-btn share"
+                             onclick="shareEmail(event,'${email}','${name.replace(/'/g,"\\'")}',${balance},'${invoiceExt}')">
+                             <i class="bi bi-envelope"></i> Email
+                         </button>`;
+            }
+        }
+        if (showRemind) {
+            html += `<button class="action-btn remind"
+                         onclick="sendReminder(event,'${phone}','${name.replace(/'/g,"\\'")}',${balance},'${invoiceExt}')"
+                         title="Send WhatsApp payment reminder">
+                         <i class="bi bi-cash-coin"></i> Remind ₹${Math.round(balance)}
+                     </button>`;
+        } else if (hasInvoice && balance <= 0.01) {
+            html += `<button class="action-btn remind settled" title="Already settled" tabindex="-1">
+                         <i class="bi bi-check-circle"></i> Settled
+                     </button>`;
+        }
+        panelActions.innerHTML = html;
+
+        /* Guest info */
+        const infoList = data.querySelector('.panel-info-list');
+        let infoHtml = '';
+        if (infoList) {
+            infoList.querySelectorAll('div').forEach(row => {
+                const label = row.querySelector('dt') ? row.querySelector('dt').textContent.trim() : '';
+                const val   = row.querySelector('dd') ? row.querySelector('dd').textContent.trim() : '';
+                infoHtml += `<div class="d-flex gap-2 mb-2">
+                    <span class="panel-label" style="min-width:72px">${label}</span>
+                    <span class="panel-val mb-0">${val}</span>
+                </div>`;
+            });
+        }
+        panelInfo.innerHTML = infoHtml;
+
+        /* Stay history */
+        const staysEl = data.querySelector('.panel-stays');
+        panelStays.innerHTML = staysEl ? staysEl.innerHTML : '<p class="text-muted" style="font-size:.8rem">No stay history.</p>';
+
+        panel.classList.add('open');
+        document.querySelectorAll('.guest-row').forEach(r => r.classList.remove('selected'));
+        const row = document.querySelector(`.guest-row[data-guest-id="${guestId}"]`);
+        if (row) row.classList.add('selected');
+    }
+
+    function closePanel() {
+        panel.classList.remove('open');
+        document.querySelectorAll('.guest-row').forEach(r => r.classList.remove('selected'));
+    }
+
+    document.querySelectorAll('.guest-row').forEach(row => {
+        row.addEventListener('click', () => openPanel(row.dataset.guestId));
+    });
+    if (panelClose) panelClose.addEventListener('click', closePanel);
+
+    document.addEventListener('click', function(e) {
+        if (!panel.contains(e.target) && !e.target.closest('.guest-row')) {
+            if (panel.classList.contains('open')) closePanel();
+        }
+    });
+
+    /* Client-side filters */
+    const statusFilter = document.getElementById('statusFilter');
+    const visitsFilter = document.getElementById('visitsFilter');
+
+    function applyFilters() {
+        const sv = statusFilter ? statusFilter.value : '';
+        const vv = visitsFilter ? visitsFilter.value : '';
+        document.querySelectorAll('.guest-row').forEach(row => {
+            let show = true;
+            if (sv && row.dataset.status !== sv) show = false;
+            if (vv && parseInt(row.dataset.visits, 10) < parseInt(vv, 10)) show = false;
+            row.style.display = show ? '' : 'none';
+        });
+    }
+
+    if (statusFilter) statusFilter.addEventListener('change', applyFilters);
+    if (visitsFilter) visitsFilter.addEventListener('change', applyFilters);
+})();
+
+/* Helper used in panel (can't call Jinja2 from inline JS) */
+function normalisePhoneJS(phone) {
+    const d = phone.replace(/\D/g, '');
+    if (d.startsWith('91') && d.length === 12) return d;
+    if (d.length === 10) return '91' + d;
+    return d;
+}
+</script>
+{% endblock %}

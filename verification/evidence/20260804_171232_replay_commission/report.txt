@@ -1,0 +1,116 @@
+====================================================================================================
+DSBC FRONTLINE — HISTORICAL REPLAY COMMISSIONING
+Wave 0 Deliverable 3 — Principle 9 / Principle 11
+====================================================================================================
+Result: 21/21 COMMISSIONED
+Faults seeded into closed business day: 2026-05-27
+
+[PASS] S-RP-NULL  (NULL CONTROL)
+    Same data, no fault. Any difference is a false positive.
+    no false positives across all dates
+
+[PASS] S-RP-BACKDATE  (DATA FAULT)
+    Post a 555.00 cash settlement INTO a closed business day. The books for that day now differ from what was reported at close; the replay must say so.
+    1 row(s) changed; every declared effect occurred
+      - ledger figures moved: 7
+      - engine figures moved: 43
+      - new history drift: nas.payment_summary.payment_count vs snapshot.payments.payment_count, nas.payment_summary.total_collected vs snapshot.payments.total_collected, nas.payment_summary.total_collected vs stored.total_revenue
+
+[PASS] S-RP-PAISA  (DATA FAULT)
+    Move a single closed-day payment by ONE PAISA. The framework claims no tolerance band on history; this is the test of that claim. A rounding-tolerant replay would let a systematic sub-rupee drift through on every day at once.
+    1 row(s) changed; every declared effect occurred
+      - ledger figures moved: 5
+      - engine figures moved: 22
+      - new history drift: nas.payment_summary.total_collected vs snapshot.payments.total_collected, nas.payment_summary.total_collected vs stored.total_revenue
+
+[PASS] S-RP-VOID  (DATA FAULT)
+    Void a payment that belongs to a closed day. Voiding after the close removes money from a period that has already been reported and reconciled.
+    1 row(s) changed; every declared effect occurred
+      - ledger figures moved: 7
+      - engine figures moved: 27
+      - new history drift: nas.payment_summary.payment_count vs snapshot.payments.payment_count, nas.payment_summary.total_collected vs snapshot.payments.total_collected, nas.payment_summary.total_collected vs stored.total_revenue
+
+[PASS] S-RP-CHARGE  (DATA FAULT)
+    Post a 222.00 charge into the closed day. Accrual revenue for a reported period must not be able to change without the replay noticing.
+    1 row(s) changed; every declared effect occurred
+      - ledger figures moved: 4
+      - engine figures moved: 22
+      - new history drift: nas.revenue_summary.accrual_net vs snapshot.revenue.accrual_net, nas.revenue_summary.accrual_net vs stored.accrual_revenue
+
+[PASS] S-RP-RATE  (DATA FAULT)
+    Raise the priced rate of one room night that belongs to the closed day by 111.00. The nightly rate record is the closest thing the schema has to an immutable statement of what a room was sold for.
+    1 row(s) changed; every declared effect occurred
+      - ledger figures moved: 1
+      - engine figures moved: 5
+
+[PASS] S-RP-STORED  (DATA FAULT)
+    Rewrite the stored close total for the audited day. The night audit log is the hotel's own statement about the day; altering it must not be quiet.
+    1 row(s) changed; every declared effect occurred
+      - ledger figures moved: 0
+      - engine figures moved: 0
+      - new history drift: nas.payment_summary.total_collected vs stored.total_revenue
+
+[PASS] S-RP-SNAPSHOT  (DATA FAULT)
+    Tamper with the frozen snapshot without touching its hash. The application claims a tamper-detection control here; this proves the claim, and proves the replay surfaces it.
+    1 row(s) changed; every declared effect occurred
+      - ledger figures moved: 0
+      - engine figures moved: 0
+      - snapshot integrity: True -> False
+
+[PASS] S-RP-ORPHAN-MODE  (RECONCILIATION FAULT)
+    Point one closed-day payment at a payment mode that does not exist. This is the seed that proves the reconciliations are not tautological: the night audit defaults a missing mode to DIRECT cash (night_audit_service.py:537), while kpi_helpers inner-joins PaymentMode and drops the row entirely. The two application views therefore disagree about the same rupees, and the ledger — which counts the row as neither direct nor OTA — is what reveals which of them moved.
+        The first attempt at this seed used an unknown mode CATEGORY and was rejected by ck_payment_mode_category. The schema forbidding that fault is a real control and is recorded as such; the orphan reaches the same disagreement by a route the schema does not close, because foreign keys are not enforced on this database.
+    1 row(s) changed; every declared effect occurred
+      - ledger figures moved: 5
+      - engine figures moved: 22
+      - RC11: RECONCILED -> UNRECONCILED
+
+[PASS] S-RP-ASAT  (AS-AT CONTROL)
+    Remove the one declared as-at exclusion and require the drift it was masking to be reported. This is the proof that PASS A and PASS C really ran under different clocks and that the comparator compares them.
+    27 past date(s) reported drift on 1 path(s) once unmasked
+      - nas.audit_header.generated_at
+
+[PASS] S-RP-CMP-NULL  (COMPARATOR FAULT)
+    Stored replay compared against itself.
+    clean
+
+[PASS] S-RP-CMP-LEDGER  (COMPARATOR FAULT)
+    The primary record for the closed day 2026-05-27 moved by one paisa.
+    reported LEDGER_CHANGED at BLOCK
+
+[PASS] S-RP-CMP-ENGINE  (COMPARATOR FAULT)
+    The application now reports a different cash figure for the closed day 2026-05-27.
+    reported ENGINE_CHANGED at BLOCK
+
+[PASS] S-RP-CMP-RECORDED  (COMPARATOR FAULT)
+    The frozen close for 2026-05-27 was rewritten.
+    reported RECORDED_CHANGED at BLOCK
+
+[PASS] S-RP-CMP-INTEGRITY  (COMPARATOR FAULT)
+    The snapshot integrity verdict for 2026-05-27 changed.
+    reported SNAPSHOT_INTEGRITY_CHANGED at BLOCK
+
+[PASS] S-RP-CMP-CLOSURE  (COMPARATOR FAULT)
+    2026-05-27 was reopened after being closed.
+    reported CLOSURE_CHANGED at BLOCK
+
+[PASS] S-RP-CMP-DATE-GONE  (COMPARATOR FAULT)
+    2026-05-27 is present in the stored replay but the release no longer produces it — a day of trading that has disappeared.
+    reported DATE_REMOVED at BLOCK
+
+[PASS] S-RP-CMP-BACKDATED  (COMPARATOR FAULT)
+    A date appears that is earlier than any the stored replay knows about — a posting back-dated into a period that did not exist.
+    reported BACKDATED_DAY at BLOCK
+
+[PASS] S-RP-CMP-RECON  (COMPARATOR FAULT)
+    A reconciliation that held on 2026-05-27 now fails.
+    reported RECONCILIATION_CHANGED at BLOCK
+
+[PASS] S-RP-CMP-ORDER  (COMPARATOR FAULT)
+    A figure on 2026-05-27 became dependent on the order the dates were replayed in.
+    reported ORDER_MISMATCH_CHANGED at BLOCK
+
+[PASS] S-RP-CMP-TODAY  (COMPARATOR FAULT)
+    The CURRENT business date 2026-05-28 took 5,000 more in cash. The hotel is trading; this must be reported and must NOT block. A gate that fails every day is a gate that gets switched off.
+    reported 1 LEDGER_CHANGED at severities ['INFO']
+

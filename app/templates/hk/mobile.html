@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="theme-color" content="#198754">
+    <title>Housekeeping — {{ config.HOTEL_NAME }}</title>
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap-icons/font/bootstrap-icons.css') }}">
+    <style>
+        body { background: #f0f4f8; font-size: 15px; }
+        .room-card { border-radius: 12px; border-left: 5px solid; }
+        .room-card.dirty  { border-color: #ffc107; }
+        .room-card.vacant { border-color: #198754; }
+        .room-card.maintenance { border-color: #6c757d; }
+        .floor-badge { font-size: 11px; }
+        .btn-action { min-width: 80px; }
+        .sticky-header { position: sticky; top: 0; z-index: 10; background: #198754; }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="sticky-header text-white px-3 py-2 d-flex justify-content-between align-items-center">
+    <div>
+        <i class="bi bi-brush me-1"></i>
+        <strong>Housekeeping</strong>
+        <span class="badge bg-warning text-dark ms-2">{{ dirty_count }} Dirty</span>
+    </div>
+    <div class="d-flex gap-2 align-items-center">
+        <select id="floorSel" class="form-select form-select-sm" style="width:auto;"
+                onchange="filterFloor(this.value)">
+            <option value="">All Floors</option>
+            {% for f in floors %}
+            <option value="{{ f }}" {% if floor_filter == f %}selected{% endif %}>Floor {{ f }}</option>
+            {% endfor %}
+        </select>
+        <a href="{{ url_for('main.housekeeping') }}" class="btn btn-sm btn-light">
+            <i class="bi bi-display"></i>
+        </a>
+    </div>
+</div>
+
+<div class="container-fluid py-3 px-2">
+
+    <!-- Status tabs -->
+    <ul class="nav nav-pills mb-3 gap-1" id="statusTabs">
+        <li class="nav-item">
+            <button class="nav-link active btn-sm" onclick="filterStatus('dirty')">
+                <i class="bi bi-exclamation-circle me-1"></i>Dirty ({{ dirty_count }})
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link btn-sm" onclick="filterStatus('all')">
+                All Rooms ({{ rooms|length }})
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link btn-sm" onclick="filterStatus('maintenance')">
+                <i class="bi bi-wrench me-1"></i>Maint. ({{ maintenance_count }})
+            </button>
+        </li>
+    </ul>
+
+    <!-- Room cards -->
+    <div id="roomList">
+        {% for room in rooms %}
+        <div class="card room-card {{ room.status|lower }} mb-2 shadow-sm status-card"
+             data-status="{{ room.status|lower }}" data-floor="{{ room.floor }}">
+            <div class="card-body py-2 px-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="fw-bold fs-5">{{ room.room_number }}</span>
+                        <span class="badge bg-secondary floor-badge ms-1">Floor {{ room.floor }}</span>
+                        <span class="badge ms-1
+                            {% if room.status == 'Dirty' %}bg-warning text-dark
+                            {% elif room.status == 'Vacant' %}bg-success
+                            {% elif room.status == 'Occupied' %}bg-danger
+                            {% else %}bg-secondary{% endif %}">
+                            {{ room.status }}
+                        </span>
+                        <div class="small text-muted">{{ room.room_type.name }}</div>
+                    </div>
+                    <div class="d-flex flex-column gap-1 align-items-end">
+                        {% if room.status == 'Dirty' %}
+                        <form method="POST" action="{{ url_for('main.mark_clean', room_id=room.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button class="btn btn-success btn-sm btn-action">
+                                <i class="bi bi-check-lg me-1"></i>Clean ✓
+                            </button>
+                        </form>
+                        {% elif room.status == 'Vacant' %}
+                        <form method="POST" action="{{ url_for('main.update_room_status', room_id=room.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="status" value="Dirty">
+                            <button class="btn btn-warning btn-sm btn-action text-dark">
+                                <i class="bi bi-brush me-1"></i>Mark Dirty
+                            </button>
+                        </form>
+                        {% elif room.status == 'Maintenance' %}
+                        <form method="POST" action="{{ url_for('main.update_room_status', room_id=room.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="status" value="Vacant">
+                            <button class="btn btn-outline-success btn-sm btn-action">
+                                <i class="bi bi-check me-1"></i>Clear
+                            </button>
+                        </form>
+                        {% endif %}
+                        <a href="{{ url_for('maintenance.index') }}?room={{ room.room_number }}"
+                           class="btn btn-outline-secondary btn-sm btn-action">
+                            <i class="bi bi-wrench me-1"></i>Issue
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if not rooms %}
+    <div class="text-center text-muted py-5">
+        <i class="bi bi-check-circle fs-1 text-success d-block mb-2"></i>
+        All rooms are clean!
+    </div>
+    {% endif %}
+</div>
+
+<script nonce="{{ csp_nonce }}">
+let currentStatus = 'dirty';
+let currentFloor = '{{ floor_filter or "" }}';
+
+function filterStatus(status) {
+    currentStatus = status;
+    document.querySelectorAll('#statusTabs .nav-link').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    applyFilters();
+}
+
+function filterFloor(floor) {
+    currentFloor = floor;
+    // Reload with floor param for server-side filter
+    const url = new URL(window.location);
+    if (floor) url.searchParams.set('floor', floor);
+    else url.searchParams.delete('floor');
+    window.location = url;
+}
+
+function applyFilters() {
+    document.querySelectorAll('.status-card').forEach(card => {
+        const matchStatus = currentStatus === 'all' ||
+            (currentStatus === 'dirty' && card.dataset.status === 'dirty') ||
+            (currentStatus === 'maintenance' && card.dataset.status === 'maintenance');
+        card.style.display = matchStatus ? '' : 'none';
+    });
+}
+
+// Apply initial filter
+applyFilters();
+</script>
+</body>
+</html>

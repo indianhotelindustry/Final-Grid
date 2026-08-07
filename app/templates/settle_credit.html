@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Settle Credit — Res #{{ reservation.id }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-warning text-dark d-flex align-items-center gap-2">
+        <i class="bi bi-cash-coin fs-5"></i>
+        <h5 class="mb-0">
+          Settle Credit — {{ reservation.guest.name }}
+          <span class="badge bg-dark text-warning ms-2 fs-6">{{ status }}</span>
+        </h5>
+      </div>
+      <div class="card-body">
+
+        {# Guest + folio summary #}
+        <div class="alert alert-light border py-2 mb-3 d-flex flex-wrap gap-3 align-items-center">
+          <span><i class="bi bi-person-fill me-1"></i><strong>{{ reservation.guest.name }}</strong></span>
+          <span><i class="bi bi-door-closed me-1"></i>Room {{ reservation.room.room_number if reservation.room else '—' }}</span>
+          <span><i class="bi bi-calendar me-1"></i>Checkout {{ reservation.departure_date.strftime('%d %b %Y') }}</span>
+          {% if reservation.credit_approved_at %}
+          <span class="text-muted">
+            <i class="bi bi-clock me-1"></i>Credit on {{ reservation.credit_approved_at.strftime('%d %b %Y') }}
+          </span>
+          {% endif %}
+        </div>
+
+        {# Receivable summary #}
+        <div class="card mb-3 border-warning">
+          <div class="card-body py-3">
+            <div class="row g-3 text-center">
+              <div class="col-4">
+                <div class="small text-muted">Original Receivable</div>
+                <div class="fw-bold fs-4">₹{{ "%.2f"|format(original) }}</div>
+              </div>
+              <div class="col-4 border-start border-end">
+                <div class="small text-muted">Recovered</div>
+                <div class="fw-bold fs-4 text-success">₹{{ "%.2f"|format(settled) }}</div>
+              </div>
+              <div class="col-4">
+                <div class="small text-muted">Remaining</div>
+                <div class="fw-bold fs-4 text-warning">₹{{ "%.2f"|format(remaining) }}</div>
+              </div>
+            </div>
+            {% if reservation.credit_reason %}
+            <hr class="my-2">
+            <div class="small text-muted">
+              <i class="bi bi-info-circle me-1"></i>
+              <strong>Credit reason:</strong> {{ reservation.credit_reason }}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        {% if status == 'Settled' %}
+        <div class="alert alert-success">
+          <i class="bi bi-check-circle-fill me-1"></i>
+          This credit is fully settled. No further action required.
+        </div>
+        <a href="{{ url_for('reports.credit_ledger') }}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left me-1"></i>Back to Credit Ledger
+        </a>
+        {% else %}
+
+        <h6 class="border-bottom pb-2 mb-3">
+          <i class="bi bi-wallet2 me-1"></i>Receive Payment Against Credit
+        </h6>
+
+        <form method="post" id="settleForm">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-md-4">
+              <label class="form-label small fw-semibold">Amount (₹) <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text">₹</span>
+                <input type="number" name="amount" id="settleAmount" class="form-control"
+                       step="0.01" min="0.01" max="{{ '%.2f'|format(remaining) }}"
+                       value="{{ '%.2f'|format(remaining) }}" required>
+              </div>
+              <div class="small text-muted mt-1">
+                Max: ₹{{ '%.2f'|format(remaining) }}
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label small fw-semibold">Payment Mode <span class="text-danger">*</span></label>
+              <select name="payment_mode_id" class="form-select" required>
+                <option value="">— Select —</option>
+                {% for pm in payment_modes %}
+                <option value="{{ pm.id }}">{{ pm.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label small fw-semibold">Reference Number</label>
+              <input type="text" name="reference_number" class="form-control"
+                     placeholder="UPI ref / cheque no. / etc.">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Notes</label>
+            <input type="text" name="notes" class="form-control"
+                   placeholder="Internal notes (optional)">
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-warning btn-lg">
+              <i class="bi bi-cash-coin me-1"></i>Record Payment &amp; Update Credit
+            </button>
+            <a href="{{ url_for('reports.credit_ledger') }}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

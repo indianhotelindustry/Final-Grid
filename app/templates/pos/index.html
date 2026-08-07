@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% block title %}POS — Room Posting{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="mb-0"><i class="bi bi-receipt me-2"></i>POS — Room Posting</h4>
+    {% if current_user.has_role('Admin','Manager') %}
+    <a href="{{ url_for('pos.items') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-list-ul me-1"></i>Manage Items
+    </a>
+    {% endif %}
+</div>
+
+<div class="row g-3">
+
+    <!-- Left: Occupied rooms list -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header fw-semibold py-2">
+                <i class="bi bi-door-open me-1"></i>Occupied Rooms
+                <span class="badge bg-danger ms-1">{{ occupied|length }}</span>
+            </div>
+            <div class="list-group list-group-flush" style="max-height:70vh;overflow-y:auto;">
+                {% for r in occupied %}
+                <a href="#" class="list-group-item list-group-item-action py-2 room-row"
+                   data-res-id="{{ r.id }}"
+                   data-guest="{{ r.guest.name if r.guest else '' }}"
+                   data-room="{{ r.room.room_number if r.room else r.room_type.name }}"
+                   onclick="selectRoom(this); return false;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ 'Rm ' + r.room.room_number if r.room else r.room_type.name }}</strong>
+                            <div class="text-muted small">{{ r.guest.name if r.guest else 'Guest' }}</div>
+                        </div>
+                        <small class="text-muted">CO: {{ r.departure_date.strftime('%d %b') }}</small>
+                    </div>
+                </a>
+                {% else %}
+                <div class="p-3 text-center text-muted small">No guests checked in.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: Posting panel -->
+    <div class="col-lg-8">
+
+        <!-- Selected guest info -->
+        <div id="noSelection" class="alert alert-secondary py-3 text-center">
+            <i class="bi bi-arrow-left me-1"></i> Select an occupied room to post a charge
+        </div>
+
+        <div id="postingPanel" style="display:none;">
+            <div class="card shadow-sm mb-3">
+                <div class="card-body py-2">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="fs-4"><i class="bi bi-person-circle text-primary"></i></div>
+                        <div>
+                            <div class="fw-bold" id="selectedGuest">—</div>
+                            <div class="text-muted small" id="selectedRoom">—</div>
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary ms-auto" id="viewChargesBtn"
+                                onclick="loadCharges()">
+                            <i class="bi bi-list-check me-1"></i>View Charges
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick-post from catalog -->
+            {% if categories %}
+            <div class="card shadow-sm mb-3">
+                <div class="card-header fw-semibold py-2">
+                    <i class="bi bi-grid me-1"></i>Quick Post from Catalog
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-tabs mb-3" id="catTabs">
+                        {% for cat, items in categories.items() %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if loop.first %}active{% endif %} py-1"
+                               data-bs-toggle="tab" href="#cat{{ loop.index }}">{{ cat }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="tab-content">
+                        {% for cat, items in categories.items() %}
+                        <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="cat{{ loop.index }}">
+                            <div class="row g-2">
+                                {% for item in items %}
+                                <div class="col-6 col-sm-4 col-lg-3">
+                                    <button class="btn btn-outline-primary btn-sm w-100 pos-item-btn"
+                                            data-item-id="{{ item.id }}"
+                                            data-name="{{ item.name }}"
+                                            data-price="{{ item.price }}"
+                                            onclick="fillQuickPost(this)">
+                                        <div class="small fw-semibold">{{ item.name }}</div>
+                                        <div class="text-success">₹{{ '{:,.0f}'.format(item.price) }}</div>
+                                    </button>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Manual post form -->
+            <div class="card shadow-sm">
+                <div class="card-header fw-semibold py-2">
+                    <i class="bi bi-pencil me-1"></i>Post Charge
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('pos.post_charge') }}" id="postForm">
+                        <input type="hidden" name="reservation_id" id="f_res_id">
+                        <input type="hidden" name="pos_item_id" id="f_item_id">
+                        <div class="row g-3">
+                            <div class="col-sm-7">
+                                <label class="form-label fw-semibold">Description <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="description" id="f_desc"
+                                       placeholder="e.g. Breakfast, Laundry — 3 shirts" required>
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="form-label fw-semibold">Amount (₹) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="amount" id="f_amount"
+                                       min="1" step="0.01" required placeholder="250">
+                            </div>
+                            <div class="col-sm-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="bi bi-plus-circle me-1"></i>Post
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Charges list for this room -->
+            <div id="chargesPanel" class="card shadow-sm mt-3" style="display:none;">
+                <div class="card-header fw-semibold py-2"><i class="bi bi-receipt me-1"></i>Current Charges</div>
+                <div id="chargesList" class="card-body py-2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script nonce="{{ csp_nonce }}">
+let currentResId = null;
+
+function selectRoom(el) {
+    document.querySelectorAll('.room-row').forEach(r => r.classList.remove('active'));
+    el.classList.add('active');
+
+    currentResId = el.dataset.resId;
+    document.getElementById('f_res_id').value = currentResId;
+    document.getElementById('selectedGuest').textContent = el.dataset.guest;
+    document.getElementById('selectedRoom').textContent = 'Room ' + el.dataset.room;
+    document.getElementById('noSelection').style.display = 'none';
+    document.getElementById('postingPanel').style.display = 'block';
+    document.getElementById('chargesPanel').style.display = 'none';
+    document.getElementById('f_item_id').value = '';
+    document.getElementById('f_desc').value = '';
+    document.getElementById('f_amount').value = '';
+}
+
+function fillQuickPost(btn) {
+    document.getElementById('f_item_id').value = btn.dataset.itemId;
+    document.getElementById('f_desc').value = btn.dataset.name;
+    document.getElementById('f_amount').value = btn.dataset.price;
+    document.getElementById('f_amount').focus();
+
+    document.querySelectorAll('.pos-item-btn').forEach(b => b.classList.remove('btn-primary'));
+    btn.classList.remove('btn-outline-primary');
+    btn.classList.add('btn-primary');
+}
+
+async function loadCharges() {
+    if (!currentResId) return;
+    const res = await fetch(`/pos/api/room-charges/${currentResId}`);
+    const data = await res.json();
+
+    let html = '';
+    if (data.charges.length === 0) {
+        html = '<p class="text-muted small mb-0">No charges posted yet.</p>';
+    } else {
+        html = '<div class="table-responsive"><table class="table table-sm mb-0 small"><thead class="table-light"><tr><th>Description</th><th>Date</th><th class="text-end">Amount</th></tr></thead><tbody>';
+        data.charges.forEach(c => {
+            html += `<tr><td>${escapeHtml(c.description)}</td><td>${escapeHtml(c.date)}</td><td class="text-end">₹${Number(c.amount).toLocaleString('en-IN')}</td></tr>`;
+        });
+        html += `</tbody><tfoot><tr class="table-success fw-bold"><td colspan="2">Total Posted</td><td class="text-end">₹${data.total.toLocaleString('en-IN')}</td></tr></tfoot></table></div>`;
+    }
+
+    document.getElementById('chargesList').innerHTML = html;
+    document.getElementById('chargesPanel').style.display = 'block';
+}
+</script>
+{% endblock %}

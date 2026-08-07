@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="theme-color" content="#198754">
+    <title>Pre-Check-In Complete — {{ hotel_name }}</title>
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap-icons/font/bootstrap-icons.css') }}">
+    <style>
+        body {
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .success-card {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        .checkmark-circle {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 8px 24px rgba(40,167,69,0.35);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.9rem;
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { color: #6c757d; }
+        .detail-value { font-weight: 600; }
+    </style>
+</head>
+<body class="p-3 p-md-4">
+    <div class="success-card">
+        <!-- Hotel header -->
+        <div class="text-center mb-4">
+            <small class="text-muted">{{ hotel_name }}</small>
+        </div>
+
+        <!-- Success card -->
+        <div class="card border-0 shadow-lg rounded-4">
+            <div class="card-body p-4 text-center">
+                <div class="checkmark-circle">
+                    <i class="bi bi-check-lg text-white" style="font-size: 2.5rem;"></i>
+                </div>
+
+                <h4 class="fw-bold mb-1">Pre-Check-In Complete!</h4>
+                <p class="text-muted mb-4">Thank you, {{ submission.full_name if submission else reservation.guest.name }}.</p>
+
+                <!-- Booking summary -->
+                <div class="bg-light rounded-3 p-3 mb-4 text-start">
+                    <div class="detail-row">
+                        <span class="detail-label">Booking Ref</span>
+                        <span class="detail-value">{{ reservation.booking_reference or ('#' ~ reservation.id) }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Room Type</span>
+                        <span class="detail-value">{{ reservation.room_type.name if reservation.room_type else '—' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Check-in</span>
+                        <span class="detail-value">{{ reservation.arrival_date.strftime('%d %B %Y') }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Check-out</span>
+                        <span class="detail-value">{{ reservation.departure_date.strftime('%d %B %Y') }}</span>
+                    </div>
+                    {% if submission and submission.estimated_arrival_time %}
+                    <div class="detail-row">
+                        <span class="detail-label">ETA</span>
+                        <span class="detail-value">{{ submission.estimated_arrival_time }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Next steps -->
+                <div class="alert alert-success border-0 text-start rounded-3 mb-4">
+                    <p class="fw-semibold mb-2"><i class="bi bi-info-circle me-1"></i> What happens next?</p>
+                    <ul class="mb-0 ps-3 small">
+                        <li>Your details are securely saved with our front desk.</li>
+                        <li>Check-in at the hotel will be quick — just show your ID.</li>
+                        {% if submission and submission.estimated_arrival_time %}
+                        <li>We'll have your room ready by {{ submission.estimated_arrival_time }}.</li>
+                        {% endif %}
+                        {% if submission and submission.special_requests %}
+                        <li>We've noted your request: <em>"{{ submission.special_requests }}"</em></li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <p class="text-muted small mb-0">
+                    <i class="bi bi-shield-check me-1 text-success"></i>
+                    Your information is encrypted and stored securely.
+                </p>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <small class="text-muted">
+                Submitted on {{ submission.submitted_at.strftime('%d %b %Y at %H:%M') if submission else 'now' }}
+            </small>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,306 @@
+{% extends 'base.html' %}
+{% block title %}OTA Dashboard — {{ config.HOTEL_NAME }}{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="mb-0"><i class="bi bi-globe me-2 text-primary"></i>OTA Channel Dashboard</h4>
+    <div class="d-flex gap-2">
+        {% if current_user.has_role('Admin','Manager') %}
+        <a href="{{ url_for('ota.settings') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-gear me-1"></i>Settings
+        </a>
+        {% endif %}
+        <a href="{{ url_for('ota.bookings') }}" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-list-ul me-1"></i>All OTA Bookings
+        </a>
+    </div>
+</div>
+
+{# OTA Revenue Intelligence — Phase A KPI strip (S1).
+   Renders ONLY when OTA_INTELLIGENCE_ENABLED is on and the route populated
+   the context. With the flag OFF, this block is a no-op and the page below
+   is byte-identical to the pre-S1 dashboard. #}
+{% if intel %}
+    {% include 'ota/_intelligence_kpi_strip.html' %}
+{% endif %}
+
+<!-- KPI Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="card shadow-sm border-0 text-center">
+            <div class="card-body py-3">
+                <div class="fs-3 fw-bold text-primary">{{ ota_res|length }}</div>
+                <div class="text-muted small">OTA Bookings (MTD)</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card shadow-sm border-0 text-center">
+            <div class="card-body py-3">
+                <div class="fs-3 fw-bold text-success">₹{{ '{:,.0f}'.format(total_ota_revenue) }}</div>
+                <div class="text-muted small">OTA Revenue (MTD)</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card shadow-sm border-0 text-center">
+            <div class="card-body py-3">
+                <div class="fs-3 fw-bold text-info">{{ ota_share }}%</div>
+                <div class="text-muted small">OTA Share of Revenue</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card shadow-sm border-0 text-center {% if failed_count > 0 %}border-danger border-2{% endif %}">
+            <div class="card-body py-3">
+                <div class="fs-3 fw-bold {% if failed_count > 0 %}text-danger{% else %}text-secondary{% endif %}">
+                    {{ failed_count }}
+                </div>
+                <div class="text-muted small">Failed Webhooks (7d)</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <!-- Source Breakdown -->
+    <div class="col-md-5">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white fw-semibold py-2">
+                <i class="bi bi-pie-chart me-1"></i>Bookings by Source (MTD)
+            </div>
+            <div class="card-body">
+                {% if by_source %}
+                {% for src, cnt in by_source.items()|sort(attribute='1', reverse=True) %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="small">{{ src }}</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="progress flex-grow-1" style="width:100px;height:8px;">
+                            <div class="progress-bar bg-primary" style="width:{{ (cnt / ota_res|length * 100)|round|int }}%"></div>
+                        </div>
+                        <span class="badge bg-primary">{{ cnt }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted small mb-0">No OTA bookings this month.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Breakdown -->
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white fw-semibold py-2">
+                <i class="bi bi-bar-chart me-1"></i>Status Breakdown
+            </div>
+            <div class="card-body">
+                {% set status_colors = {'Confirmed':'primary','CheckedIn':'success','CheckedOut':'secondary','Cancelled':'danger','NoShow':'warning'} %}
+                {% for status, cnt in status_counts.items()|sort %}
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="badge bg-{{ status_colors.get(status, 'secondary') }}">{{ status }}</span>
+                    <strong>{{ cnt }}</strong>
+                </div>
+                {% else %}
+                <p class="text-muted small mb-0">No data.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Webhook Status -->
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white fw-semibold py-2 d-flex justify-content-between">
+                <span><i class="bi bi-plug me-1"></i>Webhook Endpoint</span>
+                {% if current_user.has_role('Admin','Manager') %}
+                <button class="btn btn-xs btn-outline-success btn-sm py-0 px-2" id="pingBtn" onclick="testPing()">
+                    <i class="bi bi-wifi"></i> Test
+                </button>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <small class="text-muted">Endpoint URL</small>
+                    <div class="input-group input-group-sm mt-1">
+                        <input type="text" class="form-control form-control-sm font-monospace small"
+                               value="{{ webhook_url }}" id="webhookUrl" readonly>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="copyUrl()" title="Copy">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted">API Key (masked)</small>
+                    <div class="font-monospace small mt-1 text-secondary">{{ api_key_masked }}</div>
+                </div>
+                <div id="pingResult" class="small mt-2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Webhook Logs -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white fw-semibold py-2 d-flex justify-content-between">
+        <span><i class="bi bi-clock-history me-1"></i>Recent Webhook Activity</span>
+        <a href="{{ url_for('ota.webhook_logs') }}" class="btn btn-sm btn-outline-secondary py-0">View All</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle mb-0 small">
+            <thead class="table-light">
+                <tr>
+                    <th>Source</th><th>Event</th><th>Status</th><th>Reservation</th><th>Received</th><th>Error</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in recent_logs %}
+                <tr>
+                    <td><span class="badge bg-secondary">{{ log.source }}</span></td>
+                    <td>{{ log.event_type }}</td>
+                    <td>
+                        <span class="badge {% if log.status=='processed' %}bg-success{% elif log.status=='failed' %}bg-danger{% elif log.status=='skipped' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                            {{ log.status }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if log.reservation %}
+                        <a href="{{ url_for('main.invoice', reservation_id=log.reservation_id) }}" class="text-decoration-none">
+                            {{ log.reservation.booking_reference or log.reservation_id }}
+                        </a>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>{{ log.received_at.strftime('%d %b %H:%M') }}</td>
+                    <td class="text-danger">{{ (log.error_message or '')[:50] or '—' }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="text-center text-muted py-3">No webhook calls yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Quick Manual Booking -->
+{% if current_user.has_role('Admin','Manager','FrontDesk') %}
+<div class="card shadow-sm">
+    <div class="card-header bg-white fw-semibold py-2">
+        <i class="bi bi-plus-circle me-1"></i>Quick Manual OTA Booking
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('ota.manual_booking') }}" class="row g-2">
+            <div class="col-sm-6 col-lg-2">
+                <label class="form-label small mb-1">OTA Source</label>
+                <select class="form-select form-select-sm" name="ota_source" required>
+                    {% for src in ota_sources %}
+                    <option>{{ src }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-sm-6 col-lg-2">
+                <label class="form-label small mb-1">OTA Booking ID</label>
+                <input type="text" class="form-control form-control-sm" name="ota_booking_id" placeholder="e.g. BDC-123456">
+            </div>
+            <div class="col-sm-6 col-lg-1">
+                <label class="form-label small mb-1">First Name *</label>
+                <input type="text" class="form-control form-control-sm" name="guest_first_name" required>
+            </div>
+            <div class="col-sm-6 col-lg-1">
+                <label class="form-label small mb-1">Last Name</label>
+                <input type="text" class="form-control form-control-sm" name="guest_last_name">
+            </div>
+            <div class="col-sm-6 col-lg-2">
+                <label class="form-label small mb-1">Phone *</label>
+                <input type="text" class="form-control form-control-sm" name="guest_phone" required>
+            </div>
+            <div class="col-sm-6 col-lg-2">
+                <label class="form-label small mb-1">Room Type *</label>
+                <select class="form-select form-select-sm" name="room_type_id" required>
+                    {% for rt in room_types %}
+                    <option value="{{ rt.id }}">{{ rt.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-sm-6 col-lg-1">
+                <label class="form-label small mb-1">Arrival *</label>
+                <input type="date" class="form-control form-control-sm" name="arrival_date" id="qmoArrival" required>
+            </div>
+            <div class="col-sm-6 col-lg-1">
+                <label class="form-label small mb-1">CI Time</label>
+                <input type="time" class="form-control form-control-sm" name="checkin_time" id="qmoCheckin"
+                       value="{{ default_ci_time }}">
+            </div>
+            <div class="col-sm-6 col-lg-1">
+                <label class="form-label small mb-1">Departure *</label>
+                <input type="date" class="form-control form-control-sm" name="departure_date" id="qmoDeparture" required>
+            </div>
+            <div class="col-sm-6 col-lg-1">
+                <label class="form-label small mb-1">CO Time</label>
+                <input type="time" class="form-control form-control-sm" name="checkout_time" id="qmoCheckout"
+                       value="{{ default_co_time }}">
+            </div>
+            <div class="col-sm-4 col-lg-1">
+                <label class="form-label small mb-1">Adults</label>
+                <input type="number" class="form-control form-control-sm" name="adults" value="2" min="1">
+            </div>
+            <div class="col-sm-4 col-lg-1">
+                <label class="form-label small mb-1">Rate/Night</label>
+                <input type="number" class="form-control form-control-sm" name="rate_per_night" value="0" min="0" step="0.01">
+            </div>
+            <div class="col-12 col-lg-2">
+                <label class="form-label small mb-1">Special Requests</label>
+                <input type="text" class="form-control form-control-sm" name="special_requests">
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-circle me-1"></i>Create OTA Booking
+                </button>
+            </div>
+        </form>
+        <script nonce="{{ csp_nonce }}">
+        // Quick Manual OTA Booking: auto-suggest Departure = Arrival + 1 day.
+        // Suggestion only — once the user touches the Departure field, we stop
+        // overriding their choice so manual edits survive subsequent Arrival changes.
+        (function() {
+            var arr = document.getElementById('qmoArrival');
+            var dep = document.getElementById('qmoDeparture');
+            if (!arr || !dep) return;
+            var userTouchedDep = false;
+            dep.addEventListener('input', function() { userTouchedDep = true; });
+            arr.addEventListener('change', function() {
+                if (!arr.value) return;
+                if (userTouchedDep && dep.value && dep.value > arr.value) return;
+                var d = new Date(arr.value + 'T00:00:00');
+                d.setDate(d.getDate() + 1);
+                dep.value = d.toISOString().slice(0, 10);
+            });
+        })();
+        </script>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script nonce="{{ csp_nonce }}">
+function copyUrl() {
+    navigator.clipboard.writeText(document.getElementById('webhookUrl').value);
+}
+function testPing() {
+    const btn = document.getElementById('pingBtn');
+    const res = document.getElementById('pingResult');
+    btn.disabled = true;
+    res.innerHTML = '<span class="text-muted">Testing…</span>';
+    fetch('{{ url_for("ota.test_ping") }}', {method:'POST'})
+        .then(r => r.json())
+        .then(d => {
+            res.innerHTML = d.ok
+                ? '<span class="text-success"><i class="bi bi-check-circle me-1"></i>' + d.message + '</span>'
+                : '<span class="text-danger"><i class="bi bi-x-circle me-1"></i>' + d.message + '</span>';
+        })
+        .catch(e => { res.innerHTML = '<span class="text-danger">Error: ' + e + '</span>'; })
+        .finally(() => { btn.disabled = false; });
+}
+</script>
+{% endblock %}

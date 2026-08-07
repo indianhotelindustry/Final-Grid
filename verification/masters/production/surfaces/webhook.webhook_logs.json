@@ -1,0 +1,36 @@
+{
+  "anon_location": "/auth/login",
+  "anon_status": 302,
+  "body_bytes": 22786,
+  "body_sha256": "7403c214e54843304104462df0abdb9424ed83f759122534c9d4b660bdee6ee0",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 17,
+  "endpoint": "webhook.webhook_logs",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "logs[len]": "0",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "webhook.webhook_logs",
+  "templates": [
+    "webhook/logs.html"
+  ],
+  "truncations": [],
+  "url": "/webhook/logs"
+}

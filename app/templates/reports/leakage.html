@@ -1,0 +1,245 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Revenue Leakage Report{% endblock %}
+{% block report_name %}Revenue Leakage{% endblock %}
+
+{% block report_content %}
+<div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
+    <div>
+        <h5 class="mb-0"><i class="bi bi-shield-exclamation text-danger me-2"></i>Revenue Leakage Report</h5>
+        <small class="text-muted">Commercial leakage based on standard tariff vs actual charged revenue</small>
+    </div>
+    <div class="d-flex gap-2 d-print-none">
+        <a href="{{ url_for('reports.leakage', format='excel', start_date=start_date.isoformat(), end_date=end_date.isoformat(), only_leakage='1' if only_leakage else '', leak_type=leak_type, source_filter=source_filter) }}"
+           class="btn btn-sm btn-success"><i class="bi bi-file-earmark-excel me-1"></i>Excel</a>
+        <button class="btn btn-sm btn-outline-secondary" onclick="window.print()"><i class="bi bi-printer me-1"></i>Print</button>
+    </div>
+</div>
+
+<div class="alert alert-light border py-1 px-2 small mb-3 d-print-none">
+    <i class="bi bi-info-circle me-1"></i>This report covers rate leakage and discount leakage only. Unpaid balances, credits, and refunds are excluded.
+</div>
+
+<!-- ═══ SUMMARY CARDS ═══ -->
+<div class="row g-2 mb-3">
+    {% set cards = [
+        ('Total Standard', summary.total_standard, 'bi-tag', 'primary', 'currency'),
+        ('Total Actual', summary.total_actual, 'bi-cash-stack', 'dark', 'currency'),
+        ('Rate Leakage', summary.total_rate_leakage, 'bi-arrow-down-circle', 'danger' if summary.total_rate_leakage > 0 else 'secondary', 'currency'),
+        ('Disc Leakage', summary.total_discount, 'bi-tag-fill', 'danger' if summary.total_discount > 0 else 'secondary', 'currency'),
+        ('Total Leakage', summary.total_leakage, 'bi-shield-exclamation', 'danger' if summary.total_leakage > 0 else 'secondary', 'currency'),
+        ('Avg Leakage %', summary.avg_leakage_pct, 'bi-percent', 'warning' if summary.avg_leakage_pct > 0 else 'secondary', 'pct'),
+        ('Reservations', summary.total_reservations, 'bi-list-check', 'secondary', 'int'),
+        ('Leakage Cases', summary.leakage_count, 'bi-exclamation-triangle', 'danger' if summary.leakage_count > 0 else 'secondary', 'int'),
+    ] %}
+    {% for label, val, icon, color, fmt in cards %}
+    <div class="col-6 col-lg-3 col-xl">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body py-2 px-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="fw-bold text-{{ color }}" style="font-size:1.1rem">
+                            {% if fmt == 'pct' %}{{ '{:.1f}'.format(val) }}%
+                            {% elif fmt == 'int' %}{{ val }}
+                            {% else %}{{ '{:,.0f}'.format(val) }}{% endif %}
+                        </div>
+                        <div class="text-muted" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.3px">{{ label }}</div>
+                    </div>
+                    <i class="bi {{ icon }} text-{{ color }}" style="font-size:1rem;opacity:.3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- ═══ FILTER BAR ═══ -->
+<form class="d-flex flex-wrap align-items-end gap-2 mb-3 d-print-none" style="font-size:.85rem">
+    <div class="d-flex gap-1">
+        {% for q, ql in [('today','Today'),('week','7 Days'),('month','This Month')] %}
+        <a href="{{ url_for('reports.leakage', quick=q, only_leakage='1' if only_leakage else '', leak_type=leak_type, source_filter=source_filter) }}"
+           class="btn btn-sm {% if quick == q %}btn-primary{% else %}btn-outline-secondary{% endif %}"
+           style="font-size:.72rem;padding:3px 8px;border-radius:10px">{{ ql }}</a>
+        {% endfor %}
+    </div>
+    <div>
+        <label class="form-label form-label-sm mb-0">From</label>
+        <input type="date" name="start_date" class="form-control form-control-sm" value="{{ start_date.isoformat() }}" style="width:auto">
+    </div>
+    <div>
+        <label class="form-label form-label-sm mb-0">To</label>
+        <input type="date" name="end_date" class="form-control form-control-sm" value="{{ end_date.isoformat() }}" style="width:auto">
+    </div>
+    <div>
+        <label class="form-label form-label-sm mb-0">Type</label>
+        <select name="leak_type" class="form-select form-select-sm" style="width:auto">
+            {% for v, l in [('all','All Leakage'),('rate','Rate Leakage'),('discount','Discount Leakage'),('both','Both (Rate + Disc)')] %}
+            <option value="{{ v }}" {% if leak_type == v %}selected{% endif %}>{{ l }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <label class="form-label form-label-sm mb-0">Source</label>
+        <select name="source_filter" class="form-select form-select-sm" style="width:auto">
+            {% for v, l in [('all','All Sources'),('nightly','Nightly Rows Only'),('legacy','Legacy Only'),('validation','Validation Fallback Only')] %}
+            <option value="{{ v }}" {% if source_filter == v %}selected{% endif %}>{{ l }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-check form-check-inline ms-1">
+        <input class="form-check-input" type="checkbox" name="only_leakage" value="1"
+               id="onlyLeakage" {% if only_leakage %}checked{% endif %}>
+        <label class="form-check-label small" for="onlyLeakage">Only leakage cases</label>
+    </div>
+    <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-funnel me-1"></i>Apply</button>
+    <a href="{{ url_for('reports.leakage') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+</form>
+
+<!-- ═══ MIGRATION SUMMARY STRIP ═══ -->
+{% if migration and migration.total_records > 0 %}
+<div class="d-flex flex-wrap align-items-center gap-3 mb-2 p-2 rounded border" style="background:#f8f9fa;font-size:.75rem">
+    <span class="text-muted fw-semibold"><i class="bi bi-arrow-left-right me-1"></i>Migration:</span>
+
+    <div class="d-flex align-items-center gap-1">
+        <span class="badge bg-success">Nightly</span>
+        <span class="fw-semibold">{{ migration.counts.get('nightly_rows', 0) }}</span>
+        <span class="text-muted">({{ '{:.0f}'.format(migration.pct.get('nightly_rows', 0)) }}%)</span>
+        <span class="text-muted">· ₹<span class="fw-semibold">{{ '{:,.0f}'.format(migration.leakage.get('nightly_rows', 0)) }}</span></span>
+    </div>
+
+    <div class="d-flex align-items-center gap-1">
+        <span class="badge bg-secondary">Legacy</span>
+        <span class="fw-semibold">{{ migration.counts.get('legacy_aggregate', 0) }}</span>
+        <span class="text-muted">({{ '{:.0f}'.format(migration.pct.get('legacy_aggregate', 0)) }}%)</span>
+        <span class="text-muted">· ₹<span class="fw-semibold">{{ '{:,.0f}'.format(migration.leakage.get('legacy_aggregate', 0)) }}</span></span>
+    </div>
+
+    {% if migration.counts.get('validation_fallback', 0) > 0 %}
+    <div class="d-flex align-items-center gap-1">
+        <span class="badge bg-warning text-dark">Fallback</span>
+        <span class="fw-semibold">{{ migration.counts.get('validation_fallback', 0) }}</span>
+        <span class="text-muted">({{ '{:.0f}'.format(migration.pct.get('validation_fallback', 0)) }}%)</span>
+        <span class="text-muted">· ₹<span class="fw-semibold">{{ '{:,.0f}'.format(migration.leakage.get('validation_fallback', 0)) }}</span></span>
+    </div>
+    {% endif %}
+
+    <!-- Progress bar -->
+    <div class="flex-grow-1 d-flex align-items-center gap-2" style="min-width:180px">
+        <div class="progress flex-grow-1" style="height:6px">
+            <div class="progress-bar bg-success" role="progressbar"
+                 style="width: {{ migration.pct.get('nightly_rows', 0) }}%"
+                 title="Nightly: {{ migration.pct.get('nightly_rows', 0) }}%"></div>
+            {% if migration.pct.get('validation_fallback', 0) > 0 %}
+            <div class="progress-bar bg-warning" role="progressbar"
+                 style="width: {{ migration.pct.get('validation_fallback', 0) }}%"
+                 title="Fallback: {{ migration.pct.get('validation_fallback', 0) }}%"></div>
+            {% endif %}
+        </div>
+        <small class="text-muted fw-semibold" style="min-width:50px;text-align:right">
+            {{ '{:.0f}'.format(migration.pct.get('nightly_rows', 0)) }}% migrated
+        </small>
+    </div>
+</div>
+{% endif %}
+
+<!-- ═══ LEAKAGE TABLE ═══ -->
+{% if records %}
+<div class="table-responsive">
+    <table class="table table-sm table-hover table-striped align-middle mb-0" style="font-size:.8rem">
+        <thead class="table-light">
+            <tr>
+                <th>Date</th>
+                <th>Res #</th>
+                <th>Guest</th>
+                <th>Room</th>
+                <th class="text-center">Nights</th>
+                <th>Mode</th>
+                <th class="text-end">Std Revenue</th>
+                <th class="text-end">Actual Revenue</th>
+                <th class="text-end">Rate Leak</th>
+                <th class="text-end">Disc Leak</th>
+                <th class="text-end">Total Leak</th>
+                <th class="text-end">Leak %</th>
+                <th>Status</th>
+                <th>Source</th>
+                <th>Adj</th>
+                <th>Auth By</th>
+                <th>Reason</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in records %}
+            <tr class="{% if r.total_leakage > 0 %}table-warning{% endif %}">
+                <td class="text-nowrap">{{ r.arrival_date.strftime('%d %b') }}</td>
+                <td>
+                    {% if r.invoice_number %}
+                    <a href="{{ url_for('main.invoice', reservation_id=r.reservation_id) }}"
+                       class="text-decoration-none fw-semibold">{{ r.invoice_number }}</a>
+                    {% else %}
+                    <span class="text-muted">RES-{{ r.reservation_id }}</span>
+                    {% endif %}
+                </td>
+                <td>{{ r.guest_name }}</td>
+                <td><span class="badge bg-dark">{{ r.room_number }}</span></td>
+                <td class="text-center">{{ r.nights }}</td>
+                <td>
+                    {% if r.pricing_mode and r.pricing_mode != 'standard' %}
+                    <span class="badge bg-info" style="font-size:.65rem">{{ r.pricing_mode }}</span>
+                    {% else %}—{% endif %}
+                </td>
+                <td class="text-end">{{ '{:,.0f}'.format(r.standard_revenue) }}</td>
+                <td class="text-end">{{ '{:,.0f}'.format(r.actual_revenue) }}</td>
+                <td class="text-end {% if r.rate_leakage > 0 %}text-danger fw-semibold{% endif %}">
+                    {% if r.rate_leakage > 0 %}{{ '{:,.0f}'.format(r.rate_leakage) }}{% else %}—{% endif %}
+                </td>
+                <td class="text-end {% if r.discount_amount > 0 %}text-danger fw-semibold{% endif %}">
+                    {% if r.discount_amount > 0 %}{{ '{:,.0f}'.format(r.discount_amount) }}{% else %}—{% endif %}
+                </td>
+                <td class="text-end fw-bold {% if r.total_leakage > 0 %}text-danger{% endif %}">
+                    {% if r.total_leakage > 0 %}{{ '{:,.0f}'.format(r.total_leakage) }}{% else %}—{% endif %}
+                </td>
+                <td class="text-end">
+                    {% if r.leakage_pct > 0 %}{{ '{:.1f}'.format(r.leakage_pct) }}%{% else %}—{% endif %}
+                </td>
+                <td>
+                    {% set status_colors = {'OK':'success','APPROVED':'info','UNAUTHORIZED':'danger','UNDERPRICED':'warning','REVIEW':'secondary'} %}
+                    <span class="badge bg-{{ status_colors.get(r.status, 'secondary') }}" style="font-size:.65rem">{{ r.status }}</span>
+                </td>
+                <td>
+                    {% set _src = r.get('source', 'legacy_aggregate') %}
+                    {% set src_labels = {'nightly_rows':'Nightly','legacy_aggregate':'Legacy','validation_fallback':'Fallback'} %}
+                    {% set src_colors = {'nightly_rows':'bg-success','legacy_aggregate':'bg-secondary','validation_fallback':'bg-warning text-dark'} %}
+                    <span class="badge {{ src_colors.get(_src, 'bg-secondary') }}" style="font-size:.6rem" title="{{ _src }}">{{ src_labels.get(_src, _src) }}</span>
+                </td>
+                <td>
+                    {% if r.adjustment_type %}
+                    <span class="badge {% if r.adjustment_type == 'LEAKAGE' %}bg-danger{% elif r.adjustment_type == 'UPSELL' %}bg-success{% else %}bg-secondary{% endif %}"
+                          style="font-size:.6rem">{{ r.adjustment_type }}</span>
+                    {% else %}—{% endif %}
+                </td>
+                <td><small>{{ r.discount_authorized_by or '—' }}</small></td>
+                <td><small class="text-muted" title="{{ r.discount_reason or '' }}">{{ (r.discount_reason or '—')[:25] }}{% if r.discount_reason and r.discount_reason|length > 25 %}...{% endif %}</small></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot class="table-light fw-bold">
+            <tr>
+                <td colspan="6" class="text-end">Totals ({{ records|length }})</td>
+                <td class="text-end">{{ '{:,.0f}'.format(summary.total_standard) }}</td>
+                <td class="text-end">{{ '{:,.0f}'.format(summary.total_actual) }}</td>
+                <td class="text-end text-danger">{{ '{:,.0f}'.format(summary.total_rate_leakage) }}</td>
+                <td class="text-end text-danger">{{ '{:,.0f}'.format(summary.total_discount) }}</td>
+                <td class="text-end text-danger">{{ '{:,.0f}'.format(summary.total_leakage) }}</td>
+                <td class="text-end">{{ '{:.1f}'.format(summary.avg_leakage_pct) }}%</td>
+                <td colspan="5"></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+{% else %}
+<div class="text-center py-5 text-muted">
+    <i class="bi bi-shield-check fs-1 d-block mb-2"></i>
+    <p class="mb-1">No leakage records found for the selected period.</p>
+    <a href="{{ url_for('reports.leakage') }}" class="btn btn-sm btn-outline-primary">Reset Filters</a>
+</div>
+{% endif %}
+{% endblock %}

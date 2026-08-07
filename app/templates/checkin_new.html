@@ -1,0 +1,2190 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<style>
+/* ── Check-in form layout ────────────────────────────────────────────── */
+.ci-section { margin-bottom: 1.25rem; }
+.ci-section .card-header { background: #f8f9fa; font-weight: 600; font-size: .9rem; padding: .6rem 1rem; }
+
+/* Room Assignment — high-visibility prominent block */
+.ci-room-assign {
+    border: 2px solid #3b82f6 !important;
+    border-radius: 10px !important;
+    background: #eaf4ff;
+}
+.ci-room-assign > .card-header {
+    background: #2563eb !important;
+    color: #fff !important;
+    font-size: .95rem;
+    font-weight: 700;
+    padding: .7rem 1rem;
+    letter-spacing: .01em;
+    border-radius: 8px 8px 0 0 !important;
+}
+.ci-room-assign > .card-header i { color: rgba(255,255,255,.85) !important; }
+.ci-room-assign > .card-header .badge-warn { color: #fde68a !important; }
+.ci-room-assign .card-body { background: #eaf4ff; border-radius: 0 0 8px 8px; }
+.room-badge-available, .room-badge-vacant { background:#16a34a !important; color:#fff !important; }
+.room-badge-dirty     { background:#d97706 !important; color:#fff !important; }
+.room-badge-occupied  { background:#dc2626 !important; color:#fff !important; }
+.room-badge-maintenance { background:#6b7280 !important; color:#fff !important; }
+
+/* Stay Details — distinct teal accent */
+.ci-stay-details > .card-header {
+    background: #0f5132 !important;
+    color: #fff !important;
+    font-size: .9rem;
+    font-weight: 700;
+    padding: .65rem 1rem;
+}
+.ci-stay-details > .card-header i { color: #a3d9b5 !important; }
+.ci-stay-details { border: 2px solid #0f5132 !important; }
+
+/* Booking-type toggle */
+.booking-type-btn { border-radius: 6px !important; font-size: .85rem; padding: .35rem .9rem; }
+
+/* GST breakdown table */
+.gst-table td { padding: .2rem .4rem; font-size: .875rem; }
+.gst-table .label { color: #6c757d; }
+.gst-table .total-row td { font-weight: 700; border-top: 1px solid #dee2e6; }
+
+/* Modify-tariff row */
+#tariffOverrideRow { background: #fff8e1; }
+
+/* Passenger rows */
+.pax-row td { vertical-align: middle; padding: .3rem .35rem; }
+.pax-row input, .pax-row select { font-size: .83rem; padding: .25rem .4rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-3 pb-5">
+
+    <!-- Guest duplicate-stay warning -->
+    {% if guest_duplicate_warning %}
+    <div class="alert alert-warning d-flex align-items-center gap-2 mb-3" role="alert">
+        <i class="bi bi-exclamation-triangle-fill fs-5 flex-shrink-0"></i>
+        <div><strong>Duplicate Stay Warning:</strong> {{ guest_duplicate_warning }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Status banner (existing reservation that was already checked in) -->
+    {% if checkin_record %}
+    <div class="alert {% if checkin_record.is_profile_complete %}alert-success{% else %}alert-warning{% endif %} mb-3">
+        <strong>Mode:</strong> {{ checkin_record.checkin_mode }} &nbsp;|&nbsp;
+        <strong>Status:</strong> {% if checkin_record.is_profile_complete %}COMPLETE{% else %}INCOMPLETE{% endif %}
+    </div>
+    {% endif %}
+
+    {# Apr 2026: Advance Paid banner — front desk needs to see at a glance
+       that the guest has already paid an advance, so they can apply it
+       against the bill at checkout instead of asking for the full amount. #}
+    {% if reservation %}
+      {% set _ci_adv_gross = (reservation.payments | rejectattr('is_voided') | selectattr('payment_purpose', 'equalto', 'advance') | map(attribute='amount') | map('float') | sum) %}
+      {% set _ci_adv_refunded = (reservation.payments | rejectattr('is_voided') | selectattr('payment_purpose', 'equalto', 'refund') | map(attribute='amount') | map('float') | sum) %}
+      {% set _ci_adv_net = _ci_adv_gross - _ci_adv_refunded %}
+      {% if _ci_adv_net > 0.005 %}
+      <div class="alert mb-3 d-flex align-items-center gap-2"
+           style="background:#fef3c7;border:1px solid #f59e0b;color:#92400e;">
+        <i class="bi bi-cash-coin fs-4"></i>
+        <div class="flex-grow-1">
+          <div class="fw-bold">Advance Paid: ₹{{ _ci_adv_net | inr }}</div>
+          <div class="small">
+            Already collected from guest{% if _ci_adv_refunded > 0.005 %} (after ₹{{ _ci_adv_refunded | inr }} refunded){% endif %}.
+            This will reduce the payable amount at check-out.
+          </div>
+        </div>
+        <a href="{{ url_for('main.advance_receipt', reservation_id=reservation.id) }}"
+           target="_blank" class="btn btn-sm btn-warning">
+          <i class="bi bi-receipt"></i> View Receipt
+        </a>
+      </div>
+      {% endif %}
+    {% endif %}
+
+    <form id="checkinForm" method="POST" enctype="multipart/form-data">
+
+    <div class="row g-3">
+    <!-- ═══════════════════════════ LEFT COLUMN ═══════════════════════════ -->
+    <div class="col-xl-7">
+
+        <!-- ── 1. Booking Type ─────────────────────────────────────────── -->
+        <div class="card ci-section" id="bookingTypeCard">
+            <div class="card-header">Booking Type</div>
+            <div class="card-body py-2">
+                <div class="btn-group mb-2" role="group">
+                    <input type="radio" class="btn-check" name="booking_type" id="btRegular" value="Regular" checked>
+                    <label class="btn btn-outline-primary booking-type-btn" for="btRegular">Regular (Nightly)</label>
+                    <input type="radio" class="btn-check" name="booking_type" id="btHourly" value="Hourly">
+                    <label class="btn btn-outline-warning booking-type-btn" for="btHourly">&#9201; Hourly</label>
+                </div>
+                <!-- Shown only for Hourly -->
+                <div id="hourlyAlert" style="display:none;">
+                    <div class="alert alert-warning py-2 px-3 mb-0 small">
+                        <strong>&#9201; Hourly Booking — Checkout is time-sensitive.</strong>
+                        Set a clear check-out date and time. Staff must ensure the room is vacated on schedule.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── 2. Guest Details ────────────────────────────────────────── -->
+        <div class="card ci-section">
+            <div class="card-header">Guest Details</div>
+            <div class="card-body">
+                {% if reservation %}
+                {# Auto-split legacy name into first/last when structured fields are empty #}
+                {% set _g = reservation.guest %}
+                {% if _g.first_name %}
+                    {% set _fn = _g.first_name %}
+                    {% set _ln = _g.last_name or '' %}
+                {% else %}
+                    {% set _parts = (_g.name or '').split(None, 1) %}
+                    {% set _fn = _parts[0] if _parts else '' %}
+                    {% set _ln = _parts[1] if _parts|length > 1 else '' %}
+                {% endif %}
+                <div class="row g-2 mb-0">
+                    <div class="col-6"><p class="mb-1"><strong>Name:</strong> {{ _fn }} {{ _ln }}</p></div>
+                    <div class="col-6"><p class="mb-1"><strong>Phone:</strong> {{ _g.phone }}</p></div>
+                    <div class="col-6"><p class="mb-1"><strong>Email:</strong> {{ _g.email or '—' }}</p></div>
+                </div>
+                <input type="hidden" name="guest_name"  value="{{ _fn }} {{ _ln }}">
+                <input type="hidden" name="guest_phone" value="{{ _g.phone }}">
+                <input type="hidden" name="guest_email" value="{{ _g.email or '' }}">
+                <div class="row g-2 mt-2">
+                    <div class="col-md-4 mb-2">
+                        <label class="form-label">First Name *</label>
+                        <input type="text" name="first_name" class="form-control form-control-sm" required
+                               value="{{ _fn }}" placeholder="First name">
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" name="last_name" class="form-control form-control-sm"
+                               value="{{ _ln }}" placeholder="Last name">
+                    </div>
+                </div>
+                {% else %}
+                <div class="row g-2">
+                    <div class="col-md-3 mb-2">
+                        <label class="form-label">First Name *</label>
+                        <input type="text" name="first_name" class="form-control" required placeholder="First name">
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <label class="form-label">Last Name *</label>
+                        <input type="text" name="last_name" class="form-control" required placeholder="Last name">
+                    </div>
+                    <input type="hidden" name="guest_name" id="guestNameHidden" value="">
+                    <div class="col-md-3 mb-2">
+                        <label class="form-label">Mobile *</label>
+                        <input type="tel" name="guest_phone" class="form-control" required placeholder="10-digit number"
+                               pattern="[1-9][0-9]{9}" title="10 digits, cannot start with 0">
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="guest_email" class="form-control" placeholder="Optional">
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label">Company</label>
+                        <input type="text" name="guest_company" class="form-control" placeholder="Optional">
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- ID Proof -->
+                <hr class="my-2">
+                <div class="row g-2">
+                    <div class="col-md-5">
+                        <label class="form-label">ID Type</label>
+                        <select name="id_type" class="form-select form-select-sm">
+                            <option value="">— Select —</option>
+                            <option value="Aadhar">Aadhar Card</option>
+                            <option value="PAN">PAN Card</option>
+                            <option value="Passport">Passport</option>
+                            <option value="DL">Driving License</option>
+                            <option value="VoterID">Voter ID</option>
+                        </select>
+                    </div>
+                    <div class="col-md-7">
+                        <label class="form-label">ID Number</label>
+                        <input type="text" name="id_number" class="form-control form-control-sm"
+                               placeholder="Document number" value="{{ reservation.guest.id_proof_number if reservation else '' }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── 3. Other Guests ──────────────────────────────────────── -->
+        <div class="card ci-section">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <span>Other Guests</span>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="addPaxBtn">+ Add Other Guest</button>
+            </div>
+            <div class="card-body p-2">
+                <div style="overflow-x:auto;">
+                <table class="table table-sm mb-0" id="paxTable" style="min-width:880px;">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="min-width:120px;">First Name</th>
+                            <th style="min-width:120px;">Last Name</th>
+                            <th style="min-width:80px;">Gender</th>
+                            <th style="min-width:70px;">Age</th>
+                            <th style="min-width:120px;">Mobile</th>
+                            <th style="min-width:90px;">ID Type</th>
+                            <th style="min-width:100px;">ID Number</th>
+                            <th style="min-width:130px;">Relationship</th>
+                            <th style="width:36px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="paxBody">
+                        <!-- rows injected by JS -->
+                    </tbody>
+                </table>
+                </div>
+                <input type="hidden" name="passengers_json" id="passengersJson" value="[]">
+            </div>
+        </div>
+
+        <!-- ── 4. Stay Details ───────────────────────────────────────── -->
+        <div class="card ci-section ci-stay-details">
+            <div class="card-header">
+                <i class="bi bi-calendar2-check me-2"></i>Stay Details
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+                    <!-- Check-in -->
+                    <div class="col-md-3 mb-2">
+                        <label class="form-label">Check-in Date *</label>
+                        <input type="date" name="checkin_date" id="checkinDateInput" class="form-control"
+                               value="{{ business_date.strftime('%Y-%m-%d') }}" required>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <label class="form-label">Check-in Time</label>
+                        <input type="time" name="checkin_time" id="checkinTimeInput" class="form-control"
+                               value="{{ now_time }}">
+                    </div>
+
+                    <!-- Check-out -->
+                    <div class="col-md-3 mb-2">
+                        <label class="form-label">Check-out Date *</label>
+                        <input type="date" name="checkout_date" id="checkoutDateInput" class="form-control" required>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <label class="form-label">Check-out Time</label>
+                        {# Server-side default: prefer the reservation's stored
+                           checkout_time (existing reservations), then the hotel
+                           standard from Settings. Never copy check-in time. #}
+                        <input type="time" name="checkout_time" id="checkoutTimeInput" class="form-control"
+                               value="{{ (reservation.checkout_time if reservation and reservation.checkout_time else default_checkout_hm) or '11:00' }}">
+                    </div>
+
+                    <!-- Duration (readonly, auto-calculated) -->
+                    <div class="col-md-4 mb-2">
+                        <label class="form-label" id="durationLabel">Nights</label>
+                        <div class="input-group input-group-sm">
+                            <input type="text" id="durationDisplay" class="form-control bg-light"
+                                   readonly placeholder="Auto-calculated">
+                            <span class="input-group-text" id="durationUnit">nights</span>
+                        </div>
+                        <input type="hidden" name="nights" id="nightsInput" value="1">
+                    </div>
+
+                    <!-- Validation error -->
+                    <div class="col-12 mb-1" id="dtErrorRow" style="display:none;">
+                        <div class="alert alert-danger py-1 px-3 mb-0 small">
+                            Check-out must be after check-in. Please correct the dates/times.
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 mb-2">
+                        <label class="form-label">Adults *</label>
+                        <input type="number" name="adults" class="form-control"
+                               value="{{ reservation.adults if reservation else 1 }}" min="1" required>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <label class="form-label">Children</label>
+                        <input type="number" name="children" class="form-control"
+                               value="{{ reservation.children if reservation else 0 }}" min="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── 4. Room Assignment * ───────────────────────────────────── -->
+        <div class="card ci-section ci-room-assign">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <span>
+                    <i class="bi bi-door-open-fill me-2"></i>Room Assignment
+                    <span class="badge-warn ms-1" style="color:#fde68a;font-size:.9em;">*</span>
+                </span>
+                <button type="button" class="btn btn-sm btn-outline-light" id="autoAssignRoomBtn"
+                        title="Auto-assign first available room">
+                    <i class="bi bi-magic me-1"></i>Auto Assign
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="row g-2 align-items-end">
+                    {% if not reservation %}
+                    <div class="col-md-5 mb-2">
+                        <label class="form-label fw-semibold">Filter by Room Type</label>
+                        <select name="room_type_id" id="roomTypeSelect" class="form-select">
+                            <option value="">All Types</option>
+                            {% for rt in room_types %}
+                            <option value="{{ rt.id }}" data-rate="{{ rt.base_rate }}">
+                                {{ rt.name }} – ₹{{ rt.base_rate }}/night
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    <div class="col-md-{% if not reservation %}5{% else %}9{% endif %} mb-2">
+                        <label class="form-label fw-semibold">
+                            Room Number <span class="text-danger">*</span>
+                        </label>
+                        <select name="room_id" id="roomSelect" class="form-select form-select-lg" required>
+                            <option value="">— Choose a room —</option>
+                            {% for room in vacant_rooms %}
+                            <option value="{{ room.id }}"
+                                    data-floor="{{ room.floor }}"
+                                    data-rate="{{ room.room_type.base_rate }}"
+                                    data-type="{{ room.room_type.name }}"
+                                    data-status="{{ room.status }}"
+                                    data-gst-rate="{{ room.room_type.gst_rate or 0 }}"
+                                    data-gst-exempted="{{ 'true' if room.room_type.gst_exempted else 'false' }}"
+                                    {% if checkin_record and checkin_record.room_id == room.id %}selected{% endif %}>
+                                {{ room.room_number }} — {{ room.room_type.name }}, Floor {{ room.floor }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2 mb-2 d-flex align-items-end pb-1">
+                        <span id="roomStatusBadge" class="badge fs-6 px-3 py-2" style="display:none;"></span>
+                    </div>
+                </div>
+                <!-- Room detail strip shown after selection -->
+                <div id="roomDetailsCard" class="mt-1 p-2 rounded"
+                     style="display:none;background:#fff;border:1px solid #bfdbfe;">
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <i class="bi bi-building-fill text-primary"></i>
+                        <span class="fw-bold" id="roomDetailName"></span>
+                        <span class="text-muted small" id="roomDetailType"></span>
+                        <span class="text-muted small" id="roomDetailFloor"></span>
+                        <span class="text-muted small" id="roomDetailRate"></span>
+                    </div>
+                    <div id="rateSourceStrip" class="mt-1 d-flex align-items-center gap-2 flex-wrap" style="display:none;font-size:.75rem">
+                        <span class="text-muted"><i class="bi bi-info-circle me-1"></i>Rate source:</span>
+                        <span id="rateSourceBadge" class="badge bg-secondary">—</span>
+                        <span id="rateSourcePlan" class="text-muted" style="display:none"></span>
+                        <span id="rateSourceNote" class="text-muted fst-italic"></span>
+                        <a href="#" id="rateBreakdownToggle" class="text-primary small" style="display:none"
+                           onclick="event.preventDefault();var el=document.getElementById('rateBreakdownPanel');el.style.display=el.style.display==='none'?'':'none';">
+                            <i class="bi bi-calendar3 me-1"></i>View breakdown
+                        </a>
+                    </div>
+                    <div id="rateBreakdownPanel" class="mt-1" style="display:none">
+                        <table class="table table-sm table-borderless mb-0" style="font-size:.73rem;max-width:320px">
+                            <thead><tr class="text-muted"><th>Date</th><th class="text-end">Rate</th><th>Source</th></tr></thead>
+                            <tbody id="rateBreakdownBody"></tbody>
+                            <tfoot id="rateBreakdownFoot" class="border-top"></tfoot>
+                        </table>
+                    </div>
+                </div>
+                <!-- Validation error -->
+                <div id="roomValidationError" class="alert alert-danger py-2 px-3 mt-2 mb-0 small"
+                     style="display:none;">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i>Please assign a room before proceeding.
+                </div>
+            </div>
+        </div>
+
+        <!-- ── 5. ID Verification ─────────────────────────────────────── -->
+        <div class="card ci-section">
+            <div class="card-header">
+                <i class="bi bi-person-badge me-2"></i>ID Verification
+                {% if not reservation %}<span class="text-muted small fw-normal ms-1">(upload after check-in)</span>{% endif %}
+            </div>
+            <div class="card-body">
+                <div class="row g-2 mb-2">
+                    <div class="col-6">
+                        <label class="form-label">ID Type</label>
+                        <select id="docType" class="form-select form-select-sm">
+                            <option value="Aadhar">Aadhar Card</option>
+                            <option value="PAN">PAN Card</option>
+                            <option value="Passport">Passport</option>
+                            <option value="DL">Driving License</option>
+                            <option value="VoterID">Voter ID</option>
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">ID Number</label>
+                        <input type="text" id="docNumber" class="form-control form-control-sm">
+                    </div>
+                </div>
+                <!-- Front Side -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small mb-2">
+                        <i class="bi bi-credit-card me-1"></i>Front Side
+                    </label>
+                    <button type="button" class="btn btn-primary btn-sm w-100 mb-1" id="idFrontScanBtn">
+                        <i class="bi bi-upc-scan me-1"></i>Scan Document
+                    </button>
+                    <div class="d-flex gap-1 mb-1">
+                        <label class="btn btn-outline-secondary btn-sm flex-fill mb-0 d-flex align-items-center justify-content-center gap-1" for="idFront" style="cursor:pointer;">
+                            <i class="bi bi-upload"></i>Upload File
+                        </label>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="idFrontPhotoBtn">
+                            <i class="bi bi-camera me-1"></i>Quick Photo
+                        </button>
+                    </div>
+                    <input type="file" id="idFront" name="id_front" class="d-none" accept="image/*">
+                    <div id="idFrontPreviewBox" class="mt-1" style="display:none;">
+                        <div class="d-flex align-items-start gap-2">
+                            <img id="idFrontPreviewImg" class="img-fluid rounded border" style="max-height:110px;flex:1;">
+                            <div class="d-flex flex-column gap-1">
+                                <span class="badge bg-success" id="idFrontModeBadge">Scanned</span>
+                                <button type="button" class="btn btn-xs btn-outline-secondary" id="idFrontRetakeBtn" style="font-size:.72rem;padding:2px 7px;">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Redo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="id_front_data" id="idFrontData">
+                    <input type="hidden" name="id_front_mode" id="idFrontModeHidden" value="upload">
+                </div>
+                <!-- Back Side -->
+                <div class="mb-2">
+                    <label class="form-label fw-semibold small mb-2">
+                        <i class="bi bi-credit-card-2-back me-1"></i>Back Side
+                    </label>
+                    <button type="button" class="btn btn-primary btn-sm w-100 mb-1" id="idBackScanBtn">
+                        <i class="bi bi-upc-scan me-1"></i>Scan Document
+                    </button>
+                    <div class="d-flex gap-1 mb-1">
+                        <label class="btn btn-outline-secondary btn-sm flex-fill mb-0 d-flex align-items-center justify-content-center gap-1" for="idBack" style="cursor:pointer;">
+                            <i class="bi bi-upload"></i>Upload File
+                        </label>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="idBackPhotoBtn">
+                            <i class="bi bi-camera me-1"></i>Quick Photo
+                        </button>
+                    </div>
+                    <input type="file" id="idBack" name="id_back" class="d-none" accept="image/*">
+                    <div id="idBackPreviewBox" class="mt-1" style="display:none;">
+                        <div class="d-flex align-items-start gap-2">
+                            <img id="idBackPreviewImg" class="img-fluid rounded border" style="max-height:110px;flex:1;">
+                            <div class="d-flex flex-column gap-1">
+                                <span class="badge bg-success" id="idBackModeBadge">Scanned</span>
+                                <button type="button" class="btn btn-xs btn-outline-secondary" id="idBackRetakeBtn" style="font-size:.72rem;padding:2px 7px;">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Redo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="id_back_data" id="idBackData">
+                    <input type="hidden" name="id_back_mode" id="idBackModeHidden" value="upload">
+                </div>
+            </div>
+        </div>
+
+        <!-- ── 6. Address ─────────────────────────────────────────────── -->
+        <div class="card ci-section">
+            <div class="card-header">Address</div>
+            <div class="card-body">
+                <div class="row g-2">
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label">Country</label>
+                        <select name="guest_country" id="countrySelect" class="form-select form-select-sm">
+                            {% for cname in countries %}
+                            <option value="{{ cname }}" {% if cname == 'India' %}selected{% endif %}>{{ cname }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-2" id="stateRow">
+                        <label class="form-label">State / UT</label>
+                        <select name="guest_state" id="stateSelect" class="form-select form-select-sm">
+                            <option value="">— Select State —</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-2" id="cityRow">
+                        <label class="form-label">City</label>
+                        <!-- For India: dropdown populated by JS; for other countries: free text -->
+                        <select id="citySelect" class="form-select form-select-sm" style="display:none;">
+                            <option value="">— Select City —</option>
+                        </select>
+                        <input type="text" id="cityText" class="form-control form-control-sm" placeholder="City"
+                               style="display:none;">
+                        <!-- Mirrors the active input's value so only one name="guest_city" submits -->
+                        <input type="hidden" name="guest_city" id="cityHidden">
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <label class="form-label">PIN Code</label>
+                        <input type="text" name="guest_pin" class="form-control form-control-sm"
+                               maxlength="6" pattern="[0-9]{6}" placeholder="6 digits">
+                    </div>
+                </div>
+
+                <!-- GRC fields: DOB, Gender, Purpose -->
+                <div class="row g-2 mb-2">
+                    <div class="col-md-3 mb-2">
+                        <label class="form-label">Date of Birth</label>
+                        <input type="date" name="guest_dob" class="form-control form-control-sm"
+                               value="{{ reservation.guest.date_of_birth.isoformat() if reservation and reservation.guest and reservation.guest.date_of_birth else (prefill.date_of_birth.isoformat() if prefill is defined and prefill and prefill.date_of_birth else '') }}">
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <label class="form-label">Gender</label>
+                        <select name="guest_gender" class="form-select form-select-sm">
+                            <option value="">—</option>
+                            {% set _g = (reservation.guest.gender if reservation and reservation.guest else '') or '' %}
+                            <option value="Male" {{ 'selected' if _g == 'Male' }}>Male</option>
+                            <option value="Female" {{ 'selected' if _g == 'Female' }}>Female</option>
+                            <option value="Other" {{ 'selected' if _g == 'Other' }}>Other</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <label class="form-label">Purpose of Visit</label>
+                        <select name="purpose_of_visit" class="form-select form-select-sm">
+                            <option value="">—</option>
+                            {% set _pv = (reservation.guest.purpose_of_visit if reservation and reservation.guest else '') or '' %}
+                            {% for p in ['Business','Leisure','Medical','Education','Conference','Pilgrimage','Other'] %}
+                            <option value="{{ p }}" {{ 'selected' if _pv == p }}>{{ p }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── 4b. Foreign National Details (shown when country != India) ─ -->
+        <div class="card ci-section" id="foreignNationalBlock" style="display:none;">
+            <div class="card-header bg-warning bg-opacity-25">
+                <i class="bi bi-globe me-2"></i>Foreign National Details
+                <span class="badge bg-warning text-dark ms-2">Form C Required</span>
+            </div>
+            <div class="card-body">
+                <div class="row g-2 mb-2">
+                    <div class="col-md-4">
+                        <label class="form-label">Passport Number</label>
+                        <input type="text" name="passport_number" class="form-control form-control-sm"
+                               value="{{ foreign_info.passport_number if foreign_info is defined and foreign_info else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Passport Issue Place</label>
+                        <input type="text" name="passport_issue_place" class="form-control form-control-sm"
+                               value="{{ foreign_info.passport_issue_place if foreign_info is defined and foreign_info else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Passport Expiry</label>
+                        <input type="date" name="passport_expiry_date" class="form-control form-control-sm"
+                               value="{{ foreign_info.passport_expiry_date.isoformat() if foreign_info is defined and foreign_info and foreign_info.passport_expiry_date else '' }}">
+                    </div>
+                </div>
+                <div class="row g-2 mb-2">
+                    <div class="col-md-3">
+                        <label class="form-label">Visa Number</label>
+                        <input type="text" name="visa_number" class="form-control form-control-sm"
+                               value="{{ foreign_info.visa_number if foreign_info is defined and foreign_info else '' }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Visa Type</label>
+                        <select name="visa_type" class="form-select form-select-sm">
+                            <option value="">—</option>
+                            {% set _vt = (foreign_info.visa_type if foreign_info is defined and foreign_info else '') or '' %}
+                            {% for v in ['Tourist','Business','Employment','Student','Medical','e-Visa','Conference','Other'] %}
+                            <option value="{{ v }}" {{ 'selected' if _vt == v }}>{{ v }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Visa Issue Date</label>
+                        <input type="date" name="visa_issue_date" class="form-control form-control-sm"
+                               value="{{ foreign_info.visa_issue_date.isoformat() if foreign_info is defined and foreign_info and foreign_info.visa_issue_date else '' }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Visa Expiry Date</label>
+                        <input type="date" name="visa_expiry_date" class="form-control form-control-sm"
+                               value="{{ foreign_info.visa_expiry_date.isoformat() if foreign_info is defined and foreign_info and foreign_info.visa_expiry_date else '' }}">
+                    </div>
+                </div>
+                <div class="row g-2">
+                    <div class="col-md-4">
+                        <label class="form-label">Arrived From</label>
+                        <input type="text" name="arrival_from" class="form-control form-control-sm" placeholder="City / Country"
+                               value="{{ foreign_info.arrival_from if foreign_info is defined and foreign_info else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Next Destination</label>
+                        <input type="text" name="next_destination" class="form-control form-control-sm"
+                               value="{{ foreign_info.next_destination if foreign_info is defined and foreign_info else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Visa Issue Place</label>
+                        <input type="text" name="visa_issue_place" class="form-control form-control-sm"
+                               value="{{ foreign_info.visa_issue_place if foreign_info is defined and foreign_info else '' }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── 5. Billing & Payment — Production Pricing Engine ─────── -->
+        <style>
+        .pm-card{border:2px solid #dee2e6;border-radius:8px;padding:8px 12px;cursor:pointer;transition:all .15s;text-align:center;flex:1;min-width:110px}
+        .pm-card:hover{border-color:#86b7fe;background:#f0f7ff}
+        .pm-card.selected{border-color:#0d6efd;background:#e7f1ff;box-shadow:0 0 0 2px rgba(13,110,253,.25)}
+        .pm-card .pm-icon{font-size:1.3rem;display:block;margin-bottom:2px}
+        .pm-card .pm-label{font-size:.75rem;font-weight:600}
+        .pm-card .pm-sub{font-size:.65rem;color:#6c757d}
+        .pricing-input-area{border:2px solid #0d6efd;border-radius:8px;padding:12px;background:#f8fbff;position:relative}
+        .pricing-input-area::before{content:'';position:absolute;top:-8px;left:24px;width:14px;height:14px;background:#f8fbff;border-left:2px solid #0d6efd;border-top:2px solid #0d6efd;transform:rotate(45deg)}
+        .mode-context-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;color:#0d6efd;font-weight:700;margin-bottom:4px}
+        .billing-preview-box{border:2px solid #198754;border-radius:8px;padding:10px 14px;background:#f0fdf4}
+        .bp-row{display:flex;justify-content:space-between;align-items:center;padding:2px 0;font-size:.82rem}
+        .bp-row.bp-total{border-top:2px solid #198754;margin-top:4px;padding-top:6px;font-size:.95rem}
+        .bp-val{font-weight:700}
+        .safety-warn{border-left:3px solid #f59e0b;background:#fffbeb;padding:6px 10px;border-radius:0 6px 6px 0;font-size:.78rem;margin-top:6px}
+        .safety-warn .switch-link{color:#0d6efd;cursor:pointer;text-decoration:underline;font-weight:600}
+        </style>
+
+        <div class="card ci-section">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <span>Billing &amp; Payment</span>
+                <div class="form-check form-switch mb-0 ms-3">
+                    <input class="form-check-input" type="checkbox" id="modifyTariffToggle" role="switch">
+                    <label class="form-check-label small" for="modifyTariffToggle">Modify Pricing</label>
+                </div>
+            </div>
+            <div class="card-body">
+
+                <div id="billingWarning" class="alert alert-warning py-2 px-3 mb-2 small" style="display:none;">
+                    No tariff found for the selected room. Please check the Room Type configuration in Masters.
+                </div>
+
+                <!-- Standard Pricing (always visible, read-only) -->
+                <div class="d-flex flex-wrap gap-3 align-items-center mb-2 py-1 px-2 rounded" style="background:#f1f5f9;font-size:.85rem">
+                    <span class="text-muted">Standard Rate:</span>
+                    <strong>₹<span id="stdRateDisplay">0</span></strong><span class="text-muted">/night</span>
+                    <span class="text-muted">x</span>
+                    <strong><span id="stdNightsDisplay">1</span></strong><span class="text-muted">night(s)</span>
+                    <span class="text-muted">=</span>
+                    <strong>₹<span id="stdTotalDisplay">0</span></strong>
+                    <span class="text-muted small">(excl. GST)</span>
+                </div>
+
+                <!-- Hidden fields: backend is authoritative -->
+                <input type="hidden" name="rate_per_night"           id="rateInput" value="{{ reservation.rate_per_night if reservation else '' }}">
+                <input type="hidden" name="total_amount"             id="totalAmountHidden" value="0">
+                <input type="hidden" name="tariff_modified_manually" id="tariffModifiedFlag" value="0">
+                <input type="hidden" name="pricing_mode"             id="pricingModeHidden" value="standard">
+                <input type="hidden" name="entered_stay_total"       id="enteredStayTotalHidden" value="0">
+                <input type="hidden" name="entered_per_night"        id="enteredPerNightHidden" value="0">
+                <input type="hidden" name="discount_amount"          id="discountAmountHidden" value="0">
+                <input type="hidden" name="discount_reason"          id="discountReasonHidden" value="">
+                <input type="hidden" name="discount_authorized_by"   id="discountAuthorizedHidden" value="">
+                <input type="hidden" name="discount_given_by"        id="discountGivenByHidden" value="">
+
+                <!-- ═══ Modify Pricing Panel ═══ -->
+                <div id="modifyTariffPanel" style="display:none;">
+
+                    <!-- STEP 1: Choose pricing mode (card-style, prominent) -->
+                    <div class="mb-2">
+                        <div class="fw-semibold mb-1" style="font-size:.8rem"><i class="bi bi-sliders me-1"></i>Step 1: Choose pricing method</div>
+                        <div class="d-flex flex-wrap gap-2" id="modeCards">
+                            <label class="pm-card" data-mode="per_night" for="modePerNight">
+                                <input type="radio" name="pricing_mode_radio" id="modePerNight" value="per_night" class="d-none">
+                                <span class="pm-icon"><i class="bi bi-moon"></i></span>
+                                <span class="pm-label">Per Night Rate</span>
+                                <span class="pm-sub">Change nightly price</span>
+                            </label>
+                            <label class="pm-card" data-mode="total_stay" for="modeTotalStay">
+                                <input type="radio" name="pricing_mode_radio" id="modeTotalStay" value="total_stay" class="d-none">
+                                <span class="pm-icon"><i class="bi bi-cash-stack"></i></span>
+                                <span class="pm-label">Total Stay Amount</span>
+                                <span class="pm-sub">Set full-stay price</span>
+                            </label>
+                            <label class="pm-card" data-mode="discount_on_total" for="modeDiscount">
+                                <input type="radio" name="pricing_mode_radio" id="modeDiscount" value="discount_on_total" class="d-none">
+                                <span class="pm-icon"><i class="bi bi-tag"></i></span>
+                                <span class="pm-label">Discount</span>
+                                <span class="pm-sub">Reduce standard total</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Multi-night helper — always visible when nights > 1 -->
+                    <div id="multiNightHelper" class="alert alert-info py-2 px-3 mb-2 small" style="display:none">
+                        <i class="bi bi-info-circle-fill me-1"></i>
+                        <strong>Multi-night stay detected.</strong>
+                        Choose <b>Total Stay Amount</b> if you want to enter one combined price for the entire stay.
+                        Choosing <b>Per Night Rate</b> will multiply your entry by <span id="helperNightsCount">2</span> nights.
+                    </div>
+
+                    <!-- STEP 2: Enter value (context-aware) -->
+                    <div class="pricing-input-area mb-2">
+                        <div class="mode-context-label" id="inputContextLabel">Step 2: Enter new rate per night</div>
+
+                        <!-- Per Night Rate input -->
+                        <div id="pnSection">
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-5">
+                                    <label class="form-label form-label-sm mb-0 fw-semibold">New Rate / Night <span class="text-muted fw-normal">(excl. GST)</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">₹</span>
+                                        <input type="number" id="pnRateInput" class="form-control form-control-lg" step="0.01" min="0" placeholder="0.00">
+                                    </div>
+                                </div>
+                                <div class="col-md-7 d-flex align-items-center" style="font-size:.82rem">
+                                    <span class="text-muted" id="pnCalcPreview"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Total Stay Amount input -->
+                        <div id="tsSection" style="display:none">
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-5">
+                                    <label class="form-label form-label-sm mb-0 fw-semibold">Final Total Stay Amount <span class="text-muted fw-normal">(excl. GST)</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">₹</span>
+                                        <input type="number" id="tsTotalInput" class="form-control form-control-lg" step="0.01" min="0" placeholder="0.00">
+                                    </div>
+                                </div>
+                                <div class="col-md-7 d-flex align-items-center" style="font-size:.82rem">
+                                    <span class="text-muted" id="tsCalcPreview"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Discount fields -->
+                        <div id="discSection" style="display:none">
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <label class="form-label form-label-sm mb-0 fw-semibold">Discount Amount</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">₹</span>
+                                        <input type="number" id="discAmountInput" class="form-control" step="0.01" min="0" placeholder="0.00">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label form-label-sm mb-0">Reason <span class="text-danger">*</span></label>
+                                    <input type="text" id="discReasonInput" class="form-control form-control-sm" placeholder="Discount reason">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label form-label-sm mb-0">Authorized By <span class="text-danger">*</span></label>
+                                    <input type="text" id="discAuthInput" class="form-control form-control-sm" placeholder="Manager name">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Safety warning (context-aware) -->
+                        <div id="pnWarning" class="safety-warn" style="display:none"></div>
+                    </div>
+
+                    <!-- Adjustment badge -->
+                    <div id="adjDisplay" class="d-flex align-items-center gap-2 mb-2" style="display:none;font-size:.82rem">
+                        <span class="text-muted">Adjustment:</span>
+                        <span id="adjAmountDisplay" class="fw-bold">₹0</span>
+                        <span id="adjTypeBadge" class="badge">—</span>
+                    </div>
+                </div>
+
+                <!-- GST breakdown (collapsible) -->
+                <details class="mb-2" id="gstDetails">
+                    <summary class="small text-muted" style="cursor:pointer"><i class="bi bi-receipt me-1"></i>GST Breakdown</summary>
+                    <table class="table table-sm table-borderless gst-table w-auto mb-0 mt-1">
+                        <tbody>
+                            <tr><td class="label">Nights</td><td id="gstNights">—</td></tr>
+                            <tr><td class="label">Tariff Excl. GST</td><td>₹<span id="gstBase">0.00</span></td></tr>
+                            <tr><td class="label">GST Rate</td><td><span id="gstRate">0</span>%</td></tr>
+                            <tr><td class="label ps-3">CGST (<span id="gstRateHalf">0</span>%)</td><td>₹<span id="gstCgst">0.00</span></td></tr>
+                            <tr><td class="label ps-3">SGST (<span id="gstRateHalf2">0</span>%)</td><td>₹<span id="gstSgst">0.00</span></td></tr>
+                            <tr><td class="label">GST Amount</td><td>₹<span id="gstAmt">0.00</span></td></tr>
+                        </tbody>
+                    </table>
+                </details>
+
+                <!-- ═══ Billing Preview (always visible, prominent) ═══ -->
+                <div class="billing-preview-box" id="billingPreview">
+                    <div class="fw-semibold mb-1" style="font-size:.78rem;color:#166534"><i class="bi bi-calculator me-1"></i>Billing Preview</div>
+                    <div class="bp-row">
+                        <span>Standard Tariff</span>
+                        <span>₹<span id="prevStdRate">0</span>/night × <span id="prevNights">1</span> = ₹<span id="prevStd">0</span></span>
+                    </div>
+                    <div class="bp-row">
+                        <span>Pricing Mode</span>
+                        <span><span id="prevMode" class="badge bg-secondary">Standard</span></span>
+                    </div>
+                    <div class="bp-row">
+                        <span>Effective Rate / Night</span>
+                        <span class="bp-val">₹<span id="prevEffRate">0</span></span>
+                    </div>
+                    <div class="bp-row" id="prevAdjRow" style="display:none">
+                        <span>Adjustment</span>
+                        <span id="prevAdj" class="fw-bold">0</span>
+                    </div>
+                    <div class="bp-row">
+                        <span>GST</span>
+                        <span>₹<span id="prevGst">0</span></span>
+                    </div>
+                    <div class="bp-row bp-total">
+                        <span>Final Billable Amount</span>
+                        <span class="bp-val text-success" style="font-size:1.1rem">₹<span id="prevFinal">0</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Early Check-in Charge Preview ────────────────────────────
+             Fetched live via /api/cico/preview; shown only when applicable.
+             The actual charge is posted server-side on form submit.          -->
+        {% if reservation and reservation.id %}
+        <div id="earlyCheckinPreview" class="ci-section" style="display:none;"
+             data-res-id="{{ reservation.id }}">
+            <div class="card" style="border:1.5px solid #d97706;">
+                <div class="card-header d-flex align-items-center gap-2 py-2"
+                     style="background:#fff8e1;border-bottom:1px solid #fed7aa;">
+                    <i class="bi bi-clock-history" style="color:#d97706;"></i>
+                    <span class="fw-semibold" style="font-size:.88rem;color:#92400e;">
+                        Early Check-in Charge
+                    </span>
+                    <span id="earlyCI_badge" class="badge ms-auto"></span>
+                </div>
+                <div class="card-body py-2 px-3" id="earlyCI_body">
+                    <div class="text-muted small">Calculating based on current time…</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ── 6. Advance Payment ─────────────────────────────────────── -->
+        <div class="card ci-section">
+            <div class="card-header">Advance Payment / Deposit</div>
+            <div class="card-body">
+                <div class="row g-2">
+                    <div class="col-md-5 mb-2">
+                        <label class="form-label">Amount</label>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text">₹</span>
+                            <input type="number" name="{% if reservation %}deposit_amount{% else %}advance_payment{% endif %}"
+                                   class="form-control" step="0.01" min="0"
+                                   value="{{ checkin_record.deposit_amount if checkin_record else 0 }}">
+                        </div>
+                    </div>
+                    <div class="col-md-5 mb-2">
+                        <label class="form-label">Payment Mode</label>
+                        <select name="deposit_payment_mode_id" class="form-select form-select-sm">
+                            <option value="">— Select —</option>
+                            {% for pm in payment_modes %}
+                            <option value="{{ pm.id }}"
+                                    {% if checkin_record and checkin_record.deposit_payment_mode_id == pm.id %}selected{% endif %}>
+                                {{ pm.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── 7. Corporate Billing ───────────────────────────────────── -->
+        <div class="card ci-section">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <span>Corporate Billing</span>
+                <div class="form-check form-switch mb-0">
+                    <input class="form-check-input" type="checkbox" id="corporateToggle" name="is_corporate"
+                           {% if checkin_record and checkin_record.company_id %}checked{% endif %}>
+                </div>
+            </div>
+            <div id="corporateSection" class="card-body" style="display:{% if checkin_record and checkin_record.company_id %}block{% else %}none{% endif %};">
+                <div class="row g-2">
+                    <div class="col-md-7 mb-2">
+                        <label class="form-label">Company</label>
+                        <select name="company_id" id="companySelect" class="form-select form-select-sm">
+                            <option value="">Select company</option>
+                            {% for company in companies %}
+                            <option value="{{ company.id }}"
+                                    {% if checkin_record and checkin_record.company_id == company.id %}selected{% endif %}>
+                                {{ company.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-5 mb-2">
+                        <label class="form-label">Billing Reference</label>
+                        <input type="text" name="company_billing_ref" class="form-control form-control-sm"
+                               value="{{ checkin_record.company_billing_ref if checkin_record else '' }}">
+                    </div>
+                    <div class="col-12">
+                        <div class="alert alert-info py-1 px-2 mb-0 small" id="creditAlert" style="display:none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hidden fields for existing reservation flow -->
+        {% if reservation %}
+        <input type="hidden" name="guest_address" value="{{ reservation.guest.address or '' }}">
+        {% endif %}
+        <input type="hidden" name="billing_responsibility" id="billingResponsibility" value="Guest">
+
+    </div><!-- /col left -->
+
+    <!-- ═══════════════════════════ RIGHT COLUMN ══════════════════════════ -->
+    <div class="col-xl-5">
+
+        <!-- ── 9. Guest Photo ─────────────────────────────────────────── -->
+        <div class="card ci-section">
+            <div class="card-header">Guest Photo</div>
+            <div class="card-body">
+                {% if checkin_record and checkin_record.guest_photo_path %}
+                <div class="mb-2">
+                    <img src="{{ url_for('static', filename=checkin_record.guest_photo_path) }}"
+                         class="img-fluid rounded" style="max-height:200px;">
+                </div>
+                {% endif %}
+                <!-- Camera selector row -->
+                <div class="d-flex align-items-center gap-2 mb-2" id="cameraSelectorRow">
+                    <select id="cameraSelect" class="form-select form-select-sm" style="flex:1;min-width:0;" title="Select Camera" aria-label="Select Camera">
+                        <option value="">— Select Camera —</option>
+                    </select>
+                    <button type="button" id="refreshCameras" class="btn btn-sm btn-outline-secondary" title="Refresh camera list">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                    <button type="button" id="switchCamera" class="btn btn-sm btn-outline-secondary d-none" title="Cycle to next camera">
+                        <i class="bi bi-camera-video-fill"></i> Switch
+                    </button>
+                </div>
+                <div id="cameraMessage" class="small mb-1" style="display:none;"></div>
+
+                <div id="webcamContainer" class="mb-2">
+                    <video id="webcam" width="100%" autoplay playsinline
+                           style="border:1px solid #dee2e6;border-radius:.375rem;display:none;"></video>
+                    <img id="webcamPreview" style="display:none;max-height:200px;" class="img-fluid rounded mb-1">
+                </div>
+                <div class="btn-group w-100 mb-2" role="group">
+                    <button type="button" class="btn btn-sm btn-primary"   id="startWebcam">Start Camera</button>
+                    <button type="button" class="btn btn-sm btn-success"   id="capturePhoto" style="display:none;">Capture Photo</button>
+                    <button type="button" class="btn btn-sm btn-warning"   id="retakePhoto"  style="display:none;">Retake</button>
+                    <button type="button" class="btn btn-sm btn-secondary" id="stopWebcam"   style="display:none;">Stop</button>
+                </div>
+                <input type="file" id="photoUpload" name="guest_photo" class="form-control form-control-sm" accept="image/*">
+                <input type="hidden" name="webcam_photo_data" id="webcamPhotoData">
+                <canvas id="photoCanvas" style="display:none;"></canvas>
+            </div>
+        </div>
+
+        <!-- ID Verification moved to left column (section 4) -->
+
+<!-- ── Document Scanner Modal ──────────────────────────────────────── -->
+<div class="modal fade" id="docScannerModal" tabindex="-1" aria-labelledby="docScannerTitle" aria-modal="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header py-2">
+        <h6 class="modal-title fw-bold" id="docScannerTitle">
+            <i id="docScannerModeIcon" class="bi bi-upc-scan me-1"></i><span id="docScannerModeText">Scan Document</span> — <span id="docScannerSideLabel">Front</span>
+        </h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="docScannerClose"></button>
+      </div>
+      <div class="modal-body p-3">
+
+        <!-- Phase 1: Live preview + detection -->
+        <div id="scanPhase1">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <select id="scanCameraSelect" class="form-select form-select-sm" style="flex:1;" aria-label="Scan camera">
+              <option value="">— Select Camera —</option>
+            </select>
+            <button type="button" id="scanRefreshCameras" class="btn btn-sm btn-outline-secondary" title="Refresh cameras">
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <button type="button" id="scanSwitchCamera" class="btn btn-sm btn-outline-secondary d-none" title="Next camera">
+              <i class="bi bi-camera-video-fill"></i> Switch
+            </button>
+          </div>
+          <div id="scanCameraMsg" class="small text-danger mb-2" style="display:none;"></div>
+
+          <div class="position-relative mb-2" id="scanPreviewWrap" style="background:#000;border-radius:.375rem;overflow:hidden;">
+            <video id="scanVideo" width="100%" autoplay playsinline muted
+                   style="display:block;max-height:52vh;object-fit:contain;"></video>
+            <canvas id="scanOverlay" style="position:absolute;inset:0;pointer-events:none;"></canvas>
+          </div>
+
+          <div id="scanDetectMsg" class="small text-center mb-2" style="color:#6c757d;">
+            <i class="bi bi-info-circle me-1"></i>Place document on a plain surface. Edges will be detected automatically.
+          </div>
+
+          <!-- Focus quality bar (visible in stand mode) -->
+          <div id="scanFocusBarWrap" class="mb-2 px-3" style="display:none;">
+            <div class="d-flex justify-content-between small mb-1">
+              <span class="text-muted"><i class="bi bi-eye me-1"></i>Focus Quality</span>
+              <span id="scanFocusLabel" class="fw-semibold">--</span>
+            </div>
+            <div class="progress" style="height:8px;border-radius:4px;">
+              <div id="scanFocusBar" class="progress-bar" role="progressbar"
+                   style="width:0%;transition:width .3s,background-color .3s;"></div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-center gap-2">
+            <button type="button" class="btn btn-primary" id="scanCaptureBtn">
+              <i class="bi bi-camera-fill me-1"></i>Capture Frame
+            </button>
+          </div>
+        </div>
+
+        <!-- Phase 2: Corner adjustment -->
+        <div id="scanPhase2" style="display:none;">
+          <p class="small text-muted mb-2">
+            <i class="bi bi-arrows-move me-1"></i>
+            Drag the <strong>corner handles</strong> to adjust the document boundary, then click <strong>Apply Crop</strong>.
+          </p>
+          <div class="position-relative" id="scanAdjustWrap">
+            <canvas id="scanAdjustCanvas" style="border-radius:.375rem;max-width:100%;cursor:crosshair;touch-action:none;"></canvas>
+          </div>
+          <div class="mt-2 d-flex justify-content-between gap-2 flex-wrap">
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="scanRetakeBtn">
+              <i class="bi bi-arrow-counterclockwise me-1"></i>Retake
+            </button>
+            <button type="button" class="btn btn-sm btn-success" id="scanApplyBtn">
+              <i class="bi bi-crop me-1"></i>Apply Crop &amp; Enhance
+            </button>
+          </div>
+        </div>
+
+        <!-- Phase 3: Final result -->
+        <div id="scanPhase3" style="display:none;">
+          <p class="small text-muted mb-2">
+            <i class="bi bi-check-circle me-1 text-success"></i>Review the image below before saving.
+          </p>
+          <div class="text-center mb-2">
+            <img id="scanResultImg" class="img-fluid rounded border" style="max-height:55vh;">
+          </div>
+          <div class="d-flex justify-content-between gap-2 flex-wrap">
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-sm btn-outline-secondary" id="scanRescanBtn">
+                <i class="bi bi-arrow-counterclockwise me-1"></i>Retake
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" id="scanAdjustCornersBtn" style="display:none;">
+                <i class="bi bi-crop me-1"></i>Adjust Corners
+              </button>
+            </div>
+            <button type="button" class="btn btn-sm btn-success" id="scanUseBtn">
+              <i class="bi bi-check2-all me-1"></i>Save
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /modal-body -->
+    </div>
+  </div>
+</div>
+
+        <!-- ── 11. Guest Declaration & Signature ─────────────────────── -->
+        <div class="card ci-section">
+            <div class="card-header"><i class="bi bi-vector-pen me-2"></i>Guest Declaration &amp; Signature</div>
+            <div class="card-body">
+                <!-- Legal declaration -->
+                <div class="alert alert-light border small mb-2" style="font-size:0.78rem;line-height:1.6;">
+                    <strong>Guest Declaration:</strong> I hereby declare that the particulars given by me are true and correct.
+                    I agree to abide by the rules and regulations of the hotel and accept personal responsibility
+                    for all charges incurred during my stay unless otherwise arranged. I authorise the hotel to
+                    charge any outstanding balance to my payment method on file. I understand that the hotel is
+                    not responsible for any loss of valuables not deposited in the hotel safe. I consent to my
+                    personal data being processed for the purpose of this stay and regulatory compliance.
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="declarationCheck" name="declaration_accepted" value="1">
+                    <label class="form-check-label small fw-semibold" for="declarationCheck">
+                        I have read and accept the above declaration
+                    </label>
+                </div>
+                <input type="hidden" name="grc_declaration_accepted" id="grcDeclHidden" value="0">
+
+                {% if checkin_record and checkin_record.signature_path %}
+                <div class="mb-2">
+                    <img src="{{ url_for('static', filename=checkin_record.signature_path) }}"
+                         class="img-fluid rounded" style="max-height:120px;">
+                    <div class="small text-muted">
+                        {% if checkin_record.grc_signature_timestamp %}
+                        Signed {{ checkin_record.grc_signature_timestamp.strftime('%d %b %Y %H:%M') }}
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                <canvas id="signaturePad" width="100%" height="140"
+                        style="border:1px solid #dee2e6;border-radius:.375rem;cursor:crosshair;"></canvas>
+                <div class="btn-group w-100 mt-2" role="group">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="clearSignature">Clear</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary"   id="saveSignature">Save Signature</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── GRC Download Buttons (after check-in) ─────────────────── -->
+        {% if checkin_record %}
+        <div class="card ci-section">
+            <div class="card-body py-2 d-flex gap-2 flex-wrap">
+                <a href="{{ url_for('grc.download_pdf', reservation_id=reservation.id) }}"
+                   class="btn btn-sm btn-outline-danger" target="_blank">
+                    <i class="bi bi-file-earmark-pdf me-1"></i>Download GRC
+                </a>
+                {% if is_foreign is defined and is_foreign %}
+                <a href="{{ url_for('grc.download_form_c', reservation_id=reservation.id) }}"
+                   class="btn btn-sm btn-outline-warning" target="_blank">
+                    <i class="bi bi-file-earmark-text me-1"></i>Download Form C (FRRO)
+                </a>
+                {% endif %}
+                <a href="{{ url_for('grc.preview', reservation_id=reservation.id) }}"
+                   class="btn btn-sm btn-outline-secondary" target="_blank">
+                    <i class="bi bi-eye me-1"></i>Preview GRC
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+    </div><!-- /col right -->
+    </div><!-- /row -->
+
+    </form>
+</div><!-- /container -->
+
+<!-- Sticky action bar -->
+<div class="ci-action-bar">
+    <a href="{{ url_for('main.reservations') }}" class="btn btn-secondary">Cancel</a>
+    <button type="submit" form="checkinForm" class="btn btn-primary px-4">
+        {% if checkin_record %}Update{% else %}Complete{% endif %} Check-in
+    </button>
+</div>
+
+<script nonce="{{ csp_nonce }}">
+(function () {
+'use strict';
+
+/* ── India state→city data (from backend) ─────────────────────────── */
+const INDIA_STATES_CITIES = {{ india_states_cities | tojson }};
+
+/* ── DOM refs ──────────────────────────────────────────────────────── */
+const countrySelect   = document.getElementById('countrySelect');
+const stateSelect     = document.getElementById('stateSelect');
+const stateRow        = document.getElementById('stateRow');
+const roomSelect      = document.getElementById('roomSelect');
+const roomTypeSelect  = document.getElementById('roomTypeSelect');
+const nightsInput     = document.getElementById('nightsInput');
+const rateInput          = document.getElementById('rateInput');
+const modifyTariffToggle = document.getElementById('modifyTariffToggle');
+const passengersJson     = document.getElementById('passengersJson');
+const paxBody            = document.getElementById('paxBody');
+
+/* ── Address cascade ───────────────────────────────────────────────── */
+const citySelect  = document.getElementById('citySelect');
+const cityText    = document.getElementById('cityText');
+const cityHidden  = document.getElementById('cityHidden');
+
+function populateStates() {
+    stateSelect.innerHTML = '<option value="">— Select State —</option>';
+    Object.keys(INDIA_STATES_CITIES).sort().forEach(function (s) {
+        const opt = document.createElement('option');
+        opt.value = s; opt.textContent = s;
+        stateSelect.appendChild(opt);
+    });
+}
+
+function populateCities(state) {
+    citySelect.innerHTML = '<option value="">— Select City —</option>';
+    const cities = INDIA_STATES_CITIES[state] || [];
+    cities.forEach(function (c) {
+        const opt = document.createElement('option');
+        opt.value = c; opt.textContent = c;
+        citySelect.appendChild(opt);
+    });
+    // Add "Other" so staff can type a city not in the list
+    const other = document.createElement('option');
+    other.value = '__other__'; other.textContent = 'Other…';
+    citySelect.appendChild(other);
+    citySelect.style.display = '';
+    cityText.style.display = 'none';
+    cityHidden.value = '';
+}
+
+function showCityText() {
+    citySelect.style.display = 'none';
+    cityText.style.display = '';
+    cityText.value = '';
+    cityHidden.value = '';
+}
+
+citySelect && citySelect.addEventListener('change', function () {
+    if (this.value === '__other__') {
+        showCityText();
+        cityText.focus();
+    } else {
+        cityHidden.value = this.value;
+    }
+});
+cityText && cityText.addEventListener('input', function () {
+    cityHidden.value = this.value;
+});
+
+function handleCountryChange() {
+    const isIndia = (countrySelect.value === 'India');
+    if (isIndia) {
+        populateStates();
+        stateSelect.style.display = '';
+        // Reset city until a state is picked
+        citySelect.innerHTML = '<option value="">— Select City —</option>';
+        citySelect.style.display = '';
+        cityText.style.display = 'none';
+    } else {
+        // Non-India: free-text state and city
+        stateSelect.innerHTML = '<option value="">— State / Province —</option>';
+        showCityText();
+    }
+    cityHidden.value = '';
+}
+
+stateSelect && stateSelect.addEventListener('change', function () {
+    if (countrySelect.value === 'India' && this.value) {
+        populateCities(this.value);
+    }
+});
+
+countrySelect && countrySelect.addEventListener('change', handleCountryChange);
+// Init for India (default)
+if (countrySelect && countrySelect.value === 'India') {
+    populateStates();
+    citySelect.style.display = '';
+    cityText.style.display = 'none';
+}
+
+/* ── Foreign National Section Toggle ──────────────────────────────── */
+(function() {
+    var fnBlock = document.getElementById('foreignNationalBlock');
+    if (!fnBlock || !countrySelect) return;
+    function toggleFN() {
+        var val = (countrySelect.value || '').trim();
+        fnBlock.style.display = (val && val !== 'India') ? '' : 'none';
+    }
+    countrySelect.addEventListener('change', toggleFN);
+    toggleFN(); // init
+})();
+
+/* ── Auto-populate guest_name from first_name + last_name ─────────── */
+(function() {
+    var fn = document.querySelector('input[name="first_name"]');
+    var ln = document.querySelector('input[name="last_name"]');
+    var hid = document.getElementById('guestNameHidden');
+    if (fn && ln && hid) {
+        function sync() { hid.value = (fn.value.trim() + ' ' + ln.value.trim()).trim(); }
+        fn.addEventListener('input', sync);
+        ln.addEventListener('input', sync);
+    }
+})();
+
+/* ── Declaration checkbox sync ────────────────────────────────────── */
+(function() {
+    var chk = document.getElementById('declarationCheck');
+    var hid = document.getElementById('grcDeclHidden');
+    if (chk && hid) chk.addEventListener('change', function() { hid.value = this.checked ? '1' : '0'; });
+})();
+
+/* ── Billing — 3-Mode Pricing Engine (Redesigned UI) ─────────────── */
+const billingWarning     = document.getElementById('billingWarning');
+const modifyTariffPanel  = document.getElementById('modifyTariffPanel');
+const tariffModifiedFlag = document.getElementById('tariffModifiedFlag');
+const totalAmountHidden  = document.getElementById('totalAmountHidden');
+const pricingModeHidden  = document.getElementById('pricingModeHidden');
+const rateHidden         = document.getElementById('rateInput');
+const discAmountHidden   = document.getElementById('discountAmountHidden');
+const discReasonHidden   = document.getElementById('discountReasonHidden');
+const discAuthHidden     = document.getElementById('discountAuthorizedHidden');
+const discGivenHidden    = document.getElementById('discountGivenByHidden');
+
+const pnSection   = document.getElementById('pnSection');
+const tsSection   = document.getElementById('tsSection');
+const discSection = document.getElementById('discSection');
+const pnRateInput    = document.getElementById('pnRateInput');
+const tsTotalInput   = document.getElementById('tsTotalInput');
+const discAmtInput   = document.getElementById('discAmountInput');
+const discReasonInp  = document.getElementById('discReasonInput');
+const discAuthInp    = document.getElementById('discAuthInput');
+
+let currentGstRate     = 0;
+let currentGstExempted = false;
+let standardRatePN     = 0;
+
+function r2(n)   { return Math.round((n + Number.EPSILON) * 100) / 100; }
+function fmt(n)  { return isNaN(n) ? '0.00' : n.toFixed(2); }
+function fmtI(n) { return isNaN(n) ? '0' : Number(n).toLocaleString('en-IN', {maximumFractionDigits:0}); }
+function setText(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
+function getNights() { return Math.max(1, parseInt(nightsInput ? nightsInput.value : 1) || 1); }
+function getGstPct() { return currentGstExempted ? 0 : currentGstRate; }
+function getPricingMode() {
+    if (!modifyTariffToggle || !modifyTariffToggle.checked) return 'standard';
+    var rb = document.querySelector('input[name="pricing_mode_radio"]:checked');
+    return rb ? rb.value : 'per_night';
+}
+
+/* ── Mode card selection UI ─────────────────────────────────────── */
+var modeCards = document.querySelectorAll('.pm-card');
+modeCards.forEach(function(card) {
+    card.addEventListener('click', function() {
+        modeCards.forEach(function(c) { c.classList.remove('selected'); });
+        card.classList.add('selected');
+        var radio = card.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
+        switchPricingMode();
+    });
+});
+
+function switchPricingMode() {
+    var mode = getPricingMode();
+    var contextLabel = document.getElementById('inputContextLabel');
+    pnSection   && (pnSection.style.display   = mode === 'per_night'         ? '' : 'none');
+    tsSection   && (tsSection.style.display   = mode === 'total_stay'        ? '' : 'none');
+    discSection && (discSection.style.display = mode === 'discount_on_total' ? '' : 'none');
+    if (contextLabel) {
+        var labels = {
+            per_night: 'Step 2: Enter new rate per night',
+            total_stay: 'Step 2: Enter total amount for the ENTIRE stay',
+            discount_on_total: 'Step 2: Enter discount off standard total'
+        };
+        contextLabel.textContent = labels[mode] || 'Step 2: Enter value';
+    }
+    // Update card selection state
+    modeCards.forEach(function(c) {
+        c.classList.toggle('selected', c.dataset.mode === mode);
+    });
+    recalculateBilling();
+}
+
+/* ── GST display ────────────────────────────────────────────────── */
+function applyGstDisplay(nights, baseExcl, gstPct, gstAmt, totalWithGst) {
+    var half = r2(gstAmt / 2);
+    setText('gstNights',    nights);
+    setText('gstBase',      fmt(baseExcl));
+    setText('gstRate',      gstPct);
+    setText('gstRateHalf',  gstPct / 2);
+    setText('gstRateHalf2', gstPct / 2);
+    setText('gstCgst',      fmt(half));
+    setText('gstSgst',      fmt(half));
+    setText('gstAmt',       fmt(gstAmt));
+    if (totalAmountHidden) totalAmountHidden.value = fmt(totalWithGst);
+}
+
+/* ── Master recalculation ───────────────────────────────────────── */
+function recalculateBilling() {
+    var nights   = getNights();
+    var gstPct   = getGstPct();
+    var mode     = getPricingMode();
+    var stdTotal = r2(standardRatePN * nights);
+
+    // Standard display
+    setText('stdRateDisplay',   fmtI(standardRatePN));
+    setText('stdNightsDisplay', nights);
+    setText('stdTotalDisplay',  fmtI(stdTotal));
+
+    // Multi-night helper
+    var helper = document.getElementById('multiNightHelper');
+    if (helper) {
+        helper.style.display = (nights > 1 && mode !== 'standard') ? '' : 'none';
+        setText('helperNightsCount', nights);
+    }
+
+    var finalRatePN, finalStayTotal, discAmt = 0;
+
+    if (mode === 'per_night') {
+        finalRatePN    = parseFloat(pnRateInput ? pnRateInput.value : 0) || 0;
+        finalStayTotal = r2(finalRatePN * nights);
+    } else if (mode === 'total_stay') {
+        finalStayTotal = parseFloat(tsTotalInput ? tsTotalInput.value : 0) || 0;
+        finalRatePN    = nights > 0 ? r2(finalStayTotal / nights) : 0;
+    } else if (mode === 'discount_on_total') {
+        discAmt        = parseFloat(discAmtInput ? discAmtInput.value : 0) || 0;
+        discAmt        = Math.min(discAmt, stdTotal);
+        finalStayTotal = r2(stdTotal - discAmt);
+        finalRatePN    = nights > 0 ? r2(finalStayTotal / nights) : 0;
+    } else {
+        finalRatePN    = standardRatePN;
+        finalStayTotal = stdTotal;
+    }
+
+    var adjAmt = r2(finalStayTotal - stdTotal);
+    var adjType = 'NONE';
+    if (adjAmt < -0.01) adjType = 'LEAKAGE';
+    else if (adjAmt > 0.01) adjType = 'UPSELL';
+
+    // ── Write hidden fields (backend is authoritative) ──────────
+    if (rateHidden)         rateHidden.value         = fmt(finalRatePN);
+    if (pricingModeHidden)  pricingModeHidden.value  = mode;
+    if (tariffModifiedFlag) tariffModifiedFlag.value  = (mode !== 'standard') ? '1' : '0';
+    if (discAmountHidden)   discAmountHidden.value   = fmt(discAmt);
+    if (discReasonHidden)   discReasonHidden.value   = discReasonInp ? discReasonInp.value : '';
+    if (discAuthHidden)     discAuthHidden.value     = discAuthInp ? discAuthInp.value : '';
+
+    var enteredStayTotal = document.getElementById('enteredStayTotalHidden');
+    var enteredPerNight  = document.getElementById('enteredPerNightHidden');
+    if (enteredStayTotal) enteredStayTotal.value = (mode === 'total_stay')
+        ? fmt(parseFloat(tsTotalInput ? tsTotalInput.value : 0) || 0)
+        : fmt(finalStayTotal);
+    if (enteredPerNight) enteredPerNight.value = (mode === 'per_night')
+        ? fmt(parseFloat(pnRateInput ? pnRateInput.value : 0) || 0)
+        : fmt(finalRatePN);
+
+    // ── GST ─────────────────────────────────────────────────────
+    var baseExcl = finalStayTotal;
+    var gstAmt   = r2(baseExcl * gstPct / 100);
+    var totalGst = r2(baseExcl + gstAmt);
+    applyGstDisplay(nights, baseExcl, gstPct, gstAmt, totalGst);
+
+    // ── Inline calc previews per mode ───────────────────────────
+    var pnPrev = document.getElementById('pnCalcPreview');
+    if (pnPrev) {
+        pnPrev.textContent = (mode === 'per_night' && finalRatePN > 0)
+            ? '= ₹' + fmtI(finalRatePN) + ' x ' + nights + ' nights = ₹' + fmtI(finalStayTotal) + ' total'
+            : '';
+    }
+    var tsPrev = document.getElementById('tsCalcPreview');
+    if (tsPrev) {
+        tsPrev.textContent = (mode === 'total_stay' && finalStayTotal > 0)
+            ? '= ₹' + fmtI(finalRatePN) + '/night x ' + nights + ' nights'
+            : '';
+    }
+
+    // ── Adjustment badge ────────────────────────────────────────
+    var adjEl = document.getElementById('adjDisplay');
+    if (adjEl) adjEl.style.display = (mode !== 'standard' && adjAmt !== 0) ? 'flex' : 'none';
+    setText('adjAmountDisplay', (adjAmt >= 0 ? '+₹' : '-₹') + fmtI(Math.abs(adjAmt)));
+    var adjBadge = document.getElementById('adjTypeBadge');
+    if (adjBadge) {
+        adjBadge.textContent = adjType;
+        adjBadge.className = 'badge ' +
+            (adjType === 'LEAKAGE' ? 'bg-danger' : adjType === 'UPSELL' ? 'bg-success' : 'bg-secondary');
+    }
+
+    // ── Billing Preview ─────────────────────────────────────────
+    setText('prevStdRate', fmtI(standardRatePN));
+    setText('prevNights',  nights);
+    setText('prevStd',     fmtI(stdTotal));
+    setText('prevEffRate', fmtI(finalRatePN));
+    setText('prevGst',     fmtI(gstAmt));
+    setText('prevFinal',   fmtI(totalGst));
+
+    var prevMode = document.getElementById('prevMode');
+    if (prevMode) {
+        var modeLabels = {standard:'Standard', per_night:'Per Night', total_stay:'Total Stay', discount_on_total:'Discount'};
+        var modeColors = {standard:'bg-secondary', per_night:'bg-primary', total_stay:'bg-info', discount_on_total:'bg-warning text-dark'};
+        prevMode.textContent = modeLabels[mode] || mode;
+        prevMode.className = 'badge ' + (modeColors[mode] || 'bg-secondary');
+    }
+    var prevAdjRow = document.getElementById('prevAdjRow');
+    if (prevAdjRow) prevAdjRow.style.display = (adjAmt !== 0) ? 'flex' : 'none';
+    setText('prevAdj', (adjAmt >= 0 ? '+₹' : '-₹') + fmtI(Math.abs(adjAmt)) +
+        (adjType !== 'NONE' ? ' (' + adjType + ')' : ''));
+
+    // ── Safety warnings (per-night mode, multi-night) ───────────
+    var pnWarn = document.getElementById('pnWarning');
+    if (pnWarn) {
+        if (mode === 'per_night' && nights > 1 && finalRatePN > 0) {
+            var msg = '<i class="bi bi-exclamation-triangle-fill me-1"></i>';
+            msg += '<strong>You are editing the per-night tariff.</strong> ';
+            msg += 'For ' + nights + ' nights, ₹' + fmtI(finalRatePN) + '/night = <strong>₹' + fmtI(finalStayTotal) + ' total</strong>.';
+
+            // Detect likely confusion: entered value is close to what standard total would be
+            var likelyMeantTotal = (finalRatePN >= stdTotal * 0.5 && finalRatePN <= stdTotal * 1.5 && nights > 1);
+            if (likelyMeantTotal || finalStayTotal > stdTotal * 1.8) {
+                msg += '<br><i class="bi bi-lightbulb me-1"></i>If you intended <strong>₹' + fmtI(finalRatePN) +
+                    ' for the full stay</strong>, <span class="switch-link" id="switchToTotalLink">switch to Total Stay Amount</span>.';
+            }
+            pnWarn.innerHTML = msg;
+            pnWarn.style.display = '';
+
+            // Wire up the switch link
+            var switchLink = document.getElementById('switchToTotalLink');
+            if (switchLink) {
+                switchLink.addEventListener('click', function() {
+                    // Pre-fill total input with the value user likely intended
+                    if (tsTotalInput) tsTotalInput.value = pnRateInput ? pnRateInput.value : '';
+                    // Switch to total stay mode
+                    document.getElementById('modeTotalStay').checked = true;
+                    modeCards.forEach(function(c) {
+                        c.classList.toggle('selected', c.dataset.mode === 'total_stay');
+                    });
+                    switchPricingMode();
+                });
+            }
+        } else {
+            pnWarn.style.display = 'none';
+        }
+    }
+}
+
+/* ── Room Assignment: status badge + detail strip ──────────────────── */
+function updateRoomDisplay(opt) {
+    const badge       = document.getElementById('roomStatusBadge');
+    const detailsCard = document.getElementById('roomDetailsCard');
+    const valErr      = document.getElementById('roomValidationError');
+
+    if (!opt || !opt.value) {
+        if (badge)       { badge.style.display = 'none'; badge.textContent = ''; }
+        if (detailsCard) detailsCard.style.display = 'none';
+        return;
+    }
+    // Hide validation error once a room is selected
+    if (valErr) valErr.style.display = 'none';
+
+    const status = (opt.dataset.status || 'Vacant').toLowerCase();
+    const labelMap = { vacant:'Available', occupied:'Occupied', dirty:'Dirty — Needs Cleaning', maintenance:'Maintenance', blocked:'Blocked' };
+    const statusLabel = labelMap[status] || opt.dataset.status || 'Available';
+    if (badge) {
+        badge.className = 'badge fs-6 px-3 py-2 room-badge-' + status;
+        badge.textContent = statusLabel;
+        badge.style.display = '';
+    }
+    // Detail strip
+    const name  = document.getElementById('roomDetailName');
+    const type  = document.getElementById('roomDetailType');
+    const floor = document.getElementById('roomDetailFloor');
+    const rate  = document.getElementById('roomDetailRate');
+    if (name)  name.textContent  = 'Room ' + opt.text.split('—')[0].trim();
+    if (type)  type.textContent  = opt.dataset.type  || '';
+    if (floor) floor.textContent = 'Floor ' + (opt.dataset.floor || '—');
+    if (rate)  rate.textContent  = '₹' + (opt.dataset.rate || '—') + '/night';
+    if (detailsCard) detailsCard.style.display = '';
+}
+
+// Auto Assign: pick the first available room in the list
+const autoAssignBtn = document.getElementById('autoAssignRoomBtn');
+autoAssignBtn && autoAssignBtn.addEventListener('click', function () {
+    if (!roomSelect) return;
+    for (let i = 1; i < roomSelect.options.length; i++) {
+        const st = (roomSelect.options[i].dataset.status || '').toLowerCase();
+        if (st === 'vacant' || st === '') {
+            roomSelect.value = roomSelect.options[i].value;
+            roomSelect.dispatchEvent(new Event('change'));
+            roomSelect.focus();
+            return;
+        }
+    }
+    alert('No available rooms found.');
+});
+
+// ── Rate source display helper ───────────────────────────────────
+function updateRateSourceDisplay(data) {
+    var strip = document.getElementById('rateSourceStrip');
+    var badge = document.getElementById('rateSourceBadge');
+    var plan  = document.getElementById('rateSourcePlan');
+    var note  = document.getElementById('rateSourceNote');
+    if (!strip || !data) { if (strip) strip.style.display = 'none'; return; }
+
+    var sourceLabels = {
+        'manual_override': 'Manual Override',
+        'group_rate': 'Group Rate',
+        'rate_plan': 'Rate Plan',
+        'base_rate': 'Base Rate',
+    };
+    var sourceColors = {
+        'manual_override': 'bg-warning text-dark',
+        'group_rate': 'bg-info',
+        'rate_plan': 'bg-success',
+        'base_rate': 'bg-secondary',
+    };
+    var src = data.rate_source || 'base_rate';
+    badge.className = 'badge ' + (sourceColors[src] || 'bg-secondary');
+    badge.textContent = sourceLabels[src] || src;
+
+    if (data.applied_plan && src === 'rate_plan') {
+        plan.textContent = 'Plan: ' + data.applied_plan;
+        plan.style.display = '';
+    } else {
+        plan.style.display = 'none';
+    }
+
+    if (src === 'rate_plan') {
+        note.textContent = 'Rate derived from active date-based pricing.';
+    } else if (src === 'base_rate') {
+        note.textContent = 'No active rate plan matched. Using base rate.';
+    } else {
+        note.textContent = '';
+    }
+    strip.style.display = 'flex';
+
+    // Nightly breakdown
+    var toggle = document.getElementById('rateBreakdownToggle');
+    var panel  = document.getElementById('rateBreakdownPanel');
+    var tbody  = document.getElementById('rateBreakdownBody');
+    var tfoot  = document.getElementById('rateBreakdownFoot');
+    if (toggle && tbody && data.nightly_breakdown && data.nightly_breakdown.length > 1) {
+        toggle.style.display = '';
+        tbody.innerHTML = '';
+        var sum = 0;
+        data.nightly_breakdown.forEach(function(n) {
+            sum += n.rate;
+            var isBR = (n.source === 'Base Rate');
+            tbody.innerHTML += '<tr>' +
+                '<td>' + n.date + '</td>' +
+                '<td class="text-end fw-semibold">\u20b9' + n.rate.toLocaleString('en-IN') + '</td>' +
+                '<td><span class="badge ' + (isBR ? 'bg-secondary' : 'bg-success') + '" style="font-size:.6rem">' + n.source + '</span></td></tr>';
+        });
+        var avg = (sum / data.nightly_breakdown.length).toFixed(2);
+        tfoot.innerHTML = '<tr class="fw-semibold"><td>Average</td><td class="text-end">\u20b9' +
+            parseFloat(avg).toLocaleString('en-IN') + '</td><td></td></tr>';
+    } else {
+        if (toggle) toggle.style.display = 'none';
+        if (panel) panel.style.display = 'none';
+    }
+}
+
+// ── Room select → call tariff API for rate-plan-aware rate ───────
+roomSelect && roomSelect.addEventListener('change', function () {
+    var opt = this.options[this.selectedIndex];
+    updateRoomDisplay(opt);
+    if (!opt || !opt.value) {
+        billingWarning && (billingWarning.style.display = '');
+        updateRateSourceDisplay(null);
+        return;
+    }
+
+    // Immediate fallback from data-attributes (fast, no network)
+    var fallbackRate = parseFloat(opt.dataset.rate);
+    currentGstRate     = parseFloat(opt.dataset.gstRate) || 0;
+    currentGstExempted = opt.dataset.gstExempted === 'true';
+    if (fallbackRate && !isNaN(fallbackRate)) {
+        billingWarning && (billingWarning.style.display = 'none');
+        standardRatePN = fallbackRate;
+        if (pnRateInput) pnRateInput.value = fallbackRate;
+        recalculateBilling();
+    }
+
+    // Async: call tariff API for rate-plan-aware resolved rate + metadata
+    var arrivalEl = document.getElementById('checkinDateInput');
+    var departureEl = document.getElementById('checkoutDateInput');
+    var params = '?arrival=' + (arrivalEl ? arrivalEl.value : '') +
+                 '&departure=' + (departureEl ? departureEl.value : '');
+    fetch('/api/room/' + opt.value + '/tariff' + params)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            var resolvedRate = data.resolved_rate || data.base_rate || fallbackRate;
+            currentGstRate     = data.gst_rate || 0;
+            currentGstExempted = !!data.gst_exempted;
+            standardRatePN = resolvedRate;
+            if (pnRateInput) pnRateInput.value = resolvedRate;
+            billingWarning && (billingWarning.style.display = resolvedRate > 0 ? 'none' : '');
+            // Update rate display in room detail strip
+            var rateEl = document.getElementById('roomDetailRate');
+            if (rateEl) rateEl.textContent = '\u20b9' + resolvedRate + '/night';
+            updateRateSourceDisplay(data);
+            recalculateBilling();
+        })
+        .catch(function() {
+            // API failed — keep data-attribute fallback, show base_rate source
+            updateRateSourceDisplay({rate_source: 'base_rate', used_fallback: true});
+        });
+});
+
+if (roomSelect && roomSelect.value) {
+    updateRoomDisplay(roomSelect.options[roomSelect.selectedIndex]);
+    var selOpt = roomSelect.options[roomSelect.selectedIndex];
+    if (selOpt && selOpt.dataset.rate) {
+        standardRatePN = parseFloat(selOpt.dataset.rate) || 0;
+        currentGstRate = parseFloat(selOpt.dataset.gstRate) || 0;
+        currentGstExempted = selOpt.dataset.gstExempted === 'true';
+    }
+    // Trigger API call for pre-selected room
+    if (selOpt && selOpt.value) {
+        roomSelect.dispatchEvent(new Event('change'));
+    }
+}
+
+// Room type select (walk-in) → auto-fill standard rate
+roomTypeSelect && roomTypeSelect.addEventListener('change', function () {
+    const opt = this.options[this.selectedIndex];
+    if (opt && opt.dataset.rate) {
+        standardRatePN = parseFloat(opt.dataset.rate) || 0;
+        if (pnRateInput) pnRateInput.value = standardRatePN;
+        recalculateBilling();
+    }
+});
+
+// ── Modify Pricing toggle ────────────────────────────────────────
+modifyTariffToggle && modifyTariffToggle.addEventListener('change', function () {
+    if (this.checked) {
+        modifyTariffPanel && (modifyTariffPanel.style.display = '');
+        var nights = getNights();
+        // Default mode: total_stay for multi-night, per_night for single night
+        if (nights > 1) {
+            document.getElementById('modeTotalStay').checked = true;
+            // Pre-fill total stay input with standard total
+            if (tsTotalInput && !tsTotalInput.value) {
+                tsTotalInput.value = r2(standardRatePN * nights);
+            }
+        } else {
+            document.getElementById('modePerNight').checked = true;
+            if (pnRateInput && !pnRateInput.value) pnRateInput.value = standardRatePN;
+        }
+        switchPricingMode();
+    } else {
+        modifyTariffPanel && (modifyTariffPanel.style.display = 'none');
+        recalculateBilling();
+    }
+});
+
+// ── Input listeners for each mode ────────────────────────────────
+pnRateInput   && pnRateInput.addEventListener('input',   recalculateBilling);
+tsTotalInput  && tsTotalInput.addEventListener('input',   recalculateBilling);
+discAmtInput  && discAmtInput.addEventListener('input',   recalculateBilling);
+discReasonInp && discReasonInp.addEventListener('input',  recalculateBilling);
+discAuthInp   && discAuthInp.addEventListener('input',    recalculateBilling);
+
+// ── Initial billing calc ─────────────────────────────────────────
+{% if reservation %}
+standardRatePN     = {{ (reservation.standard_tariff or reservation.rate_per_night or 0) | float }};
+currentGstRate     = {{ (reservation.room_type.gst_rate or 0) | float }};
+currentGstExempted = {{ 'true' if reservation.room_type.gst_exempted else 'false' }};
+if (pnRateInput) pnRateInput.value = standardRatePN;
+{% endif %}
+recalculateBilling();
+
+/* ── Booking type & date-time ──────────────────────────────────────── */
+const checkinDateInput  = document.getElementById('checkinDateInput');
+const checkinTimeInput  = document.getElementById('checkinTimeInput');
+const checkoutDateInput = document.getElementById('checkoutDateInput');
+const checkoutTimeInput = document.getElementById('checkoutTimeInput');
+const hourlyAlert       = document.getElementById('hourlyAlert');
+const dtErrorRow        = document.getElementById('dtErrorRow');
+const durationDisplay   = document.getElementById('durationDisplay');
+const durationLabel     = document.getElementById('durationLabel');
+const durationUnit      = document.getElementById('durationUnit');
+
+function isHourlyMode() {
+    const rb = document.querySelector('input[name="booking_type"]:checked');
+    return rb ? rb.value === 'Hourly' : false;
+}
+
+// Build a Date from a date string + time string (safe, no timezone issues)
+function buildDT(dateStr, timeStr) {
+    return new Date((dateStr || '') + 'T' + (timeStr || '00:00') + ':00');
+}
+
+// Validate: check-out strictly after check-in; show/hide error row; return bool
+function validateDatetime() {
+    const ciDate = checkinDateInput  && checkinDateInput.value;
+    const coDate = checkoutDateInput && checkoutDateInput.value;
+    if (!ciDate || !coDate) { dtErrorRow && (dtErrorRow.style.display = 'none'); return true; }
+    const ciTime = (checkinTimeInput  && checkinTimeInput.value)  || '00:00';
+    const coTime = (checkoutTimeInput && checkoutTimeInput.value) || '00:00';
+    const valid  = buildDT(coDate, coTime) > buildDT(ciDate, ciTime);
+    if (dtErrorRow) dtErrorRow.style.display = valid ? 'none' : '';
+    return valid;
+}
+
+// Core function: read both datetimes, calculate duration, update fields, fire billing
+function updateDuration() {
+    const ciDate = checkinDateInput  && checkinDateInput.value;
+    const coDate = checkoutDateInput && checkoutDateInput.value;
+    if (!ciDate || !coDate) return;
+
+    const ciTime = (checkinTimeInput  && checkinTimeInput.value)  || '00:00';
+    const coTime = (checkoutTimeInput && checkoutTimeInput.value) || '00:00';
+    const ciDT   = buildDT(ciDate, ciTime);
+    const coDT   = buildDT(coDate, coTime);
+    const diffMs = coDT - ciDT;
+
+    if (diffMs <= 0) { validateDatetime(); return; }
+
+    if (isHourlyMode()) {
+        // Hours: round up to nearest 0.5
+        const rawHours  = diffMs / 3600000;
+        const dispHours = Math.ceil(rawHours * 2) / 2;   // e.g. 1.5, 2.0, 2.5
+        if (durationDisplay) durationDisplay.value = dispHours + ' hr' + (dispHours !== 1 ? 's' : '');
+        if (durationLabel)   durationLabel.textContent = 'Duration';
+        if (durationUnit)    durationUnit.textContent  = 'hrs';
+        // Backend receives nights=1 for hourly; staff uses Modify Tariff for amount
+        if (nightsInput) nightsInput.value = '1';
+    } else {
+        // Nights: ceiling of day difference
+        const nights = Math.max(1, Math.ceil(diffMs / 86400000));
+        if (durationDisplay) durationDisplay.value = nights;
+        if (durationLabel)   durationLabel.textContent = 'Nights';
+        if (durationUnit)    durationUnit.textContent  = 'nights';
+        if (nightsInput)     nightsInput.value = nights;
+    }
+
+    validateDatetime();
+    recalculateBilling();
+}
+
+// Hotel-configured standard checkout time (from Settings.default_checkout_time
+// or Settings.cico_standard_checkout via _resolve_default_checkout_hm in
+// routes.py). Falls back to 11:00 AM — the most common hotel default. Used
+// as the Regular-mode checkout default so the check-in time is NEVER copied
+// into the checkout time slot.
+const STANDARD_CHECKOUT_HM = '{{ default_checkout_hm or "11:00" }}';
+
+// Set sensible default checkout based on booking type and current checkin datetime
+//
+// Rules:
+//   Regular bookings → date = check-in date + 1 day
+//                      time = hotel standard (STANDARD_CHECKOUT_HM)
+//                      — NEVER copied from the check-in time.
+//   Hourly bookings  → date + time = check-in + 1 hour
+//
+// When toggling booking types, we actively reset the time so a stale
+// Hourly checkout time (e.g. 14:08 after a 13:08 check-in) cannot leak
+// into Regular mode.
+function setDefaultCheckout() {
+    const ciDate = checkinDateInput && checkinDateInput.value;
+    if (!ciDate) return;
+    const ciTime = (checkinTimeInput && checkinTimeInput.value) || '00:00';
+    const ciDT   = buildDT(ciDate, ciTime);
+
+    if (isHourlyMode()) {
+        // Default: checkin + 1 hour
+        const coDT = new Date(ciDT.getTime() + 3600000);
+        if (checkoutDateInput) checkoutDateInput.value = coDT.toISOString().slice(0, 10);
+        if (checkoutTimeInput) checkoutTimeInput.value = coDT.toTimeString().slice(0, 5);
+    } else {
+        // Default: checkin date + 1 day; time = hotel standard.
+        const coDT = new Date(ciDT.getTime() + 86400000);
+        if (checkoutDateInput) checkoutDateInput.value = coDT.toISOString().slice(0, 10);
+        if (checkoutTimeInput) {
+            // Detect a "stale" Hourly-mode time (matches checkin time +1h or
+            // matches checkin time itself) and reset to the hotel standard.
+            const current = checkoutTimeInput.value || '';
+            const staleValues = new Set([
+                '',
+                ciTime,                                                    // copied check-in
+                new Date(ciDT.getTime() + 3600000).toTimeString().slice(0, 5),  // Hourly +1h
+            ]);
+            if (staleValues.has(current) || current === STANDARD_CHECKOUT_HM) {
+                checkoutTimeInput.value = STANDARD_CHECKOUT_HM;
+            }
+            // Otherwise the user has explicitly typed a custom time — keep it.
+        }
+    }
+}
+
+// Apply UI state for selected booking type
+function applyBookingType() {
+    const hourly = isHourlyMode();
+
+    // Hourly indicator banner
+    if (hourlyAlert) hourlyAlert.style.display = hourly ? '' : 'none';
+
+    // Update duration label immediately
+    if (durationLabel) durationLabel.textContent = hourly ? 'Duration' : 'Nights';
+    if (durationUnit)  durationUnit.textContent  = hourly ? 'hrs' : 'nights';
+
+    // When switching type, reset checkout to sensible default for the new mode
+    setDefaultCheckout();
+    updateDuration();
+}
+
+// ── Listeners ──────────────────────────────────────────────────────
+document.querySelectorAll('input[name="booking_type"]').forEach(function (rb) {
+    rb.addEventListener('change', applyBookingType);
+});
+
+checkinDateInput  && checkinDateInput.addEventListener('change',  function () { setDefaultCheckout(); updateDuration(); });
+checkinTimeInput  && checkinTimeInput.addEventListener('change',  updateDuration);
+checkoutDateInput && checkoutDateInput.addEventListener('change', updateDuration);
+checkoutTimeInput && checkoutTimeInput.addEventListener('change', updateDuration);
+
+// ── Form submit: validate before POST ──────────────────────────────
+document.getElementById('checkinForm').addEventListener('submit', function (e) {
+    updateDuration();   // ensure nightsInput is current
+    if (!validateDatetime()) {
+        e.preventDefault();
+        if (dtErrorRow) {
+            dtErrorRow.style.display = '';
+            dtErrorRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+    }
+    // Validate room assignment
+    if (roomSelect && !roomSelect.value) {
+        e.preventDefault();
+        const valErr = document.getElementById('roomValidationError');
+        if (valErr) {
+            valErr.style.display = '';
+            valErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        roomSelect.focus();
+        return;
+    }
+    syncPassengersJson();
+});
+
+// ── Init on page load ──────────────────────────────────────────────
+setDefaultCheckout();
+updateDuration();
+applyBookingType();
+
+/* ── Corporate toggle ──────────────────────────────────────────────── */
+document.getElementById('corporateToggle') && document.getElementById('corporateToggle').addEventListener('change', function () {
+    document.getElementById('corporateSection').style.display = this.checked ? 'block' : 'none';
+    document.getElementById('billingResponsibility').value = this.checked ? 'Company' : 'Guest';
+});
+
+document.getElementById('companySelect') && document.getElementById('companySelect').addEventListener('change', function () {
+    const cid = this.value;
+    const creditAlert = document.getElementById('creditAlert');
+    if (!cid) { creditAlert.style.display = 'none'; return; }
+    fetch('/api/checkin/company/' + cid)
+        .then(r => r.json())
+        .then(d => {
+            creditAlert.style.display = 'block';
+            const limit = Number(d.credit_limit);
+            const avail = Number(d.available_credit);
+            const pct = limit > 0 ? (avail / limit) * 100 : 100;
+            let badge = '';
+            if (limit > 0 && pct < 15) {
+                badge = ' <span class="badge bg-danger">LOW CREDIT</span>';
+            } else if (limit > 0 && pct < 30) {
+                badge = ' <span class="badge bg-warning text-dark">Credit Running Low</span>';
+            }
+            creditAlert.className = 'alert ' + (pct < 15 ? 'alert-danger' : pct < 30 ? 'alert-warning' : 'alert-info') + ' small mt-2';
+            creditAlert.innerHTML = `<strong>${escapeHtml(d.name)}</strong> — Limit: ₹${limit.toLocaleString()} | Used: ₹${Number(d.credit_used).toLocaleString()} | <strong>Available: ₹${avail.toLocaleString()}</strong>${badge}`;
+        })
+        .catch(() => { creditAlert.style.display = 'none'; });
+});
+
+/* ── Passengers ────────────────────────────────────────────────────── */
+let paxRows = [];
+
+function esc(s) { return String(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+// Relationship options (Friend is the default, matching Express Check-in modal).
+const REL_OPTIONS = ['Friend','Spouse','Brother','Sister','Father','Mother','Colleague','Family Member'];
+
+function relOptionsHtml(selected) {
+    const s = selected || 'Friend';
+    return REL_OPTIONS.map(function(v) {
+        return `<option value="${v}" ${v===s?'selected':''}>${v}</option>`;
+    }).join('');
+}
+
+function renderPaxTable() {
+    paxBody.innerHTML = '';
+    paxRows.forEach(function (p, idx) {
+        // Back-fill first/last from legacy single 'name' on render.
+        if (!p.first_name && p.name) {
+            const parts = String(p.name).trim().split(/\s+/);
+            p.first_name = parts.shift() || '';
+            p.last_name  = parts.join(' ');
+        }
+        const tr = document.createElement('tr');
+        tr.className = 'pax-row';
+        tr.innerHTML = `
+            <td><input class="form-control form-control-sm" placeholder="First Name *" value="${esc(p.first_name)}" data-idx="${idx}" data-field="first_name" autocomplete="off"></td>
+            <td><input class="form-control form-control-sm" placeholder="Last Name" value="${esc(p.last_name)}" data-idx="${idx}" data-field="last_name" autocomplete="off"></td>
+            <td>
+              <select class="form-select form-select-sm" data-idx="${idx}" data-field="gender">
+                <option value="">—</option>
+                <option value="Male"   ${p.gender==='Male'?'selected':''}>Male</option>
+                <option value="Female" ${p.gender==='Female'?'selected':''}>Female</option>
+                <option value="Other"  ${p.gender==='Other'?'selected':''}>Other</option>
+              </select>
+            </td>
+            <td><input class="form-control form-control-sm" type="number" min="1" max="120" placeholder="Age" value="${esc(p.age||'')}" data-idx="${idx}" data-field="age" style="width:70px;"></td>
+            <td><input class="form-control form-control-sm" type="tel" inputmode="numeric" maxlength="10" pattern="[1-9][0-9]{9}" placeholder="10-digit mobile" value="${esc(p.mobile||'')}" data-idx="${idx}" data-field="mobile" autocomplete="off"></td>
+            <td>
+              <select class="form-select form-select-sm" data-idx="${idx}" data-field="id_type">
+                <option value="">—</option>
+                <option value="Aadhar"   ${p.id_type==='Aadhar'?'selected':''}>Aadhar</option>
+                <option value="PAN"      ${p.id_type==='PAN'?'selected':''}>PAN</option>
+                <option value="Passport" ${p.id_type==='Passport'?'selected':''}>Passport</option>
+                <option value="DL"       ${p.id_type==='DL'?'selected':''}>DL</option>
+                <option value="VoterID"  ${p.id_type==='VoterID'?'selected':''}>Voter ID</option>
+              </select>
+            </td>
+            <td><input class="form-control form-control-sm" placeholder="ID Number" value="${esc(p.id_number||'')}" data-idx="${idx}" data-field="id_number"></td>
+            <td>
+              <select class="form-select form-select-sm" data-idx="${idx}" data-field="relationship">
+                ${relOptionsHtml(p.relationship)}
+              </select>
+            </td>
+            <td><button type="button" class="btn btn-sm btn-outline-danger" data-remove="${idx}">✕</button></td>
+        `;
+        paxBody.appendChild(tr);
+    });
+
+    // Change/input listeners — write back to paxRows + keep hidden JSON synced.
+    paxBody.querySelectorAll('[data-idx]').forEach(function (el) {
+        function commit() {
+            paxRows[this.dataset.idx][this.dataset.field] = this.value;
+            // Keep legacy 'name' aligned with first+last so existing backend
+            // code that reads p.name continues to work.
+            const row = paxRows[this.dataset.idx];
+            row.name = ((row.first_name || '') + ' ' + (row.last_name || '')).trim();
+            syncPassengersJson();
+        }
+        el.addEventListener('change', commit);
+        el.addEventListener('input', commit);
+    });
+
+    // Mobile field — digits only, reject leading 0, auto-advance to Relationship on 10 digits.
+    paxBody.querySelectorAll('input[data-field="mobile"]').forEach(function (el) {
+        el.addEventListener('input', function () {
+            let d = this.value.replace(/\D/g, '').replace(/^0+/, '');
+            if (d.length > 10) d = d.slice(0, 10);
+            if (d !== this.value) this.value = d;
+            paxRows[this.dataset.idx].mobile = d;
+            syncPassengersJson();
+            if (d.length === 10) {
+                const next = paxBody.querySelector(`select[data-idx="${this.dataset.idx}"][data-field="relationship"]`);
+                if (next) next.focus();
+            }
+        });
+    });
+
+    paxBody.querySelectorAll('[data-remove]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            paxRows.splice(parseInt(this.dataset.remove), 1);
+            renderPaxTable();
+        });
+    });
+    syncPassengersJson();
+}
+
+function syncPassengersJson() {
+    passengersJson.value = JSON.stringify(paxRows);
+}
+
+document.getElementById('addPaxBtn') && document.getElementById('addPaxBtn').addEventListener('click', function () {
+    paxRows.push({
+        name: '', first_name: '', last_name: '',
+        gender: '', age: '', mobile: '',
+        id_type: '', id_number: '',
+        relationship: 'Friend',  // default per CI form spec
+    });
+    renderPaxTable();
+});
+
+/* ── Webcam: handled by /static/js/checkin-camera.js ────────────── */
+
+/* ── Signature Pad ─────────────────────────────────────────────────── */
+const sigCanvas = document.getElementById('signaturePad');
+const sigCtx    = sigCanvas.getContext('2d');
+function resizeSigCanvas() {
+    const rect = sigCanvas.getBoundingClientRect();
+    sigCanvas.width  = rect.width  || 400;
+    sigCanvas.height = 140;
+}
+resizeSigCanvas();
+window.addEventListener('resize', resizeSigCanvas);
+
+let drawing = false;
+sigCtx.strokeStyle = '#1a1a1a'; sigCtx.lineWidth = 2; sigCtx.lineCap = 'round';
+
+function getPos(e) {
+    const r = sigCanvas.getBoundingClientRect();
+    if (e.touches) return { x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top };
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
+sigCanvas.addEventListener('mousedown', e => { drawing = true; const p = getPos(e); sigCtx.beginPath(); sigCtx.moveTo(p.x, p.y); });
+sigCanvas.addEventListener('mousemove', e => { if (!drawing) return; const p = getPos(e); sigCtx.lineTo(p.x, p.y); sigCtx.stroke(); });
+sigCanvas.addEventListener('mouseup', () => drawing = false);
+sigCanvas.addEventListener('mouseleave', () => drawing = false);
+sigCanvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; const p = getPos(e); sigCtx.beginPath(); sigCtx.moveTo(p.x, p.y); }, { passive: false });
+sigCanvas.addEventListener('touchmove', e => { e.preventDefault(); if (!drawing) return; const p = getPos(e); sigCtx.lineTo(p.x, p.y); sigCtx.stroke(); }, { passive: false });
+sigCanvas.addEventListener('touchend', () => drawing = false);
+
+document.getElementById('clearSignature').addEventListener('click', function () {
+    sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+    const si = document.querySelector('#checkinForm input[name="signature_data"]');
+    if (si) si.value = '';
+});
+document.getElementById('saveSignature').addEventListener('click', function () {
+    const blank = document.createElement('canvas');
+    blank.width = sigCanvas.width; blank.height = sigCanvas.height;
+    if (sigCanvas.toDataURL() === blank.toDataURL()) { alert('Please draw your signature first.'); return; }
+    let si = document.querySelector('#checkinForm input[name="signature_data"]');
+    if (!si) {
+        si = document.createElement('input'); si.type = 'hidden'; si.name = 'signature_data';
+        document.getElementById('checkinForm').appendChild(si);
+    }
+    si.value = sigCanvas.toDataURL('image/png');
+    this.textContent = '✓ Saved';
+    this.classList.replace('btn-outline-primary', 'btn-success');
+});
+
+/* ── ID Upload ─────────────────────────────────────────────────────── */
+document.getElementById('uploadIdBtn') && document.getElementById('uploadIdBtn').addEventListener('click', function () {
+    const docType   = document.getElementById('docType').value;
+    const docNumber = document.getElementById('docNumber').value.trim();
+    const frontFile = document.getElementById('idFront').files[0];
+    const backFile  = document.getElementById('idBack').files[0];
+    if (!docNumber) { alert('Please enter the ID number.'); return; }
+    const fd = new FormData();
+    fd.append('document_type',   docType);
+    fd.append('document_number', docNumber);
+    if (frontFile) fd.append('front_image', frontFile);
+    if (backFile)  fd.append('back_image',  backFile);
+    {% if reservation %}
+    fetch('/api/guest/{{ reservation.guest_id }}/id-document', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success) {
+                const btn = document.getElementById('uploadIdBtn');
+                btn.textContent = '✓ ID Uploaded';
+                btn.classList.replace('btn-outline-primary', 'btn-success');
+            } else { alert('Upload failed: ' + (d.error || 'Unknown error')); }
+        })
+        .catch(() => alert('Upload failed. Please try again.'));
+    {% else %}
+    alert('Complete check-in first, then upload the ID document from the reservation page.');
+    {% endif %}
+});
+
+// (submit handler is above in the booking type section)
+
+})(); // end IIFE
+</script>
+
+{# ── Early CI charge preview (separate script — runs after IIFE) ── #}
+{% if reservation and reservation.id %}
+<script nonce="{{ csp_nonce }}">
+(function () {
+  var previewEl = document.getElementById('earlyCheckinPreview');
+  var resId     = previewEl ? parseInt(previewEl.getAttribute('data-res-id') || '0', 10) : 0;
+  var bodyEl    = document.getElementById('earlyCI_body');
+  var badgeEl   = document.getElementById('earlyCI_badge');
+  if (!previewEl || !bodyEl) return;
+
+  function pad(n) { return ('0' + n).slice(-2); }
+  var now = new Date();
+  var hm  = pad(now.getHours()) + ':' + pad(now.getMinutes());
+
+  fetch('/api/cico/preview?type=early&reservation_id=' + resId + '&time=' + encodeURIComponent(hm))
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      if (!d || !d.applicable) return;          // no charge — keep panel hidden
+      previewEl.style.display = '';
+      if (d.grace) {
+        badgeEl.className   = 'badge bg-success ms-auto';
+        badgeEl.textContent = 'Grace — No Charge';
+        bodyEl.innerHTML    = '<span class="small text-success">'
+          + '<i class="bi bi-check-circle me-1"></i>'
+          + d.slab_label + ' — within grace period. No early check-in charge.</span>';
+      } else {
+        badgeEl.className   = 'badge ms-auto text-dark';
+        badgeEl.style.background = '#fde68a';
+        badgeEl.textContent = d.pct + '% surcharge';
+        bodyEl.innerHTML    =
+          '<div class="d-flex flex-wrap gap-3 align-items-center" style="font-size:.83rem;">'
+          + '<span><strong>Slab:</strong> ' + d.slab_label + '</span>'
+          + '<span><strong>Rate:</strong> ' + d.pct + '% of nightly tariff</span>'
+          + '<span class="fw-bold" style="color:#d97706;font-size:.95rem;">'
+          +   '₹' + d.amount.toFixed(2) + ' will be auto-charged on submit'
+          + '</span>'
+          + '</div>'
+          + '<div class="mt-1 text-muted" style="font-size:.74rem;">'
+          + '<i class="bi bi-info-circle me-1"></i>'
+          + 'Estimated at ' + hm + '. Actual charge uses the exact submission time.</div>';
+      }
+    })
+    .catch(function () { /* API unreachable — fail silently */ });
+})();
+</script>
+{% endif %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/checkin-camera.js') }}"></script>
+<script src="{{ url_for('static', filename='js/document-scanner.js') }}"></script>
+{% endblock %}
+{% endblock %}

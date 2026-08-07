@@ -1,0 +1,1696 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Global Secondary Tab Bar -->
+<ul class="nav nav-tabs mt-2" role="tablist" id="globalTabs">
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.dashboard') }}"><i class="bi bi-grid-3x3"></i> Dashboard</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.reservations') }}"><i class="bi bi-list-ul"></i> Front Desk</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.housekeeping') }}"><i class="bi bi-brush"></i> Housekeeping</a>
+    </li>
+    {% if current_user.has_role('Admin','Manager','FrontDesk','Accountant') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.invoice_manager') }}"><i class="bi bi-receipt-cutoff"></i> Invoice Manager</a>
+    </li>
+    {% endif %}
+    {% if current_user.has_role('Admin','Manager','FrontDesk','Accountant') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.room_grid') }}"><i class="bi bi-calendar3"></i> Calendar View</a>
+    </li>
+    {% endif %}
+    {% if current_user.has_role('Admin','Manager') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('groups.index') }}"><i class="bi bi-people-fill"></i> Group Bookings</a>
+    </li>
+    {% endif %}
+    {% if current_user.has_role('Admin','Manager','Accountant') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link active" href="{{ url_for('main.night_audit') }}"><i class="bi bi-moon-stars"></i> Night Audit</a>
+    </li>
+    {% endif %}
+</ul>
+
+{# ── Status helpers ─────────────────────────────────────────────────────── #}
+{% set log_status = current_log.status if current_log else 'Open' %}
+{% set status_label = {
+    'Open':       'OPEN',
+    'Pending':    'OPEN',
+    'InProgress': 'IN PROGRESS',
+    'Completed':  'CLOSED',
+    'Reopened':   'REOPENED',
+    'Warning':    'CLOSED (WARN)',
+} %}
+{% set status_color = {
+    'Open':       'warning',
+    'Pending':    'warning',
+    'InProgress': 'primary',
+    'Completed':  'success',
+    'Reopened':   'danger',
+    'Warning':    'warning',
+} %}
+{% set s_label = status_label.get(log_status, log_status) %}
+{% set s_color = status_color.get(log_status, 'secondary') %}
+
+{# ── Header row ─────────────────────────────────────────────────────────── #}
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3 mb-2">
+    <div class="d-flex align-items-center gap-3">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-moon-stars-fill me-2 text-dark"></i>Night Audit</h5>
+        <span class="badge bg-{{ s_color }} fs-6 px-3 py-2">{{ s_label }}</span>
+        <span class="text-muted small">Audit Date:
+            <strong>{{ audit_date.strftime('%d %B %Y') if audit_date else '—' }}</strong>
+            {% if audit_is_closed %}<span class="badge bg-success ms-1">Closed</span>
+            {% elif current_log and current_log.status == 'Pending' %}<span class="badge bg-warning text-dark ms-1">Pending</span>
+            {% elif not current_log %}<span class="badge bg-secondary ms-1">Not Run</span>
+            {% endif %}
+            {% if audit_source|default('') == 'snapshot' %}<span class="badge bg-dark bg-opacity-50 ms-1" style="font-size:0.55rem;" title="Showing frozen data from close time">Snapshot</span>
+            {% elif audit_source|default('') == 'live' %}<span class="badge bg-info bg-opacity-50 ms-1" style="font-size:0.55rem;" title="Showing live recomputed data">Live</span>
+            {% endif %}
+        </span>
+    </div>
+    <div class="d-flex gap-2 align-items-center flex-wrap">
+        {# Date picker for Analytics #}
+        {% if active_tab == 'analytics' %}
+        <form class="d-flex gap-1 align-items-center mb-0" method="GET">
+            <input type="hidden" name="tab" value="analytics">
+            <input type="date" name="date" class="form-control form-control-sm"
+                   value="{{ audit_date.isoformat() }}"
+                   max="{{ bd.isoformat() if bd else '' }}">
+            <button class="btn btn-sm btn-outline-secondary">Go</button>
+        </form>
+        {% endif %}
+        {# Export buttons (analytics only) #}
+        {% if active_tab == 'analytics' and report %}
+        <a href="{{ url_for('reports.night_audit', date=audit_date.isoformat(), format='excel') }}"
+           class="btn btn-sm btn-success">
+            <i class="bi bi-file-earmark-excel me-1"></i>Excel
+        </a>
+        <a href="{{ url_for('reports.night_audit', date=audit_date.isoformat(), format='print') }}"
+           class="btn btn-sm btn-outline-dark" target="_blank" rel="noopener">
+            <i class="bi bi-printer me-1"></i>Print / PDF
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+{# ── Main 4-tab nav pills ────────────────────────────────────────────────── #}
+<ul class="nav nav-pills mb-3" id="naTabs">
+    <li class="nav-item">
+        <a class="nav-link {% if active_tab == 'dashboard' %}active{% endif %}"
+           href="{{ url_for('main.night_audit', tab='dashboard') }}">
+            <i class="bi bi-speedometer2 me-1"></i>Dashboard
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if active_tab == 'analytics' %}active{% endif %}"
+           href="{{ url_for('main.night_audit', tab='analytics', date=audit_date.isoformat()) }}">
+            <i class="bi bi-bar-chart-line me-1"></i>Analytics
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if active_tab == 'history' %}active{% endif %}"
+           href="{{ url_for('main.night_audit', tab='history') }}">
+            <i class="bi bi-clock-history me-1"></i>History
+        </a>
+    </li>
+    {% if current_user.has_role('Admin', 'Manager') %}
+    <li class="nav-item">
+        <a class="nav-link {% if active_tab == 'settings' %}active{% endif %}"
+           href="{{ url_for('main.night_audit', tab='settings') }}">
+            <i class="bi bi-gear me-1"></i>Settings
+        </a>
+    </li>
+    {% endif %}
+</ul>
+
+{# ══════════════════════════════════════════════════════════════════════════
+   TAB A — DASHBOARD (CEO-level financial control system)
+══════════════════════════════════════════════════════════════════════════ #}
+{% if active_tab == 'dashboard' %}
+
+{# ── Pre-compute derived values ─────────────────────────────────────── #}
+{% if report %}
+{% set _rev   = report['revenue'] %}
+{% set _pay   = report['payments'] %}
+{% set _folio = report['folio'] %}
+{% set _ctrl  = report['control'] %}
+{% set _occ   = report['occupancy'] %}
+{% set _exc   = report['exceptions'] %}
+{% set _shifts = report['shifts'] %}
+{% set _rr    = report['revenue_risk'] %}
+
+{# Recon engine values #}
+{% set _recon_diff      = _ctrl.reconciliation_difference | float %}
+{% set _recon_abs       = _recon_diff | abs %}
+{% set _missing_pay     = _folio.checkout_outstanding_total | float %}
+{% set _rate_mismatch   = _rev.leakage_total | float %}
+{% set _cash_mismatch   = _shifts.total_variance | float | abs %}
+
+{# Overpayments sum #}
+{% set _overpay_ns = namespace(v=0.0) %}
+{% for f in _folio.negative_folios %}{% set _overpay_ns.v = _overpay_ns.v + (f.balance | float | abs) %}{% endfor %}
+{% set _overpay = _overpay_ns.v %}
+
+{# Unauthorized discounts (no authorized_by) #}
+{% set _unauth_disc_ns = namespace(v=0.0, ct=0) %}
+{% for d in _rev.discount_list %}
+{% if not d.authorized_by or d.authorized_by == '—' %}
+{% set _unauth_disc_ns.v = _unauth_disc_ns.v + (d.discount | float) %}
+{% set _unauth_disc_ns.ct = _unauth_disc_ns.ct + 1 %}
+{% endif %}
+{% endfor %}
+{% set _unauth_disc    = _unauth_disc_ns.v %}
+{% set _unauth_disc_ct = _unauth_disc_ns.ct %}
+
+{# Risk level #}
+{% if _exc.blocker_count > 0 or _recon_abs > 0.01 or _overpay > 0 %}
+{% set _risk_level = 'HIGH' %}
+{% set _risk_color = 'danger' %}
+{% elif _exc.warning_count > 0 or _unauth_disc > 0 or _cash_mismatch > 50 %}
+{% set _risk_level = 'MEDIUM' %}
+{% set _risk_color = 'warning' %}
+{% else %}
+{% set _risk_level = 'LOW' %}
+{% set _risk_color = 'success' %}
+{% endif %}
+
+{# Hard-block conditions for Complete Audit #}
+{% set _hard_blocks = [] %}
+{% if _exc.blocker_count > 0 %}{% set _ = _hard_blocks.append('Unresolved blockers: ' ~ _exc.blocker_count) %}{% endif %}
+{% if _recon_abs > 1.0 %}{% set _ = _hard_blocks.append('Recon difference ₹' ~ '{:,.2f}'.format(_recon_abs) ~ ' ≠ 0') %}{% endif %}
+{% if _missing_pay > 0.01 %}{% set _ = _hard_blocks.append('Pending folios: ₹' ~ '{:,.0f}'.format(_missing_pay) ~ ' uncollected') %}{% endif %}
+{% if _overpay > 0 %}{% set _ = _hard_blocks.append((_folio.negative_folios | length) ~ ' overpayment(s) unresolved') %}{% endif %}
+{% set _has_hard_block = _hard_blocks | length > 0 %}
+
+{% else %}{# no report loaded #}
+{% set _recon_diff = 0.0 %}
+{% set _recon_abs = 0.0 %}
+{% set _risk_level = 'UNKNOWN' %}
+{% set _risk_color = 'secondary' %}
+{% set _has_hard_block = false %}
+{% set _hard_blocks = [] %}
+{% set _missing_pay = 0.0 %}
+{% set _overpay = 0.0 %}
+{% set _rate_mismatch = 0.0 %}
+{% set _cash_mismatch = 0.0 %}
+{% set _unauth_disc = 0.0 %}
+{% set _unauth_disc_ct = 0 %}
+{% endif %}
+
+{# ── STICKY AUDIT BAR ──────────────────────────────────────────────────── #}
+<style>
+.na-sticky { position:sticky; top:0; z-index:100; background:#1a1d21;
+             color:#fff; padding:6px 16px; border-radius:0 0 8px 8px;
+             display:flex; flex-wrap:wrap; align-items:center; gap:16px;
+             font-size:.8rem; margin-bottom:16px; }
+.na-sticky .na-pill { display:inline-flex; align-items:center; gap:5px;
+                       padding:2px 10px; border-radius:12px; font-weight:600; }
+.na-section-title { font-size:.7rem; font-weight:700; text-transform:uppercase;
+                    letter-spacing:.06em; color:#6c757d; margin-bottom:8px; }
+.na-risk-row { display:flex; align-items:center; cursor:pointer;
+               padding:8px 12px; border-radius:6px; transition:background .15s;
+               border:1px solid transparent; }
+.na-risk-row:hover { background:#f8f9fa; border-color:#dee2e6; }
+.na-risk-row .na-risk-label { flex:1; font-size:.85rem; font-weight:500; }
+.na-risk-row .na-risk-meta  { font-size:.78rem; color:#6c757d; }
+.na-risk-row .na-risk-amt   { font-size:.9rem; font-weight:700; min-width:100px; text-align:right; }
+.na-risk-row.na-risk-clean  { color:#198754; }
+.na-risk-row.na-risk-warn   { color:#92400e; }
+.na-risk-row.na-risk-danger { color:#dc3545; }
+.na-recon-bar { background:#f1f3f5; border-radius:4px; overflow:hidden; height:8px; margin-top:4px; }
+.na-recon-seg { height:100%; display:inline-block; }
+.recon-breakdown-line { display:flex; align-items:center; gap:6px;
+                        font-size:.8rem; padding:2px 0; color:#495057; }
+.recon-breakdown-line .rbl-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.recon-breakdown-line .rbl-label { flex:1; }
+.recon-breakdown-line .rbl-amt { font-weight:600; }
+</style>
+
+<div class="na-sticky">
+    <span><i class="bi bi-moon-stars me-1"></i><strong>Night Audit</strong></span>
+    <span class="text-white-50">|</span>
+    <span><i class="bi bi-calendar3 me-1 text-white-50"></i>{{ audit_date.strftime('%d %b %Y') if audit_date else '—' }}</span>
+    <span class="na-pill bg-{{ s_color }} {% if s_color == 'warning' %}text-dark{% endif %}">
+        <i class="bi bi-circle-fill" style="font-size:.5rem;"></i>{{ s_label }}
+    </span>
+    {% if report %}
+    <span class="na-pill {% if _recon_abs < 1 %}bg-success{% else %}bg-danger{% endif %}">
+        <i class="bi bi-{% if _recon_abs < 1 %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+        Recon ₹{{ '{:,.0f}'.format(_recon_abs) }}
+    </span>
+    <span class="na-pill bg-{{ _risk_color }} {% if _risk_color == 'warning' %}text-dark{% endif %}">
+        <i class="bi bi-shield-{% if _risk_level == 'HIGH' %}x{% elif _risk_level == 'MEDIUM' %}exclamation{% else %}check{% endif %}"></i>
+        Risk: {{ _risk_level }}
+    </span>
+    {% if _exc.blocker_count > 0 %}
+    <span class="na-pill bg-danger"><i class="bi bi-x-octagon"></i>{{ _exc.blocker_count }} Blocker{{ 's' if _exc.blocker_count != 1 }}</span>
+    {% endif %}
+    {% if _exc.warning_count > 0 %}
+    <span class="na-pill bg-warning text-dark"><i class="bi bi-exclamation-triangle"></i>{{ _exc.warning_count }} Warning{{ 's' if _exc.warning_count != 1 }}</span>
+    {% endif %}
+    {% endif %}
+</div>
+
+<div class="row g-3">
+
+{# ═══════════════════════════════════════════════════════════
+   LEFT COLUMN (8 cols): Sections A + B + C + D
+═══════════════════════════════════════════════════════════ #}
+<div class="col-lg-8">
+
+{# ── SECTION A: Financial Health Snapshot ──────────────────────────── #}
+<p class="na-section-title"><i class="bi bi-bank me-1"></i>A. Financial Health Snapshot</p>
+{% if report %}
+<div class="row g-2 mb-3">
+    <div class="col-6 col-sm-3">
+        <div class="card border-0 shadow-sm text-center py-3 bg-success text-white">
+            <div class="fw-bold fs-6">₹{{ '{:,.0f}'.format(_rev.accrual_net) }}</div>
+            <div class="small opacity-90">Accrual Net Revenue</div>
+        </div>
+    </div>
+    <div class="col-6 col-sm-3">
+        <div class="card border-0 shadow-sm text-center py-3 bg-primary text-white">
+            <div class="fw-bold fs-6">₹{{ '{:,.0f}'.format(_pay.total_collected) }}</div>
+            <div class="small opacity-90">Direct Collected</div>
+        </div>
+    </div>
+    <div class="col-6 col-sm-3">
+        <div class="card border-0 shadow-sm text-center py-3 {% if _ctrl.total_outstanding > 0 %}bg-warning text-dark{% else %}bg-light{% endif %}">
+            <div class="fw-bold fs-6">₹{{ '{:,.0f}'.format(_ctrl.total_outstanding) }}</div>
+            <div class="small {% if _ctrl.total_outstanding > 0 %}fw-semibold{% else %}text-muted{% endif %}">Outstanding ({% if audit_is_closed %}at close{% else %}live{% endif %})</div>
+            {% if _ctrl.lifetime_outstanding is defined and _ctrl.lifetime_outstanding > 0 %}
+            <div class="small text-muted mt-1">Total dues: ₹{{ '{:,.0f}'.format(_ctrl.lifetime_outstanding) }}</div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-6 col-sm-3">
+        <div class="card border-0 shadow-sm text-center py-3 {% if _recon_abs < 1 %}bg-success text-white{% elif _recon_abs < 1000 %}bg-warning text-dark{% else %}bg-danger text-white{% endif %}">
+            <div class="fw-bold fs-6">₹{{ '{:,.0f}'.format(_recon_abs) }}</div>
+            <div class="small opacity-90">Recon Diff.</div>
+        </div>
+    </div>
+</div>
+
+{# Recon breakdown #}
+{% if _recon_abs > 0.01 %}
+<div class="card shadow-sm mb-3 border-{{ 'danger' if _recon_abs > 1000 else 'warning' }}">
+    <div class="card-body py-2 px-3">
+        <div class="d-flex align-items-center justify-content-between mb-1">
+            <span class="fw-semibold small">Reconciliation Difference</span>
+            <span class="fw-bold text-{{ 'danger' if _recon_abs > 1000 else 'warning' }}">₹{{ '{:,.2f}'.format(_recon_diff) }}</span>
+        </div>
+        {% set _total_classified = _missing_pay + _overpay + _rate_mismatch %}
+        {% if _total_classified > 0 %}
+        <div class="na-recon-bar mb-2">
+            {% if _missing_pay > 0 %}<div class="na-recon-seg bg-danger" style="width:{{ [(_missing_pay / _total_classified * 100), 100] | min | int }}%"></div>{% endif %}
+            {% if _overpay > 0 %}<div class="na-recon-seg bg-warning" style="width:{{ [(_overpay / _total_classified * 100), 100] | min | int }}%"></div>{% endif %}
+            {% if _rate_mismatch > 0 %}<div class="na-recon-seg bg-info" style="width:{{ [(_rate_mismatch / _total_classified * 100), 100] | min | int }}%"></div>{% endif %}
+        </div>
+        {% if _missing_pay > 0.01 %}
+        <div class="recon-breakdown-line"><div class="rbl-dot bg-danger"></div><span class="rbl-label">Missing Payments (uncollected checkouts)</span><span class="rbl-amt text-danger">₹{{ '{:,.0f}'.format(_missing_pay) }}</span></div>
+        {% endif %}
+        {% if _overpay > 0.01 %}
+        <div class="recon-breakdown-line"><div class="rbl-dot bg-warning"></div><span class="rbl-label">Overpayments Unresolved</span><span class="rbl-amt text-warning">₹{{ '{:,.0f}'.format(_overpay) }}</span></div>
+        {% endif %}
+        {% if _rate_mismatch > 0.01 %}
+        <div class="recon-breakdown-line"><div class="rbl-dot bg-info"></div><span class="rbl-label">Rate Mismatch (below standard tariff)</span><span class="rbl-amt text-info">₹{{ '{:,.0f}'.format(_rate_mismatch) }}</span></div>
+        {% endif %}
+        {% set _unclassified = _recon_abs - _total_classified %}
+        {% if _unclassified > 1 %}
+        <div class="recon-breakdown-line"><div class="rbl-dot bg-secondary"></div><span class="rbl-label">Other / Unclassified</span><span class="rbl-amt text-secondary">₹{{ '{:,.0f}'.format(_unclassified) }}</span></div>
+        {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% else %}
+<div class="alert alert-success py-2 mb-3 d-flex align-items-center gap-2">
+    <i class="bi bi-check-circle-fill fs-5"></i>
+    <span><strong>Reconciliation is clean.</strong> Revenue, Collections and Outstanding balance perfectly.</span>
+</div>
+{% endif %}
+
+{# ── SECTION B: Money at Risk ───────────────────────────────────────── #}
+<p class="na-section-title"><i class="bi bi-shield-exclamation me-1"></i>B. Money at Risk</p>
+<div class="card shadow-sm mb-3">
+    <div class="card-body p-0">
+
+        {# B1: Unsettled checkouts #}
+        {% set _b1_ct = _folio.checkout_outstanding_list | length %}
+        <div class="na-risk-row {% if _b1_ct > 0 %}na-risk-danger{% else %}na-risk-clean{% endif %}"
+             {% if _b1_ct > 0 %}data-bs-toggle="modal" data-bs-target="#marUnsettledModal"{% endif %}>
+            <i class="bi bi-door-open me-2 fs-5"></i>
+            <span class="na-risk-label">Unsettled Checkouts</span>
+            <span class="na-risk-meta me-3">{{ _b1_ct }} guest{{ 's' if _b1_ct != 1 }}</span>
+            <span class="na-risk-amt {% if _b1_ct > 0 %}text-danger{% else %}text-success{% endif %}">
+                {% if _b1_ct > 0 %}₹{{ '{:,.0f}'.format(_missing_pay) }}{% else %}<i class="bi bi-check-circle"></i>{% endif %}
+            </span>
+            {% if _b1_ct > 0 %}<i class="bi bi-chevron-right ms-2 text-muted small"></i>{% endif %}
+        </div>
+
+        {# B2: Overpayments #}
+        {% set _b2_ct = _folio.negative_folios | length %}
+        <div class="na-risk-row {% if _b2_ct > 0 %}na-risk-warn{% else %}na-risk-clean{% endif %}"
+             {% if _b2_ct > 0 %}data-bs-toggle="modal" data-bs-target="#marOverpayModal"{% endif %}>
+            <i class="bi bi-arrow-up-circle me-2 fs-5"></i>
+            <span class="na-risk-label">Overpayments Unresolved</span>
+            <span class="na-risk-meta me-3">{{ _b2_ct }} case{{ 's' if _b2_ct != 1 }}</span>
+            <span class="na-risk-amt {% if _b2_ct > 0 %}text-warning{% else %}text-success{% endif %}">
+                {% if _b2_ct > 0 %}₹{{ '{:,.0f}'.format(_overpay) }}{% else %}<i class="bi bi-check-circle"></i>{% endif %}
+            </span>
+            {% if _b2_ct > 0 %}<i class="bi bi-chevron-right ms-2 text-muted small"></i>{% endif %}
+        </div>
+
+        {# B3: Unauthorized discounts #}
+        <div class="na-risk-row {% if _unauth_disc_ct > 0 %}na-risk-warn{% else %}na-risk-clean{% endif %}"
+             {% if _unauth_disc_ct > 0 %}data-bs-toggle="modal" data-bs-target="#marDiscModal"{% endif %}>
+            <i class="bi bi-tag me-2 fs-5"></i>
+            <span class="na-risk-label">Discounts Without Authorization</span>
+            <span class="na-risk-meta me-3">{{ _unauth_disc_ct }} case{{ 's' if _unauth_disc_ct != 1 }}</span>
+            <span class="na-risk-amt {% if _unauth_disc_ct > 0 %}text-warning{% else %}text-success{% endif %}">
+                {% if _unauth_disc_ct > 0 %}₹{{ '{:,.0f}'.format(_unauth_disc) }}{% else %}<i class="bi bi-check-circle"></i>{% endif %}
+            </span>
+            {% if _unauth_disc_ct > 0 %}<i class="bi bi-chevron-right ms-2 text-muted small"></i>{% endif %}
+        </div>
+
+        {# B4: Rate overrides / leakage #}
+        {% set _b4_ct = _rev.leakage_count %}
+        <div class="na-risk-row {% if _b4_ct > 0 %}na-risk-warn{% else %}na-risk-clean{% endif %}"
+             {% if _b4_ct > 0 %}data-bs-toggle="modal" data-bs-target="#marLeakageModal"{% endif %}>
+            <i class="bi bi-percent me-2 fs-5"></i>
+            <span class="na-risk-label">Rate Overrides (Below Standard)</span>
+            <span class="na-risk-meta me-3">{{ _b4_ct }} room{{ 's' if _b4_ct != 1 }}</span>
+            <span class="na-risk-amt {% if _b4_ct > 0 %}text-warning{% else %}text-success{% endif %}">
+                {% if _b4_ct > 0 %}₹{{ '{:,.0f}'.format(_rate_mismatch) }}{% else %}<i class="bi bi-check-circle"></i>{% endif %}
+            </span>
+            {% if _b4_ct > 0 %}<i class="bi bi-chevron-right ms-2 text-muted small"></i>{% endif %}
+        </div>
+
+        {# B5: Missing room charges #}
+        {% set _b5_ct = report['room_charges'].missing_count %}
+        <div class="na-risk-row {% if _b5_ct > 0 %}na-risk-danger{% else %}na-risk-clean{% endif %}"
+             {% if _b5_ct > 0 %}data-bs-toggle="modal" data-bs-target="#marMissingModal"{% endif %}>
+            <i class="bi bi-receipt-cutoff me-2 fs-5"></i>
+            <span class="na-risk-label">Missing Room Charges</span>
+            <span class="na-risk-meta me-3">{{ _b5_ct }} room{{ 's' if _b5_ct != 1 }}</span>
+            <span class="na-risk-amt {% if _b5_ct > 0 %}text-danger{% else %}text-success{% endif %}">
+                {% if _b5_ct > 0 %}{{ _b5_ct }} unposted{% else %}<i class="bi bi-check-circle"></i>{% endif %}
+            </span>
+            {% if _b5_ct > 0 %}<i class="bi bi-chevron-right ms-2 text-muted small"></i>{% endif %}
+        </div>
+
+        {# B6: Negative balances #}
+        <div class="na-risk-row {% if _b2_ct > 0 %}na-risk-warn{% else %}na-risk-clean{% endif %}">
+            <i class="bi bi-arrow-down-circle me-2 fs-5"></i>
+            <span class="na-risk-label">Negative Balances</span>
+            <span class="na-risk-meta me-3">{{ _b2_ct }} folio{{ 's' if _b2_ct != 1 }}</span>
+            <span class="na-risk-amt {% if _b2_ct > 0 %}text-warning{% else %}text-success{% endif %}">
+                {% if _b2_ct > 0 %}₹{{ '{:,.0f}'.format(_overpay) }}{% else %}<i class="bi bi-check-circle"></i>{% endif %}
+            </span>
+        </div>
+
+        {# B7: Cash mismatch #}
+        <div class="na-risk-row {% if _cash_mismatch > 50 %}na-risk-danger{% elif _cash_mismatch > 0 %}na-risk-warn{% else %}na-risk-clean{% endif %}"
+             {% if _shifts.shifts | length > 0 %}data-bs-toggle="modal" data-bs-target="#marCashModal"{% endif %}>
+            <i class="bi bi-cash-stack me-2 fs-5"></i>
+            <span class="na-risk-label">Cash Mismatch</span>
+            <span class="na-risk-meta me-3">{{ _shifts.shifts | length }} shift{{ 's' if (_shifts.shifts | length) != 1 }}</span>
+            <span class="na-risk-amt {% if _cash_mismatch > 50 %}text-danger{% elif _cash_mismatch > 0 %}text-warning{% else %}text-success{% endif %}">
+                {% if _cash_mismatch > 0 %}₹{{ '{:,.0f}'.format(_cash_mismatch) }}{% else %}<i class="bi bi-check-circle"></i>{% endif %}
+            </span>
+            {% if _shifts.shifts | length > 0 %}<i class="bi bi-chevron-right ms-2 text-muted small"></i>{% endif %}
+        </div>
+
+    </div>
+</div>
+
+{# ── SECTION C: Operational Status ─────────────────────────────────── #}
+<p class="na-section-title"><i class="bi bi-house-door me-1"></i>C. Operational Status</p>
+<div class="row g-2 mb-3">
+    <div class="col-6 col-sm-3">
+        <div class="card border-0 shadow-sm text-center py-3 bg-primary text-white">
+            <div class="fw-bold fs-5">{{ _occ.occ_pct }}%</div>
+            <div class="small opacity-90">Occupancy</div>
+        </div>
+    </div>
+    <div class="col-6 col-sm-3">
+        <div class="card border-0 shadow-sm text-center py-3 bg-info text-white">
+            <div class="fw-bold fs-5">{{ _occ.occupied }} / {{ _occ.sellable_rooms }}</div>
+            <div class="small opacity-90">Rooms Occupied</div>
+        </div>
+    </div>
+    <div class="col-6 col-sm-3">
+        <div class="card border-0 shadow-sm text-center py-3 bg-light">
+            <div class="fw-bold fs-5">{{ _occ.stayovers }}</div>
+            <div class="small text-muted">Stayovers</div>
+        </div>
+    </div>
+    <div class="col-6 col-sm-3">
+        <div class="card border-0 shadow-sm text-center py-3 {% if (_occ.expected_not_checkedout | length) > 0 %}bg-warning text-dark{% else %}bg-light{% endif %}">
+            <div class="fw-bold fs-5">{{ _occ.expected_not_checkedout | length }}</div>
+            <div class="small {% if (_occ.expected_not_checkedout | length) > 0 %}fw-semibold{% else %}text-muted{% endif %}">Pending Checkouts</div>
+        </div>
+    </div>
+</div>
+
+{# ── SECTION D: Revenue Quality ─────────────────────────────────────── #}
+<p class="na-section-title"><i class="bi bi-bar-chart me-1"></i>D. Revenue Quality</p>
+<div class="card shadow-sm mb-3">
+    <div class="card-body p-0">
+        {% set _total_rev_quality = _rev.room_revenue + _rev.extra_charges_total + _rev.upsell_total %}
+        {% macro rev_row(label, icon, amount, color, pct_base=0, is_negative=false) %}
+        <div class="d-flex align-items-center px-3 py-2 border-bottom">
+            <i class="bi {{ icon }} me-2 text-{{ color }}" style="width:18px;"></i>
+            <span class="small flex-grow-1">{{ label }}</span>
+            <div class="d-flex align-items-center gap-3">
+                {% if pct_base > 0 %}
+                <div style="width:80px; height:6px; background:#e9ecef; border-radius:3px; overflow:hidden;">
+                    <div style="width:{{ [(amount / pct_base * 100), 100] | min | int }}%; height:100%; background:{% if is_negative %}#dc3545{% elif color == 'success' %}#198754{% elif color == 'info' %}#0dcaf0{% elif color == 'warning' %}#ffc107{% else %}#0d6efd{% endif %};"></div>
+                </div>
+                {% endif %}
+                <span class="fw-semibold small text-{{ color }}" style="min-width:90px; text-align:right;">
+                    {% if is_negative %}−{% endif %}₹{{ '{:,.0f}'.format(amount) }}
+                </span>
+            </div>
+        </div>
+        {% endmacro %}
+        {{ rev_row('Room Revenue',    'bi-door-open',    _rev.room_revenue,           'primary', _total_rev_quality) }}
+        {{ rev_row('Extra Charges',   'bi-plus-circle',  _rev.extra_charges_total,    'info',    _total_rev_quality) }}
+        {% if _rev.discount_total > 0 %}
+        {{ rev_row('Discounts',       'bi-tag',          _rev.discount_total,         'danger',  _total_rev_quality, true) }}
+        {% endif %}
+        {% if _rev.upsell_total > 0 %}
+        {{ rev_row('Upsell',          'bi-arrow-up-right-circle', _rev.upsell_total,  'success', _total_rev_quality) }}
+        {% endif %}
+        {{ rev_row('Tax (GST)',       'bi-percent',      _rev.tax_amount,             'secondary', _total_rev_quality) }}
+        <div class="d-flex align-items-center px-3 py-2 bg-light fw-bold small">
+            <span class="flex-grow-1">Gross Revenue</span>
+            <span class="text-success">₹{{ '{:,.0f}'.format(_rev.gross_revenue) }}</span>
+        </div>
+    </div>
+</div>
+
+{% else %}{# no report #}
+<div class="alert alert-secondary py-3">
+    <i class="bi bi-info-circle me-2"></i>
+    Financial data not loaded. Run Audit Checks to populate the dashboard.
+</div>
+{% endif %}{# /report #}
+
+</div>{# /col-lg-8 #}
+
+{# ═══════════════════════════════════════════════════════════
+   RIGHT COLUMN (4 cols): Section E — Audit Control Panel
+═══════════════════════════════════════════════════════════ #}
+<div class="col-lg-4">
+
+{# ── SECTION E: Audit Control Panel ────────────────────────────────── #}
+<p class="na-section-title"><i class="bi bi-sliders me-1"></i>E. Audit Control Panel</p>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+
+        {# Status widget #}
+        <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+            <div>
+                <div class="text-muted small">Audit Status</div>
+                <span class="badge bg-{{ s_color }} {% if s_color == 'warning' %}text-dark{% endif %} fs-6">{{ s_label }}</span>
+            </div>
+            <div class="text-end">
+                <div class="text-muted small">Audit Date</div>
+                <div class="fw-semibold">{{ audit_date.strftime('%d %b %Y') if audit_date else '—' }}
+                    {% if audit_is_closed %} <span class="badge bg-success" style="font-size:0.6rem;">Closed</span>
+                    {% elif current_log and current_log.status == 'Pending' %} <span class="badge bg-warning text-dark" style="font-size:0.6rem;">Pending</span>
+                    {% elif not current_log %} <span class="badge bg-secondary" style="font-size:0.6rem;">Not Run</span>
+                    {% endif %}</div>
+            </div>
+        </div>
+
+        {# Plain-language audit summary #}
+        {% if panel_explanation %}
+        <div class="mb-3 pb-2 border-bottom">
+            <div class="small">
+                <i class="bi bi-lightbulb me-1
+                  {% if panel_explanation.audit_readiness_state == 'not_ready' %}text-danger
+                  {% elif panel_explanation.audit_readiness_state == 'warnings' %}text-warning
+                  {% else %}text-success{% endif %}"></i>
+                {{ panel_explanation.plain_summary }}
+            </div>
+            {% if panel_explanation.has_issues %}
+            <div class="mt-1">
+              <a href="{{ url_for('reports.night_audit', date=audit_date.isoformat()) }}#pane-explain"
+                 class="small text-decoration-none fw-semibold">
+                <i class="bi bi-arrow-right me-1"></i>View full explanation &amp; fix steps
+              </a>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {# Hard block checklist — state driven via panel_ui from ui_state() #}
+        {% if report and panel_ui %}
+        <div class="mb-3">
+            <div class="small fw-semibold text-muted mb-2">Completion Requirements</div>
+            <ul class="list-unstyled mb-0">
+              {% for row in [panel_ui.recon, panel_ui.overpay, panel_ui.checkout, panel_ui.blockers] %}
+              <li class="d-flex align-items-center gap-2 small py-1">
+                  <i class="bi {{ row.icon }} {{ row.icon_cls }}"></i>
+                  <span class="{{ 'text-muted' if row.state == 'success' else row.text_class }}">{{ row.label }}</span>
+              </li>
+              {% endfor %}
+            </ul>
+            {# DEBUG — remove after confirming states are correct #}
+            <div class="text-muted" style="font-size:.68rem; margin-top:4px; opacity:.6;">
+              recon={{ panel_ui.recon.state }}
+              · overpay={{ panel_ui.overpay.state }}
+              · checkout={{ panel_ui.checkout.state }}
+              · blockers={{ panel_ui.blockers.state }}
+            </div>
+        </div>
+        {% elif report %}
+        <div class="mb-3">
+            <div class="small fw-semibold text-muted mb-2">Completion Requirements</div>
+            <div class="small text-muted">State engine unavailable — refresh the page.</div>
+        </div>
+        {% endif %}
+
+        {# Action buttons #}
+        <div class="d-grid gap-2">
+
+            {% if log_status in ('Open', 'Pending', 'Reopened', 'InProgress') %}
+            <form method="POST" action="{{ url_for('reports.night_audit_run') }}" class="mb-0">
+                <input type="hidden" name="audit_date" value="{{ audit_date.isoformat() }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-primary w-100">
+                    <i class="bi bi-play-circle me-1"></i>Run Audit Checks
+                </button>
+            </form>
+            {% endif %}
+
+            {% if current_user.has_role('Admin', 'Manager') %}
+                {% if log_status in ('Open', 'Pending', 'Reopened', 'InProgress') %}
+                {% if panel_ui %}
+                <button class="btn {{ panel_ui.complete_btn.cls }} w-100"
+                        data-bs-toggle="modal" data-bs-target="#completeModal">
+                    <i class="bi bi-check2-circle me-1"></i>{{ panel_ui.complete_btn.label }}
+                </button>
+                <div class="text-center mt-1">
+                  <small class="{{ panel_ui.readiness.cls }}">
+                    <i class="bi {{ panel_ui.readiness.icon }} me-1"></i>{{ panel_ui.readiness.label }}
+                  </small>
+                </div>
+                {% else %}
+                <button class="btn {% if _has_hard_block %}btn-outline-dark{% else %}btn-dark{% endif %} w-100"
+                        data-bs-toggle="modal" data-bs-target="#completeModal">
+                    <i class="bi bi-check2-circle me-1"></i>Complete Audit
+                    {% if _has_hard_block %}
+                    <span class="badge bg-danger ms-1">{{ _hard_blocks | length }} issue{{ 's' if _hard_blocks | length != 1 }}</span>
+                    {% endif %}
+                </button>
+                {% endif %}
+                {% endif %}
+
+                {% if log_status in ('Completed', 'Warning') %}
+                <button class="btn btn-outline-warning w-100" data-bs-toggle="modal" data-bs-target="#reopenModal">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i>Reopen Audit
+                </button>
+                {% endif %}
+
+                {# Re-run a previously-skipped audit (Admin-only). Appears only
+                   when the SELECTED audit_date's log is in Skipped state —
+                   converts it to Completed/Warning, posts the missing
+                   room_rent charges, writes a reopen trail entry. #}
+                {% if log_status == 'Skipped' and current_user.has_role('Admin') %}
+                <button class="btn btn-warning w-100 fw-semibold"
+                        data-bs-toggle="modal" data-bs-target="#fixSkippedPanelModal">
+                    <i class="bi bi-wrench-adjustable me-1"></i>Fix Skipped Day
+                </button>
+                {% endif %}
+
+                {% if current_user.has_role('Admin') and bd and bd < today %}
+                <button type="button" class="btn btn-outline-danger w-100"
+                        data-bs-toggle="modal" data-bs-target="#forceCloseModal">
+                    <i class="bi bi-fast-forward-fill me-1"></i>Force Close (Admin)
+                </button>
+                {% endif %}
+            {% endif %}
+
+            <a href="{{ url_for('main.night_audit', tab='analytics', date=audit_date.isoformat()) }}"
+               class="btn btn-outline-secondary w-100">
+                <i class="bi bi-bar-chart-line me-1"></i>View Full Analytics
+            </a>
+        </div>
+
+        {# Log metadata #}
+        {% if current_log and current_log.run_at %}
+        <div class="mt-3 pt-2 border-top small text-muted">
+            <div>Last run: {{ current_log.run_at.strftime('%d %b %H:%M') }}</div>
+            {% if current_log.run_by %}
+            <div>By: {{ current_log.run_by.full_name }}</div>
+            {% endif %}
+            {% if current_log.override_used %}
+            <div class="mt-1"><span class="badge bg-warning text-dark">Override Used</span> {{ current_log.override_reason or '' }}</div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+{# Blockers list (compact) #}
+{% if exc_summary and exc_summary.blocker_count > 0 %}
+<div class="card border-danger shadow-sm mb-3">
+    <div class="card-header bg-danger text-white py-2 small fw-semibold d-flex align-items-center gap-2">
+        <i class="bi bi-x-octagon-fill"></i>{{ exc_summary.blocker_count }} Blocker{{ 's' if exc_summary.blocker_count != 1 }}
+    </div>
+    <ul class="list-group list-group-flush">
+        {% for b in exc_summary.blockers %}
+        <li class="list-group-item list-group-item-danger py-2 small">
+            <i class="bi {{ b.icon }} me-1"></i>{{ b.detail }}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{# Warnings list (compact) #}
+{% if exc_summary and exc_summary.warning_count > 0 %}
+<div class="card border-warning shadow-sm mb-3">
+    <div class="card-header bg-warning text-dark py-2 small fw-semibold d-flex align-items-center gap-2">
+        <i class="bi bi-exclamation-triangle-fill"></i>{{ exc_summary.warning_count }} Warning{{ 's' if exc_summary.warning_count != 1 }}
+    </div>
+    <ul class="list-group list-group-flush" style="max-height:200px; overflow-y:auto;">
+        {% for w in exc_summary.warnings %}
+        <li class="list-group-item list-group-item-warning py-2 small">
+            <i class="bi {{ w.icon }} me-1"></i>{{ w.detail }}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{% if exc_summary and exc_summary.blocker_count == 0 and exc_summary.warning_count == 0 %}
+<div class="alert alert-success py-2 small">
+    <i class="bi bi-check-circle-fill me-1"></i>No blockers or warnings.
+</div>
+{% endif %}
+
+</div>{# /col-lg-4 #}
+</div>{# /row #}
+
+
+{# ══════════════════════════════════════════════════════════════════════
+   MONEY AT RISK MODALS
+══════════════════════════════════════════════════════════════════════ #}
+{% if report %}
+
+{# Modal: Unsettled Checkouts #}
+<div class="modal fade" id="marUnsettledModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white py-2">
+                <h6 class="modal-title"><i class="bi bi-door-open me-2"></i>Unsettled Checkouts</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light"><tr><th>Booking</th><th>Guest</th><th>Room</th><th class="text-end">Total</th><th class="text-end">Paid</th><th class="text-end">Balance</th></tr></thead>
+                    <tbody>
+                        {% for f in _folio.checkout_outstanding_list %}
+                        <tr class="table-danger">
+                            <td>{{ f.reservation.booking_reference }}</td>
+                            <td>{{ f.reservation.guest.name if f.reservation.guest else '—' }}</td>
+                            <td>{{ f.reservation.room.room_number if f.reservation.room else '—' }}</td>
+                            <td class="text-end">₹{{ '{:,.2f}'.format(f.total | float) }}</td>
+                            <td class="text-end">₹{{ '{:,.2f}'.format(f.paid | float) }}</td>
+                            <td class="text-end fw-bold text-danger">₹{{ '{:,.2f}'.format(f.balance | float) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal: Overpayments #}
+<div class="modal fade" id="marOverpayModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark py-2">
+                <h6 class="modal-title"><i class="bi bi-arrow-up-circle me-2"></i>Overpayments Unresolved</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light"><tr><th>Booking</th><th>Guest</th><th>Room</th><th class="text-end">Total</th><th class="text-end">Paid</th><th class="text-end">Excess</th></tr></thead>
+                    <tbody>
+                        {% for f in _folio.negative_folios %}
+                        <tr class="table-warning">
+                            <td>{{ f.reservation.booking_reference }}</td>
+                            <td>{{ f.reservation.guest.name if f.reservation.guest else '—' }}</td>
+                            <td>{{ f.reservation.room.room_number if f.reservation.room else '—' }}</td>
+                            <td class="text-end">₹{{ '{:,.2f}'.format(f.total | float) }}</td>
+                            <td class="text-end">₹{{ '{:,.2f}'.format(f.paid | float) }}</td>
+                            <td class="text-end fw-bold text-warning">₹{{ '{:,.2f}'.format((f.balance | float) | abs) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal: Unauthorized Discounts #}
+<div class="modal fade" id="marDiscModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark py-2">
+                <h6 class="modal-title"><i class="bi bi-tag me-2"></i>Discounts Without Authorization</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light"><tr><th>Booking</th><th>Room</th><th>Given By</th><th>Reason</th><th class="text-end">Discount</th></tr></thead>
+                    <tbody>
+                        {% for d in _rev.discount_list %}
+                        {% if not d.authorized_by or d.authorized_by == '—' %}
+                        <tr class="table-warning">
+                            <td>{{ d.reservation.booking_reference }}</td>
+                            <td>{{ d.room }}</td>
+                            <td>{{ d.given_by }}</td>
+                            <td class="text-muted small">{{ d.reason }}</td>
+                            <td class="text-end fw-bold">₹{{ '{:,.2f}'.format(d.discount | float) }}</td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal: Rate Overrides / Leakage #}
+<div class="modal fade" id="marLeakageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark py-2">
+                <h6 class="modal-title"><i class="bi bi-percent me-2"></i>Rate Overrides — Below Standard Tariff</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light"><tr><th>Booking</th><th>Room</th><th>Staff</th><th class="text-end">Standard</th><th class="text-end">Actual</th><th class="text-end">Loss</th></tr></thead>
+                    <tbody>
+                        {% for l in _rev.leakage_list %}
+                        <tr class="table-warning">
+                            <td>{{ l.reservation.booking_reference }}</td>
+                            <td>{{ l.room }}</td>
+                            <td>{{ l.user }}</td>
+                            <td class="text-end">₹{{ '{:,.0f}'.format(l.standard_tariff) }}</td>
+                            <td class="text-end">₹{{ '{:,.0f}'.format(l.actual_rate) }}</td>
+                            <td class="text-end fw-bold text-danger">₹{{ '{:,.0f}'.format(l.amount) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal: Missing Room Charges #}
+<div class="modal fade" id="marMissingModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white py-2">
+                <h6 class="modal-title"><i class="bi bi-receipt-cutoff me-2"></i>Missing Room Charges</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light"><tr><th>Booking</th><th>Guest</th><th>Room</th><th>Type</th></tr></thead>
+                    <tbody>
+                        {% for r in report['room_charges'].missing_rent %}
+                        <tr class="table-danger">
+                            <td>{{ r.booking_reference }}</td>
+                            <td>{{ r.guest.name if r.guest else '—' }}</td>
+                            <td>{{ r.room.room_number if r.room else '—' }}</td>
+                            <td>{{ r.room_type.name if r.room_type else '—' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal: Cash Mismatch #}
+<div class="modal fade" id="marCashModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white py-2">
+                <h6 class="modal-title"><i class="bi bi-cash-stack me-2"></i>Shift Cash Positions</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light"><tr><th>Staff</th><th>Type</th><th>Status</th><th class="text-end">Expected</th><th class="text-end">Declared</th><th class="text-end">Variance</th></tr></thead>
+                    <tbody>
+                        {% for s in _shifts.shifts %}
+                        <tr class="{{ 'table-danger' if s.variance_flag else '' }}">
+                            <td>{{ s.user_name }}</td>
+                            <td>{{ s.shift_type }}</td>
+                            <td><span class="badge {{ 'bg-warning text-dark' if s.status == 'Open' else 'bg-success' }}">{{ s.status }}</span></td>
+                            <td class="text-end">₹{{ '{:,.0f}'.format(s.expected_cash) }}</td>
+                            <td class="text-end">₹{{ '{:,.0f}'.format(s.declared_cash) }}</td>
+                            <td class="text-end fw-bold {{ 'text-danger' if s.variance_flag else 'text-success' }}">₹{{ '{:,.0f}'.format(s.variance | float | abs) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endif %}{# /report modals #}
+
+
+{# ── Complete Audit Modal ─────────────────────────────────────────────── #}
+{% if current_user.has_role('Admin', 'Manager') %}
+<div class="modal fade" id="completeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header {% if _has_hard_block %}bg-danger text-white{% else %}bg-dark text-white{% endif %} py-2">
+                <h5 class="modal-title"><i class="bi bi-check2-circle me-2"></i>Complete Night Audit</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('reports.night_audit_complete') }}">
+                <div class="modal-body">
+                    <input type="hidden" name="audit_date" value="{{ audit_date.isoformat() }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <p class="mb-2">Complete audit for <strong>{{ audit_date.strftime('%d %B %Y') }}</strong>?
+                       Business date will advance to the next day.</p>
+
+                    {% if _has_hard_block %}
+                    <div class="alert alert-danger py-2 mb-3">
+                        <div class="fw-semibold mb-1"><i class="bi bi-x-octagon-fill me-1"></i>Hard Blocks Detected</div>
+                        <ul class="mb-0 small ps-3">
+                            {% for hb in _hard_blocks %}<li>{{ hb }}</li>{% endfor %}
+                        </ul>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Override Reason <span class="text-danger">*</span></label>
+                        <textarea name="override_reason" class="form-control" rows="3"
+                                  placeholder="Explain why completing with these issues…" required></textarea>
+                        <div class="form-text text-danger">This action will be recorded in the audit trail.</div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-success py-2 mb-3">
+                        <i class="bi bi-check-circle-fill me-1"></i>All completion requirements met.
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Override Reason (optional)</label>
+                        <textarea name="override_reason" class="form-control" rows="2"
+                                  placeholder="Optional remark…"></textarea>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn {% if _has_hard_block %}btn-danger{% else %}btn-dark{% endif %}">
+                        <i class="bi bi-check2-circle me-1"></i>Confirm Complete
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{# ── Reopen Audit Modal ───────────────────────────────────────────────── #}
+<div class="modal fade" id="reopenModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header py-2">
+                <h5 class="modal-title"><i class="bi bi-arrow-counterclockwise me-2"></i>Reopen Audit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('reports.night_audit_reopen') }}">
+                <div class="modal-body">
+                    <input type="hidden" name="audit_date" value="{{ audit_date.isoformat() }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <p>Reopen the audit for <strong>{{ audit_date.strftime('%d %B %Y') }}</strong>?
+                       The business date will be unlocked.</p>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Reason <span class="text-danger">*</span></label>
+                        <textarea name="reason" class="form-control" rows="2"
+                                  placeholder="Why are you reopening this audit?" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i>Confirm Reopen
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{# ── Fix Skipped Day modal — collects mandatory reason, posts to the
+     rerun-skipped endpoint. Shown only when the selected audit_date's
+     log is in Skipped state and the user is Admin (button-side gated). #}
+{% if log_status == 'Skipped' and current_user.has_role('Admin') %}
+<div class="modal fade" id="fixSkippedPanelModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning-subtle py-2">
+                <h5 class="modal-title">
+                    <i class="bi bi-wrench-adjustable me-2"></i>Re-run Skipped Audit
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('reports.night_audit_rerun_skipped') }}">
+                <div class="modal-body">
+                    <input type="hidden" name="audit_date" value="{{ audit_date.isoformat() }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="alert alert-warning small mb-3">
+                        <i class="bi bi-info-circle-fill me-1"></i>
+                        This will re-compute the audit for
+                        <strong>{{ audit_date.strftime('%d %B %Y') }}</strong>
+                        and post any missing <code>room_rent</code> charges.
+                        The original "Skipped (Override)" marker is kept on
+                        record; a new reopen-trail entry captures the reason
+                        below.
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-semibold">
+                            Reason for re-running (mandatory)
+                        </label>
+                        <textarea name="reason" class="form-control" rows="3"
+                                  required minlength="8"
+                                  placeholder="e.g. Force-closed during power outage; reconciling billing for guest #124"></textarea>
+                        <div class="form-text">
+                            Minimum 8 characters. Written to the immutable reopen trail.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-warning fw-semibold">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Re-run Audit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{# ── Force Close modal — replaces the plain window.confirm() so the
+     admin sees the financial-continuity warning explicitly and must
+     acknowledge before the form submits. #}
+{% if current_user.has_role('Admin') and bd and bd < today %}
+<div class="modal fade" id="forceCloseModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white py-2">
+                <h5 class="modal-title">
+                    <i class="bi bi-fast-forward-fill me-2"></i>Force Close — Advance Business Date
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('reports.night_audit_advance_date') }}">
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="alert alert-danger small mb-3">
+                        <strong><i class="bi bi-exclamation-triangle-fill me-1"></i>
+                        This will skip night audit for every date from
+                        {{ bd.strftime('%d %b %Y') }} to today and may break
+                        financial continuity.</strong>
+                        <br><br>
+                        Use this <u>only in an emergency</u> — for example
+                        when the system was offline for several days and
+                        normal audit is not possible. Every skipped date can
+                        later be corrected via
+                        <em>Night Audit → History → Fix Skipped Day</em>
+                        once the underlying data issue is resolved.
+                    </div>
+                    <div class="mb-2 small">
+                        <strong>What Force Close does:</strong>
+                        <ul class="mb-0 ps-3">
+                            <li>Marks every missing date as <em>Skipped (Override)</em>.</li>
+                            <li>Does NOT post any <code>room_rent</code> charges
+                                for those dates — balances will be incomplete.</li>
+                            <li>Advances PMS business date to today so operations
+                                can continue.</li>
+                        </ul>
+                    </div>
+                    <div class="form-check mt-3">
+                        <input class="form-check-input" type="checkbox" id="forceCloseAck">
+                        <label class="form-check-label small" for="forceCloseAck">
+                            I understand this may break financial continuity and
+                            I will use "Fix Skipped Day" later to reconcile.
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="submit" id="forceCloseSubmit" class="btn btn-danger fw-semibold" disabled>
+                        <i class="bi bi-fast-forward-fill me-1"></i>Force Close
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script nonce="{{ csp_nonce }}">
+(function () {
+    // Gate the destructive "Force Close" submit on the explicit
+    // acknowledgement checkbox. CSP-compliant (no inline onchange).
+    var ack = document.getElementById('forceCloseAck');
+    var btn = document.getElementById('forceCloseSubmit');
+    if (ack && btn) {
+        ack.addEventListener('change', function () { btn.disabled = !ack.checked; });
+    }
+})();
+</script>
+{% endif %}
+
+{% endif %}{# /dashboard #}
+
+
+{# ══════════════════════════════════════════════════════════════════════════
+   TAB B — ANALYTICS
+══════════════════════════════════════════════════════════════════════════ #}
+{% if active_tab == 'analytics' %}
+
+{% if report %}
+{% set occupancy    = report['occupancy'] %}
+{% set revenue      = report['revenue'] %}
+{% set payments     = report['payments'] %}
+{% set folio        = report['folio'] %}
+{% set exceptions   = report['exceptions'] %}
+{% set tax          = report['tax'] %}
+{% set control      = report['control'] %}
+{% set revenue_risk = report['revenue_risk'] %}
+{% set header       = report['header'] %}
+
+{# Status + blocker badges #}
+{% if exceptions.blocker_count > 0 or exceptions.warning_count > 0 %}
+<div class="d-flex gap-2 mb-3 flex-wrap">
+    {% if exceptions.blocker_count > 0 %}
+    <span class="badge bg-danger fs-6 px-3 py-2">
+        <i class="bi bi-x-octagon-fill me-1"></i>{{ exceptions.blocker_count }} Blocker{{ 's' if exceptions.blocker_count != 1 }}
+    </span>
+    {% endif %}
+    {% if exceptions.warning_count > 0 %}
+    <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+        <i class="bi bi-exclamation-triangle-fill me-1"></i>{{ exceptions.warning_count }} Warning{{ 's' if exceptions.warning_count != 1 }}
+    </span>
+    {% endif %}
+    <span class="badge bg-{{ s_color }} fs-6 px-3 py-2">{{ s_label }}</span>
+</div>
+{% else %}
+<div class="alert alert-success py-2 mb-3">
+    <i class="bi bi-check-circle-fill me-2"></i>
+    No blockers or warnings. Audit is clean for {{ audit_date.strftime('%d %B %Y') }}.
+    <span class="badge bg-success ms-2">{{ s_label }}</span>
+</div>
+{% endif %}
+
+{# Analytics sub-pills #}
+<ul class="nav nav-pills mb-3" id="analyticsPills">
+    <li class="nav-item">
+        <a class="nav-link active" href="#" data-bs-toggle="pill" data-bs-target="#apRevenue">
+            <i class="bi bi-currency-rupee me-1"></i>Revenue
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#" data-bs-toggle="pill" data-bs-target="#apCollection">
+            <i class="bi bi-cash-stack me-1"></i>Collection
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#" data-bs-toggle="pill" data-bs-target="#apTax">
+            <i class="bi bi-percent me-1"></i>Tax
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#" data-bs-toggle="pill" data-bs-target="#apLeakage">
+            <i class="bi bi-shield-exclamation me-1"></i>Leakage
+            {% if revenue_risk.high_alerts > 0 %}
+            <span class="badge bg-danger ms-1">{{ revenue_risk.high_alerts }}</span>
+            {% elif revenue_risk.total_alerts > 0 %}
+            <span class="badge bg-warning text-dark ms-1">{{ revenue_risk.total_alerts }}</span>
+            {% endif %}
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#" data-bs-toggle="pill" data-bs-target="#apOccupancy">
+            <i class="bi bi-grid-3x3-gap me-1"></i>Occupancy
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#" data-bs-toggle="pill" data-bs-target="#apExceptions">
+            <i class="bi bi-exclamation-triangle me-1"></i>Exceptions
+            {% if exceptions.blocker_count > 0 %}
+            <span class="badge bg-danger ms-1">{{ exceptions.blocker_count }}</span>
+            {% elif exceptions.warning_count > 0 %}
+            <span class="badge bg-warning text-dark ms-1">{{ exceptions.warning_count }}</span>
+            {% endif %}
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#" data-bs-toggle="pill" data-bs-target="#apControl">
+            <i class="bi bi-shield-check me-1"></i>Control
+        </a>
+    </li>
+</ul>
+
+<div class="tab-content">
+
+{# ── Revenue ── #}
+<div class="tab-pane fade show active" id="apRevenue">
+    <div class="row g-3 mb-3">
+        {% set kpis = [
+            ('Room Revenue',    '₹' ~ '{:,.0f}'.format(revenue.room_revenue),           'bg-primary text-white'),
+            ('Extra Charges',   '₹' ~ '{:,.0f}'.format(revenue.extra_charges_total),    'bg-secondary text-white'),
+            ('Discounts',       '₹' ~ '{:,.0f}'.format(revenue.discount_total),          'bg-warning text-dark'),
+            ('Accrual Net Revenue', '₹' ~ '{:,.0f}'.format(revenue.accrual_net),          'bg-success text-white'),
+            ('Tax',             '₹' ~ '{:,.0f}'.format(revenue.tax_amount),              'bg-info text-white'),
+            ('Gross Revenue',   '₹' ~ '{:,.0f}'.format(revenue.gross_revenue),           'bg-dark text-white'),
+        ] %}
+        {% for label, val, cls in kpis %}
+        <div class="col-6 col-md-2">
+            <div class="card border-0 shadow-sm text-center py-3 {{ cls }}">
+                <div class="fw-bold fs-6">{{ val }}</div>
+                <div class="small opacity-90">{{ label }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="card shadow-sm">
+        <div class="card-header fw-semibold bg-light py-2">Revenue Breakdown</div>
+        <div class="card-body p-0">
+            <table class="table table-sm mb-0">
+                <tbody>
+                    <tr><td>Room Revenue</td><td class="text-end">₹{{ '{:,.2f}'.format(revenue.room_revenue) }}</td></tr>
+                    <tr><td>Extra Charges</td><td class="text-end">₹{{ '{:,.2f}'.format(revenue.extra_charges_total) }}</td></tr>
+                    <tr class="text-danger"><td>Less: Discounts</td><td class="text-end">−₹{{ '{:,.2f}'.format(revenue.discount_total) }}</td></tr>
+                    <tr class="fw-semibold"><td>Accrual Net Revenue (Pre-Tax)</td><td class="text-end">₹{{ '{:,.2f}'.format(revenue.accrual_net) }}</td></tr>
+                    <tr><td>Tax Liability</td><td class="text-end">₹{{ '{:,.2f}'.format(revenue.tax_amount) }}</td></tr>
+                    <tr class="table-warning fw-bold"><td>Gross Revenue (incl. Tax)</td><td class="text-end">₹{{ '{:,.2f}'.format(revenue.gross_revenue) }}</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% if revenue.upsell_total > 0 %}
+    <div class="card shadow-sm mt-3">
+        <div class="card-header fw-semibold bg-light py-2">Upsell Summary</div>
+        <div class="card-body py-2 text-success fw-semibold">
+            ₹{{ '{:,.2f}'.format(revenue.upsell_total) }} upsell revenue
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{# ── Collection ── #}
+<div class="tab-pane fade" id="apCollection">
+    <div class="card shadow-sm">
+        <div class="card-header fw-semibold bg-light py-2">Collections by Payment Mode</div>
+        <div class="card-body p-0">
+            <table class="table table-sm mb-0">
+                <thead class="table-light">
+                    <tr><th>Mode</th><th class="text-end">Amount</th><th class="text-muted text-end">Txns</th></tr>
+                </thead>
+                <tbody>
+                    {% for mode, v in payments.by_mode.items() %}
+                    <tr>
+                        <td>{{ mode }}</td>
+                        <td class="text-end">₹{{ '{:,.2f}'.format(v.amount) }}</td>
+                        <td class="text-end text-muted small">{{ v.count }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="table-success fw-bold">
+                        <td>Direct Collected</td>
+                        <td class="text-end">₹{{ '{:,.2f}'.format(payments.total_collected) }}</td>
+                        <td></td>
+                    </tr>
+                    {% if payments.total_refunds > 0 %}
+                    <tr class="text-danger">
+                        <td>Less: Refunds</td>
+                        <td class="text-end">−₹{{ '{:,.2f}'.format(payments.total_refunds) }}</td>
+                        <td></td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row g-3 mt-1">
+        <div class="col-sm-4">
+            <div class="card border-0 shadow-sm text-center py-3 bg-success text-white">
+                <div class="fw-bold fs-5">₹{{ '{:,.0f}'.format(payments.total_collected) }}</div>
+                <div class="small opacity-90">Direct Collected</div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card border-0 shadow-sm text-center py-3 bg-warning text-dark">
+                <div class="fw-bold fs-5">₹{{ '{:,.0f}'.format(control.total_outstanding) }}</div>
+                <div class="small">Outstanding</div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card border-0 shadow-sm text-center py-3 {{ 'bg-success text-white' if control.reconciliation_difference | abs < 1 else 'bg-danger text-white' }}">
+                <div class="fw-bold fs-5">₹{{ '{:,.2f}'.format(control.reconciliation_difference) }}</div>
+                <div class="small opacity-90">Recon. Difference</div>
+            </div>
+        </div>
+    </div>
+
+    {# ── OTA Settlements & Outstanding ──────────────────────────────────── #}
+    {% if payments.ota_by_head is defined and (payments.ota_by_head or payments.ota_outstanding_lifetime) %}
+    <div class="card border-0 shadow-sm mt-3">
+        <div class="card-header fw-semibold bg-light py-2"><i class="bi bi-globe me-1"></i>OTA Receivables Posted Today</div>
+        <div class="card-body p-0">
+            <table class="table table-sm mb-0">
+                <thead class="table-light">
+                    <tr><th>OTA Channel</th><th class="text-end">Settled Today</th></tr>
+                </thead>
+                <tbody>
+                    {% if payments.ota_by_head %}
+                    {% for head_name, info in payments.ota_by_head.items() %}
+                    <tr>
+                        <td>{{ head_name }}</td>
+                        <td class="text-end">₹{{ '{:,.2f}'.format(info.amount if info is mapping else info) }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr><td colspan="2" class="text-center text-muted small py-2">No OTA receivables posted today</td></tr>
+                    {% endif %}
+                    <tr class="table-info fw-bold">
+                        <td>Total OTA Receivable</td>
+                        <td class="text-end">₹{{ '{:,.2f}'.format(payments.total_ota_settled | default(0)) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {# OTA Outstanding by Channel #}
+    {% if payments.ota_outstanding_lifetime is defined and payments.ota_outstanding_lifetime is mapping %}
+    <div class="card border-0 shadow-sm mt-2">
+        <div class="card-header fw-semibold bg-light py-2"><i class="bi bi-exclamation-triangle me-1"></i>OTA Outstanding (Gross, Unadjusted)</div>
+        <div class="card-body p-0">
+            <table class="table table-sm mb-0">
+                <thead class="table-light">
+                    <tr><th>OTA Channel</th><th class="text-end">Outstanding</th></tr>
+                </thead>
+                <tbody>
+                    {% set _ota_total = namespace(val=0) %}
+                    {% for head_name, amount in payments.ota_outstanding_lifetime.items() %}
+                    {% if amount > 0 %}
+                    <tr>
+                        <td>{{ head_name }}</td>
+                        <td class="text-end text-warning fw-semibold">₹{{ '{:,.2f}'.format(amount) }}</td>
+                    </tr>
+                    {% set _ota_total.val = _ota_total.val + amount %}
+                    {% endif %}
+                    {% endfor %}
+                    {% if _ota_total.val > 0 %}
+                    <tr class="table-warning fw-bold">
+                        <td>Total OTA Outstanding</td>
+                        <td class="text-end">₹{{ '{:,.2f}'.format(_ota_total.val) }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="2" class="text-center text-success small py-2"><i class="bi bi-check-circle me-1"></i>No OTA outstanding</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            <div class="px-3 pb-2"><small class="text-muted">Phase 1: Gross receivable (no payout deductions applied)</small></div>
+        </div>
+    </div>
+    {% endif %}
+    {% endif %}
+</div>
+
+{# ── Tax ── #}
+<div class="tab-pane fade" id="apTax">
+    <div class="card shadow-sm">
+        <div class="card-header fw-semibold bg-light py-2">Tax Snapshot by Rate</div>
+        <div class="card-body p-0">
+            {% if tax.has_data %}
+            <table class="table table-sm mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Rate / Type</th>
+                        <th class="text-end">Taxable Amt</th>
+                        <th class="text-end">CGST</th>
+                        <th class="text-end">SGST</th>
+                        <th class="text-end">Total Tax</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for key, line in tax.by_rate.items() %}
+                    <tr>
+                        <td>{{ key }}</td>
+                        <td class="text-end">₹{{ '{:,.2f}'.format(line.taxable | float) }}</td>
+                        <td class="text-end">₹{{ '{:,.2f}'.format((line.tax | float) / 2) }}</td>
+                        <td class="text-end">₹{{ '{:,.2f}'.format((line.tax | float) / 2) }}</td>
+                        <td class="text-end fw-semibold">₹{{ '{:,.2f}'.format(line.tax | float) }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="table-warning fw-bold">
+                        <td>Total</td>
+                        <td class="text-end">₹{{ '{:,.2f}'.format(tax.total_taxable) }}</td>
+                        <td class="text-end">₹{{ '{:,.2f}'.format(tax.total_tax / 2) }}</td>
+                        <td class="text-end">₹{{ '{:,.2f}'.format(tax.total_tax / 2) }}</td>
+                        <td class="text-end">₹{{ '{:,.2f}'.format(tax.total_tax) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            {% else %}
+            <div class="text-center py-4 text-muted">No tax lines for this date.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{# ── Leakage / Revenue Risk ── #}
+<div class="tab-pane fade" id="apLeakage">
+    {% if revenue_risk.raw_alerts %}
+    <div class="card shadow-sm">
+        <div class="card-header fw-semibold bg-light py-2">
+            Revenue Risk Alerts
+            {% if revenue_risk.high_alerts > 0 %}
+            <span class="badge bg-danger ms-2">{{ revenue_risk.high_alerts }} High</span>
+            {% endif %}
+            {% if revenue_risk.total_alerts > 0 %}
+            <span class="badge bg-warning text-dark ms-2">{{ revenue_risk.total_alerts }} Total</span>
+            {% endif %}
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-sm mb-0">
+                <thead class="table-light">
+                    <tr><th>Severity</th><th>Type</th><th>Staff</th><th>Time</th><th>Detail</th></tr>
+                </thead>
+                <tbody>
+                    {% for a in revenue_risk.raw_alerts %}
+                    <tr class="{{ 'table-danger' if a.severity == 'HIGH' else 'table-warning' }}">
+                        <td><span class="badge {{ 'bg-danger' if a.severity == 'HIGH' else 'bg-warning text-dark' }}">{{ a.severity }}</span></td>
+                        <td>{{ a.alert_type }}</td>
+                        <td>{{ a.username }}</td>
+                        <td class="small text-muted">{{ a.created_at }}</td>
+                        <td class="small">{{ a.message }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-success py-2">
+        <i class="bi bi-check-circle-fill me-2"></i>No revenue leakage alerts for this date.
+    </div>
+    {% endif %}
+    {% if revenue.leakage_total > 0 %}
+    <div class="alert alert-warning mt-2 py-2">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        Estimated Leakage: <strong>₹{{ '{:,.2f}'.format(revenue.leakage_total) }}</strong>
+    </div>
+    {% endif %}
+</div>
+
+{# ── Occupancy ── #}
+<div class="tab-pane fade" id="apOccupancy">
+    <div class="row g-3 mb-3">
+        {% set occ_kpis = [
+            ('Total Rooms',     occupancy.total_rooms,              'bg-secondary text-white'),
+            ('Out of Order',    occupancy.out_of_order,             'bg-danger text-white'),
+            ('Sellable',        occupancy.sellable_rooms,           'bg-info text-white'),
+            ('Occupied',        occupancy.occupied,                 'bg-primary text-white'),
+            ('Occ %',           occupancy.occ_pct ~ '%',            'bg-success text-white'),
+            ('Arrivals',        occupancy.new_arrivals_count,       'bg-light'),
+            ('Departures',      occupancy.checked_out_today_count,  'bg-light'),
+            ('No-Shows',        report['reservations'].noshows_count,  'bg-warning text-dark'),
+        ] %}
+        {% for label, val, cls in occ_kpis %}
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm text-center py-3 {{ cls }}">
+                <div class="fw-bold fs-5">{{ val }}</div>
+                <div class="small {% if cls == 'bg-light' %}text-muted{% else %}opacity-90{% endif %}">{{ label }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% if occupancy.expected_not_checkedout %}
+    <div class="card border-warning shadow-sm">
+        <div class="card-header bg-warning text-dark py-2 fw-semibold">
+            <i class="bi bi-clock-history me-1"></i>Pending Checkouts ({{ occupancy.expected_not_checkedout | length }})
+        </div>
+        <ul class="list-group list-group-flush">
+            {% for r in occupancy.expected_not_checkedout %}
+            <li class="list-group-item py-2 small">
+                {{ r.guest.name if r.guest else 'Unknown' }} — Room {{ r.room.room_number if r.room else '?' }}
+                (Departs {{ r.departure_date.strftime('%d %b') }})
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+
+{# ── Exceptions ── #}
+<div class="tab-pane fade" id="apExceptions">
+    {% if exceptions.blockers %}
+    <div class="card border-danger shadow-sm mb-3">
+        <div class="card-header bg-danger text-white py-2 fw-semibold">
+            <i class="bi bi-x-octagon-fill me-1"></i>Blockers ({{ exceptions.blocker_count }})
+        </div>
+        <ul class="list-group list-group-flush">
+            {% for b in exceptions.blockers %}
+            <li class="list-group-item list-group-item-danger small py-2">{{ b }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% if exceptions.warnings %}
+    <div class="card border-warning shadow-sm mb-3">
+        <div class="card-header bg-warning text-dark py-2 fw-semibold">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>Warnings ({{ exceptions.warning_count }})
+        </div>
+        <ul class="list-group list-group-flush">
+            {% for w in exceptions.warnings %}
+            <li class="list-group-item list-group-item-warning small py-2">{{ w }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% if not exceptions.blockers and not exceptions.warnings %}
+    <div class="alert alert-success py-2">
+        <i class="bi bi-check-circle-fill me-2"></i>No exceptions for {{ audit_date.strftime('%d %B %Y') }}.
+    </div>
+    {% endif %}
+</div>
+
+{# ── Control ── #}
+<div class="tab-pane fade" id="apControl">
+    <div class="card border-{{ 'success' if control.can_close else 'danger' }} shadow-sm mb-3">
+        <div class="card-header fw-bold bg-{{ 'success' if control.can_close else 'danger' }} text-white py-2">
+            <i class="bi bi-shield-{{ 'check' if control.can_close else 'x' }} me-1"></i>
+            Final Audit Control — {{ 'CLEAR TO CLOSE' if control.can_close else 'CANNOT CLOSE' }}
+        </div>
+        <div class="card-body">
+            <div class="row g-3 text-center">
+                <div class="col-sm-4">
+                    <div class="text-muted small">Net Revenue (Pre-Tax)</div>
+                    <div class="fw-bold fs-6">₹{{ '{:,.2f}'.format(control.total_posted_revenue) }}</div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="text-muted small">Tax Liability</div>
+                    <div class="fw-bold fs-6 text-secondary">₹{{ '{:,.2f}'.format(control.tax_liability) }}</div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="text-muted small">Direct Collected</div>
+                    <div class="fw-bold fs-6 text-success">₹{{ '{:,.2f}'.format(control.total_collected) }}</div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-muted small">Outstanding</div>
+                    <div class="fw-bold fs-6 text-warning">₹{{ '{:,.2f}'.format(control.total_outstanding) }}</div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-muted small">Reconciliation Difference</div>
+                    <div class="fw-bold fs-6 {{ 'text-success' if control.reconciliation_difference | abs < 1 else 'text-danger' }}">
+                        ₹{{ '{:,.2f}'.format(control.reconciliation_difference) }}
+                    </div>
+                </div>
+            </div>
+            {% if control.close_reasons %}
+            <hr class="my-2">
+            <ul class="mb-0 text-danger small">
+                {% for reason in control.close_reasons %}
+                <li>{{ reason }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+</div>{# /tab-content #}
+
+{% else %}
+{# report not loaded #}
+<div class="alert alert-secondary py-3">
+    <i class="bi bi-info-circle me-2"></i>
+    No analytics data available for {{ audit_date.strftime('%d %B %Y') }}.
+    Run Audit Checks first from the
+    <a href="{{ url_for('main.night_audit', tab='dashboard') }}">Dashboard tab</a>.
+</div>
+{% endif %}
+
+{% endif %}{# /analytics #}
+
+
+{# ══════════════════════════════════════════════════════════════════════════
+   TAB C — HISTORY
+══════════════════════════════════════════════════════════════════════════ #}
+{% if active_tab == 'history' %}
+
+<div class="card shadow-sm">
+    <div class="card-header fw-semibold bg-light py-2 d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-clock-history me-2"></i>Audit History (last 60)</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover table-sm mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th class="text-end">Revenue</th>
+                    <th class="text-end">Occ.</th>
+                    <th class="text-end">Pending CO</th>
+                    <th>Run By</th>
+                    <th>Completed At</th>
+                    <th class="text-center">Blockers</th>
+                    <th class="text-center">Warn.</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in history_logs %}
+                {% set sc = {
+                    'Completed':  'success',
+                    'Warning':    'warning',
+                    'Reopened':   'danger',
+                    'InProgress': 'primary',
+                    'Pending':    'secondary',
+                } %}
+                <tr>
+                    <td class="fw-semibold">{{ log.audit_date.strftime('%d %b %Y') }}</td>
+                    <td>
+                        <span class="badge bg-{{ sc.get(log.status, 'secondary') }}">
+                            {{ log.status or 'Pending' }}
+                        </span>
+                        {% if log.override_used %}
+                        <span class="badge bg-warning text-dark ms-1" title="{{ log.override_reason }}">Override</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        {% if log.total_revenue %}₹{{ '{:,.0f}'.format(log.total_revenue | float) }}{% else %}—{% endif %}
+                    </td>
+                    <td class="text-end">{{ log.occupancy_count or '—' }}</td>
+                    <td class="text-end">{{ log.pending_checkouts or '—' }}</td>
+                    <td>{{ log.run_by.full_name if log.run_by else '—' }}</td>
+                    <td class="text-muted small">
+                        {{ log.completed_at.strftime('%d %b %H:%M') if log.completed_at else '—' }}
+                    </td>
+                    <td class="text-center">
+                        {% if log.blocker_count %}
+                        <span class="badge bg-danger">{{ log.blocker_count }}</span>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td class="text-center">
+                        {% if log.warning_count %}
+                        <span class="badge bg-warning text-dark">{{ log.warning_count }}</span>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('main.night_audit', tab='analytics', date=log.audit_date.isoformat()) }}"
+                           class="btn btn-xs btn-outline-secondary py-0 px-2">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="10" class="text-center text-muted py-4">
+                        <i class="bi bi-info-circle me-2"></i>No audit history yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endif %}{# /history #}
+
+
+{# ══════════════════════════════════════════════════════════════════════════
+   TAB D — SETTINGS
+══════════════════════════════════════════════════════════════════════════ #}
+{% if active_tab == 'settings' and current_user.has_role('Admin', 'Manager') %}
+
+<div class="card shadow-sm" style="max-width:600px;">
+    <div class="card-header fw-semibold bg-light py-2">
+        <i class="bi bi-robot me-2 text-primary"></i>Automatic Night Audit
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('main.night_audit_settings_save') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="mb-3 d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="fw-semibold">Enable Automatic Night Audit</div>
+                    <div class="text-muted small">Runs end-of-day audit at the configured time every night</div>
+                </div>
+                <div class="form-check form-switch ms-3">
+                    <input class="form-check-input" type="checkbox" role="switch"
+                           name="night_audit_enabled" value="true" id="naEnabled"
+                           {{ 'checked' if settings.get('night_audit_enabled', 'true') == 'true' }}>
+                    <label class="form-check-label" for="naEnabled"></label>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold" for="naTime">Audit Run Time</label>
+                <input type="time" name="night_audit_time" id="naTime"
+                       class="form-control form-control-sm" style="max-width:140px;"
+                       value="{{ settings.get('night_audit_time', '02:00') }}">
+                <div class="form-text">24-hour server time. Applied the following midnight.</div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save me-1"></i>Save Settings
+            </button>
+        </form>
+    </div>
+</div>
+
+{% endif %}{# /settings #}
+
+{% endblock %}

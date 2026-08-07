@@ -1,0 +1,92 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Departures — {{ report_date.strftime('%d %b %Y') }}{% endblock %}
+{% block report_name %}Departures List{% endblock %}
+
+{% block report_content %}
+<div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+    <h5 class="mb-0"><i class="bi bi-box-arrow-right text-warning me-2"></i>
+        Departures — {{ report_date.strftime('%d %B %Y') }}
+        <span class="badge bg-secondary ms-1">{{ records|length }}</span>
+    </h5>
+    <div class="d-flex gap-2 d-print-none">
+        <a href="{{ url_for('reports.departures', date=report_date.isoformat(), format='excel') }}"
+           class="btn btn-sm btn-warning text-dark">
+            <i class="bi bi-file-earmark-excel me-1"></i>Excel
+        </a>
+        <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i>Print
+        </button>
+    </div>
+</div>
+
+{% set today = report_date %}
+{% include 'reports/_date_nav.html' with context %}
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle mb-0 small">
+            <thead class="table-warning">
+                <tr>
+                    <th>Ref</th><th>Guest</th><th>Phone</th><th>Room</th><th>Room Type</th>
+                    <th>Check-in</th><th>Nights</th><th class="text-end">Room Rev.</th>
+                    <th class="text-end">Extras</th><th class="text-end">Total</th>
+                    <th class="text-end">Paid</th><th class="text-end">Balance</th><th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set ns = namespace(total_rev=0.0, total_paid=0.0) %}
+                {% for r in records %}
+                {% set nights = (r.departure_date - r.arrival_date).days %}
+                {% set room_rev = r.rate_per_night | float * nights %}
+                {% set extras = r.extra_charges | sum(attribute='amount') | float %}
+                {% set total = room_rev + extras %}
+                {# Only count non-voided payments #}
+                {% set pns = namespace(paid=0.0) %}
+                {% for p in r.payments %}{% if not p.is_voided %}{% set pns.paid = pns.paid + p.amount | float %}{% endif %}{% endfor %}
+                {% set balance = total - pns.paid %}
+                {% set ns.total_rev = ns.total_rev + total %}
+                {% set ns.total_paid = ns.total_paid + pns.paid %}
+                <tr class="{% if balance > 0 and r.status == 'CheckedOut' %}table-warning{% endif %}">
+                    <td class="fw-semibold text-primary">{{ r.booking_reference or r.id }}</td>
+                    <td>{{ r.guest.name if r.guest else '—' }}</td>
+                    <td>{{ r.guest.phone if r.guest else '—' }}</td>
+                    <td>{{ r.room.room_number if r.room else '—' }}</td>
+                    <td>{{ r.room_type.name if r.room_type else '—' }}</td>
+                    <td>{{ r.arrival_date.strftime('%d %b') }}</td>
+                    <td class="text-center">{{ nights }}</td>
+                    <td class="text-end">₹{{ '{:,.0f}'.format(room_rev) }}</td>
+                    <td class="text-end">₹{{ '{:,.0f}'.format(extras) }}</td>
+                    <td class="text-end fw-semibold">₹{{ '{:,.0f}'.format(total) }}</td>
+                    <td class="text-end text-success">₹{{ '{:,.0f}'.format(pns.paid) }}</td>
+                    <td class="text-end {{ 'text-danger fw-bold' if balance > 0 else 'text-success' }}">
+                        ₹{{ '{:,.0f}'.format(balance) }}
+                    </td>
+                    <td>
+                        <span class="badge {% if r.status == 'CheckedOut' %}bg-secondary{% else %}bg-primary{% endif %}">
+                            {{ r.status }}
+                        </span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="13" class="text-center text-muted py-4">No departures for this date.</td></tr>
+                {% endfor %}
+            </tbody>
+            {% if records %}
+            <tfoot class="table-secondary fw-bold">
+                <tr>
+                    <td colspan="9" class="text-end">Totals ({{ records|length }} guests):</td>
+                    <td class="text-end">₹{{ '{:,.0f}'.format(ns.total_rev) }}</td>
+                    <td class="text-end text-success">₹{{ '{:,.0f}'.format(ns.total_paid) }}</td>
+                    <td class="text-end {{ 'text-danger' if (ns.total_rev - ns.total_paid) > 0 else 'text-success' }}">
+                        ₹{{ '{:,.0f}'.format(ns.total_rev - ns.total_paid) }}
+                    </td>
+                    <td></td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+</div>
+
+<style>@media print { .d-print-none { display:none !important; } }</style>
+{% endblock %}

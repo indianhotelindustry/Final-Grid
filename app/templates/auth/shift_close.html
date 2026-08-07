@@ -1,0 +1,280 @@
+{% extends 'base.html' %}
+{% block title %}Close Shift — {{ shift.shift_type }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0"><i class="bi bi-stop-circle text-warning me-2"></i>Close Shift</h4>
+    <small class="text-muted">
+      {{ shift.shift_type }} shift &nbsp;|&nbsp; {{ shift.user.full_name }}
+      &nbsp;|&nbsp; Started {{ shift.start_time.strftime('%d %b %Y %H:%M') }}
+    </small>
+  </div>
+  <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for cat, msg in messages %}
+    <div class="alert alert-{{ cat }} alert-dismissible fade show">
+      {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  {% endfor %}
+{% endwith %}
+
+<div class="row g-3">
+
+  <!-- ── Left column: Payment summary + Adjustments ── -->
+  <div class="col-lg-7">
+
+    <!-- Payment Mode Summary -->
+    <div class="card shadow-sm mb-3">
+      <div class="card-header fw-semibold">
+        <i class="bi bi-credit-card me-1"></i>Payment Mode Summary (This Shift)
+      </div>
+      <div class="card-body p-0">
+        {% if payment_summary %}
+        <table class="table table-sm table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Mode</th>
+              <th class="text-end">Amount Received (₹)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for mode, total in payment_summary.items() %}
+            <tr>
+              <td>{{ mode }}</td>
+              <td class="text-end fw-semibold">{{ '%.2f'|format(total) }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot class="table-secondary fw-bold">
+            <tr>
+              <td>Total Collections</td>
+              <td class="text-end">₹{{ '%.2f'|format(payment_summary.values()|sum) }}</td>
+            </tr>
+          </tfoot>
+        </table>
+        {% else %}
+          <p class="text-muted small p-3 mb-0">No payments recorded in this shift.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Cash Adjustments -->
+    <div class="card shadow-sm mb-3">
+      <div class="card-header d-flex justify-content-between align-items-center fw-semibold">
+        <span><i class="bi bi-sliders me-1"></i>Cash Adjustments</span>
+        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse"
+                data-bs-target="#adjForm">
+          <i class="bi bi-plus me-1"></i>Add Adjustment
+        </button>
+      </div>
+
+      <div class="collapse" id="adjForm">
+        <div class="card-body border-bottom bg-light">
+          <form method="POST" action="{{ url_for('auth.shift_adjustment') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="row g-2">
+              <div class="col-sm-4">
+                <label class="form-label small fw-semibold">Type</label>
+                <select class="form-select form-select-sm" name="adjustment_type" required>
+                  <option value="payout">Payout (cash out to guest/vendor)</option>
+                  <option value="float_add">Float Add (cash added to drawer)</option>
+                  <option value="float_remove">Float Remove (cash removed from drawer)</option>
+                  <option value="petty_cash">Petty Cash Expense</option>
+                </select>
+              </div>
+              <div class="col-sm-3">
+                <label class="form-label small fw-semibold">Amount (₹)</label>
+                <input type="number" class="form-control form-control-sm" name="amount"
+                       min="0.01" step="0.01" required placeholder="0.00">
+              </div>
+              <div class="col-sm-5">
+                <label class="form-label small fw-semibold">Description</label>
+                <input type="text" class="form-control form-control-sm" name="description"
+                       required placeholder="e.g. Payout to maintenance vendor">
+              </div>
+              <div class="col-12 text-end">
+                <button type="submit" class="btn btn-primary btn-sm">
+                  <i class="bi bi-check-lg me-1"></i>Save Adjustment
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card-body p-0">
+        {% if adjustments %}
+        <table class="table table-sm table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Type</th>
+              <th>Description</th>
+              <th class="text-end">Effect on Cash</th>
+              <th>By</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for adj in adjustments %}
+            <tr>
+              <td>
+                {% if adj.adjustment_type == 'float_add' %}
+                  <span class="badge bg-success">Float Add</span>
+                {% elif adj.adjustment_type == 'float_remove' %}
+                  <span class="badge bg-secondary">Float Remove</span>
+                {% elif adj.adjustment_type == 'payout' %}
+                  <span class="badge bg-warning text-dark">Payout</span>
+                {% else %}
+                  <span class="badge bg-info text-dark">Petty Cash</span>
+                {% endif %}
+              </td>
+              <td><small>{{ adj.description }}</small></td>
+              <td class="text-end fw-semibold
+                {{ 'text-success' if adj.adjustment_type == 'float_add' else 'text-danger' }}">
+                {{ '+' if adj.adjustment_type == 'float_add' else '−' }}
+                ₹{{ '%.2f'|format(adj.amount) }}
+              </td>
+              <td><small class="text-muted">{{ adj.created_by.full_name }}</small></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+          <p class="text-muted small p-3 mb-0">No adjustments recorded.</p>
+        {% endif %}
+      </div>
+    </div>
+
+  </div><!-- /left col -->
+
+  <!-- ── Right column: Cash Reconciliation ── -->
+  <div class="col-lg-5">
+    <div class="card shadow-sm border-warning">
+      <div class="card-header bg-warning bg-opacity-25 fw-semibold">
+        <i class="bi bi-cash-coin me-1"></i>Cash Reconciliation
+      </div>
+      <div class="card-body">
+
+        <!-- Breakdown (read-only) -->
+        <table class="table table-sm table-borderless mb-3">
+          <tr>
+            <td class="text-muted">Opening Cash</td>
+            <td class="text-end fw-semibold">₹{{ '%.2f'|format(shift.opening_cash or 0) }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">+ Cash Received</td>
+            <td class="text-end text-success">₹{{ '%.2f'|format(cash_breakdown.received) }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">− Cash Voided</td>
+            <td class="text-end text-danger">₹{{ '%.2f'|format(cash_breakdown.voided) }}</td>
+          </tr>
+          {% set adj_net = namespace(val=0) %}
+          {% for adj in adjustments %}
+            {% if adj.adjustment_type == 'float_add' %}
+              {% set adj_net.val = adj_net.val + adj.amount|float %}
+            {% else %}
+              {% set adj_net.val = adj_net.val - adj.amount|float %}
+            {% endif %}
+          {% endfor %}
+          <tr>
+            <td class="text-muted">± Adjustments</td>
+            <td class="text-end {{ 'text-success' if adj_net.val >= 0 else 'text-danger' }}">
+              {{ '+' if adj_net.val >= 0 else '' }}₹{{ '%.2f'|format(adj_net.val) }}
+            </td>
+          </tr>
+          <tr class="table-light">
+            <td class="fw-bold">Expected Cash</td>
+            <td class="text-end fw-bold fs-5" id="expected-display">
+              ₹{{ '%.2f'|format(expected_cash) }}
+            </td>
+          </tr>
+        </table>
+
+        <hr>
+
+        <!-- Close form -->
+        <form method="POST" action="{{ url_for('auth.close_shift') }}" id="closeForm">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              Declared Closing Cash (₹) <span class="text-danger">*</span>
+            </label>
+            <input type="number" class="form-control form-control-lg" id="declared_cash"
+                   name="declared_cash" min="0" step="0.01" value="0" required
+                   oninput="updateVariance()">
+          </div>
+
+          <div class="mb-3 p-2 rounded" id="variance-box" style="background:#f8f9fa;">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="fw-semibold">Variance</span>
+              <span class="fw-bold fs-5" id="variance-display">₹0.00</span>
+            </div>
+            <div class="small text-muted mt-1" id="variance-hint"></div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Handover Notes</label>
+            <textarea class="form-control" name="close_notes" rows="2"
+                      placeholder="Pending tasks, observations for next shift..."></textarea>
+          </div>
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-warning btn-lg"
+                    onclick="return confirm('Close this shift? This cannot be undone.');">
+              <i class="bi bi-stop-fill me-2"></i>Close Shift
+            </button>
+          </div>
+        </form>
+
+        <p class="text-muted small mt-2 mb-0 text-center">
+          Auto-approved if |variance| ≤ ₹{{ '%.0f'|format(threshold) }}.
+          Larger variances require Manager approval.
+        </p>
+
+      </div>
+    </div>
+  </div><!-- /right col -->
+
+</div><!-- /row -->
+
+<script nonce="{{ csp_nonce }}">
+const expected = {{ expected_cash | float }};
+const threshold = {{ threshold | float }};
+
+function updateVariance() {
+  const declared = parseFloat(document.getElementById('declared_cash').value) || 0;
+  const variance = declared - expected;
+  const box = document.getElementById('variance-box');
+  const disp = document.getElementById('variance-display');
+  const hint = document.getElementById('variance-hint');
+
+  const sign = variance >= 0 ? '+' : '';
+  disp.textContent = sign + '₹' + Math.abs(variance).toFixed(2);
+
+  if (variance > 0) {
+    disp.className = 'fw-bold fs-5 text-success';
+    disp.textContent = '+₹' + variance.toFixed(2);
+  } else if (variance < 0) {
+    disp.className = 'fw-bold fs-5 text-danger';
+    disp.textContent = '−₹' + Math.abs(variance).toFixed(2);
+  } else {
+    disp.className = 'fw-bold fs-5 text-muted';
+  }
+
+  if (Math.abs(variance) <= threshold) {
+    box.style.background = '#d1e7dd';
+    hint.textContent = 'Within threshold — will auto-approve.';
+    hint.className = 'small text-success mt-1';
+  } else {
+    box.style.background = '#f8d7da';
+    hint.textContent = 'Exceeds threshold — requires Manager approval.';
+    hint.className = 'small text-danger mt-1';
+  }
+}
+updateVariance();
+</script>
+{% endblock %}

@@ -1,0 +1,1486 @@
+{% extends "base.html" %}
+{% from "_partials/audit_override.html" import audit_override %}
+{% from "_partials/training_glossary.html" import accounting_glossary %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-9">
+    <div class="card shadow-sm">
+      <div class="card-header bg-danger text-white d-flex align-items-center gap-2">
+        <i class="bi bi-box-arrow-right fs-5"></i>
+        <h5 class="mb-0">Check-out — {{ reservation.guest.name }}</h5>
+      </div>
+      <div class="card-body">
+
+        {# ── Training: vocabulary cheat-sheet ── #}
+        {{ accounting_glossary() }}
+
+        {# ── Server-rejection banner (set when the previous POST failed
+             balance-check). Shows the EXACT remaining the server saw,
+             plus a one-click "Pay this remaining" button that pre-fills
+             the Cash field. The marker also keeps Manager Override and
+             Individual Credit visible regardless of JS math state. ── #}
+        {% if checkout_debug and checkout_debug.final_outstanding > 0.01 %}
+        {# Operational-confidence presentation: a small (<= ₹5) leftover is a
+           GST/rounding recompute delta — present it calmly. A larger amount
+           is a genuine shortfall and stays firm. Same buttons, same logic. #}
+        {% set _co_minor = checkout_debug.final_outstanding <= 5 %}
+        <div id="serverRejectionMarker"
+             class="alert {{ 'alert-warning' if _co_minor else 'alert-danger' }} d-flex align-items-start gap-2 mb-3"
+             data-remaining="{{ '%.2f'|format(checkout_debug.final_outstanding) }}">
+          <i class="bi {{ 'bi-info-circle-fill' if _co_minor else 'bi-exclamation-octagon-fill' }} fs-4"></i>
+          <div class="flex-grow-1">
+            <div class="fw-bold">
+              {% if _co_minor %}
+              Minor GST adjustment detected — ₹{{ '%.2f'|format(checkout_debug.final_outstanding) }} difference after recomputation.
+              {% else %}
+              Checkout not yet settled — server still sees ₹{{ '%.2f'|format(checkout_debug.final_outstanding) }} pending.
+              {% endif %}
+            </div>
+            <div class="small mt-1">
+              {% if _co_minor %}
+              A small GST/rounding difference remained after submit. Please collect or approve the adjustment:
+              {% else %}
+              Likely cause: GST on late fee or discount changed the total after submit. Use one of:
+              {% endif %}
+            </div>
+            <div class="d-flex gap-2 mt-2 flex-wrap">
+              <button type="button" id="payRemainingCashBtn"
+                      class="btn btn-sm btn-success">
+                <i class="bi bi-cash-coin me-1"></i>Pay ₹{{ '%.2f'|format(checkout_debug.final_outstanding) }} as Cash
+              </button>
+              <span class="small text-muted align-self-center">or tick Manager Override / Individual Credit below.</span>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        {# ── Audit lock banner (always visible when locked, never hides data) ── #}
+        {% if audit_lock %}
+        <div class="alert alert-dark border-2 border-warning d-flex align-items-start gap-2 mb-3"
+             style="background:#1f2937;color:#fef3c7;">
+          <i class="bi bi-lock-fill text-warning fs-4 mt-1 flex-shrink-0"></i>
+          <div class="flex-grow-1">
+            <div class="fw-bold">
+              &#128274; Locked — closed in Night Audit on {{ audit_lock.date_human }}
+            </div>
+            <div class="small mt-1">
+              This folio's departure date falls in a closed Night Audit.
+              Editing is blocked. Contact Admin for correction.
+            </div>
+            {# Reusable Admin override — fields targeted at the checkout form below #}
+            {{ audit_override(audit_lock.is_admin, audit_lock,
+                              suffix='Folio',
+                              form_id='checkoutForm') }}
+          </div>
+        </div>
+        {% endif %}
+
+        {# ── Guest info bar ── #}
+        <div class="alert alert-info py-2 mb-3 d-flex flex-wrap gap-3 align-items-center">
+          <span><i class="bi bi-person-fill me-1"></i><strong>{{ reservation.guest.name }}</strong></span>
+          <span><i class="bi bi-door-closed me-1"></i>Room {{ reservation.room.room_number if reservation.room else '—' }}</span>
+          <span><i class="bi bi-calendar me-1"></i>{{ reservation.arrival_date.strftime('%d %b') }} → {{ reservation.departure_date.strftime('%d %b %Y') }}</span>
+          {% if reservation.checkin_record and reservation.checkin_record.company %}
+          <span class="badge bg-primary fs-6"><i class="bi bi-building me-1"></i>{{ reservation.checkin_record.company.name }}</span>
+          {% endif %}
+        </div>
+
+        {# ── Loyalty info strip ── #}
+        {% if loyalty_info and loyalty_info.enrolled %}
+        <div class="alert alert-light border py-2 mb-3">
+            <div class="d-flex flex-wrap gap-3 align-items-center">
+                <span class="badge px-2 py-1" style="background:{{ loyalty_info.color }}">
+                    <i class="bi bi-award me-1"></i>{{ loyalty_info.tier }}
+                </span>
+                <span class="fw-semibold">{{ "{:,}".format(loyalty_info.balance) }} pts</span>
+                <span class="text-muted small">{{ loyalty_info.loyalty_number }}</span>
+                <span class="text-muted">|</span>
+                <span class="small">Max discount: <strong>₹{{ "%.2f"|format(loyalty_info.max_discount) }}</strong></span>
+                <button type="button" class="btn btn-sm btn-outline-primary ms-auto"
+                        data-bs-toggle="modal" data-bs-target="#loyaltyRedeemModal">
+                    <i class="bi bi-gift me-1"></i>Redeem Points
+                </button>
+            </div>
+        </div>
+        {% endif %}
+
+        {# ── Admin/Manager: server-side billing debug panel ── #}
+        {% if current_user.has_role('Admin', 'Manager') %}
+        <details class="mb-3" {% if checkout_debug %}open{% endif %}>
+          <summary class="small text-muted" style="cursor:pointer;user-select:none;">
+            <i class="bi bi-bug me-1"></i>Server Billing Debug
+            {% if checkout_debug %}<span class="badge bg-danger ms-1">Checkout blocked — see values below</span>{% endif %}
+          </summary>
+          <div class="card border-secondary mt-2" style="font-size:0.82rem;">
+            <div class="card-body py-2">
+              {% if checkout_debug %}
+              {# Values actually used by the server during the failed checkout attempt #}
+              <div class="fw-bold text-danger mb-1">Values used during last checkout attempt:</div>
+              <table class="table table-sm table-borderless mb-0" style="font-size:0.82rem;">
+                <tr><td class="text-muted">Total Bill (pre-tax + GST)</td><td class="fw-semibold">₹{{ "%.2f"|format(checkout_debug.total_bill) }}</td></tr>
+                <tr><td class="text-muted">Already Paid (pre-checkout)</td><td class="fw-semibold text-success">₹{{ "%.2f"|format(checkout_debug.already_paid) }}</td></tr>
+                <tr><td class="text-muted">Paying Now (from form, incl. OTA auto-settle)</td><td class="fw-semibold text-primary">₹{{ "%.2f"|format(checkout_debug.paying_now) }}</td></tr>
+                <tr><td class="text-muted">Final Paid (after posting)</td><td class="fw-semibold text-success">₹{{ "%.2f"|format(checkout_debug.final_paid) }}</td></tr>
+                <tr class="table-danger"><td class="fw-bold">Final Outstanding (server)</td><td class="fw-bold text-danger">₹{{ "%.2f"|format(checkout_debug.final_outstanding) }}</td></tr>
+              </table>
+              <div class="small text-muted mt-2">
+                <i class="bi bi-info-circle me-1"></i>
+                Common cause of "exact payment denied": late-fee GST or discount changed the total
+                between JS preview and server post. Use the <strong>Pay ₹X as Cash</strong> button at
+                the top of the page to clear the exact remaining, or tick Manager Override / Individual Credit.
+              </div>
+              {% else %}
+              {# GET-time snapshot — what backend will start from #}
+              <div class="fw-bold text-secondary mb-1">Current billing snapshot (pre-submission):</div>
+              <table class="table table-sm table-borderless mb-0" style="font-size:0.82rem;">
+                <tr><td class="text-muted">Total Bill</td><td class="fw-semibold">₹{{ "%.2f"|format(billing.rounded_grand_total) }}</td>
+                    <td class="text-muted ps-3">Pre-tax ₹{{ "%.2f"|format(billing.total) }} + GST ₹{{ "%.2f"|format(billing.gst_amount) }} · Room: ₹{{ "%.2f"|format(billing.room_charges) }} · Extra: ₹{{ "%.2f"|format(billing.extra_charges) }} · Disc: −₹{{ "%.2f"|format(billing.discount) }}</td></tr>
+                <tr><td class="text-muted">Already Paid</td><td class="fw-semibold text-success">₹{{ "%.2f"|format(billing.paid) }}</td>
+                    <td class="text-muted ps-3">Payments in DB before this checkout form is submitted</td></tr>
+                <tr><td class="text-muted">Current Balance</td><td class="fw-semibold {% if billing.settlement_balance > 0.01 %}text-danger{% else %}text-success{% endif %}">₹{{ "%.2f"|format(billing.settlement_balance) }}</td>
+                    <td class="text-muted ps-3">Rounded invoice total − paid − credit. Updated after "Paying Now" entries are posted</td></tr>
+              </table>
+              {% endif %}
+            </div>
+          </div>
+        </details>
+        {% endif %}
+
+        {# ── Late Check-out preview panel ── #}
+        {% if late_co_preview and late_co_preview.applicable %}
+        <div class="alert {{ 'alert-warning' if not late_co_preview.grace else 'alert-success' }} mb-3 d-flex align-items-start gap-2">
+          <i class="bi {{ 'bi-clock-fill' if not late_co_preview.grace else 'bi-check-circle-fill' }} fs-5 mt-1 flex-shrink-0"></i>
+          <div class="flex-grow-1">
+            {% if late_co_preview.grace %}
+              <strong>Grace Period Active</strong> — {{ late_co_preview.slab_label }}.
+              No late check-out charge will be applied.
+            {% else %}
+              <strong>Late Check-out Charge Will Apply</strong>
+              — {{ late_co_preview.slab_label }}<br>
+              <span class="fw-semibold">
+                {{ late_co_preview.pct }}% of ₹{{ "%.2f"|format(reservation.rate_per_night) }}
+                = <span class="text-danger fs-6">₹{{ "%.2f"|format(late_co_preview.amount) }}</span>
+              </span>
+              will be added to this bill on submission.
+              {% if cico_allow_waive %}
+              <div class="mt-2">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="waive_late_checkout"
+                         value="1" id="waiveLateCoChk">
+                  <label class="form-check-label fw-semibold text-secondary" for="waiveLateCoChk">
+                    Waive Late Check-out Charge (Manager authorisation)
+                  </label>
+                </div>
+                <div id="waiveLateCoReasonRow" class="mt-1 d-none">
+                  <input type="text" name="waive_late_co_reason" class="form-control form-control-sm"
+                         placeholder="Reason for waiving late check-out charge (required)">
+                </div>
+              </div>
+              {% endif %}
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+
+        {# ── Billing summary card ── #}
+        <div class="card mb-3 border-0 bg-light">
+          <div class="card-body py-3">
+            <div class="row g-3 text-center">
+              <div class="col-6 col-md-3">
+                <div class="small text-muted">Room Charges</div>
+                <div class="fw-semibold">₹{{ "%.2f"|format(billing.room_charges) }}</div>
+                <div class="small text-muted">{{ billing.nights }} night{{ 's' if billing.nights != 1 }}</div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="small text-muted">Extra Charges</div>
+                <div class="fw-semibold">₹{{ "%.2f"|format(billing.extra_charges) }}</div>
+                {# CICO sub-breakdown — shows only when relevant #}
+                {%- set _cico = namespace(ci=0.0, co=0.0) -%}
+                {%- for ec in reservation.extra_charges -%}
+                  {%- if ec.charge_type == 'early_checkin' -%}{%- set _cico.ci = _cico.ci + ec.amount|float -%}
+                  {%- elif ec.charge_type == 'late_checkout' -%}{%- set _cico.co = _cico.co + ec.amount|float -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                {%- if _cico.ci > 0 -%}
+                <div class="small mt-1" style="font-size:.72rem;color:#0284c7;">
+                  <i class="bi bi-sunrise me-1"></i>Early CI ₹{{ "%.0f"|format(_cico.ci) }}
+                </div>
+                {%- endif -%}
+                {%- if _cico.co > 0 -%}
+                <div class="small" style="font-size:.72rem;color:#d97706;">
+                  <i class="bi bi-sunset me-1"></i>Late CO ₹{{ "%.0f"|format(_cico.co) }}
+                </div>
+                {%- elif late_co_preview and late_co_preview.applicable and not late_co_preview.grace -%}
+                <div class="small" style="font-size:.72rem;color:#d97706;">
+                  <i class="bi bi-hourglass-split me-1"></i>Late CO ₹{{ "%.0f"|format(late_co_preview.amount) }} (pending)
+                </div>
+                {%- endif -%}
+              </div>
+              {% if billing.discount > 0 %}
+              <div class="col-6 col-md-3">
+                <div class="small text-muted text-danger">Discount Applied</div>
+                <div class="fw-semibold text-danger">−₹{{ "%.2f"|format(billing.discount) }}</div>
+              </div>
+              {% endif %}
+              <div class="col-6 col-md-3 border-start">
+                {# Total Bill = rounded_grand_total — the whole-rupee
+                   invoice figure the guest is actually quoted and pays
+                   (v2.2.16). Pre-tax subtotal + GST are shown as small
+                   sub-lines below for transparency. #}
+                <div class="small text-muted">Total Bill</div>
+                <div class="fw-bold fs-5">₹{{ "%.2f"|format(billing.rounded_grand_total) }}</div>
+                {% if billing.gst_amount > 0 %}
+                <div class="small text-muted" style="font-size:.7rem;">
+                  (₹{{ "%.2f"|format(billing.total) }} + GST ₹{{ "%.2f"|format(billing.gst_amount) }})
+                </div>
+                {% endif %}
+              </div>
+              <div class="col-6 col-md-3 border-start">
+                <div class="small text-muted">Already Paid</div>
+                <div class="fw-bold fs-5 text-success">₹{{ "%.2f"|format(billing.paid) }}</div>
+              </div>
+            </div>
+            <hr class="my-2">
+            {% if billing.settlement_balance > 0.005 %}
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-danger fw-bold"><i class="bi bi-exclamation-circle me-1"></i>Balance Due</span>
+              <span class="text-danger fw-bold fs-4" id="summaryBalanceStatic">₹{{ "%.2f"|format(billing.settlement_balance) }}</span>
+            </div>
+            {% elif billing.settlement_balance < -0.005 %}
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="fw-bold" style="color:#b45309;"><i class="bi bi-arrow-up-circle me-1"></i>Overpaid</span>
+              <span class="fw-bold fs-4" id="summaryBalanceStatic" style="color:#b45309;">₹{{ "%.2f"|format(billing.settlement_balance|abs) }}</span>
+            </div>
+            {% else %}
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-success fw-bold"><i class="bi bi-check-circle-fill me-1"></i>Fully Settled</span>
+              <span class="text-success fw-bold fs-4" id="summaryBalanceStatic">₹0.00</span>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        {# ── Payment ledger ── #}
+        {% if reservation.payments %}
+        <div class="card mb-3">
+          <div class="card-header d-flex justify-content-between align-items-center py-2">
+            <strong><i class="bi bi-receipt me-1"></i>Payment Ledger</strong>
+            {% if current_user.has_role('Admin','Manager') %}
+            <a href="{{ url_for('billing.void_pending') }}" class="btn btn-outline-danger btn-sm">
+              <i class="bi bi-slash-circle me-1"></i>Void Requests
+              {% if pending_void_count > 0 %}<span class="badge bg-danger ms-1">{{ pending_void_count }}</span>{% endif %}
+            </a>
+            {% endif %}
+          </div>
+          <div class="card-body p-0">
+            <table class="table table-sm mb-0">
+              <thead class="table-light"><tr><th>Date</th><th>Mode</th><th class="text-end">Amount</th><th></th></tr></thead>
+              <tbody>
+                {% for p in reservation.payments %}
+                {% set _is_rev = p.is_correction and p.is_reversal %}
+                {% set _is_repl = p.is_correction and not p.is_reversal %}
+                {# A row is "corrected" when a reversal entry references it. #}
+                {% set _has_rev = (reservation.payments | selectattr('corrects_id', 'equalto', p.id) | selectattr('is_reversal') | list) | length > 0 %}
+                <tr class="{% if p.is_voided %}text-muted text-decoration-line-through{% elif _is_rev %}table-danger{% elif _is_repl %}table-success{% endif %}">
+                  <td>
+                    {{ p.payment_date.strftime('%d %b') }}
+                    {% if _is_rev or _is_repl %}<div class="small text-muted">corrects #{{ p.corrects_id }}</div>{% endif %}
+                  </td>
+                  <td>
+                    {{ p.payment_mode.name }}
+                    {% if _is_rev %}<span class="badge bg-danger ms-1" title="Reversal posted to cancel a closed-audit payment without mutating the original">REVERSAL</span>{% endif %}
+                    {% if _is_repl %}<span class="badge bg-success ms-1" title="Replacement entry — paired with a reversal to restate the original at a new amount">CORRECTION</span>{% endif %}
+                    {% if _has_rev and not _is_rev and not _is_repl %}<span class="badge bg-warning text-dark ms-1" title="A reversal entry has been posted against this row — see correction below">CORRECTED</span>{% endif %}
+                  </td>
+                  <td class="text-end">
+                    {% if _is_rev %}<span class="text-danger fw-bold">−₹{{ '%.2f'|format(p.amount) }}</span>
+                    {% else %}₹{{ '%.2f'|format(p.amount) }}{% endif %}
+                    {% if p.is_voided %}<span class="badge bg-secondary ms-1">VOID</span>{% endif %}
+                  </td>
+                  <td class="text-end">
+                    {% if not p.is_voided and not p.is_correction %}
+                      {% if current_user.has_role('Admin','Manager') %}
+                      <button type="button" class="btn btn-outline-danger btn-sm py-0"
+                              data-bs-toggle="modal" data-bs-target="#voidModal{{ p.id }}">
+                        <i class="bi bi-slash-circle"></i>
+                      </button>
+                      {% else %}
+                      <button type="button" class="btn btn-outline-warning btn-sm py-0"
+                              data-bs-toggle="modal" data-bs-target="#voidReqModal{{ p.id }}">
+                        <i class="bi bi-question-circle"></i>
+                      </button>
+                      {% endif %}
+                    {% endif %}
+                  </td>
+                </tr>
+                {% if p.is_correction and p.correction_reason %}
+                <tr class="{% if _is_rev %}table-danger{% else %}table-success{% endif %}" style="border-top:none;">
+                  <td colspan="4" class="small text-muted py-1">
+                    <i class="bi bi-info-circle me-1"></i>{{ p.correction_reason }}
+                  </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {# Direct void modals #}
+        {% for p in reservation.payments if not p.is_voided and current_user.has_role('Admin','Manager') %}
+        {% set _p_lock = payment_lock_map.get(p.id) if payment_lock_map else None %}
+        <div class="modal fade" id="voidModal{{ p.id }}" tabindex="-1">
+          <div class="modal-dialog"><div class="modal-content border-danger">
+            <form method="POST" action="{{ url_for('billing.direct_void', payment_id=p.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-slash-circle me-2"></i>Void Payment</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <p>Voiding <strong>₹{{ '%.2f'|format(p.amount) }}</strong> via <strong>{{ p.payment_mode.name }}</strong> posted {{ p.payment_date.strftime('%d %b %Y') }}.</p>
+                {% if _p_lock %}
+                <div class="alert alert-dark border border-warning py-2 small d-flex align-items-start gap-2"
+                     style="background:#1f2937;color:#fef3c7;">
+                  <i class="bi bi-lock-fill text-warning"></i>
+                  <div>
+                    &#128274; <strong>Locked</strong> — closed in Night Audit on {{ _p_lock.date_human }}.
+                    Direct void is blocked. Admin override will post a
+                    <strong>reversal entry</strong> instead — original row stays untouched.
+                  </div>
+                </div>
+                {% else %}
+                <div class="alert alert-warning py-2 small"><i class="bi bi-exclamation-triangle me-1"></i>Only allowed within void window before night audit settles this date.</div>
+                {% endif %}
+                <div class="mb-3">
+                  <label class="form-label">Reason <span class="text-danger">*</span></label>
+                  <input type="text" name="reason" class="form-control" required placeholder="e.g. Wrong amount entered">
+                </div>
+                {{ audit_override(_p_lock.is_admin if _p_lock else False, _p_lock,
+                                  suffix='Void' ~ p.id) }}
+                {% if _p_lock and _p_lock.is_admin %}
+                <details class="mt-2">
+                  <summary class="small text-success fw-semibold" style="cursor:pointer;user-select:none;">
+                    <i class="bi bi-arrow-repeat me-1"></i>Post a Replacement (optional)
+                  </summary>
+                  <div class="mt-2 p-2 rounded border border-success" style="background:rgba(16,185,129,0.08);">
+                    <div class="small text-muted mb-2">
+                      Leave blank for a reversal-only correction. Enter an amount to also post a
+                      replacement entry (e.g. original ₹1000 was wrong, should have been ₹1200).
+                    </div>
+                    <div class="row g-2">
+                      <div class="col-12 col-md-6">
+                        <label class="form-label small mb-1">Replacement Amount (₹)</label>
+                        <div class="input-group input-group-sm">
+                          <span class="input-group-text">₹</span>
+                          <input type="number" name="correction_new_amount"
+                                 class="form-control" step="0.01" min="0" placeholder="0.00">
+                        </div>
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="form-label small mb-1">Replacement Mode</label>
+                        <select name="correction_new_mode_id" class="form-select form-select-sm">
+                          <option value="">(same as original — {{ p.payment_mode.name }})</option>
+                          {% for pm in payment_modes %}
+                            {% if pm.category == 'direct_payment' %}
+                            <option value="{{ pm.id }}">{{ pm.name }}</option>
+                            {% endif %}
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <div class="col-12">
+                        <label class="form-label small mb-1">Reference (optional)</label>
+                        <input type="text" name="correction_new_reference"
+                               class="form-control form-control-sm"
+                               placeholder="UPI ref / cheque no.">
+                      </div>
+                    </div>
+                  </div>
+                </details>
+                {% endif %}
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-danger">Confirm Void</button>
+              </div>
+            </form>
+          </div></div>
+        </div>
+        {% endfor %}
+
+        {# Request void modals #}
+        {% for p in reservation.payments if not p.is_voided and not current_user.has_role('Admin','Manager') %}
+        <div class="modal fade" id="voidReqModal{{ p.id }}" tabindex="-1">
+          <div class="modal-dialog"><div class="modal-content">
+            <form method="POST" action="{{ url_for('billing.request_void', payment_id=p.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-question-circle text-warning me-2"></i>Request Void</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <p>Requesting void of <strong>₹{{ '%.2f'|format(p.amount) }}</strong> via <strong>{{ p.payment_mode.name }}</strong>.</p>
+                <div class="mb-3">
+                  <label class="form-label">Reason <span class="text-danger">*</span></label>
+                  <input type="text" name="reason" class="form-control" required placeholder="e.g. Guest paid wrong amount">
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-warning">Submit Request</button>
+              </div>
+            </form>
+          </div></div>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {# ────────────────── CHECKOUT FORM ────────────────── #}
+        <form method="post" id="checkoutForm">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="overpayment_action" id="overpaymentActionInput" value="">
+
+          {# Extra charge row #}
+          <h6 class="border-bottom pb-2 mb-3">Add Extra Charge <span class="text-muted fw-normal small">(optional)</span></h6>
+          <div class="row g-2 mb-4">
+            <div class="col-7 col-md-8">
+              <input type="text" name="extra_description" class="form-control" placeholder="e.g. Laundry, Minibar, Room Service">
+            </div>
+            <div class="col-5 col-md-4">
+              <div class="input-group">
+                <span class="input-group-text">₹</span>
+                <input type="number" name="extra_amount" class="form-control" step="0.01" min="0" placeholder="0.00">
+              </div>
+            </div>
+          </div>
+
+          {# ── Discount section ── #}
+          <h6 class="border-bottom pb-2 mb-3">
+            <i class="bi bi-tag me-1 text-warning"></i>Apply Discount
+            <span class="text-muted fw-normal small">(optional — requires authorisation)</span>
+          </h6>
+          <div class="row g-2 mb-2">
+            <div class="col-6 col-md-3">
+              <label class="form-label small">Discount Amount (₹)</label>
+              <div class="input-group input-group-sm">
+                <span class="input-group-text">₹</span>
+                <input type="number" name="discount_amount" id="coDiscountAmt"
+                       class="form-control" step="0.01" min="0" value="{{ reservation.discount_amount or 0 }}"
+                       placeholder="0.00">
+              </div>
+            </div>
+            <div class="col-6 col-md-4">
+              <label class="form-label small">Discount Reason</label>
+              <select name="discount_reason" id="coDiscountReason" class="form-select form-select-sm">
+                <option value="">— Select —</option>
+                <option value="Walk-in negotiation" {% if reservation.discount_reason == 'Walk-in negotiation' %}selected{% endif %}>Walk-in negotiation</option>
+                <option value="Corporate rate" {% if reservation.discount_reason == 'Corporate rate' %}selected{% endif %}>Corporate rate</option>
+                <option value="Loyalty guest" {% if reservation.discount_reason == 'Loyalty guest' %}selected{% endif %}>Loyalty guest</option>
+                <option value="Service issue" {% if reservation.discount_reason == 'Service issue' %}selected{% endif %}>Service issue</option>
+                <option value="Management approval" {% if reservation.discount_reason == 'Management approval' %}selected{% endif %}>Management approval</option>
+                <option value="Other" {% if reservation.discount_reason == 'Other' %}selected{% endif %}>Other</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-5">
+              <label class="form-label small">Authorized By <span id="coDiscountAuthRequired" class="text-danger d-none">*</span></label>
+              <input type="text" name="discount_authorized_by" id="coDiscountAuth"
+                     class="form-control form-control-sm"
+                     value="{{ reservation.discount_authorized_by or '' }}"
+                     placeholder="Manager name / employee ID">
+            </div>
+          </div>
+          <div id="coDiscountAlert" class="alert alert-warning py-1 small mb-3 d-none">
+            <i class="bi bi-exclamation-triangle me-1"></i>
+            "Authorized By" is required when a discount is applied.
+          </div>
+
+          {# ── OTA prepaid notice (Phase 1) ── #}
+          {% if ota_info and ota_info.is_ota_prepaid %}
+          <div class="alert alert-info py-2 px-3 mb-3 small d-flex align-items-start gap-2">
+            <i class="bi bi-globe mt-1"></i>
+            <div>
+              <strong>OTA Prepaid Booking</strong> — room revenue for this reservation
+              will be auto-settled to <strong>{{ ota_info.head_name or 'OTA receivable head' }}</strong>
+              {% if ota_info.source %}(source: {{ ota_info.source }}{% if ota_info.booking_ref %} · {{ ota_info.booking_ref }}{% endif %}){% endif %}.
+              Do not collect room charges from the guest.
+              Use the fields below only for extras (minibar, laundry, etc.).
+            </div>
+          </div>
+          {% endif %}
+
+          {# ── Payment inputs (one per mode) ── #}
+          {# Always shown: Case A (balance>0) inputs enabled; Case B (=0) disabled + Fully Settled; Case C (<0) disabled + Overpaid #}
+          <h6 class="border-bottom pb-2 mb-3">
+            <i class="bi bi-wallet2 me-1"></i>Collect Payment
+          </h6>
+
+          {# Payment mode row — equal-width blocks, single row on desktop #}
+          {# Only show direct-payment modes here; OTA heads are auto-settled. #}
+          {% set _direct_modes = payment_modes | selectattr('category', 'equalto', 'direct_payment') | list %}
+          <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-{{ _direct_modes|length if _direct_modes|length <= 5 else 5 }} g-2 mb-3" id="paymentInputsRow">
+            {% for pm in _direct_modes %}
+            {% set icon = {
+              'cash':          'bi-cash-coin',
+              'card':          'bi-credit-card-2-front',
+              'upi':           'bi-qr-code-scan',
+              'bank transfer': 'bi-bank',
+              'bank':          'bi-bank',
+              'cheque':        'bi-file-earmark-text',
+              'online':        'bi-globe',
+            }.get(pm.name.lower(), 'bi-currency-rupee') %}
+            <div class="col">
+              <div class="border rounded px-2 pt-2 pb-1 h-100" style="background:#f8fafc;">
+                <label class="form-label fw-semibold small d-flex align-items-center gap-1 mb-1"
+                       for="pm_{{ pm.id }}">
+                  <i class="bi {{ icon }} text-primary"></i> {{ pm.name }}
+                </label>
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text">₹</span>
+                  <input type="number"
+                         name="pm_amount_{{ pm.id }}"
+                         id="pm_{{ pm.id }}"
+                         class="form-control pm-input"
+                         data-mode="{{ pm.name }}"
+                         data-pmid="{{ pm.id }}"
+                         data-index="{{ loop.index0 }}"
+                         step="0.01" min="0"
+                         placeholder="0.00">
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+
+          {# ── Real-time payment status ── #}
+          <div class="card mb-3 text-white" style="background: linear-gradient(135deg,#1e3a5f,#2d6a9f);">
+            <div class="card-body py-3">
+              <div class="row g-0 text-center mb-3">
+                <div class="col-3 border-end border-white border-opacity-25">
+                  <div class="small opacity-75">Total Bill</div>
+                  <div class="fs-5 fw-bold">₹{{ "%.2f"|format(billing.rounded_grand_total) }}</div>
+                  {% if billing.gst_amount > 0 %}
+                  <div class="small opacity-75" style="font-size:.68rem;">
+                    incl. GST ₹{{ "%.2f"|format(billing.gst_amount) }}
+                  </div>
+                  {% endif %}
+                </div>
+                <div class="col-3 border-end border-white border-opacity-25">
+                  <div class="small opacity-75">Already Paid</div>
+                  <div class="fs-5 fw-bold" style="color:#6ee7b7">₹{{ "%.2f"|format(billing.paid) }}</div>
+                </div>
+                <div class="col-3 border-end border-white border-opacity-25">
+                  <div class="small opacity-75">Paying Now</div>
+                  <div class="fs-5 fw-bold" id="payingNowDisplay" style="color:#93c5fd">₹0.00</div>
+                </div>
+                <div class="col-3">
+                  <div class="small opacity-75">Remaining</div>
+                  <div class="fs-5 fw-bold" id="remainingDisplay">{% if billing.settlement_balance <= 0.005 %}₹0.00{% else %}₹{{ "%.2f"|format(billing.settlement_balance) }}{% endif %}</div>
+                </div>
+              </div>
+
+              {# Progress bar #}
+              <div class="mb-1" style="font-size:.7rem;opacity:.75">
+                Payment progress —
+                <span id="progressLabel">{% if billing.settlement_balance > 0.005 %}Balance Due: ₹{{ "%.2f"|format(billing.settlement_balance) }}{% elif billing.settlement_balance < -0.005 %}Overpaid: ₹{{ "%.2f"|format(billing.settlement_balance|abs) }}{% else %}Fully Settled{% endif %}</span>
+              </div>
+              <div class="progress" style="height:10px;background:rgba(255,255,255,.2)">
+                {# Progress bar divides paid by grand_total so inclusive /
+                   exclusive cases both reach 100% when fully settled. #}
+                <div id="progressBar" class="progress-bar" role="progressbar"
+                     style="width:{% if billing.settlement_balance <= 0.005 %}100{% elif billing.rounded_grand_total > 0 %}{{ [[billing.paid / billing.rounded_grand_total * 100, 0]|max, 100]|min | round(1) }}{% else %}0{% endif %}%;background:#6ee7b7;transition:width .3s"></div>
+              </div>
+
+              {# Per-mode breakdown (hidden until something entered) #}
+              <div id="modeBreakdown" class="mt-2 d-flex flex-wrap gap-2" style="display:none"></div>
+            </div>
+          </div>
+
+          {# Quick-fill shortcuts — shown only when there is a balance to clear #}
+          {% if billing.settlement_balance > 0 %}
+          <div class="mb-3 d-flex gap-2 flex-wrap align-items-center">
+            <span class="small text-muted fw-semibold">Quick fill:</span>
+            {% for pm in _direct_modes %}
+            {% set lname = pm.name.lower() %}
+            {% if 'cash' in lname %}
+            <button type="button" class="btn btn-sm btn-success fill-remaining-btn"
+                    data-pmid="{{ pm.id }}" title="Fill all remaining balance as Cash">
+              <i class="bi bi-cash-coin me-1"></i>Full Cash
+            </button>
+            {% elif 'upi' in lname %}
+            <button type="button" class="btn btn-sm btn-info text-white fill-remaining-btn"
+                    data-pmid="{{ pm.id }}" title="Fill all remaining balance as UPI">
+              <i class="bi bi-qr-code-scan me-1"></i>Full UPI
+            </button>
+            {% else %}
+            <button type="button" class="btn btn-outline-secondary btn-sm fill-remaining-btn"
+                    data-pmid="{{ pm.id }}" title="Fill all remaining balance as {{ pm.name }}">
+              <i class="bi bi-lightning me-1"></i>Full {{ pm.name }}
+            </button>
+            {% endif %}
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          {# Corporate Credit — billed to company on terms (only when company linked) #}
+          {% if reservation.checkin_record and reservation.checkin_record.company %}
+          {% set avail_credit = reservation.checkin_record.company.credit_limit - reservation.checkin_record.company.credit_used %}
+          <div class="card border-primary mb-3">
+            <div class="card-header py-2 d-flex justify-content-between align-items-center"
+                 style="background:rgba(13,110,253,.08)">
+              <span class="text-primary fw-semibold">
+                <i class="bi bi-building me-1"></i>Corporate Credit — {{ reservation.checkin_record.company.name }}
+              </span>
+              <button type="button" id="btnCreditRemaining" class="btn btn-primary btn-sm">
+                Bill Remaining to Company
+              </button>
+            </div>
+            <div class="card-body py-2">
+              <div class="row g-2 align-items-center">
+                <div class="col-auto"><label class="form-label mb-0 small">Amount to Credit:</label></div>
+                <div class="col-4">
+                  <div class="input-group input-group-sm">
+                    <span class="input-group-text">₹</span>
+                    <input type="number" name="credit_amount" id="creditAmount"
+                           class="form-control" step="0.01" min="0" value="0">
+                  </div>
+                </div>
+                <div class="col-auto small {% if avail_credit < reservation.checkin_record.company.credit_limit * 0.15 %}text-danger fw-bold{% elif avail_credit < reservation.checkin_record.company.credit_limit * 0.30 %}text-warning{% else %}text-muted{% endif %}">
+                Available: ₹{{ "%.2f"|format(avail_credit) }}
+                {% if reservation.checkin_record.company.credit_limit > 0 and avail_credit < reservation.checkin_record.company.credit_limit * 0.15 %}
+                  <span class="badge bg-danger ms-1">LOW</span>
+                {% endif %}
+              </div>
+              </div>
+              <div class="small text-muted mt-1">
+                <i class="bi bi-info-circle me-1"></i>Charged to company, payable per credit terms.
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <input type="hidden" name="credit_amount" value="0">
+          {% endif %}
+
+          {# Dynamic status alert #}
+          <div id="statusAlert" class="alert mb-3" style="display:none"></div>
+
+          {# ── Overpayment resolution panel — shown by JS when remaining < 0 ── #}
+          <div id="overpaymentPanel" class="card border-warning mb-3" style="display:none">
+
+            {# Header #}
+            <div class="card-header d-flex align-items-center gap-2 py-2"
+                 style="background:rgba(245,158,11,.12)">
+              <i class="bi bi-exclamation-circle-fill text-warning fs-5 flex-shrink-0"></i>
+              <div>
+                <div class="fw-bold text-warning-emphasis">
+                  Overpaid Amount: ₹<span id="overpayAmt">0.00</span>
+                </div>
+                <div class="small text-muted">
+                  Guest has paid more than the bill. Please resolve before completing check-out.
+                </div>
+              </div>
+            </div>
+
+            <div class="card-body pt-3 pb-2">
+
+              {# ── Step 1: Reason ── #}
+              <div class="mb-3">
+                <label class="form-label fw-semibold small mb-1">
+                  Why was extra amount paid?
+                </label>
+                <div class="d-flex flex-column gap-1">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio"
+                           name="overpay_reason" id="opReasonMistake"
+                           value="mistake" checked>
+                    <label class="form-check-label" for="opReasonMistake">
+                      Paid by Mistake
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio"
+                           name="overpay_reason" id="opReasonIntentional"
+                           value="intentional">
+                    <label class="form-check-label" for="opReasonIntentional">
+                      Extra Paid Intentionally
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio"
+                           name="overpay_reason" id="opReasonOther"
+                           value="other">
+                    <label class="form-check-label" for="opReasonOther">
+                      Other
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {# ── Step 2: Resolution ── #}
+              <div class="mb-3">
+                <label class="form-label fw-semibold small mb-1">
+                  How should this be resolved?
+                  <span class="text-danger">*</span>
+                </label>
+                <div class="d-flex flex-column gap-1">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio"
+                           name="overpay_resolution" id="opResRefund"
+                           value="refund">
+                    <label class="form-check-label" for="opResRefund">
+                      <i class="bi bi-arrow-counterclockwise me-1 text-danger"></i>
+                      Refund Now
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio"
+                           name="overpay_resolution" id="opResTip"
+                           value="tip">
+                    <label class="form-check-label" for="opResTip">
+                      <i class="bi bi-person-hearts me-1 text-success"></i>
+                      Tip to the Waiter
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio"
+                           name="overpay_resolution" id="opResIncome"
+                           value="income">
+                    <label class="form-check-label" for="opResIncome">
+                      <i class="bi bi-graph-up me-1 text-primary"></i>
+                      Adjust as Other Income
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio"
+                           name="overpay_resolution" id="opResUpsell"
+                           value="upsell">
+                    <label class="form-check-label" for="opResUpsell">
+                      <i class="bi bi-arrow-up-circle me-1 text-success"></i>
+                      Convert to Upsell Rate
+                      <span class="badge text-bg-success-subtle ms-1"
+                            style="font-size:0.65rem">recommended</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {# ── Step 3a: Refund sub-fields ── #}
+              <div id="overpayRefundFields" style="display:none" class="border rounded p-2 mb-3 bg-light">
+                <div class="row g-2">
+                  <div class="col-12 col-sm-6">
+                    <label class="form-label small fw-semibold mb-1">
+                      Refund Mode <span class="text-danger">*</span>
+                    </label>
+                    <select name="overpay_refund_mode" id="overpayRefundMode"
+                            class="form-select form-select-sm">
+                      <option value="">— Select refund mode —</option>
+                      {% for pm in _direct_modes %}
+                      <option value="{{ pm.id }}">{{ pm.name }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="col-12 col-sm-6">
+                    <label class="form-label small mb-1">
+                      Remarks <span class="text-muted">(optional)</span>
+                    </label>
+                    <input type="text" name="overpay_refund_remarks" id="overpayRefundRemarks"
+                           class="form-control form-control-sm"
+                           placeholder="e.g. Guest requested cash refund">
+                  </div>
+                </div>
+              </div>
+
+              {# ── Step 3b: Tip sub-fields ── #}
+              <div id="overpayTipFields" style="display:none" class="border rounded p-2 mb-3 bg-light">
+                <div class="row g-2">
+                  <div class="col-12 col-sm-6">
+                    <label class="form-label small fw-semibold mb-1">
+                      Waiter / Staff Name <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" name="overpay_waiter_name" id="overpayWaiterName"
+                           class="form-control form-control-sm"
+                           placeholder="Name of staff member receiving tip">
+                  </div>
+                  <div class="col-12 col-sm-6">
+                    <label class="form-label small mb-1">
+                      Remarks <span class="text-muted">(optional)</span>
+                    </label>
+                    <input type="text" name="overpay_tip_remarks" id="overpayTipRemarks"
+                           class="form-control form-control-sm"
+                           placeholder="e.g. Excellent service">
+                  </div>
+                </div>
+              </div>
+
+              {# ── Step 3c: Other Income sub-fields ── #}
+              <div id="overpayIncomeFields" style="display:none" class="border rounded p-2 mb-3 bg-light">
+                <div>
+                  <label class="form-label small fw-semibold mb-1">
+                    Remarks <span class="text-danger">*</span>
+                  </label>
+                  <input type="text" name="overpay_income_remarks" id="overpayIncomeRemarks"
+                         class="form-control form-control-sm"
+                         placeholder="Describe the nature of this income">
+                </div>
+              </div>
+
+              {# ── Step 3d: Upsell sub-fields ── #}
+              <div id="overpayUpsellFields" style="display:none" class="border rounded p-2 mb-3 bg-light">
+                <div class="small text-muted mb-2">
+                  <i class="bi bi-info-circle me-1"></i>
+                  Bumps the room's offered rate to match what the guest paid
+                  and records the difference as <strong>Upsell Revenue</strong>
+                  (above standard tariff).
+                </div>
+                <div>
+                  <label class="form-label small fw-semibold mb-1">
+                    Remarks <span class="text-muted">(optional)</span>
+                  </label>
+                  <input type="text" name="overpay_upsell_remarks" id="overpayUpsellRemarks"
+                         class="form-control form-control-sm"
+                         placeholder="e.g. Guest opted for sea-view at the higher rate">
+                </div>
+              </div>
+
+              {# ── Contextual note ── #}
+              <div id="overpayNote" class="small text-muted mb-2" style="display:none"></div>
+
+              {# ── Revenue notice ── #}
+              <div id="overpayRevenueNote"
+                   class="alert alert-info py-2 px-3 small mb-0">
+                <i class="bi bi-info-circle-fill me-1"></i>
+                <strong>Note:</strong> This amount will not be added to room revenue.
+              </div>
+
+            </div>
+          </div>
+
+          {# ── Individual Credit (Guest Receivable) — shown by JS only when balance > 0 and no company linked ── #}
+          {% if not (reservation.checkin_record and reservation.checkin_record.company) %}
+          <div class="card border-warning mb-3" id="individualCreditRow" style="display:none">
+            <div class="card-header py-2 d-flex align-items-center gap-2"
+                 style="background:rgba(245,158,11,.12)">
+              <i class="bi bi-person-badge text-warning"></i>
+              <strong class="text-warning-emphasis">Mark as Receivable (Individual Credit Checkout)</strong>
+              <span class="badge bg-warning text-dark ms-auto">Manager / Admin only</span>
+            </div>
+            <div class="card-body py-2">
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox"
+                       name="individual_credit_enabled" value="1"
+                       id="indCreditChk">
+                <label class="form-check-label fw-semibold" for="indCreditChk">
+                  Check out with outstanding balance — record as guest receivable
+                </label>
+              </div>
+              <div id="indCreditFields" class="d-none">
+                <div class="row g-2">
+                  <div class="col-12 col-md-7">
+                    <label class="form-label small mb-1">
+                      Reason for Receivable <span class="text-danger">*</span>
+                    </label>
+                    <textarea name="individual_credit_reason" id="indCreditReason"
+                              class="form-control form-control-sm" rows="2"
+                              placeholder="e.g. Guest will pay tomorrow / Pending bank transfer"></textarea>
+                  </div>
+                  <div class="col-12 col-md-5">
+                    <label class="form-label small mb-1">
+                      Approved By <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" name="individual_credit_approved_by"
+                           id="indCreditApprovedBy"
+                           class="form-control form-control-sm"
+                           placeholder="Manager / Admin name">
+                    <div class="small text-muted mt-1">
+                      <i class="bi bi-info-circle me-1"></i>Tracked as a <strong>receivable</strong> in the Credit Ledger.
+                      Receivable ≠ revenue.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          {# Manager override — shown by JS only when needed #}
+          {% if current_user.has_role('Admin', 'Manager') %}
+          <div class="form-check mb-3" id="managerOverrideRow" style="display:none">
+            <input class="form-check-input" type="checkbox" name="manager_override_checkout"
+                   value="1" id="managerOverride">
+            <label class="form-check-label text-danger fw-bold" for="managerOverride">
+              Manager Override — allow check-out with outstanding balance
+            </label>
+          </div>
+          {% endif %}
+
+          <div class="d-grid gap-2 mt-3">
+            <button type="submit" class="btn btn-danger btn-lg">
+              <i class="bi bi-box-arrow-right me-1"></i>Complete Check-out
+            </button>
+            <a href="{{ url_for('main.reservations') }}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script nonce="{{ csp_nonce }}">
+(function () {
+
+  /* ── Server values (explicit, never stale) ──────────────────── */
+  /* TOTAL_BILL = GRAND TOTAL (tax-inclusive). Settlement comparison
+     uses the same figure the guest was quoted — this is the fix for
+     the inclusive-GST overpayment false-positive. Pre-tax base is
+     still available as PRE_TAX for displays that need it. */
+  var ROOM_CHARGES    = parseFloat('{{ "%.4f"|format(billing.room_charges) }}') || 0;
+  var EXTRA_CHARGES   = parseFloat('{{ "%.4f"|format(billing.extra_charges) }}') || 0;
+  var PRE_TAX         = parseFloat('{{ "%.4f"|format(billing.total) }}')         || 0;
+  var GST_AMOUNT      = parseFloat('{{ "%.4f"|format(billing.gst_amount) }}')    || 0;
+  // v2.2.16 — TOTAL_BILL is the ROUNDED whole-rupee invoice total
+  // (rounded_grand_total); BALANCE is the rounded settlement_balance.
+  // Both mirror the server's settlement math so the checkout screen
+  // settles cleanly when the guest pays the printed invoice amount —
+  // no phantom "Overpaid ₹0.xx" from paise-level rounding.
+  var TOTAL_BILL      = parseFloat('{{ "%.4f"|format(billing.rounded_grand_total) }}')   || 0;
+  var ALREADY_PAID    = parseFloat('{{ "%.4f"|format(billing.paid) }}')    || 0;
+  var BALANCE         = parseFloat('{{ "%.4f"|format(billing.settlement_balance) }}') || 0;
+  // Late CO preview — server pre-grosses with GST so JS sees the actual
+  // amount the backend will charge ("amount_with_gst"). Pre-Apr-2026
+  // versions added only the pre-tax amount, which caused "checkout
+  // denied after exact payment" because the server posts GST on top.
+  var LATE_CO_PREVIEW = parseFloat('{{ "%.4f"|format(late_co_preview.amount_with_gst if late_co_preview and not late_co_preview.grace and late_co_preview.amount_with_gst is defined else (late_co_preview.amount if late_co_preview and not late_co_preview.grace else 0)) }}') || 0;
+  var LATE_CO_PRETAX  = parseFloat('{{ "%.4f"|format(late_co_preview.amount_pretax if late_co_preview and late_co_preview.amount_pretax is defined else (late_co_preview.amount if late_co_preview else 0)) }}') || 0;
+  var LATE_CO_GST     = parseFloat('{{ "%.4f"|format(late_co_preview.gst_amount if late_co_preview and late_co_preview.gst_amount is defined else 0) }}') || 0;
+  // Adjust TOTAL_BILL and BALANCE to include the pending late CO charge
+  // (gross of GST, so it matches what the server will compute).
+  if (LATE_CO_PREVIEW > 0) {
+    TOTAL_BILL += LATE_CO_PREVIEW;
+    EXTRA_CHARGES += LATE_CO_PRETAX;   // pre-tax piece for the extras display
+    GST_AMOUNT    += LATE_CO_GST;      // gst piece tracked separately
+    // v2.2.16 — re-round to whole rupees so the settlement comparison
+    // still matches the server's rounded invoice total once the late
+    // check-out charge is posted at POST time.
+    TOTAL_BILL = Math.round(TOTAL_BILL);
+    BALANCE    = TOTAL_BILL - ALREADY_PAID;
+  }
+  // BALANCE == TOTAL_BILL - ALREADY_PAID (server-computed, kept for cross-check)
+
+  /* ── Discount live update ─────────────────────────────────────────── */
+  var discountInput = document.getElementById('coDiscountAmt');
+  var discountAuth  = document.getElementById('coDiscountAuth');
+  var discountAlert = document.getElementById('coDiscountAlert');
+  var authRequired  = document.getElementById('coDiscountAuthRequired');
+
+  function applyDiscount() {
+    var disc = toNum((discountInput || {}).value);
+    // Discount comes off the PRE-TAX base; GST then recomputes
+    // proportionally on the discounted base. Dropping GST entirely
+    // (the pre-fix behaviour) caused TOTAL_BILL to undershoot the
+    // server-computed grand_total → "exact payment denied".
+    var basePreTax = Math.max(0, ROOM_CHARGES + EXTRA_CHARGES - disc);
+    // GST_AMOUNT is the GST on the original pre-tax base (before
+    // discount). Scale it by the new/old base ratio so a discount
+    // proportionally reduces the GST portion too.
+    var origPreTax = ROOM_CHARGES + EXTRA_CHARGES;
+    var gstScale   = origPreTax > 0 ? (basePreTax / origPreTax) : 1;
+    var gstNow     = GST_AMOUNT * gstScale;
+    // v2.2.16 — round to whole rupees: the server rounds the post-
+    // discount grand total the same way, so the screen and the
+    // server agree on settlement.
+    TOTAL_BILL = Math.round(Math.max(0, basePreTax + gstNow));
+    BALANCE    = TOTAL_BILL - ALREADY_PAID;   // allow negative (overpaid after discount)
+    // Show/hide required marker
+    if (authRequired) authRequired.classList.toggle('d-none', disc <= 0);
+    recalculatePaymentSummary();
+  }
+  if (discountInput) {
+    discountInput.addEventListener('input', applyDiscount);
+    // Validate on form submit
+    document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+      var disc = toNum(discountInput.value);
+      var auth = (discountAuth ? discountAuth.value : '').trim();
+      if (disc > 0 && !auth) {
+        e.preventDefault();
+        if (discountAlert) discountAlert.classList.remove('d-none');
+        discountAuth.focus();
+      }
+    }, true); // capture phase
+  }
+
+  /* ── Safe number parser ──────────────────────────────────────── */
+  function toNum(val) {
+    // Strip currency symbols, commas, spaces; handle empty → 0
+    var s = String(val).replace(/[₹,\s]/g, '').trim();
+    var n = parseFloat(s);
+    return (isNaN(n) || n < 0) ? 0 : n;
+  }
+
+  /* ── Core recalculation ──────────────────────────────────────── */
+  function recalculatePaymentSummary() {
+
+    // 1. Sum all payment mode inputs
+    var payingNow = 0;
+    document.querySelectorAll('.pm-input').forEach(function (inp) {
+      payingNow += toNum(inp.value);
+    });
+
+    // 2. Company credit (if present)
+    var creditAmt = toNum((document.getElementById('creditAmount') || {}).value);
+
+    // 3. Core formula
+    //    remaining = Total Bill − Already Paid − Paying Now − Credit
+    var remaining = TOTAL_BILL - ALREADY_PAID - payingNow - creditAmt;
+    var overpaid  = remaining < -0.01;   // more than 1 paisa over
+    var settled   = Math.abs(remaining) <= 0.01;
+    var shortfall = remaining > 0.01;
+
+    /* ── Paying Now ── */
+    var el = document.getElementById('payingNowDisplay');
+    if (el) el.textContent = '₹' + payingNow.toFixed(2);
+
+    /* ── Remaining ── */
+    el = document.getElementById('remainingDisplay');
+    if (el) {
+      if (overpaid) {
+        el.textContent = '-₹' + Math.abs(remaining).toFixed(2);
+        el.style.color  = '#fcd34d';   // amber  — overpaid
+      } else if (settled) {
+        el.textContent = '₹0.00';
+        el.style.color  = '#6ee7b7';   // green  — fully settled
+      } else {
+        el.textContent = '₹' + remaining.toFixed(2);
+        el.style.color  = '#fca5a5';   // red    — still owed
+      }
+    }
+
+    /* ── Progress bar — shows overall payment progress: (paid + paying now) / total ── */
+    var totalPaidSoFar = ALREADY_PAID + payingNow + creditAmt;
+    var pct = TOTAL_BILL > 0 ? Math.min(100, (totalPaidSoFar / TOTAL_BILL) * 100) : 100;
+    el = document.getElementById('progressBar');
+    if (el) {
+      el.style.width      = pct.toFixed(1) + '%';
+      el.style.background = overpaid ? '#fcd34d' : settled ? '#6ee7b7' : '#93c5fd';
+    }
+    el = document.getElementById('progressLabel');
+    if (el) {
+      if (overpaid) {
+        el.textContent = 'Overpaid ₹' + Math.abs(remaining).toFixed(2);
+      } else if (settled) {
+        el.textContent = 'Fully Settled';
+      } else {
+        el.textContent = 'Balance: ₹' + remaining.toFixed(2);
+      }
+    }
+
+    /* ── Per-mode breakdown badges ── */
+    el = document.getElementById('modeBreakdown');
+    if (el) {
+      var badges = [];
+      document.querySelectorAll('.pm-input').forEach(function (inp) {
+        var v = toNum(inp.value);
+        if (v > 0) {
+          badges.push('<span class="badge bg-white text-dark border">' +
+            (inp.dataset.mode || 'Payment') + ': ₹' + v.toFixed(2) + '</span>');
+        }
+      });
+      el.innerHTML     = badges.join('');
+      el.style.display = badges.length ? 'flex' : 'none';
+    }
+
+    /* ── Visual lock only — never use `disabled` (disabled inputs are stripped
+         from the POST body, so the server would see paying_now=0 and wrongly
+         block a valid checkout).  Use pointer-events + opacity to signal the
+         "no more input needed" state while keeping values in the submission. ── */
+    document.querySelectorAll('.pm-input').forEach(function (inp) {
+      inp.style.pointerEvents = shortfall ? '' : 'none';
+      inp.style.opacity       = shortfall ? '' : '0.65';
+    });
+
+    /* ── Status alert (settled / shortfall only — overpaid has its own panel) ── */
+    el = document.getElementById('statusAlert');
+    if (el) {
+      if (overpaid) {
+        el.style.display = 'none';   // overpaymentPanel already shows the message
+      } else if (settled) {
+        el.style.display = '';
+        el.className     = 'alert alert-success mb-3';
+        el.innerHTML     = '<i class="bi bi-check-circle-fill me-2"></i>' +
+          '<strong>Fully Settled</strong> — ready to complete check-out.';
+      } else if (shortfall) {
+        el.style.display = '';
+        el.className     = 'alert alert-danger mb-3';
+        el.innerHTML     = '<i class="bi bi-exclamation-triangle-fill me-2"></i>' +
+          '<strong>Still Outstanding: ₹' + remaining.toFixed(2) + '</strong>' +
+          ' — enter more payment, credit to company, or use Manager Override.';
+      } else {
+        el.style.display = 'none';
+      }
+    }
+
+    /* ── Manager override row ──
+       Sticky-visible after a server-side rejection: if checkout_debug
+       is on the page (set by the route when the prior submit failed
+       balance-check), keep override + Individual Credit visible no
+       matter what the JS thinks the live remaining is. Without this,
+       a JS-vs-server math mismatch (e.g. GST on late fee) hides the
+       very controls the user needs to recover. */
+    var _serverRejected = !!document.getElementById('serverRejectionMarker');
+    el = document.getElementById('managerOverrideRow');
+    if (el) el.style.display = (shortfall || _serverRejected) ? '' : 'none';
+
+    /* ── Individual Credit Checkout row ── */
+    el = document.getElementById('individualCreditRow');
+    if (el) {
+      var showCredit = shortfall || _serverRejected;
+      el.style.display = showCredit ? '' : 'none';
+      if (!showCredit) {
+        var chk = document.getElementById('indCreditChk');
+        if (chk) chk.checked = false;
+        var fields = document.getElementById('indCreditFields');
+        if (fields) fields.classList.add('d-none');
+      }
+    }
+
+    /* ── Overpayment panel ── */
+    var panel = document.getElementById('overpaymentPanel');
+    if (panel) {
+      if (overpaid) {
+        panel.style.display = '';
+        var oAmt = document.getElementById('overpayAmt');
+        if (oAmt) oAmt.textContent = Math.abs(remaining).toFixed(2);
+      } else {
+        panel.style.display = 'none';
+        // Reset all resolution radios and hide all sub-fields when panel is not needed
+        document.querySelectorAll('input[name="overpay_resolution"]').forEach(function (r) {
+          r.checked = false;
+        });
+        ['overpayRefundFields', 'overpayTipFields', 'overpayIncomeFields',
+         'overpayUpsellFields'].forEach(function (id) {
+          var f = document.getElementById(id); if (f) f.style.display = 'none';
+        });
+        var note = document.getElementById('overpayNote');
+        if (note) { note.textContent = ''; note.style.display = 'none'; }
+      }
+    }
+  }
+
+  /* ── Bind payment inputs (input + change covers typing, paste, autofill) ── */
+  var pmInputs = Array.from(document.querySelectorAll('.pm-input'));
+  pmInputs.forEach(function (inp, idx) {
+    inp.addEventListener('input',  recalculatePaymentSummary);
+    inp.addEventListener('change', recalculatePaymentSummary);
+    // Clear the displayed "0" on focus so cashier can type straight away
+    inp.addEventListener('focus',  function () { if (this.value === '0' || this.value === '0.00') this.value = ''; });
+    // Restore "0" on blur if left blank (so toNum() always gets a valid value)
+    inp.addEventListener('blur',   function () { if (this.value === '') this.value = '0'; recalculatePaymentSummary(); });
+    // Enter key → auto-advance to next payment field (faster cashier flow)
+    inp.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        var next = pmInputs[idx + 1];
+        if (next) { next.focus(); next.select(); }
+      }
+    });
+  });
+
+  /* ── Credit amount ── */
+  var creditInput = document.getElementById('creditAmount');
+  if (creditInput) {
+    creditInput.addEventListener('input',  recalculatePaymentSummary);
+    creditInput.addEventListener('change', recalculatePaymentSummary);
+    creditInput.addEventListener('focus',  function () { if (this.value === '0') this.value = ''; });
+    creditInput.addEventListener('blur',   function () { if (this.value === '') this.value = '0'; recalculatePaymentSummary(); });
+  }
+
+  /* ── Credit remaining button ── */
+  var btnCred = document.getElementById('btnCreditRemaining');
+  if (btnCred) {
+    btnCred.addEventListener('click', function () {
+      var payingNow = 0;
+      document.querySelectorAll('.pm-input').forEach(function (i) { payingNow += toNum(i.value); });
+      var leftover = Math.max(0, BALANCE - payingNow);
+      if (creditInput) { creditInput.value = leftover.toFixed(2); }
+      recalculatePaymentSummary();
+    });
+  }
+
+  /* ── Quick-fill buttons ── */
+  document.querySelectorAll('.fill-remaining-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var inp = document.getElementById('pm_' + this.dataset.pmid);
+      if (!inp) return;
+      var payingNow = 0;
+      document.querySelectorAll('.pm-input').forEach(function (i) { payingNow += toNum(i.value); });
+      var leftover = Math.max(0, BALANCE - payingNow - toNum((creditInput || {}).value));
+      inp.value = leftover.toFixed(2);
+      recalculatePaymentSummary();
+    });
+  });
+
+  /* ── Resolution radio — show/hide sub-fields and contextual note ── */
+  var overpayNotes = {
+    refund: 'Refund will be processed at the counter immediately.',
+    tip:    'Tip amount will be credited to the named staff member\'s record.',
+    income: 'Amount will be posted to Other Income — not included in room revenue.',
+    upsell: 'Bumps the room rate to what the guest paid; the difference is recorded as Upsell Revenue.'
+  };
+  document.querySelectorAll('input[name="overpay_resolution"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      var val = this.value;
+      document.getElementById('overpayRefundFields').style.display  = (val === 'refund') ? '' : 'none';
+      document.getElementById('overpayTipFields').style.display     = (val === 'tip')    ? '' : 'none';
+      document.getElementById('overpayIncomeFields').style.display  = (val === 'income') ? '' : 'none';
+      var upsell = document.getElementById('overpayUpsellFields');
+      if (upsell) upsell.style.display = (val === 'upsell') ? '' : 'none';
+      var note = document.getElementById('overpayNote');
+      if (note) {
+        note.textContent    = overpayNotes[val] || '';
+        note.style.display  = overpayNotes[val] ? '' : 'none';
+      }
+      // Flip the revenue notice for the upsell branch — it's the only
+      // resolution option that DOES become room revenue.
+      var revNote = document.getElementById('overpayRevenueNote');
+      if (revNote) {
+        if (val === 'upsell') {
+          revNote.className = 'alert alert-success py-2 px-3 small mb-0';
+          revNote.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>'
+                            + '<strong>Note:</strong> This amount WILL be added to '
+                            + 'room revenue as Upsell.';
+        } else {
+          revNote.className = 'alert alert-info py-2 px-3 small mb-0';
+          revNote.innerHTML = '<i class="bi bi-info-circle-fill me-1"></i>'
+                            + '<strong>Note:</strong> This amount will not be added '
+                            + 'to room revenue.';
+        }
+      }
+    });
+  });
+
+  /* ── Form submit guard ── */
+  var form = document.getElementById('checkoutForm');
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      // Waiver reason is required when waiving late CO charge
+      var _wChk = document.getElementById('waiveLateCoChk');
+      if (_wChk && _wChk.checked) {
+        var _wReason = document.querySelector('input[name="waive_late_co_reason"]');
+        if (_wReason && !_wReason.value.trim()) {
+          e.preventDefault();
+          _wReason.focus();
+          _wReason.classList.add('is-invalid');
+          alert('Please enter a reason for waiving the late check-out charge.');
+          return;
+        }
+      }
+
+      var payingNow = 0;
+      document.querySelectorAll('.pm-input').forEach(function (i) { payingNow += toNum(i.value); });
+      var creditAmt = toNum((creditInput || {}).value);
+      var remaining = TOTAL_BILL - ALREADY_PAID - payingNow - creditAmt;
+
+      /* Individual credit checkout — when checked, reason + approver are mandatory */
+      var indChk = document.getElementById('indCreditChk');
+      if (indChk && indChk.checked) {
+        var reason = document.getElementById('indCreditReason');
+        var approver = document.getElementById('indCreditApprovedBy');
+        if (!reason || !reason.value.trim()) {
+          e.preventDefault();
+          if (reason) reason.focus();
+          alert('Credit Reason is required when marking as Credit.');
+          return;
+        }
+        if (!approver || !approver.value.trim()) {
+          e.preventDefault();
+          if (approver) approver.focus();
+          alert('Approved By is required when marking as Credit.');
+          return;
+        }
+      }
+
+      if (remaining < -0.01) {
+        var panel = document.getElementById('overpaymentPanel');
+
+        // 1. Resolution must be selected
+        var resRadio = document.querySelector('input[name="overpay_resolution"]:checked');
+        if (!resRadio) {
+          e.preventDefault();
+          if (panel) { panel.classList.add('border-danger'); panel.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+          alert('Please select how to resolve the overpayment before checking out.');
+          return;
+        }
+
+        var resolution = resRadio.value;
+
+        // 2. Refund: mode is mandatory
+        if (resolution === 'refund') {
+          var refMode = document.getElementById('overpayRefundMode');
+          if (!refMode || !refMode.value) {
+            e.preventDefault();
+            if (refMode) refMode.focus();
+            alert('Please select a Refund Mode before checking out.');
+            return;
+          }
+        }
+
+        // 3. Tip: waiter name is mandatory
+        if (resolution === 'tip') {
+          var waiterName = document.getElementById('overpayWaiterName');
+          if (!waiterName || !waiterName.value.trim()) {
+            e.preventDefault();
+            if (waiterName) waiterName.focus();
+            alert('Waiter / Staff Name is required when recording a tip.');
+            return;
+          }
+        }
+
+        // 4. Other Income: remarks are mandatory
+        if (resolution === 'income') {
+          var incomeRemarks = document.getElementById('overpayIncomeRemarks');
+          if (!incomeRemarks || !incomeRemarks.value.trim()) {
+            e.preventDefault();
+            if (incomeRemarks) incomeRemarks.focus();
+            alert('Remarks are required when adjusting as Other Income.');
+            return;
+          }
+        }
+      }
+    });
+  }
+
+  /* ── Individual Credit checkbox — toggle reason fields ── */
+  var indCreditChk = document.getElementById('indCreditChk');
+  if (indCreditChk) {
+    var indCreditFields = document.getElementById('indCreditFields');
+    indCreditChk.addEventListener('change', function () {
+      if (indCreditFields) indCreditFields.classList.toggle('d-none', !this.checked);
+    });
+  }
+
+  /* ── Waive Late CO checkbox — toggle reason box + re-adjust TOTAL_BILL ── */
+  var waiveChk = document.getElementById('waiveLateCoChk');
+  if (waiveChk) {
+    var waiveRow = document.getElementById('waiveLateCoReasonRow');
+    waiveChk.addEventListener('change', function () {
+      if (waiveRow) waiveRow.classList.toggle('d-none', !this.checked);
+      // Remove or restore the late CO amount from the running total
+      if (this.checked) {
+        TOTAL_BILL -= LATE_CO_PREVIEW;
+        BALANCE    -= LATE_CO_PREVIEW;
+      } else {
+        TOTAL_BILL += LATE_CO_PREVIEW;
+        BALANCE    += LATE_CO_PREVIEW;
+      }
+      recalculatePaymentSummary();
+    });
+  }
+
+  /* ── Server-rejection: one-click "pay remaining as cash" ──────── */
+  var _payRemainingBtn = document.getElementById('payRemainingCashBtn');
+  var _serverMarker    = document.getElementById('serverRejectionMarker');
+  if (_payRemainingBtn && _serverMarker) {
+    _payRemainingBtn.addEventListener('click', function () {
+      var remaining = parseFloat(_serverMarker.dataset.remaining || '0') || 0;
+      if (remaining <= 0.005) return;
+      // Find the first input whose data-mode contains "cash" (case-insensitive)
+      var cashInp = null;
+      document.querySelectorAll('.pm-input').forEach(function (inp) {
+        if (cashInp) return;
+        if ((inp.dataset.mode || '').toLowerCase().indexOf('cash') !== -1) cashInp = inp;
+      });
+      // Fallback to the first payment input if no Cash mode is configured
+      if (!cashInp) cashInp = document.querySelector('.pm-input');
+      if (!cashInp) return;
+      cashInp.value = remaining.toFixed(2);
+      cashInp.focus();
+      cashInp.dispatchEvent(new Event('input', { bubbles: true }));
+      // Smooth scroll to the payment row so user sees the change
+      cashInp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }
+
+  /* ── Initial render ── */
+  recalculatePaymentSummary();
+
+}());
+</script>
+
+{% if loyalty_info and loyalty_info.enrolled %}
+<!-- Loyalty Redemption Modal -->
+<div class="modal fade" id="loyaltyRedeemModal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header py-2">
+        <h6 class="modal-title"><i class="bi bi-gift me-1"></i>Redeem Loyalty Points</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-2 text-center">
+          <span class="badge fs-6" style="background:{{ loyalty_info.color }}">{{ loyalty_info.tier }}</span>
+          <div class="fw-bold fs-5 mt-1">{{ "{:,}".format(loyalty_info.balance) }} pts</div>
+        </div>
+        <hr>
+        <!-- Discount -->
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Billing Discount</label>
+          <div class="input-group input-group-sm">
+            <input type="number" id="redeemPoints" class="form-control" min="1" max="{{ loyalty_info.balance }}"
+                   placeholder="Points to redeem">
+            <button type="button" class="btn btn-success" id="redeemDiscountBtn">Apply</button>
+          </div>
+          <div class="small text-muted mt-1">1 pt = ₹{{ loyalty_info.redemption_value }} (max ₹{{ "%.0f"|format(loyalty_info.max_discount) }})</div>
+        </div>
+        <!-- Perks -->
+        <div class="mb-2">
+          <label class="form-label small fw-semibold">Perks</label>
+          <div class="d-grid gap-1">
+            <button type="button" class="btn btn-sm btn-outline-primary perk-btn" data-type="late_checkout">
+              <i class="bi bi-clock me-1"></i>Late Checkout
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-primary perk-btn" data-type="early_checkin">
+              <i class="bi bi-sunrise me-1"></i>Early Check-in
+            </button>
+          </div>
+        </div>
+        <div id="redeemMsg" class="small mt-2" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script nonce="{{ csp_nonce }}">
+(function(){
+  var guestId = {{ reservation.guest_id }};
+  var resId = {{ reservation.id }};
+  var msgEl = document.getElementById('redeemMsg');
+  function showMsg(text, ok) {
+    msgEl.innerHTML = '<i class="bi bi-' + (ok ? 'check-circle text-success' : 'exclamation-circle text-danger') + ' me-1"></i>' + text;
+    msgEl.style.display = '';
+  }
+  function doRedeem(body) {
+    fetch('{{ url_for("loyalty.api_redeem") }}', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body)
+    }).then(function(r){ return r.json(); }).then(function(d){
+      showMsg(d.message || d.error, d.success);
+      if (d.success) setTimeout(function(){ location.reload(); }, 1200);
+    }).catch(function(e){ showMsg('Request failed', false); });
+  }
+  var discBtn = document.getElementById('redeemDiscountBtn');
+  if (discBtn) discBtn.addEventListener('click', function(){
+    var pts = parseInt(document.getElementById('redeemPoints').value);
+    if (!pts || pts <= 0) return showMsg('Enter valid points', false);
+    doRedeem({guest_id: guestId, reservation_id: resId, type: 'discount', points: pts});
+  });
+  document.querySelectorAll('.perk-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      doRedeem({guest_id: guestId, reservation_id: resId, type: this.dataset.type});
+    });
+  });
+})();
+</script>
+{% endif %}
+{% endblock %}

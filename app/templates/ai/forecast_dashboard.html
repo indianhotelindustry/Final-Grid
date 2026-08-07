@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+{% block title %}Revenue Forecast - AI Insights{% endblock %}
+
+{% block styles %}
+<style>
+.forecast-card {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    transition: transform 0.15s;
+}
+.forecast-card:hover { transform: translateY(-2px); }
+.forecast-card .card-body { padding: 1.25rem; }
+.forecast-card .metric-value { font-size: 1.6rem; font-weight: 700; line-height: 1.2; }
+.forecast-card .metric-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7280; font-weight: 600; }
+.confidence-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; }
+.table-forecast th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7280; border-bottom: 2px solid #e5e7eb; }
+.table-forecast td { font-size: 0.88rem; vertical-align: middle; }
+.legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; }
+.spinner-overlay { display: flex; justify-content: center; align-items: center; min-height: 200px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h4 class="mb-1"><i class="bi bi-graph-up-arrow me-2 text-primary"></i>Revenue Forecast</h4>
+        <p class="text-muted mb-0" style="font-size:0.85rem;">AI-powered projections based on on-the-books data and historical patterns</p>
+    </div>
+    <div class="d-flex gap-2">
+        <select id="forecastDays" class="form-select form-select-sm" style="width:auto;">
+            <option value="30">30 Days</option>
+            <option value="60">60 Days</option>
+            <option value="90" selected>90 Days</option>
+            <option value="180">180 Days</option>
+        </select>
+        <button id="refreshBtn" class="btn btn-sm btn-outline-primary" onclick="loadForecast()">
+            <i class="bi bi-arrow-clockwise"></i> Refresh
+        </button>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-3 mb-4" id="summaryCards">
+    <div class="col-sm-6 col-lg-3">
+        <div class="card forecast-card">
+            <div class="card-body text-center">
+                <div class="metric-label mb-1">This Month OTB</div>
+                <div class="metric-value text-primary" id="thisMonthOtb">--</div>
+                <div class="text-muted" style="font-size:0.75rem;" id="thisMonthLabel"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card forecast-card">
+            <div class="card-body text-center">
+                <div class="metric-label mb-1">This Month Projected</div>
+                <div class="metric-value text-success" id="thisMonthProjected">--</div>
+                <div class="text-muted" style="font-size:0.75rem;">Including estimated fill</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card forecast-card">
+            <div class="card-body text-center">
+                <div class="metric-label mb-1">Next Month Projected</div>
+                <div class="metric-value text-info" id="nextMonthProjected">--</div>
+                <div class="text-muted" style="font-size:0.75rem;" id="nextMonthLabel"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card forecast-card">
+            <div class="card-body text-center">
+                <div class="metric-label mb-1">90-Day Total</div>
+                <div class="metric-value text-warning" id="total90">--</div>
+                <div class="text-muted" style="font-size:0.75rem;">Projected revenue</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart -->
+<div class="card forecast-card mb-4">
+    <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
+        <h6 class="fw-semibold mb-0"><i class="bi bi-bar-chart me-1"></i> Daily Revenue Forecast</h6>
+        <div class="d-flex gap-3 mt-2" style="font-size:0.78rem;">
+            <span><span class="legend-dot" style="background:#3b82f6;"></span>OTB Revenue</span>
+            <span><span class="legend-dot" style="background:#22c55e;"></span>Projected Total</span>
+            <span><span class="legend-dot" style="background:#f59e0b;"></span>Occupancy %</span>
+        </div>
+    </div>
+    <div class="card-body" style="height:350px;">
+        <div class="spinner-overlay" id="chartSpinner">
+            <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+        </div>
+        <canvas id="forecastChart" style="display:none;"></canvas>
+    </div>
+</div>
+
+<!-- Monthly Summary Table -->
+<div class="card forecast-card">
+    <div class="card-header bg-white pt-3">
+        <h6 class="fw-semibold mb-0"><i class="bi bi-calendar3 me-1"></i> Monthly Revenue Summary</h6>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-forecast table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-3">Month</th>
+                        <th class="text-end">OTB Revenue</th>
+                        <th class="text-end">Projected Add'l</th>
+                        <th class="text-end">Total Projected</th>
+                        <th class="text-center">Avg Occupancy</th>
+                        <th class="text-center">Confidence</th>
+                    </tr>
+                </thead>
+                <tbody id="monthlyBody">
+                    <tr><td colspan="6" class="text-center py-4 text-muted">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/chartjs/chart.umd.min.js') }}"></script>
+<script nonce="{{ csp_nonce }}">
+const curr = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+let forecastChart = null;
+
+function loadForecast() {
+    const days = document.getElementById('forecastDays').value;
+    document.getElementById('chartSpinner').style.display = 'flex';
+    document.getElementById('forecastChart').style.display = 'none';
+
+    // Load daily forecast + monthly in parallel
+    Promise.all([
+        fetch('/api/ai/forecast?days=' + days).then(r => r.json()),
+        fetch('/api/ai/forecast/monthly?months=4').then(r => r.json()),
+    ]).then(([daily, monthly]) => {
+        renderChart(daily.forecast);
+        renderSummaryCards(daily.forecast, monthly.summary);
+        renderMonthlyTable(monthly.summary);
+    }).catch(err => {
+        console.error('Forecast load error:', err);
+        document.getElementById('chartSpinner').innerHTML =
+            '<span class="text-danger"><i class="bi bi-exclamation-triangle"></i> Failed to load forecast data.</span>';
+    });
+}
+
+function renderChart(data) {
+    const canvas = document.getElementById('forecastChart');
+    const ctx = canvas.getContext('2d');
+    document.getElementById('chartSpinner').style.display = 'none';
+    canvas.style.display = 'block';
+
+    const labels = data.map(d => {
+        const dt = new Date(d.date);
+        return dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    });
+
+    if (forecastChart) forecastChart.destroy();
+
+    forecastChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'OTB Revenue',
+                    data: data.map(d => d.otb_revenue),
+                    backgroundColor: 'rgba(59,130,246,0.7)',
+                    borderRadius: 3,
+                    order: 2,
+                },
+                {
+                    label: 'Projected Total',
+                    data: data.map(d => d.total_projected_revenue),
+                    backgroundColor: 'rgba(34,197,94,0.35)',
+                    borderColor: '#22c55e',
+                    borderWidth: 1,
+                    borderRadius: 3,
+                    order: 3,
+                },
+                {
+                    label: 'Occupancy %',
+                    data: data.map(d => d.occupancy_pct),
+                    type: 'line',
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245,158,11,0.1)',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: false,
+                    yAxisID: 'yOcc',
+                    order: 1,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            if (ctx.dataset.yAxisID === 'yOcc') return ctx.dataset.label + ': ' + ctx.raw + '%';
+                            return ctx.dataset.label + ': ' + curr.format(ctx.raw);
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { maxRotation: 45, font: { size: 10 }, maxTicksLimit: 20 } },
+                y: { beginAtZero: true, grid: { color: '#f3f4f6' }, ticks: { callback: v => curr.format(v), font: { size: 10 } } },
+                yOcc: { position: 'right', min: 0, max: 100, grid: { display: false }, ticks: { callback: v => v + '%', font: { size: 10 } } }
+            }
+        }
+    });
+}
+
+function renderSummaryCards(daily, monthly) {
+    // Current month
+    const today = new Date();
+    const thisMonthKey = today.toISOString().slice(0, 7);
+    const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    const nextMonthKey = nextMonth.toISOString().slice(0, 7);
+
+    const thisM = monthly.find(m => m.month === thisMonthKey);
+    const nextM = monthly.find(m => m.month === nextMonthKey);
+
+    document.getElementById('thisMonthOtb').textContent = thisM ? curr.format(thisM.otb_revenue) : '--';
+    document.getElementById('thisMonthProjected').textContent = thisM ? curr.format(thisM.total_revenue) : '--';
+    document.getElementById('thisMonthLabel').textContent = thisM ? thisM.month_name : '';
+    document.getElementById('nextMonthProjected').textContent = nextM ? curr.format(nextM.total_revenue) : '--';
+    document.getElementById('nextMonthLabel').textContent = nextM ? nextM.month_name : '';
+
+    const total90 = daily.reduce((s, d) => s + d.total_projected_revenue, 0);
+    document.getElementById('total90').textContent = curr.format(total90);
+}
+
+function renderMonthlyTable(summary) {
+    const tbody = document.getElementById('monthlyBody');
+    if (!summary.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">No data available.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = summary.map(m => {
+        const confClass = m.avg_confidence >= 60 ? 'bg-success' : (m.avg_confidence >= 35 ? 'bg-warning text-dark' : 'bg-secondary');
+        return `<tr>
+            <td class="ps-3 fw-semibold">${m.month_name}</td>
+            <td class="text-end">${curr.format(m.otb_revenue)}</td>
+            <td class="text-end">${curr.format(m.projected_revenue)}</td>
+            <td class="text-end fw-bold">${curr.format(m.total_revenue)}</td>
+            <td class="text-center">${m.avg_occupancy}%</td>
+            <td class="text-center"><span class="badge ${confClass} confidence-badge">${m.avg_confidence}%</span></td>
+        </tr>`;
+    }).join('');
+}
+
+document.getElementById('forecastDays').addEventListener('change', loadForecast);
+document.addEventListener('DOMContentLoaded', loadForecast);
+</script>
+{% endblock %}

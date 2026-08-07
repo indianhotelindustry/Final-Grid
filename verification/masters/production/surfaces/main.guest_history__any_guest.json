@@ -1,0 +1,57 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/guest/1/history",
+  "anon_status": 302,
+  "body_bytes": 30387,
+  "body_sha256": "62069ec5ee5d797c94302b0d8a905efa9fd84c549b7e45d6972740f0efa6a868",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 33,
+  "endpoint": "main.guest_history",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "guest[type]": "Guest",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "rows[0].billing.balance": "200",
+    "rows[0].billing.company_credit": "0",
+    "rows[0].billing.discount": "0",
+    "rows[0].billing.extra_charges": "190.48",
+    "rows[0].billing.grand_total": "2200",
+    "rows[0].billing.gst_amount": "104.76",
+    "rows[0].billing.nights": "2",
+    "rows[0].billing.paid": "2000",
+    "rows[0].billing.room_charges": "1904.76",
+    "rows[0].billing.round_off": "0",
+    "rows[0].billing.rounded_grand_total": "2200",
+    "rows[0].billing.settlement_balance": "200",
+    "rows[0].billing.total": "2095.24",
+    "rows[0].billing[len]": "13",
+    "rows[0].reservation[type]": "Reservation",
+    "rows[0][len]": "2",
+    "rows[len]": "1"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "Guest stay history.",
+  "origin": "declared",
+  "params": {
+    "id": 1,
+    "resolver": "any_guest",
+    "rule": "lowest guest id"
+  },
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "main.guest_history__any_guest",
+  "templates": [
+    "guest_history.html"
+  ],
+  "truncations": [],
+  "url": "/guest/1/history"
+}

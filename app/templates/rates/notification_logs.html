@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block title %}Notification Logs{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="mb-0"><i class="bi bi-bell me-2"></i>Notification Logs</h4>
+    <a href="{{ url_for('rates.index') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Rate Plans
+    </a>
+</div>
+
+<!-- Summary badges -->
+{% set sent = logs | selectattr('status','eq','sent') | list | length %}
+{% set failed = logs | selectattr('status','eq','failed') | list | length %}
+{% set skipped = logs | selectattr('status','eq','skipped') | list | length %}
+<div class="row g-2 mb-3">
+    <div class="col-auto"><span class="badge bg-success fs-6">{{ sent }} Sent</span></div>
+    <div class="col-auto"><span class="badge bg-danger fs-6">{{ failed }} Failed</span></div>
+    <div class="col-auto"><span class="badge bg-secondary fs-6">{{ skipped }} Skipped</span></div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 small">
+            <thead class="table-light">
+                <tr>
+                    <th>Channel</th>
+                    <th>Type</th>
+                    <th>Recipient</th>
+                    <th>Reservation</th>
+                    <th>Status</th>
+                    <th>Sent At</th>
+                    <th>Error</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>
+                        {% if log.channel == 'whatsapp' %}
+                        <i class="bi bi-whatsapp text-success"></i> WhatsApp
+                        {% else %}
+                        <i class="bi bi-envelope text-primary"></i> Email
+                        {% endif %}
+                    </td>
+                    <td><span class="badge bg-light text-dark">{{ log.message_type }}</span></td>
+                    <td>{{ log.recipient }}</td>
+                    <td>
+                        {% if log.reservation %}
+                            <small class="text-primary">{{ log.reservation.booking_reference or log.reservation_id }}</small>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>
+                        <span class="badge
+                            {% if log.status == 'sent' %}bg-success
+                            {% elif log.status == 'failed' %}bg-danger
+                            {% else %}bg-secondary{% endif %}">
+                            {{ log.status }}
+                        </span>
+                    </td>
+                    <td><small>{{ log.sent_at.strftime('%d %b %H:%M:%S') }}</small></td>
+                    <td>
+                        {% if log.error_message %}
+                        <span class="text-danger small" title="{{ log.error_message }}">
+                            {{ log.error_message[:50] }}
+                        </span>
+                        {% else %}—{% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7" class="text-center text-muted py-4">No notifications sent yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Quick setup guide -->
+<div class="card mt-4">
+    <div class="card-header fw-semibold py-2"><i class="bi bi-gear me-1"></i>Notification Setup</div>
+    <div class="card-body">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <h6 class="fw-bold"><i class="bi bi-whatsapp text-success me-1"></i>WhatsApp (UltraMSG)</h6>
+                <ol class="small">
+                    <li>Sign up at <strong>ultramsg.com</strong></li>
+                    <li>Create an instance, connect your WhatsApp Business number</li>
+                    <li>Copy Instance ID and Token</li>
+                    <li>Add to <code>.env</code>:<br>
+                        <code>ULTRAMSG_INSTANCE=instance12345</code><br>
+                        <code>ULTRAMSG_TOKEN=your_token</code><br>
+                        <code>FRONTDESK_WHATSAPP=919876543210</code>
+                    </li>
+                </ol>
+            </div>
+            <div class="col-md-6">
+                <h6 class="fw-bold"><i class="bi bi-envelope text-primary me-1"></i>Email (Gmail)</h6>
+                <ol class="small">
+                    <li>Enable 2FA on your Gmail account</li>
+                    <li>Create an App Password: Google Account → Security → App Passwords</li>
+                    <li>Add to <code>.env</code>:<br>
+                        <code>SMTP_HOST=smtp.gmail.com</code><br>
+                        <code>SMTP_PORT=587</code><br>
+                        <code>SMTP_USER=you@gmail.com</code><br>
+                        <code>SMTP_PASS=xxxx xxxx xxxx xxxx</code><br>
+                        <code>SMTP_FROM=Hotel Name &lt;you@gmail.com&gt;</code>
+                    </li>
+                </ol>
+            </div>
+        </div>
+        <div class="alert alert-info py-2 mt-2 mb-0">
+            <i class="bi bi-info-circle me-1"></i>
+            If <code>ULTRAMSG_INSTANCE</code> or <code>SMTP_HOST</code> are not set, notifications are silently
+            skipped (status = <strong>skipped</strong>). The booking flow is never affected.
+        </div>
+    </div>
+</div>
+{% endblock %}

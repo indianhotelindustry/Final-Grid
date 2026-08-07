@@ -1,0 +1,33 @@
+Flask>=3.1.3
+Flask-SQLAlchemy==3.1.1
+Flask-Login==0.6.3
+Flask-Migrate>=4.0.7
+APScheduler==3.10.4
+python-dotenv==1.0.1
+
+requests>=2.32.3
+openpyxl>=3.1.5
+flask-limiter>=3.8.0
+flask-wtf>=1.2.1
+cryptography>=43.0.0
+waitress>=3.0.0
+setuptools>=70.0.0
+xhtml2pdf>=0.2.17
+
+# Optional: PostgreSQL support (not needed for SQLite offline deployment)
+# pip install psycopg[binary]>=3.1.0
+# Optional: Linux production server
+# pip install gunicorn>=22.0.0
+
+# Optional: AI Insights via Gemini (Module 7).
+# Offline hotels: leave commented — the AI Insights panel falls back to a
+# deterministic local rule-based generator that needs no network.
+# Internet-connected hotels: uncomment to enable Gemini-powered insights.
+# pip install google-genai>=0.3.0
+
+# Optional: Native desktop window ("App Mode" shortcut).
+# Without pywebview, the App Mode shortcut opens the default browser —
+# the app still works, just in a regular browser tab. Installing pywebview
+# switches the shortcut to a dedicated native window with no browser
+# chrome, giving the PMS an app-like feel.
+# pip install pywebview>=5.0

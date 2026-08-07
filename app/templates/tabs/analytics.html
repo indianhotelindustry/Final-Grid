@@ -1,0 +1,426 @@
+<!-- ===== ANALYTICS TAB ===== -->
+<style>
+.an-card { border:0; box-shadow:0 1px 4px rgba(0,0,0,.08); border-radius:8px; }
+.an-card .card-header { background:#fff; border-bottom:1px solid #f0f0f0; padding:.6rem 1rem; }
+.an-card .card-title  { font-size:.82rem; font-weight:700; margin:0; }
+.an-empty { display:flex; flex-direction:column; align-items:center; justify-content:center;
+            color:#9ca3af; padding:2.5rem 1rem; gap:.4rem; font-size:.8rem; }
+.an-empty i { font-size:2rem; }
+.an-kpi-box { background:#f8f9fa; border-radius:6px; padding:.6rem 1rem; text-align:center; }
+.an-kpi-val { font-size:1.5rem; font-weight:700; line-height:1.1; }
+.an-kpi-lbl { font-size:.68rem; color:#6c757d; margin-top:.15rem; }
+.range-btn { font-size:.75rem; padding:.25rem .65rem; }
+.range-btn.active { background:#0d6efd; color:#fff; border-color:#0d6efd; }
+#an-custom-range { display:none; gap:.4rem; align-items:center; }
+</style>
+
+<!-- Date Filter Bar -->
+<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+    <span style="font-size:.78rem;font-weight:600;color:#495057;">Period:</span>
+    <div class="btn-group btn-group-sm" id="an-range-btns">
+        <button class="btn btn-outline-secondary range-btn" data-range="today">Today</button>
+        <button class="btn btn-outline-secondary range-btn" data-range="7">7 Days</button>
+        <button class="btn btn-outline-secondary range-btn" data-range="14">14 Days</button>
+        <button class="btn btn-outline-secondary range-btn active" data-range="30">30 Days</button>
+        <button class="btn btn-outline-secondary range-btn" data-range="custom">Custom</button>
+    </div>
+    <div id="an-custom-range">
+        <input type="date" id="an-df" class="form-control form-control-sm" style="width:140px;">
+        <span style="font-size:.75rem;">to</span>
+        <input type="date" id="an-dt" class="form-control form-control-sm" style="width:140px;">
+        <button class="btn btn-primary btn-sm" id="an-apply-custom">Apply</button>
+    </div>
+    <span id="an-range-label" class="text-muted ms-1" style="font-size:.72rem;"></span>
+</div>
+
+<!-- Row 1: Occupancy + Revenue Trends -->
+<div class="row g-2 mb-2">
+    <div class="col-12 col-md-6">
+        <div class="card an-card h-100">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="bi bi-graph-up text-primary"></i>
+                <span class="card-title">Occupancy Trend</span>
+            </div>
+            <div class="card-body p-2" style="min-height:200px;">
+                <div id="an-occ-empty" class="an-empty" style="display:none;">
+                    <i class="bi bi-bar-chart"></i><span>No occupancy data for this period</span>
+                </div>
+                <canvas id="an-occ-chart" height="180"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="card an-card h-100">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="bi bi-currency-rupee text-success"></i>
+                <span class="card-title">Revenue Trend</span>
+            </div>
+            <div class="card-body p-2" style="min-height:200px;">
+                <div id="an-rev-empty" class="an-empty" style="display:none;">
+                    <i class="bi bi-graph-up-arrow"></i><span>No revenue recorded for this period</span>
+                </div>
+                <canvas id="an-rev-chart" height="180"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Row 2: Booking Sources + ALOS -->
+<div class="row g-2 mb-2">
+    <div class="col-12 col-md-5">
+        <div class="card an-card h-100">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="bi bi-pie-chart text-info"></i>
+                <span class="card-title">Booking Sources</span>
+            </div>
+            <div class="card-body p-2 d-flex align-items-center justify-content-center" style="min-height:220px;">
+                <div id="an-src-empty" class="an-empty" style="display:none;">
+                    <i class="bi bi-diagram-3"></i><span>No bookings for this period</span>
+                </div>
+                <div id="an-src-wrap" style="position:relative;max-width:260px;width:100%;">
+                    <canvas id="an-src-chart"></canvas>
+                    <div id="an-src-legend" class="mt-2" style="font-size:.72rem;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-7">
+        <div class="card an-card h-100">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="bi bi-calendar-range text-warning"></i>
+                <span class="card-title">Average Stay Length (ALOS)</span>
+            </div>
+            <div class="card-body p-2" style="min-height:220px;">
+                <!-- KPI row -->
+                <div class="d-flex gap-2 mb-2">
+                    <div class="an-kpi-box flex-fill">
+                        <div class="an-kpi-val text-warning" id="an-alos-val">—</div>
+                        <div class="an-kpi-lbl">Avg Nights / Stay</div>
+                    </div>
+                </div>
+                <div id="an-alos-empty" class="an-empty" style="display:none;">
+                    <i class="bi bi-calendar3"></i><span>No completed stays in this period</span>
+                </div>
+                <canvas id="an-alos-chart" height="130"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Row 3: Room Performance Table -->
+<div class="row g-2">
+    <div class="col-12">
+        <div class="card an-card">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="bi bi-building text-danger"></i>
+                <span class="card-title">Room Performance</span>
+            </div>
+            <div class="card-body p-2">
+                <div id="an-room-empty" class="an-empty" style="display:none;">
+                    <i class="bi bi-grid-3x3"></i><span>No room activity for this period</span>
+                </div>
+                <div id="an-room-wrap" class="table-responsive" style="display:none;">
+                    <table class="table table-sm table-hover mb-0" style="font-size:.78rem;">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Room</th>
+                                <th class="text-center">Bookings</th>
+                                <th class="text-end">Revenue</th>
+                                <th class="text-end">Avg Rate</th>
+                                <th class="text-center">Occupancy %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="an-room-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='vendor/chartjs/chart.umd.min.js') }}"></script>
+<script>
+(function () {
+    /* ---- chart instances (destroy on refresh) ---- */
+    const _charts = {};
+
+    function destroyChart(id) {
+        if (_charts[id]) { _charts[id].destroy(); delete _charts[id]; }
+    }
+
+    /* ---- colour palette ---- */
+    const SRC_COLORS = {
+        'OTA':     '#0d6efd',
+        'Walk-in': '#198754',
+        'Calling': '#fd7e14',
+        'Website': '#6f42c1',
+        'Agent':   '#dc3545',
+    };
+    function srcColor(src) {
+        return SRC_COLORS[src] || '#6c757d';
+    }
+
+    /* ---- helpers ---- */
+    function showEmpty(id, show) {
+        document.getElementById(id).style.display = show ? '' : 'none';
+    }
+    function showEl(id, show) {
+        const el = document.getElementById(id);
+        if (el) el.style.display = show ? '' : 'none';
+    }
+    function fmtDate(iso) {
+        const d = new Date(iso + 'T00:00:00');
+        return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    }
+    function fmtRupee(v) {
+        return '₹' + Number(v).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+    }
+
+    /* ---- fetch + render ---- */
+    function loadAnalytics(params) {
+        const qs = new URLSearchParams(params).toString();
+        const lbl = document.getElementById('an-range-label');
+        lbl.textContent = 'Loading…';
+        fetch('/api/analytics/data?' + qs)
+            .then(r => {
+                if (!r.ok) {
+                    return r.json().then(d => { throw new Error(d.error || ('HTTP ' + r.status)); })
+                        .catch(() => { throw new Error('HTTP ' + r.status); });
+                }
+                return r.json();
+            })
+            .then(d => {
+                if (d.error) { throw new Error(d.error); }
+                renderAll(d);
+            })
+            .catch(err => {
+                console.error('Analytics error:', err);
+                lbl.textContent = 'Error: ' + err.message;
+                lbl.style.color = '#dc3545';
+            });
+    }
+
+    function renderAll(d) {
+        /* label */
+        const label = d.date_from === d.date_to
+            ? d.date_from
+            : d.date_from + ' → ' + d.date_to;
+        document.getElementById('an-range-label').textContent = label;
+
+        renderOccupancy(d.occupancy_trend);
+        renderRevenue(d.revenue_trend);
+        renderSources(d.booking_sources);
+        renderAlos(d.current_alos, d.alos_trend);
+        renderRoomPerf(d.room_performance);
+    }
+
+    /* 1. Occupancy Trend */
+    function renderOccupancy(rows) {
+        destroyChart('occ');
+        const allZero = rows.every(r => r.pct === 0);
+        showEmpty('an-occ-empty', allZero);
+        const canvas = document.getElementById('an-occ-chart');
+        canvas.style.display = allZero ? 'none' : '';
+        if (allZero) return;
+
+        _charts.occ = new Chart(canvas, {
+            type: 'line',
+            data: {
+                labels: rows.map(r => fmtDate(r.date)),
+                datasets: [{
+                    label: 'Occupancy %',
+                    data: rows.map(r => r.pct),
+                    borderColor: '#0d6efd',
+                    backgroundColor: 'rgba(13,110,253,.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: rows.length > 20 ? 0 : 3,
+                    borderWidth: 2,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { min: 0, max: 100, ticks: { callback: v => v + '%', font: { size: 10 } },
+                         grid: { color: '#f0f0f0' } },
+                    x: { ticks: { font: { size: 10 }, maxTicksLimit: 10 }, grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    /* 2. Revenue Trend */
+    function renderRevenue(rows) {
+        destroyChart('rev');
+        const allZero = rows.every(r => r.rev === 0);
+        showEmpty('an-rev-empty', allZero);
+        const canvas = document.getElementById('an-rev-chart');
+        canvas.style.display = allZero ? 'none' : '';
+        if (allZero) return;
+
+        _charts.rev = new Chart(canvas, {
+            type: 'bar',
+            data: {
+                labels: rows.map(r => fmtDate(r.date)),
+                datasets: [{
+                    label: 'Revenue',
+                    data: rows.map(r => r.rev),
+                    backgroundColor: 'rgba(25,135,84,.7)',
+                    borderRadius: 3,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false },
+                           tooltip: { callbacks: { label: ctx => fmtRupee(ctx.parsed.y) } } },
+                scales: {
+                    y: { ticks: { callback: v => '₹' + (v >= 1000 ? (v/1000).toFixed(0)+'k' : v),
+                                  font: { size: 10 } }, grid: { color: '#f0f0f0' } },
+                    x: { ticks: { font: { size: 10 }, maxTicksLimit: 10 }, grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    /* 3. Booking Sources */
+    function renderSources(rows) {
+        destroyChart('src');
+        const wrap = document.getElementById('an-src-wrap');
+        if (!rows || rows.length === 0) {
+            showEmpty('an-src-empty', true);
+            wrap.style.display = 'none';
+            return;
+        }
+        showEmpty('an-src-empty', false);
+        wrap.style.display = '';
+
+        const colors = rows.map(r => srcColor(r.source));
+        _charts.src = new Chart(document.getElementById('an-src-chart'), {
+            type: 'doughnut',
+            data: {
+                labels: rows.map(r => r.source),
+                datasets: [{ data: rows.map(r => r.count), backgroundColor: colors, borderWidth: 2 }]
+            },
+            options: {
+                responsive: true,
+                cutout: '60%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: ctx => ctx.label + ': ' + ctx.parsed } }
+                }
+            }
+        });
+
+        /* custom legend */
+        const total = rows.reduce((s, r) => s + r.count, 0);
+        document.getElementById('an-src-legend').innerHTML = rows.map((r, i) =>
+            `<div class="d-flex align-items-center gap-1 mb-1">
+                <div style="width:10px;height:10px;border-radius:2px;background:${colors[i]};flex-shrink:0;"></div>
+                <span>${r.source}</span>
+                <span class="ms-auto fw-bold">${r.count}</span>
+                <span class="text-muted">(${Math.round(r.count/total*100)}%)</span>
+             </div>`
+        ).join('');
+    }
+
+    /* 4. ALOS */
+    function renderAlos(current, trend) {
+        destroyChart('alos');
+        document.getElementById('an-alos-val').textContent =
+            current !== null && current !== undefined ? current + ' nights' : '—';
+
+        const canvas = document.getElementById('an-alos-chart');
+        if (!trend || trend.length === 0) {
+            showEmpty('an-alos-empty', true);
+            canvas.style.display = 'none';
+            return;
+        }
+        showEmpty('an-alos-empty', false);
+        canvas.style.display = '';
+
+        _charts.alos = new Chart(canvas, {
+            type: 'line',
+            data: {
+                labels: trend.map(r => fmtDate(r.date)),
+                datasets: [{
+                    label: 'ALOS (nights)',
+                    data: trend.map(r => r.alos),
+                    borderColor: '#fd7e14',
+                    backgroundColor: 'rgba(253,126,20,.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: trend.length > 20 ? 0 : 4,
+                    borderWidth: 2,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { min: 0, ticks: { font: { size: 10 }, stepSize: 1 }, grid: { color: '#f0f0f0' } },
+                    x: { ticks: { font: { size: 10 }, maxTicksLimit: 8 }, grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    /* 5. Room Performance */
+    function renderRoomPerf(rows) {
+        const empty = document.getElementById('an-room-empty');
+        const wrap  = document.getElementById('an-room-wrap');
+        if (!rows || rows.length === 0) {
+            empty.style.display = '';
+            wrap.style.display  = 'none';
+            return;
+        }
+        empty.style.display = 'none';
+        wrap.style.display  = '';
+
+        const tbody = document.getElementById('an-room-tbody');
+        tbody.innerHTML = rows.map(r => {
+            const occBar = `<div style="height:6px;background:#e9ecef;border-radius:3px;">
+                <div style="width:${r.occ_pct}%;height:100%;background:#0d6efd;border-radius:3px;"></div>
+            </div>`;
+            return `<tr>
+                <td class="fw-semibold">${r.room}</td>
+                <td class="text-center">${r.bookings}</td>
+                <td class="text-end">${fmtRupee(r.revenue)}</td>
+                <td class="text-end">${fmtRupee(r.avg_rate)}</td>
+                <td class="text-center" style="min-width:90px;">
+                    <div>${r.occ_pct}%</div>${occBar}
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    /* ---- filter UI ---- */
+    const rangeEl  = document.getElementById('an-range-label');
+    const customEl = document.getElementById('an-custom-range');
+
+    document.getElementById('an-range-btns').addEventListener('click', function (e) {
+        const btn = e.target.closest('.range-btn');
+        if (!btn) return;
+        document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const r = btn.dataset.range;
+        if (r === 'custom') {
+            customEl.style.display = 'flex';
+        } else {
+            customEl.style.display = 'none';
+            loadAnalytics({ range: r });
+        }
+    });
+
+    document.getElementById('an-apply-custom').addEventListener('click', function () {
+        const df = document.getElementById('an-df').value;
+        const dt = document.getElementById('an-dt').value;
+        if (!df || !dt) return;
+        if (df > dt) { alert('Start date must be before end date.'); return; }
+        loadAnalytics({ date_from: df, date_to: dt });
+    });
+
+    /* ---- initial load ---- */
+    loadAnalytics({ range: 30 });
+})();
+</script>

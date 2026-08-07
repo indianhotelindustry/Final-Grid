@@ -1,0 +1,115 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}In-House Guest List — {{ today.strftime('%d %b %Y') }}{% endblock %}
+{% block report_name %}In-House Guest List{% endblock %}
+
+{% block report_content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h5 class="mb-0">
+        <i class="bi bi-house-door-fill text-primary me-2"></i>
+        In-House Guest List
+        <span class="badge bg-primary ms-1">{{ records|length }}</span>
+        <small class="text-muted fs-6 ms-1">{{ today.strftime('%d %B %Y') }}</small>
+    </h5>
+    <div class="d-flex gap-2 d-print-none">
+        <a href="{{ url_for('reports.inhouse', format='excel') }}" class="btn btn-sm btn-success">
+            <i class="bi bi-file-earmark-excel me-1"></i>Excel
+        </a>
+        <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i>Print
+        </button>
+    </div>
+</div>
+
+<!-- KPI row -->
+<div class="row g-2 mb-3">
+    <div class="col-auto">
+        <div class="card border-0 bg-primary text-white px-3 py-2 shadow-sm">
+            <div class="fw-bold fs-5">{{ records|length }}</div>
+            <div class="small">In-House</div>
+        </div>
+    </div>
+    <div class="col-auto">
+        <div class="card border-0 bg-success text-white px-3 py-2 shadow-sm">
+            <div class="fw-bold fs-5">{{ occ_pct }}%</div>
+            <div class="small">Occupancy</div>
+        </div>
+    </div>
+    <div class="col-auto">
+        <div class="card border-0 bg-danger text-white px-3 py-2 shadow-sm">
+            <div class="fw-bold fs-5">{{ records | selectattr('_overdue') | list | length }}</div>
+            <div class="small">Overdue Checkouts</div>
+        </div>
+    </div>
+    <div class="col-auto">
+        <div class="card border-0 bg-warning text-dark px-3 py-2 shadow-sm">
+            <div class="fw-bold fs-5">{{ records | selectattr('_balance', 'gt', 0) | list | length }}</div>
+            <div class="small">Balance Due</div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle mb-0 small">
+            <thead class="table-primary">
+                <tr>
+                    <th>Room</th>
+                    <th>Guest Name</th>
+                    <th>Phone</th>
+                    <th>Room Type</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th class="text-center">Stayed</th>
+                    <th class="text-center">Left</th>
+                    <th class="text-end">Rate/Night</th>
+                    <th class="text-end">Balance</th>
+                    <th>Source</th>
+                    <th class="d-print-none">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in records %}
+                <tr class="{% if r._overdue %}table-danger{% elif r._balance > 0 %}table-warning{% endif %}">
+                    <td class="fw-bold">
+                        {{ r.room.room_number if r.room else '—' }}
+                        {% if r._overdue %}
+                        <span class="badge bg-danger ms-1" title="Overdue checkout">!</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ r.guest.name if r.guest else '—' }}</td>
+                    <td>{{ r.guest.phone if r.guest else '—' }}</td>
+                    <td>{{ r.room_type.name if r.room_type else '—' }}</td>
+                    <td>{{ r.arrival_date.strftime('%d %b') }}</td>
+                    <td class="{% if r._overdue %}text-danger fw-bold{% endif %}">
+                        {{ r.departure_date.strftime('%d %b') }}
+                    </td>
+                    <td class="text-center">{{ r._nights_stayed }}n</td>
+                    <td class="text-center {% if r._nights_remaining < 0 %}text-danger{% endif %}">
+                        {{ r._nights_remaining }}n
+                    </td>
+                    <td class="text-end">₹{{ '{:,.0f}'.format(r.rate_per_night) }}</td>
+                    <td class="text-end {% if r._balance > 0 %}text-danger fw-bold{% else %}text-success{% endif %}">
+                        ₹{{ '{:,.2f}'.format(r._balance) }}
+                    </td>
+                    <td><span class="badge bg-secondary">{{ r.source or 'Walk-in' }}</span></td>
+                    <td class="d-print-none">
+                        <a href="{{ url_for('main.checkout', reservation_id=r.id) }}"
+                           class="btn btn-xs btn-sm btn-outline-danger py-0 px-1">
+                            Checkout
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="12" class="text-center text-muted py-5">
+                        <i class="bi bi-house-door fs-1 d-block mb-2"></i>
+                        No guests currently checked in.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<style>@media print { .d-print-none { display:none !important; } }</style>
+{% endblock %}

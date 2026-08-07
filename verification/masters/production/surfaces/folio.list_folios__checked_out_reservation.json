@@ -1,0 +1,40 @@
+{
+  "anon_location": "/auth/login?next=%2Fapi%2Freservation%2F1%2Ffolios",
+  "anon_status": 302,
+  "body_bytes": 279,
+  "body_sha256": "7c54f803ae24d2c3acc6c16ab0d5061f2e374cae025e239e4fbf5c0d9585e266",
+  "category": "FINANCIAL",
+  "content_type": "application/json",
+  "duration_ms": 8,
+  "endpoint": "folio.list_folios",
+  "error": "",
+  "figure_source": "json",
+  "figures": {
+    "$.folios[0].id": "1",
+    "$.folios[0].is_closed": "False",
+    "$.folios[0].reservation_id": "1",
+    "$.folios[0].totals.balance": "0",
+    "$.folios[0].totals.extra_charges": "0",
+    "$.folios[0].totals.paid": "0",
+    "$.folios[0].totals[len]": "3",
+    "$.folios[0][len]": "11",
+    "$.folios[len]": "1",
+    "$.reservation_id": "1",
+    "$[len]": "2"
+  },
+  "location": "",
+  "normalisation_hits": {},
+  "note": "Split-billing sub-ledger.",
+  "origin": "declared",
+  "params": {
+    "id": 1,
+    "resolver": "checked_out_reservation",
+    "rule": "lowest reservation id with status CheckedOut"
+  },
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "folio.list_folios__checked_out_reservation",
+  "templates": [],
+  "truncations": [],
+  "url": "/api/reservation/1/folios"
+}

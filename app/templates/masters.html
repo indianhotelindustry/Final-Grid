@@ -1,0 +1,2581 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex align-items-center mb-3">
+    <h4 class="mb-0"><i class="bi bi-sliders me-2"></i>Masters Configuration</h4>
+</div>
+
+{% if dev_seed_enabled %}
+<div class="card border-warning mb-3" id="devSeedCard">
+    <div class="card-body py-2 px-3 d-flex align-items-center gap-3 flex-wrap">
+        <div class="flex-grow-1">
+            <strong class="text-warning"><i class="bi bi-tools me-1"></i>Dev Tools</strong>
+            <span class="text-muted small ms-2">
+                Seed versatile test data (30d history, all OTA channels, all payment modes, every reservation status).
+                Reset removes only what Seed created. Visible because <code>ENABLE_DEV_SEED=1</code>.
+            </span>
+        </div>
+        <button type="button" class="btn btn-sm btn-success" id="devSeedBtn">
+            <i class="bi bi-database-fill-add me-1"></i>Seed Test Data
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-danger" id="devSeedResetBtn">
+            <i class="bi bi-database-fill-x me-1"></i>Reset Seed
+        </button>
+    </div>
+</div>
+<script nonce="{{ csp_nonce }}">
+(function() {
+    function postJSON(url) {
+        return fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json'}})
+            .then(function(r) { return r.json().then(function(j) { return {ok: r.ok, body: j}; }); });
+    }
+    function busy(btn, label) {
+        btn.disabled = true;
+        btn.dataset.orig = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>' + label;
+    }
+    function restore(btn) {
+        btn.disabled = false;
+        btn.innerHTML = btn.dataset.orig || btn.innerHTML;
+    }
+    document.getElementById('devSeedBtn').addEventListener('click', function() {
+        var btn = this;
+        busy(btn, 'Seeding...');
+        postJSON('{{ url_for("main.dev_seed_create") }}')
+            .then(function(res) {
+                if (res.ok && res.body.success) {
+                    var c = res.body.counts || {};
+                    var lines = Object.keys(c).map(function(k) { return k + ': ' + c[k]; }).join('\n');
+                    alert(res.body.skipped ? (res.body.reason || 'Already seeded.') :
+                          ('Seeded successfully:\n' + lines));
+                    location.reload();
+                } else {
+                    alert('Seed failed: ' + (res.body.error || 'unknown error'));
+                    restore(btn);
+                }
+            })
+            .catch(function(e) { alert('Network error: ' + e); restore(btn); });
+    });
+    document.getElementById('devSeedResetBtn').addEventListener('click', function() {
+        if (!confirm('Delete all seeded test data? This only removes rows created by the seeder.')) return;
+        var btn = this;
+        busy(btn, 'Resetting...');
+        postJSON('{{ url_for("main.dev_seed_reset") }}')
+            .then(function(res) {
+                if (res.ok && res.body.success) {
+                    var r = res.body.removed || {};
+                    var lines = Object.keys(r).map(function(k) { return k + ': ' + r[k]; }).join('\n');
+                    alert(res.body.reset ? ('Reset complete:\n' + lines) :
+                          (res.body.reason || 'Nothing to reset.'));
+                    location.reload();
+                } else {
+                    alert('Reset failed: ' + (res.body.error || 'unknown error'));
+                    restore(btn);
+                }
+            })
+            .catch(function(e) { alert('Network error: ' + e); restore(btn); });
+    });
+})();
+</script>
+{% endif %}
+
+<!-- Tabs nav -->
+<ul class="nav nav-tabs mb-3" id="mastersTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tab-roomtypes" data-bs-toggle="tab" data-bs-target="#pane-roomtypes"
+                type="button" role="tab">
+            <i class="bi bi-door-open me-1"></i>Room Types
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-rooms" data-bs-toggle="tab" data-bs-target="#pane-rooms"
+                type="button" role="tab">
+            <i class="bi bi-building me-1"></i>Rooms
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-payment" data-bs-toggle="tab" data-bs-target="#pane-payment"
+                type="button" role="tab">
+            <i class="bi bi-credit-card me-1"></i>Payment Modes
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-property" data-bs-toggle="tab" data-bs-target="#pane-property"
+                type="button" role="tab">
+            <i class="bi bi-building me-1"></i>Property Config
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-invoice" data-bs-toggle="tab" data-bs-target="#pane-invoice"
+                type="button" role="tab">
+            <i class="bi bi-receipt me-1"></i>Invoice Master
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-settings" data-bs-toggle="tab" data-bs-target="#pane-settings"
+                type="button" role="tab">
+            <i class="bi bi-shield-check me-1"></i>Business Rules
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-cico" data-bs-toggle="tab" data-bs-target="#pane-cico"
+                type="button" role="tab">
+            <i class="bi bi-clock-history me-1"></i>CI/CO Rules
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-webhooks" data-bs-toggle="tab" data-bs-target="#pane-webhooks"
+                type="button" role="tab">
+            <i class="bi bi-plug me-1"></i>Webhook Logs
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content">
+
+    <!-- ═══════════════════════════════════════════
+         ROOM TYPES
+    ═══════════════════════════════════════════════ -->
+    <div class="tab-pane fade show active" id="pane-roomtypes" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-semibold mb-0">
+                <i class="bi bi-door-open text-primary me-1"></i>Room Types
+                <span class="badge bg-secondary ms-1">{{ room_types|length }}</span>
+            </h6>
+            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addRoomTypeModal">
+                <i class="bi bi-plus-circle me-1"></i>Add Room Type
+            </button>
+        </div>
+        <div class="card shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Floor</th>
+                            <th>Base Rate</th>
+                            <th>Taxable (₹)</th>
+                            <th>GST %</th>
+                            <th>CGST (₹)</th>
+                            <th>SGST (₹)</th>
+                            <th>Status</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rt in room_types %}
+                        {% set gst_pct = rt.gst_rate | float %}
+                        {% set base    = rt.base_rate | float %}
+                        {% if not rt.gst_exempted and gst_pct > 0 %}
+                            {% set cgst_amt = (base * gst_pct / 200) | round(2) %}
+                            {% set sgst_amt = cgst_amt %}
+                        {% else %}
+                            {% set cgst_amt = 0.0 %}
+                            {% set sgst_amt = 0.0 %}
+                        {% endif %}
+                        {% if not rt.gst_exempted and rt.is_gst_inclusive and gst_pct %}
+                            {% set display_rate = (base * (1 + gst_pct / 100)) | round(2) %}
+                        {% else %}
+                            {% set display_rate = base %}
+                        {% endif %}
+                        <tr>
+                            <td class="text-muted small">{{ loop.index }}</td>
+                            <td class="fw-semibold">
+                                {{ rt.name }}
+                                {% if rt.description %}
+                                    <div class="text-muted small fw-normal">{{ rt.description }}</div>
+                                {% endif %}
+                            </td>
+                            <td class="text-muted small">{{ rt.floor_number or '—' }}</td>
+                            <td>
+                                ₹{{ '{:,.2f}'.format(display_rate) }}
+                                {% if not rt.gst_exempted and gst_pct and rt.is_gst_inclusive %}
+                                    <span class="badge bg-success ms-1" style="font-size:0.65rem">Incl.</span>
+                                {% elif not rt.gst_exempted and gst_pct %}
+                                    <span class="badge bg-secondary ms-1" style="font-size:0.65rem">+GST</span>
+                                {% endif %}
+                            </td>
+                            <td>₹{{ '{:,.2f}'.format(base) }}</td>
+                            <td>
+                                {% if rt.gst_exempted %}
+                                    <span class="badge bg-secondary">Exempt</span>
+                                {% elif gst_pct %}
+                                    <span class="badge bg-info text-dark">{{ gst_pct | int }}%</span>
+                                {% else %}
+                                    <span class="text-muted small">0%</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-muted small">₹{{ '{:,.2f}'.format(cgst_amt) }}</td>
+                            <td class="text-muted small">₹{{ '{:,.2f}'.format(sgst_amt) }}</td>
+                            <td>
+                                {% if rt.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center text-nowrap">
+                                <button class="btn btn-sm btn-outline-primary py-0 px-2 me-1 btn-edit-rt"
+                                        data-id="{{ rt.id }}"
+                                        data-name="{{ rt.name }}"
+                                        data-rate="{{ rt.base_rate }}"
+                                        data-floor="{{ rt.floor_number or '' }}"
+                                        data-gst="{{ rt.gst_rate | int }}"
+                                        data-gst-exempted="{{ 'true' if rt.gst_exempted else 'false' }}"
+                                        data-gst-inclusive="{{ 'true' if rt.is_gst_inclusive else 'false' }}"
+                                        data-active="{{ 'true' if rt.is_active else 'false' }}"
+                                        data-description="{{ rt.description or '' }}"
+                                        data-bs-toggle="modal" data-bs-target="#editRoomTypeModal">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger py-0 px-2 btn-delete"
+                                        data-url="{{ url_for('main.delete_room_type', rt_id=rt.id) }}"
+                                        data-label="Room Type"
+                                        data-name="{{ rt.name }}">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="10" class="text-center text-muted py-4">
+                                No room types configured. Add one to get started.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div><!-- /pane-roomtypes -->
+
+
+    <!-- ═══════════════════════════════════════════
+         ROOMS MASTER
+    ═══════════════════════════════════════════════ -->
+    <div class="tab-pane fade" id="pane-rooms" role="tabpanel">
+
+        <!-- Toolbar -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <h6 class="fw-semibold mb-0">
+                <i class="bi bi-building text-primary me-1"></i>Rooms
+                <span class="badge bg-secondary ms-1">{{ rooms|length }}</span>
+            </h6>
+            <div class="d-flex gap-2 flex-wrap">
+                <input type="text" id="roomMasterSearch" class="form-control form-control-sm" placeholder="Search room / floor / type…" style="width:200px;">
+                <select id="roomMasterFilterFloor" class="form-select form-select-sm" style="width:110px;">
+                    <option value="">All Floors</option>
+                    {% for fl in rooms|map(attribute='floor')|unique|sort %}
+                    <option value="{{ fl }}">Floor {{ fl }}</option>
+                    {% endfor %}
+                </select>
+                <select id="roomMasterFilterStatus" class="form-select form-select-sm" style="width:120px;">
+                    <option value="">All Status</option>
+                    <option value="Vacant">Vacant</option>
+                    <option value="Occupied">Occupied</option>
+                    <option value="Dirty">Dirty</option>
+                    <option value="Maintenance">Maintenance</option>
+                </select>
+                <select id="roomMasterFilterLifecycle" class="form-select form-select-sm" style="width:130px;" title="Lifecycle filter">
+                    <option value="active">Active only</option>
+                    <option value="">Show all</option>
+                    <option value="inactive">Inactive only</option>
+                </select>
+                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addRoomModal">
+                    <i class="bi bi-plus-circle me-1"></i>Add Room
+                </button>
+                <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#bulkAddRoomModal">
+                    <i class="bi bi-table me-1"></i>Bulk Add
+                </button>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="roomMasterTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Room No.</th>
+                            <th>Name</th>
+                            <th>Floor</th>
+                            <th>Wing</th>
+                            <th>Type</th>
+                            <th>Max</th>
+                            <th>Extra Bed</th>
+                            <th>Status</th>
+                            <th>Flags</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="roomMasterBody">
+                        {% for room in rooms %}
+                        <tr data-room-number="{{ room.room_number|lower }}"
+                            data-floor="{{ room.floor }}"
+                            data-type="{{ room.room_type.name|lower }}"
+                            data-status="{{ room.status }}"
+                            data-lifecycle="{{ 'active' if room.is_active else 'inactive' }}"
+                            class="{{ 'table-secondary text-muted' if not room.is_active else '' }}">
+                            <td class="text-muted small">{{ loop.index }}</td>
+                            <td class="fw-bold">{{ room.room_number }}</td>
+                            <td class="text-muted small">{{ room.room_name or '—' }}</td>
+                            <td>{{ room.floor }}</td>
+                            <td class="text-muted small">{{ room.wing or '—' }}</td>
+                            <td><span class="badge bg-light text-dark border">{{ room.room_type.name }}</span></td>
+                            <td class="small text-muted">{{ room.max_adults or 2 }}A / {{ room.max_children or 2 }}C</td>
+                            <td class="text-center">
+                                {% if room.extra_bed_allowed %}
+                                    <i class="bi bi-check-circle-fill text-success"></i>
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if room.status == 'Vacant' %}
+                                    <span class="badge bg-success">Vacant</span>
+                                {% elif room.status == 'Occupied' %}
+                                    <span class="badge bg-danger">Occupied</span>
+                                {% elif room.status == 'Dirty' %}
+                                    <span class="badge bg-warning text-dark">Dirty</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ room.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="small">
+                                {% if not room.is_active %}
+                                    <span class="badge bg-secondary me-1">Inactive</span>
+                                {% endif %}
+                                {% if room.is_out_of_order %}
+                                    <span class="badge bg-danger me-1">OOO</span>
+                                {% endif %}
+                                {% if not room.is_sellable %}
+                                    <span class="badge bg-warning text-dark">Not Sellable</span>
+                                {% endif %}
+                                {% if room.is_active and room.is_sellable and not room.is_out_of_order %}
+                                    <span class="badge bg-success">Active</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center text-nowrap">
+                                <button class="btn btn-sm btn-outline-primary py-0 px-2 me-1 btn-edit-room"
+                                        data-id="{{ room.id }}"
+                                        data-room-number="{{ room.room_number }}"
+                                        data-room-name="{{ room.room_name or '' }}"
+                                        data-floor="{{ room.floor }}"
+                                        data-wing="{{ room.wing or '' }}"
+                                        data-room-type-id="{{ room.room_type_id }}"
+                                        data-max-adults="{{ room.max_adults or 2 }}"
+                                        data-max-children="{{ room.max_children or 2 }}"
+                                        data-extra-bed="{{ 'true' if room.extra_bed_allowed else 'false' }}"
+                                        data-is-active="{{ 'true' if room.is_active else 'false' }}"
+                                        data-is-sellable="{{ 'true' if room.is_sellable else 'false' }}"
+                                        data-is-ooo="{{ 'true' if room.is_out_of_order else 'false' }}"
+                                        data-maintenance-note="{{ room.maintenance_note or '' }}"
+                                        data-sort-order="{{ room.sort_order or 0 }}"
+                                        data-bs-toggle="modal" data-bs-target="#editRoomModal">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </button>
+                                <form method="post" action="{{ url_for('main.masters_toggle_room', room_id=room.id) }}" class="d-inline"
+                                      onsubmit="return confirm({{ ('Deactivate Room ' ~ room.room_number ~ '?\\n\\nThis room will not be available for future bookings.\\nAll past records (reservations, invoices, audits) remain unchanged.\\n\\nYou can reactivate it anytime.') | tojson if room.is_active else ('Reactivate Room ' ~ room.room_number ~ '?\\n\\nThis room will become available for new bookings again.') | tojson }});">
+                                    <button type="submit" class="btn btn-sm py-0 px-2 me-1 {{ 'btn-outline-warning' if room.is_active else 'btn-outline-success' }}">
+                                        <i class="bi {{ 'bi-pause-circle' if room.is_active else 'bi-play-circle' }}"></i>
+                                        {{ 'Deactivate' if room.is_active else 'Activate' }}
+                                    </button>
+                                </form>
+                                <button class="btn btn-sm btn-outline-danger py-0 px-2 btn-delete"
+                                        data-url="{{ url_for('main.masters_delete_room', room_id=room.id) }}"
+                                        data-label="Room"
+                                        data-name="{{ room.room_number }}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr id="roomMasterEmpty">
+                            <td colspan="11" class="text-center text-muted py-4">
+                                No rooms configured. Add a room to get started.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div><!-- /pane-rooms -->
+
+
+    <!-- ═══════════════════════════════════════════
+         PAYMENT MODES
+    ═══════════════════════════════════════════════ -->
+    <div class="tab-pane fade" id="pane-payment" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-semibold mb-0">
+                <i class="bi bi-credit-card text-success me-1"></i>Payment Modes
+                <span class="badge bg-secondary ms-1">{{ payment_modes|length }}</span>
+            </h6>
+            <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addPaymentModeModal">
+                <i class="bi bi-plus-circle me-1"></i>Add New Mode
+            </button>
+        </div>
+        <div class="card shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pm in payment_modes %}
+                        <tr>
+                            <td class="text-muted small">{{ loop.index }}</td>
+                            <td class="fw-semibold">{{ pm.name }}</td>
+                            <td>
+                                <span class="badge {% if pm.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {% if pm.is_active %}Active{% else %}Inactive{% endif %}
+                                </span>
+                            </td>
+                            <td class="text-center text-nowrap">
+                                <button class="btn btn-sm btn-outline-primary py-0 px-2 me-1 btn-edit-pm"
+                                        data-id="{{ pm.id }}"
+                                        data-name="{{ pm.name }}"
+                                        data-active="{{ 'true' if pm.is_active else 'false' }}"
+                                        data-bs-toggle="modal" data-bs-target="#editPaymentModeModal">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger py-0 px-2 btn-delete"
+                                        data-url="{{ url_for('main.delete_payment_mode', pm_id=pm.id) }}"
+                                        data-label="Payment Mode"
+                                        data-name="{{ pm.name }}">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">No payment modes found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div><!-- /pane-payment -->
+
+
+    <!-- ═══════════════════════════════════════════
+         PROPERTY CONFIGURATION
+    ═══════════════════════════════════════════════ -->
+    <div class="tab-pane fade" id="pane-property" role="tabpanel">
+        <div class="mb-3">
+            <h6 class="fw-semibold mb-0">
+                <i class="bi bi-building text-primary me-1"></i>Property Configuration
+            </h6>
+            <div class="text-muted small">These settings apply to the current property. Used across invoices, reports, and night audit.</div>
+        </div>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form method="post" action="{{ url_for('main.save_property') }}">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Property Name <span class="text-danger">*</span></label>
+                            <input type="text" name="hotel_name" class="form-control"
+                                   value="{{ prop.get('hotel_name', '') }}"
+                                   placeholder="e.g. Sukoon City View Hotel" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Contact Person</label>
+                            <input type="text" name="hotel_contact_person" class="form-control"
+                                   value="{{ prop.get('hotel_contact_person', '') }}"
+                                   placeholder="General Manager / Owner name">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">Address</label>
+                            <textarea name="hotel_address" class="form-control" rows="2"
+                                      placeholder="Full address including city, state and PIN">{{ prop.get('hotel_address', '') }}</textarea>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Contact Number</label>
+                            <input type="text" name="hotel_contact" class="form-control"
+                                   value="{{ prop.get('hotel_contact', '') }}"
+                                   placeholder="+91 98xxx xxxxx">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Email Address</label>
+                            <input type="email" name="hotel_email" class="form-control"
+                                   value="{{ prop.get('hotel_email', '') }}"
+                                   placeholder="info@hotel.com">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">GST Number (GSTIN)</label>
+                            <input type="text" name="hotel_gstin" class="form-control"
+                                   value="{{ prop.get('hotel_gstin', '') }}"
+                                   maxlength="15" placeholder="15-digit GSTIN"
+                                   style="text-transform:uppercase;">
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-1"></i>Save Property Config
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div><!-- /pane-property -->
+
+
+    <!-- ═══════════════════════════════════════════
+         INVOICE MASTER
+    ═══════════════════════════════════════════════ -->
+    <div class="tab-pane fade" id="pane-invoice" role="tabpanel">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <div>
+                <h6 class="fw-semibold mb-0">
+                    <i class="bi bi-receipt-cutoff text-warning me-1"></i>Invoice Customization
+                </h6>
+                <div class="text-muted small">All fields are optional — leave blank to use system defaults.</div>
+            </div>
+            <a href="{{ url_for('billing.invoice_register') }}" target="_blank"
+               class="btn btn-sm btn-outline-secondary d-print-none" title="Open Invoice Register">
+                <i class="bi bi-receipt me-1"></i>Invoice Register
+            </a>
+        </div>
+
+        <form method="post" action="{{ url_for('main.save_invoice_settings') }}" enctype="multipart/form-data">
+            <div class="row g-3">
+
+            {# ── A. BRANDING ──────────────────────────────────────────────── #}
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-dark text-white py-2 px-3">
+                        <i class="bi bi-palette me-1"></i><strong>A. Branding</strong>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+
+                            <!-- Invoice Logo -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Invoice Logo</label>
+                                {% set inv_logo = inv.get('invoice_logo_filename') %}
+                                {% if inv_logo %}
+                                <div class="mb-2">
+                                    <img src="{{ url_for('static', filename='uploads/' ~ inv_logo) }}"
+                                         alt="Invoice logo"
+                                         style="height:48px;max-width:200px;object-fit:contain;border:1px solid #dee2e6;border-radius:4px;padding:4px;">
+                                </div>
+                                {% endif %}
+                                <input type="file" name="invoice_logo" class="form-control form-control-sm"
+                                       accept=".png,.jpg,.jpeg,.gif,.svg,.webp">
+                                <div class="form-text">PNG, JPG, SVG, WebP. Appears top-left of invoice.</div>
+                            </div>
+
+                            <!-- Invoice Title -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Invoice Title</label>
+                                <input type="text" name="invoice_title" class="form-control form-control-sm"
+                                       value="{{ inv.get('invoice_title','TAX INVOICE') }}"
+                                       placeholder="TAX INVOICE">
+                                <div class="form-text">Printed in bold top-right. Default: TAX INVOICE.</div>
+                            </div>
+
+                            <!-- Show Logo toggle -->
+                            <div class="col-md-4 d-flex align-items-center pt-4">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" role="switch"
+                                           name="invoice_show_logo" id="tog_show_logo" value="true"
+                                           {% if inv.get('invoice_show_logo','true') == 'true' %}checked{% endif %}>
+                                    <label class="form-check-label fw-semibold" for="tog_show_logo">Show Logo on Invoice</label>
+                                </div>
+                            </div>
+
+                            <!-- Header text -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Invoice Header Text</label>
+                                <textarea name="invoice_header" class="form-control form-control-sm" rows="2"
+                                          placeholder="Tagline or sub-heading below hotel name">{{ inv.get('invoice_header','') }}</textarea>
+                                <div class="form-text">Shown below hotel name on every invoice.</div>
+                            </div>
+
+                            <!-- Footer text -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Invoice Footer Text</label>
+                                <textarea name="invoice_footer" class="form-control form-control-sm" rows="2"
+                                          placeholder="Website, social handles, cancellation policy…">{{ inv.get('invoice_footer','') }}</textarea>
+                                <div class="form-text">Printed at the very bottom of every invoice.</div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# ── B. TAX / LEGAL ───────────────────────────────────────────── #}
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-success text-white py-2 px-3">
+                        <i class="bi bi-shield-check me-1"></i><strong>B. Tax / Legal</strong>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Hotel PAN</label>
+                                <input type="text" name="invoice_pan" class="form-control form-control-sm"
+                                       value="{{ inv.get('invoice_pan','') }}"
+                                       placeholder="AABCS1429B"
+                                       maxlength="10" style="text-transform:uppercase;">
+                                <div class="form-text">Printed alongside GSTIN on invoice. Optional.</div>
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label fw-semibold">Note</label>
+                                <p class="text-muted small mb-0 mt-1">
+                                    GSTIN, State Code, and CIN are managed under <strong>Property Config</strong> and
+                                    <strong>Night Audit → Compliance</strong> tabs. Changes there reflect on all invoices instantly.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# ── C. INVOICE PREFERENCES ───────────────────────────────────── #}
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-primary text-white py-2 px-3">
+                        <i class="bi bi-gear me-1"></i><strong>C. Invoice Preferences</strong>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+
+                            <!-- Number prefix -->
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">Invoice Number Prefix</label>
+                                <input type="text" name="invoice_prefix" class="form-control form-control-sm"
+                                       value="{{ inv.get('invoice_prefix','INV') }}"
+                                       placeholder="INV" maxlength="6"
+                                       style="text-transform:uppercase;">
+                                <div class="form-text">e.g. INV, SKN, HT</div>
+                            </div>
+
+                            <!-- Location code -->
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">Location Code</label>
+                                <input type="text" name="invoice_location_code" class="form-control form-control-sm"
+                                       value="{{ inv.get('invoice_location_code','') }}"
+                                       placeholder="JBP, DEL…" maxlength="6"
+                                       style="text-transform:uppercase;">
+                                <div class="form-text">Optional. SKN-JBP-2026-000042</div>
+                            </div>
+
+                            <!-- Layout -->
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">Print Layout</label>
+                                <select name="invoice_layout" class="form-select form-select-sm">
+                                    {% set cur_lay = inv.get('invoice_layout','a4') %}
+                                    <option value="a4"      {% if cur_lay == 'a4'      %}selected{% endif %}>A4 (Standard)</option>
+                                    <option value="compact" {% if cur_lay == 'compact' %}selected{% endif %}>Compact (Narrow)</option>
+                                </select>
+                                <div class="form-text">A4 = wide card. Compact = narrower column.</div>
+                            </div>
+
+                            <!-- Template (future-ready) -->
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">Template Style</label>
+                                <select name="invoice_template" class="form-select form-select-sm">
+                                    {% set cur_tpl = inv.get('invoice_template','standard') %}
+                                    <option value="standard" {% if cur_tpl == 'standard' %}selected{% endif %}>Standard</option>
+                                    <option value="compact"  {% if cur_tpl == 'compact'  %}selected{% endif %}>Compact</option>
+                                    <option value="detailed" {% if cur_tpl == 'detailed' %}selected{% endif %}>Detailed</option>
+                                </select>
+                                <div class="form-text">Reserved for future template variants.</div>
+                            </div>
+
+                            <!-- Thank you -->
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">Thank You Message</label>
+                                <input type="text" name="invoice_thankyou" class="form-control form-control-sm"
+                                       value="{{ inv.get('invoice_thankyou','Thank you for choosing us. We look forward to welcoming you again!') }}"
+                                       placeholder="Thank you for your stay…">
+                                <div class="form-text">Printed at the bottom of every invoice.</div>
+                            </div>
+
+                            <!-- Terms -->
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">Terms &amp; Conditions / Notes</label>
+                                <textarea name="invoice_terms" class="form-control form-control-sm" rows="3"
+                                          placeholder="Cancellation policy, refund terms, check-out time…">{{ inv.get('invoice_terms','') }}</textarea>
+                                <div class="form-text">Shown in the footer section when "Show Terms" is enabled.</div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# ── D. DISPLAY CONTROLS ──────────────────────────────────────── #}
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-secondary text-white py-2 px-3">
+                        <i class="bi bi-toggles me-1"></i><strong>D. Display Controls</strong>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2">
+
+                            {% set toggles = [
+                                ('invoice_show_guest_address',   'tog_guest_addr',   'Show Guest Address'),
+                                ('invoice_show_booking_type',    'tog_btype',        'Show Booking Type (Regular/Hourly)'),
+                                ('invoice_show_gst_breakdown',   'tog_gst',          'Show GST Breakdown Table'),
+                                ('invoice_show_payment_summary', 'tog_payments',     'Show Payment Summary'),
+                                ('invoice_show_balance_badge',   'tog_badge',        'Show Balance Status Badge'),
+                                ('invoice_show_terms',           'tog_terms',        'Show Terms &amp; Conditions'),
+                                ('invoice_show_signatory',       'tog_signatory',    'Show Authorized Signatory Block'),
+                                ('invoice_show_cg_note',         'tog_cg_note',      'Show "Computer Generated" Note'),
+                                ('invoice_qr_enabled',           'tog_qr',           'Show QR Code Placeholder'),
+                            ] %}
+                            {% for key, tid, label in toggles %}
+                            <div class="col-md-6 col-lg-4">
+                                <div class="d-flex align-items-center gap-2 p-2 rounded border bg-light">
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input" type="checkbox" role="switch"
+                                               name="{{ key }}" id="{{ tid }}" value="true"
+                                               {% if inv.get(key,'true') == 'true' %}checked{% endif %}>
+                                        <label class="form-check-label small fw-semibold" for="{{ tid }}">{{ label }}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            </div>{# /row #}
+
+            <div class="mt-3 d-flex gap-2">
+                <button type="submit" class="btn btn-warning text-dark fw-semibold">
+                    <i class="bi bi-save me-1"></i>Save Invoice Settings
+                </button>
+                <a href="{{ url_for('main.invoice', reservation_id=1) }}" target="_blank"
+                   class="btn btn-outline-secondary btn-sm align-self-center">
+                    <i class="bi bi-eye me-1"></i>Preview Invoice
+                </a>
+            </div>
+
+        </form>
+    </div><!-- /pane-invoice -->
+
+
+    <!-- ═══════════════════════════════════════════
+         APP BRANDING
+    ═══════════════════════════════════════════════ -->
+
+
+    <!-- ═══════════════════════════════════════════
+         SYSTEM SETTINGS
+    ═══════════════════════════════════════════════ -->
+    <div class="tab-pane fade" id="pane-settings" role="tabpanel">
+
+        <!-- Unsaved-changes bar -->
+        <div id="settingsUnsavedBar" class="settings-unsaved-bar d-none">
+            <span><i class="bi bi-circle-fill text-warning me-2" style="font-size:.6rem;"></i>You have unsaved changes</span>
+            <button type="submit" form="settingsForm" class="btn btn-sm btn-primary ms-3">
+                <i class="bi bi-save me-1"></i>Save now
+            </button>
+        </div>
+
+        <form method="post" action="{{ url_for('main.update_settings') }}" id="settingsForm" novalidate>
+
+            <!-- ── A. NO-SHOW POLICY ──────────────────────────────────── -->
+            <div class="settings-section">
+                <div class="settings-section-header">
+                    <div>
+                        <h6 class="settings-section-title"><i class="bi bi-person-x me-2 text-warning"></i>No-Show Policy</h6>
+                        <p class="settings-section-desc">Automatically charge guests who do not arrive on their booking date.</p>
+                    </div>
+                </div>
+
+                <div class="settings-row">
+                    <div class="settings-row-info">
+                        <span class="settings-label">Enable No-Show Fee</span>
+                        <span class="settings-hint">Post a fee automatically when a reservation is marked No-Show</span>
+                    </div>
+                    <div class="settings-row-ctrl">
+                        <div class="form-check form-switch settings-switch">
+                            <input class="form-check-input" type="checkbox" role="switch"
+                                   name="noshow_fee_enabled" value="true"
+                                   id="tog_noshow_fee_enabled"
+                                   data-ctrl-id="noshow_fee_enabled"
+                                   {% if sett.get('noshow_fee_enabled') == 'true' %}checked{% endif %}>
+                            <label class="form-check-label settings-switch-label" for="tog_noshow_fee_enabled"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-dep" data-dep="noshow_fee_enabled" data-dep-val="true">
+
+                    <div class="settings-row">
+                        <div class="settings-row-info">
+                            <span class="settings-label">Fee Calculation Mode</span>
+                            <span class="settings-hint">How the no-show charge is computed</span>
+                        </div>
+                        <div class="settings-row-ctrl">
+                            <select name="noshow_fee_mode" id="sel_noshow_fee_mode"
+                                    class="form-select form-select-sm settings-input-sm"
+                                    data-ctrl-id="noshow_fee_mode">
+                                <option value="fixed"   {% if sett.get('noshow_fee_mode','fixed') == 'fixed'   %}selected{% endif %}>Fixed Amount (₹)</option>
+                                <option value="percent" {% if sett.get('noshow_fee_mode') == 'percent' %}selected{% endif %}>Percentage of first night</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="settings-row">
+                        <div class="settings-row-info">
+                            <span class="settings-label">
+                                <span id="noshow_amount_label_fixed">Fee Amount</span>
+                                <span id="noshow_amount_label_pct" class="d-none">Percentage of First Night Rate</span>
+                            </span>
+                            <span class="settings-hint">Applied per no-show reservation</span>
+                        </div>
+                        <div class="settings-row-ctrl">
+                            <div class="input-group input-group-sm" style="width:160px;">
+                                <span class="input-group-text" id="noshow_prefix">₹</span>
+                                <input type="number" name="noshow_fee_amount"
+                                       class="form-control form-control-sm"
+                                       value="{{ sett.get('noshow_fee_amount','0') }}"
+                                       min="0" step="0.01">
+                                <span class="input-group-text d-none" id="noshow_suffix">%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-row settings-row-last">
+                        <div class="settings-row-info">
+                            <span class="settings-label">Auto-Post for OTA Bookings</span>
+                            <span class="settings-hint">Automatically apply fee to OTA channel bookings (MakeMyTrip, Booking.com etc.)</span>
+                        </div>
+                        <div class="settings-row-ctrl">
+                            <div class="form-check form-switch settings-switch">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                       name="noshow_ota_auto_process" value="true"
+                                       id="tog_noshow_ota"
+                                       {% if sett.get('noshow_ota_auto_process') == 'true' %}checked{% endif %}>
+                                <label class="form-check-label settings-switch-label" for="tog_noshow_ota"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /noshow dep -->
+            </div><!-- /No-Show -->
+
+
+            <!-- ── C. COMPLIANCE & INVOICE ───────────────────────────── -->
+            <div class="settings-section">
+                <div class="settings-section-header">
+                    <div>
+                        <h6 class="settings-section-title"><i class="bi bi-shield-check me-2 text-success"></i>Compliance &amp; Invoice</h6>
+                        <p class="settings-section-desc">GST and legal identifiers printed on invoices and reports.</p>
+                    </div>
+                </div>
+
+                <div class="settings-row">
+                    <div class="settings-row-info">
+                        <span class="settings-label">GST Number (GSTIN)</span>
+                        <span class="settings-hint">15-character GST Identification Number</span>
+                    </div>
+                    <div class="settings-row-ctrl">
+                        <input type="text" name="hotel_gstin" class="form-control form-control-sm settings-input-md"
+                               value="{{ sett.get('hotel_gstin','') }}"
+                               maxlength="15" minlength="15"
+                               placeholder="e.g. 07AABCS1429B1Z1"
+                               pattern="[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}"
+                               style="text-transform:uppercase;" autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="settings-row">
+                    <div class="settings-row-info">
+                        <span class="settings-label">State Code</span>
+                        <span class="settings-hint">2-digit GST state code (07 = Delhi, 27 = Maharashtra…)</span>
+                    </div>
+                    <div class="settings-row-ctrl">
+                        <input type="text" name="hotel_state_code" class="form-control form-control-sm settings-input-xs"
+                               value="{{ sett.get('hotel_state_code','') }}"
+                               maxlength="2" placeholder="07" pattern="[0-9]{2}"
+                               style="text-transform:uppercase;">
+                    </div>
+                </div>
+
+                <div class="settings-row">
+                    <div class="settings-row-info">
+                        <span class="settings-label">Room GST Policy</span>
+                        <span class="settings-hint">Determines GST slab for room charges when room type has no explicit rate</span>
+                    </div>
+                    <div class="settings-row-ctrl">
+                        <select name="hotel_gst_policy" class="form-select form-select-sm settings-input-md">
+                            <option value="standard_12_18" {% if sett.get('hotel_gst_policy','standard_12_18') == 'standard_12_18' %}selected{% endif %}>
+                                Standard 12%/18% (post Jul 2022)
+                            </option>
+                            <option value="new_5_18" {% if sett.get('hotel_gst_policy') == 'new_5_18' %}selected{% endif %}>
+                                Budget 0%/5%/18% (pre Jul 2022 / special zones)
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="settings-row settings-row-last">
+                    <div class="settings-row-info">
+                        <span class="settings-label">CIN / Company Registration No.</span>
+                        <span class="settings-hint">Optional — printed on GST-compliant invoices</span>
+                    </div>
+                    <div class="settings-row-ctrl">
+                        <input type="text" name="hotel_cin" class="form-control form-control-sm settings-input-md"
+                               value="{{ sett.get('hotel_cin','') }}"
+                               placeholder="U55101DL2020PTC000000"
+                               style="text-transform:uppercase;">
+                    </div>
+                </div>
+            </div><!-- /Compliance -->
+
+
+            <!-- ── D. PAYMENT CONTROLS ───────────────────────────────── -->
+            <div class="settings-section">
+                <div class="settings-section-header">
+                    <div>
+                        <h6 class="settings-section-title"><i class="bi bi-cash-coin me-2 text-danger"></i>Payment Controls</h6>
+                        <p class="settings-section-desc">Time windows and thresholds that govern payment void and cash handling.</p>
+                    </div>
+                </div>
+
+                <div class="settings-row">
+                    <div class="settings-row-info">
+                        <span class="settings-label">Manager Void Window</span>
+                        <span class="settings-hint">Hours within which a Manager can void a payment without Admin approval</span>
+                    </div>
+                    <div class="settings-row-ctrl">
+                        <div class="input-group input-group-sm" style="width:140px;">
+                            <input type="number" name="void_window_hours"
+                                   class="form-control form-control-sm"
+                                   value="{{ sett.get('void_window_hours','2') }}"
+                                   min="0" max="72" step="1">
+                            <span class="input-group-text">hrs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-row">
+                    <div class="settings-row-info">
+                        <span class="settings-label">Admin Void Window</span>
+                        <span class="settings-hint">Hours within which an Admin can void a payment</span>
+                    </div>
+                    <div class="settings-row-ctrl">
+                        <div class="input-group input-group-sm" style="width:140px;">
+                            <input type="number" name="admin_void_window_hours"
+                                   class="form-control form-control-sm"
+                                   value="{{ sett.get('admin_void_window_hours','24') }}"
+                                   min="0" max="168" step="1">
+                            <span class="input-group-text">hrs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-row settings-row-last">
+                    <div class="settings-row-info">
+                        <span class="settings-label">Max Cash Variance Before Approval</span>
+                        <span class="settings-hint">Shift closing variance above this triggers manager approval requirement</span>
+                    </div>
+                    <div class="settings-row-ctrl">
+                        <div class="input-group input-group-sm" style="width:160px;">
+                            <span class="input-group-text">₹</span>
+                            <input type="number" name="shift_variance_threshold"
+                                   class="form-control form-control-sm"
+                                   value="{{ sett.get('shift_variance_threshold','50') }}"
+                                   min="0" step="1">
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /Payment Controls -->
+
+
+            <!-- ── E. ALERTS & MONITORING ────────────────────────────── -->
+            <div class="settings-section">
+                <div class="settings-section-header">
+                    <div>
+                        <h6 class="settings-section-title"><i class="bi bi-bell me-2 text-info"></i>Alerts &amp; Monitoring</h6>
+                        <p class="settings-section-desc">Thresholds and links for operational monitoring and guest review.</p>
+                    </div>
+                </div>
+
+                <div class="settings-row">
+                    <div class="settings-row-info">
+                        <span class="settings-label">High-Demand Occupancy Threshold</span>
+                        <span class="settings-hint">Show demand alert badge on dashboard when occupancy exceeds this %</span>
+                    </div>
+                    <div class="settings-row-ctrl">
+                        <div class="input-group input-group-sm" style="width:130px;">
+                            <input type="number" name="high_demand_threshold"
+                                   class="form-control form-control-sm"
+                                   value="{{ sett.get('high_demand_threshold','85') }}"
+                                   min="1" max="100" step="1">
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-row settings-row-last">
+                    <div class="settings-row-info">
+                        <span class="settings-label">Google Review URL</span>
+                        <span class="settings-hint">Sent to guests post-checkout to collect Google reviews</span>
+                    </div>
+                    <div class="settings-row-ctrl">
+                        <input type="url" name="google_review_url"
+                               class="form-control form-control-sm settings-input-lg"
+                               value="{{ sett.get('google_review_url','') }}"
+                               placeholder="https://g.page/r/…/review">
+                    </div>
+                </div>
+            </div><!-- /Alerts -->
+
+
+            <!-- ── F. SYSTEM INTEGRATION ─────────────────────────────── -->
+            <div class="settings-section">
+                <div class="settings-section-header">
+                    <div>
+                        <h6 class="settings-section-title"><i class="bi bi-plug me-2 text-secondary"></i>System Integration</h6>
+                        <p class="settings-section-desc">Webhook keys and external tunnel configuration for OTA and channel integrations.</p>
+                    </div>
+                </div>
+
+                <div class="settings-row">
+                    <div class="settings-row-info">
+                        <span class="settings-label">Webhook API Key</span>
+                        <span class="settings-hint">Read-only — send this key in the <code>X-API-Key</code> header from OTA systems</span>
+                    </div>
+                    <div class="settings-row-ctrl d-flex gap-2 align-items-center">
+                        <input type="text" id="apiKeyInput"
+                               class="form-control form-control-sm settings-input-md font-monospace"
+                               value="{{ sett.get('webhook_api_key','') }}"
+                               readonly style="letter-spacing:.03em;">
+                        <button type="button" class="btn btn-sm btn-outline-secondary text-nowrap" id="copyApiKeyBtn">
+                            <i class="bi bi-copy me-1"></i>Copy
+                        </button>
+                    </div>
+                </div>
+
+                <div class="settings-row settings-row-last">
+                    <div class="settings-row-info">
+                        <span class="settings-label">Cloudflare Tunnel URL</span>
+                        <span class="settings-hint">Public HTTPS URL exposed via Cloudflare tunnel for inbound webhooks</span>
+                    </div>
+                    <div class="settings-row-ctrl">
+                        <input type="url" name="cloudflare_tunnel_url"
+                               class="form-control form-control-sm settings-input-lg"
+                               value="{{ sett.get('cloudflare_tunnel_url','') }}"
+                               placeholder="https://your-tunnel.trycloudflare.com">
+                    </div>
+                </div>
+            </div><!-- /Integration -->
+
+
+            <!-- ── G. BACKUP & BRANDING ──────────────────────────────── -->
+            <div class="settings-section">
+                <div class="settings-section-header">
+                    <div>
+                        <h6 class="settings-section-title"><i class="bi bi-archive me-2 text-purple"></i>Backup</h6>
+                        <p class="settings-section-desc">Automatic database backup schedule.</p>
+                    </div>
+                </div>
+
+                <div class="settings-row settings-row-last">
+                    <div class="settings-row-info">
+                        <span class="settings-label">Daily Backup Time</span>
+                        <span class="settings-hint">Time at which the automatic database backup runs (server time)</span>
+                    </div>
+                    <div class="settings-row-ctrl">
+                        <input type="time" name="backup_time"
+                               class="form-control form-control-sm settings-input-sm"
+                               value="{{ sett.get('backup_time','03:00') }}">
+                    </div>
+                </div>
+            </div><!-- /Backup -->
+
+
+            <!-- ── MONTHLY TARGETS ────────────────────────────────── -->
+            <div class="settings-section">
+                <div class="settings-section-header">
+                    <div>
+                        <h6 class="settings-section-title"><i class="bi bi-bullseye me-2 text-primary"></i>Monthly Targets</h6>
+                        <p class="settings-section-desc">Set revenue and occupancy targets shown on the dashboard.</p>
+                    </div>
+                </div>
+                <div class="settings-row">
+                    <div class="settings-row-info">
+                        <span class="settings-label">Monthly Revenue Target (₹)</span>
+                        <span class="settings-hint">Total revenue target for the current month</span>
+                    </div>
+                    <div class="settings-row-ctrl">
+                        <input type="number" name="monthly_revenue_target" step="1000" min="0"
+                               class="form-control form-control-sm settings-input-sm"
+                               value="{{ sett.get('monthly_revenue_target','0') }}" placeholder="e.g. 500000">
+                    </div>
+                </div>
+                <div class="settings-row">
+                    <div class="settings-row-info">
+                        <span class="settings-label">Monthly Occupancy Target (%)</span>
+                        <span class="settings-hint">Target occupancy percentage for the current month</span>
+                    </div>
+                    <div class="settings-row-ctrl">
+                        <input type="number" name="monthly_occupancy_target" step="1" min="0" max="100"
+                               class="form-control form-control-sm settings-input-sm"
+                               value="{{ sett.get('monthly_occupancy_target','0') }}" placeholder="e.g. 75">
+                    </div>
+                </div>
+            </div><!-- /Monthly Targets -->
+
+
+            <!-- Save bar -->
+            <div class="settings-save-bar">
+                <span class="text-muted small" id="settingsSavedHint"></span>
+                <button type="submit" class="btn btn-primary btn-sm px-4" id="settingsSaveBtn">
+                    <i class="bi bi-save me-1"></i>Save All Settings
+                </button>
+            </div>
+
+        </form>
+    </div><!-- /pane-settings -->
+
+    <!-- ═══════════════════════════════════════════
+         CI/CO RULES
+    ═══════════════════════════════════════════════ -->
+    <div class="tab-pane fade" id="pane-cico" role="tabpanel">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h6 class="fw-semibold mb-0">
+                    <i class="bi bi-clock-history text-primary me-1"></i>Check-in / Check-out Rules
+                </h6>
+                <p class="text-muted small mb-0">Configure early check-in and late check-out time slabs and charges.</p>
+            </div>
+        </div>
+
+        <form method="post" action="{{ url_for('main.save_cico_rules') }}" id="cicoForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            {# ── A. Standard Times ── #}
+            <div class="card shadow-sm mb-3">
+                <div class="card-header py-2" style="background:#f8fafc;">
+                    <h6 class="mb-0 fw-semibold"><i class="bi bi-clock me-1 text-secondary"></i>Standard Timings</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-semibold">Standard Check-in Time</label>
+                            <input type="time" name="cico_standard_checkin" class="form-control"
+                                   value="{{ cico.std_checkin }}">
+                            <div class="form-text">Guests arriving before this time may attract early CI charges.</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-semibold">Standard Check-out Time</label>
+                            <input type="time" name="cico_standard_checkout" class="form-control"
+                                   value="{{ cico.std_checkout }}">
+                            <div class="form-text">Guests departing after this time may attract late CO charges.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# ── B. Early Check-in ── #}
+            <div class="card shadow-sm mb-3">
+                <div class="card-header py-2 d-flex justify-content-between align-items-center" style="background:#f8fafc;">
+                    <h6 class="mb-0 fw-semibold"><i class="bi bi-sunrise me-1 text-warning"></i>Early Check-in Rules</h6>
+                    <div class="form-check form-switch mb-0">
+                        <input class="form-check-input" type="checkbox" role="switch"
+                               name="cico_early_enabled" value="1" id="cicoEarlyEnabled"
+                               {% if cico.early_enabled %}checked{% endif %}>
+                        <label class="form-check-label small" for="cicoEarlyEnabled">Enable</label>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="alert alert-info mx-3 mt-3 py-2 small mb-0">
+                        <i class="bi bi-info-circle me-1"></i>
+                        <strong>Rule:</strong> Early CI charge applies only if the guest books at least 1 full night.
+                        The charge is <em>added on top of</em> the regular nightly tariff (e.g. ₹1000 room + 30% = ₹1300 total).
+                    </div>
+                    <table class="table table-sm align-middle mb-0 mt-2">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width:120px">From</th>
+                                <th style="width:120px">To</th>
+                                <th>Label</th>
+                                <th style="width:120px">% of Tariff</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for slab in cico.early_slabs %}
+                            <tr class="{{ 'table-success' if slab.pct == 0 else '' }}">
+                                <td>
+                                    <input type="time" name="cico_early_from_{{ loop.index0 }}"
+                                           class="form-control form-control-sm" value="{{ slab.from_hm }}">
+                                </td>
+                                <td>
+                                    <input type="time" name="cico_early_to_{{ loop.index0 }}"
+                                           class="form-control form-control-sm" value="{{ slab.to_hm }}">
+                                </td>
+                                <td>
+                                    <input type="text" name="cico_early_label_{{ loop.index0 }}"
+                                           class="form-control form-control-sm" value="{{ slab.label }}">
+                                </td>
+                                <td>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" name="cico_early_pct_{{ loop.index0 }}"
+                                               class="form-control" min="0" max="100" step="1"
+                                               value="{{ slab.pct }}">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <input type="hidden" name="cico_early_slab_count" value="{{ cico.early_slabs|length }}">
+                </div>
+            </div>
+
+            {# ── C. Late Check-out ── #}
+            <div class="card shadow-sm mb-3">
+                <div class="card-header py-2 d-flex justify-content-between align-items-center" style="background:#f8fafc;">
+                    <h6 class="mb-0 fw-semibold"><i class="bi bi-sunset me-1 text-danger"></i>Late Check-out Rules</h6>
+                    <div class="form-check form-switch mb-0">
+                        <input class="form-check-input" type="checkbox" role="switch"
+                               name="cico_late_enabled" value="1" id="cicoLateEnabled"
+                               {% if cico.late_enabled %}checked{% endif %}>
+                        <label class="form-check-label small" for="cicoLateEnabled">Enable</label>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="alert alert-info mx-3 mt-3 py-2 small mb-0">
+                        <i class="bi bi-info-circle me-1"></i>
+                        <strong>Rule:</strong> Late CO charge applies only on the departure date or after.
+                        Set % to 0 for grace/buffer period. Edit time windows and percentages per your property policy.
+                    </div>
+                    <table class="table table-sm align-middle mb-0 mt-2">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width:120px">From</th>
+                                <th style="width:120px">To</th>
+                                <th>Label</th>
+                                <th style="width:120px">% of Tariff</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for slab in cico.late_slabs %}
+                            <tr class="{{ 'table-success' if slab.pct == 0 else '' }}">
+                                <td>
+                                    <input type="time" name="cico_late_from_{{ loop.index0 }}"
+                                           class="form-control form-control-sm" value="{{ slab.from_hm }}">
+                                </td>
+                                <td>
+                                    <input type="time" name="cico_late_to_{{ loop.index0 }}"
+                                           class="form-control form-control-sm" value="{{ slab.to_hm }}">
+                                </td>
+                                <td>
+                                    <input type="text" name="cico_late_label_{{ loop.index0 }}"
+                                           class="form-control form-control-sm" value="{{ slab.label }}">
+                                </td>
+                                <td>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" name="cico_late_pct_{{ loop.index0 }}"
+                                               class="form-control" min="0" max="100" step="1"
+                                               value="{{ slab.pct }}">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <input type="hidden" name="cico_late_slab_count" value="{{ cico.late_slabs|length }}">
+                </div>
+            </div>
+
+            {# ── D. Control Options ── #}
+            <div class="card shadow-sm mb-3">
+                <div class="card-header py-2" style="background:#f8fafc;">
+                    <h6 class="mb-0 fw-semibold"><i class="bi bi-toggles me-1 text-secondary"></i>Control Options</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                       name="cico_auto_post" value="1" id="cicoAutoPost"
+                                       {% if cico.auto_post %}checked{% endif %}>
+                                <label class="form-check-label fw-semibold" for="cicoAutoPost">
+                                    Auto-post charges
+                                </label>
+                            </div>
+                            <div class="form-text">Automatically post early/late charges to folio at check-in/checkout.</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                       name="cico_allow_waive" value="1" id="cicoAllowWaive"
+                                       {% if cico.allow_waive %}checked{% endif %}>
+                                <label class="form-check-label fw-semibold" for="cicoAllowWaive">
+                                    Allow waiver at checkout
+                                </label>
+                            </div>
+                            <div class="form-text">Show a "Waive Late Check-out Charge" option on the checkout screen.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary px-4">
+                    <i class="bi bi-save me-1"></i>Save CI/CO Rules
+                </button>
+            </div>
+        </form>
+
+    </div><!-- /pane-cico -->
+
+    <!-- ═══════════════════════════════════════════
+         WEBHOOK LOGS
+    ═══════════════════════════════════════════════ -->
+    <div class="tab-pane fade" id="pane-webhooks" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-semibold mb-0">Webhook Logs</h6>
+        </div>
+        {% if webhook_logs %}
+        <div class="table-responsive">
+            <table class="table table-sm table-striped table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Source</th>
+                        <th>Event</th>
+                        <th>Status</th>
+                        <th>Received</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for wh in webhook_logs %}
+                    <tr>
+                        <td>{{ wh.id }}</td>
+                        <td><span class="badge bg-secondary">{{ wh.source }}</span></td>
+                        <td>{{ wh.event_type }}</td>
+                        <td>
+                            {% if wh.status == 'success' %}
+                            <span class="badge bg-success">Success</span>
+                            {% elif wh.status == 'failed' %}
+                            <span class="badge bg-danger">Failed</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">{{ wh.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ wh.received_at.strftime('%d %b %Y %H:%M') if wh.received_at else '-' }}</td>
+                        <td><small class="text-muted">{{ wh.error_message or '' }}</small></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center text-muted py-4">
+            <i class="bi bi-plug fs-1 d-block mb-2"></i>
+            No webhook logs yet.
+        </div>
+        {% endif %}
+    </div><!-- /pane-webhooks -->
+
+</div><!-- /tab-content -->
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MODALS
+═══════════════════════════════════════════════════════════════════ -->
+
+<!-- Add Room -->
+<div class="modal fade" id="addRoomModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-building me-2"></i>Add Room</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{{ url_for('main.masters_add_room') }}">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Room Number <span class="text-danger">*</span></label>
+                            <input type="text" name="room_number" class="form-control" placeholder="e.g. 101" maxlength="10" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Floor <span class="text-danger">*</span></label>
+                            <input type="number" name="floor" class="form-control" min="0" max="99" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Wing / Block</label>
+                            <input type="text" name="wing" class="form-control" placeholder="A / North / etc." maxlength="50">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Sort Order</label>
+                            <input type="number" name="sort_order" class="form-control" value="0" min="0">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Room Name (optional)</label>
+                            <input type="text" name="room_name" class="form-control" placeholder="e.g. Honeymoon Suite" maxlength="100">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Room Type <span class="text-danger">*</span></label>
+                            <select name="room_type_id" class="form-select" required>
+                                <option value="">— Select type —</option>
+                                {% for rt in room_types %}
+                                {% if rt.is_active %}
+                                <option value="{{ rt.id }}">{{ rt.name }} (₹{{ '{:,.0f}'.format(rt.base_rate) }}/night)</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Max Adults</label>
+                            <input type="number" name="max_adults" class="form-control" value="2" min="1" max="10">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Max Children</label>
+                            <input type="number" name="max_children" class="form-control" value="2" min="0" max="10">
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex flex-wrap gap-4 pt-1">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="extra_bed_allowed" id="addExtraBed">
+                                    <label class="form-check-label" for="addExtraBed">Extra Bed Allowed</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="is_active" id="addRoomActive" checked>
+                                    <label class="form-check-label" for="addRoomActive">Active</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="is_sellable" id="addRoomSellable" checked>
+                                    <label class="form-check-label" for="addRoomSellable">Sellable</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="is_out_of_order" id="addRoomOOO">
+                                    <label class="form-check-label text-danger" for="addRoomOOO">Out of Order</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Maintenance Note</label>
+                            <textarea name="maintenance_note" class="form-control" rows="2" placeholder="Optional note for housekeeping or maintenance team…"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i>Add Room</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Room -->
+<div class="modal fade" id="editRoomModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Edit Room</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" id="editRoomForm">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Room Number <span class="text-danger">*</span></label>
+                            <input type="text" name="room_number" id="editRoomNumber" class="form-control" maxlength="10" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Floor <span class="text-danger">*</span></label>
+                            <input type="number" name="floor" id="editRoomFloor" class="form-control" min="0" max="99" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Wing / Block</label>
+                            <input type="text" name="wing" id="editRoomWing" class="form-control" maxlength="50">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Sort Order</label>
+                            <input type="number" name="sort_order" id="editRoomSortOrder" class="form-control" min="0">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Room Name (optional)</label>
+                            <input type="text" name="room_name" id="editRoomName" class="form-control" maxlength="100">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Room Type <span class="text-danger">*</span></label>
+                            <select name="room_type_id" id="editRoomTypeId" class="form-select" required>
+                                <option value="">— Select type —</option>
+                                {% for rt in room_types %}
+                                <option value="{{ rt.id }}">{{ rt.name }} (₹{{ '{:,.0f}'.format(rt.base_rate) }}/night)</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Max Adults</label>
+                            <input type="number" name="max_adults" id="editRoomMaxAdults" class="form-control" min="1" max="10">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Max Children</label>
+                            <input type="number" name="max_children" id="editRoomMaxChildren" class="form-control" min="0" max="10">
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex flex-wrap gap-4 pt-1">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="extra_bed_allowed" id="editExtraBed">
+                                    <label class="form-check-label" for="editExtraBed">Extra Bed Allowed</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="is_active" id="editRoomActive">
+                                    <label class="form-check-label" for="editRoomActive">Active</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="is_sellable" id="editRoomSellable">
+                                    <label class="form-check-label" for="editRoomSellable">Sellable</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="is_out_of_order" id="editRoomOOO">
+                                    <label class="form-check-label text-danger" for="editRoomOOO">Out of Order</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Maintenance Note</label>
+                            <textarea name="maintenance_note" id="editRoomMaintenanceNote" class="form-control" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Room Type -->
+<div class="modal fade" id="addRoomTypeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-door-open me-2"></i>Add Room Type</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{{ url_for('main.add_room_type') }}">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <!-- Name & Floor -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Name <span class="text-danger">*</span></label>
+                            <input type="text" name="name" class="form-control" required placeholder="e.g. Deluxe, Suite">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Floor Number</label>
+                            <input type="text" name="floor_number" class="form-control" placeholder="e.g. Ground, 1st, 2">
+                        </div>
+                        <!-- Base Rate & GST Rate -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" id="addRtRateLabel">Base Rate (Excl. GST) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                <input type="number" name="rate" id="addRtRateInput" class="form-control"
+                                       step="0.01" min="0.01" required placeholder="0.00">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">GST %</label>
+                            <select name="gst_rate" class="form-select" id="addGstRate">
+                                <option value="0">0% (No GST)</option>
+                                <option value="5">5%</option>
+                                <option value="12">12%</option>
+                                <option value="18">18%</option>
+                            </select>
+                        </div>
+                        <!-- Is Taxable & Rate Type -->
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                       name="is_taxable" id="addIsTaxable" checked>
+                                <label class="form-check-label fw-semibold" for="addIsTaxable">Is Taxable</label>
+                            </div>
+                            <div class="form-text">Uncheck to mark as GST Exempt / Non-Taxable</div>
+                        </div>
+                        <div class="col-md-6" id="addRateTypeRow">
+                            <label class="form-label fw-semibold">Rate Type <span class="text-danger">*</span></label>
+                            <div class="d-flex gap-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="rate_type"
+                                           id="addRtTypeExcl" value="exclusive" checked>
+                                    <label class="form-check-label" for="addRtTypeExcl">Exclusive of GST</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="rate_type"
+                                           id="addRtTypeIncl" value="inclusive">
+                                    <label class="form-check-label" for="addRtTypeIncl">Inclusive of GST</label>
+                                </div>
+                            </div>
+                            <div class="form-text" id="addRtTypeHelp">GST will be added on top during billing.</div>
+                        </div>
+                        <!-- GST Breakdown Preview (always visible) -->
+                        <div class="col-md-12">
+                            <div class="card border-secondary-subtle bg-light">
+                                <div class="card-body py-2 px-3">
+                                    <p class="text-muted small mb-2 fw-semibold">GST Breakdown Preview <span class="fw-normal">(read-only)</span></p>
+                                    <div class="row g-2">
+                                        <div class="col-md-4">
+                                            <label class="form-label small text-muted mb-1">Taxable (₹)</label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text">₹</span>
+                                                <input type="text" id="addPreviewTaxable" class="form-control bg-white fw-semibold" readonly value="0.00">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small text-muted mb-1">CGST (₹) <span id="addPreviewCgstPct" class="fw-normal"></span></label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text">₹</span>
+                                                <input type="text" id="addPreviewCgst" class="form-control bg-white" readonly value="0.00">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small text-muted mb-1">SGST (₹) <span id="addPreviewSgstPct" class="fw-normal"></span></label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text">₹</span>
+                                                <input type="text" id="addPreviewSgst" class="form-control bg-white" readonly value="0.00">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Description & Active -->
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">Description</label>
+                            <textarea name="description" class="form-control" rows="2"
+                                      placeholder="Optional details about this room type"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch mt-1">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                       name="is_active" value="1" id="addRtActive" checked>
+                                <label class="form-check-label" for="addRtActive">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i>Add Room Type
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Room Type -->
+<div class="modal fade" id="editRoomTypeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Edit Room Type</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" id="editRoomTypeForm">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <!-- Name & Floor -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Name <span class="text-danger">*</span></label>
+                            <input type="text" name="name" id="editRtName" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Floor Number</label>
+                            <input type="text" name="floor_number" id="editRtFloor" class="form-control">
+                        </div>
+                        <!-- Base Rate & GST Rate -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" id="editRtRateLabel">Base Rate (Excl. GST) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                <input type="number" name="rate" id="editRtRate" class="form-control" step="0.01" min="0.01" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">GST %</label>
+                            <select name="gst_rate" id="editRtGstRate" class="form-select">
+                                <option value="0">0% (No GST)</option>
+                                <option value="5">5%</option>
+                                <option value="12">12%</option>
+                                <option value="18">18%</option>
+                            </select>
+                        </div>
+                        <!-- Is Taxable & Rate Type -->
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                       name="is_taxable" id="editIsTaxable" checked>
+                                <label class="form-check-label fw-semibold" for="editIsTaxable">Is Taxable</label>
+                            </div>
+                            <div class="form-text">Uncheck to mark as GST Exempt / Non-Taxable</div>
+                        </div>
+                        <div class="col-md-6" id="editRateTypeRow">
+                            <label class="form-label fw-semibold">Rate Type <span class="text-danger">*</span></label>
+                            <div class="d-flex gap-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="rate_type"
+                                           id="editRtTypeExcl" value="exclusive" checked>
+                                    <label class="form-check-label" for="editRtTypeExcl">Exclusive of GST</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="rate_type"
+                                           id="editRtTypeIncl" value="inclusive">
+                                    <label class="form-check-label" for="editRtTypeIncl">Inclusive of GST</label>
+                                </div>
+                            </div>
+                            <div class="form-text" id="editRtTypeHelp">GST will be added on top during billing.</div>
+                        </div>
+                        <!-- GST Breakdown Preview (always visible) -->
+                        <div class="col-md-12">
+                            <div class="card border-secondary-subtle bg-light">
+                                <div class="card-body py-2 px-3">
+                                    <p class="text-muted small mb-2 fw-semibold">GST Breakdown Preview <span class="fw-normal">(read-only)</span></p>
+                                    <div class="row g-2">
+                                        <div class="col-md-4">
+                                            <label class="form-label small text-muted mb-1">Taxable (₹)</label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text">₹</span>
+                                                <input type="text" id="editPreviewTaxable" class="form-control bg-white fw-semibold" readonly value="0.00">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small text-muted mb-1">CGST (₹) <span id="editPreviewCgstPct" class="fw-normal text-muted"></span></label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text">₹</span>
+                                                <input type="text" id="editPreviewCgst" class="form-control bg-white" readonly value="0.00">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small text-muted mb-1">SGST (₹) <span id="editPreviewSgstPct" class="fw-normal text-muted"></span></label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text">₹</span>
+                                                <input type="text" id="editPreviewSgst" class="form-control bg-white" readonly value="0.00">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Description & Active -->
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">Description</label>
+                            <textarea name="description" id="editRtDesc" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch mt-1">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                       name="is_active" value="1" id="editRtActive">
+                                <label class="form-check-label" for="editRtActive">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i>Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Payment Mode -->
+<div class="modal fade" id="addPaymentModeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-credit-card me-2"></i>Add Payment Mode</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{{ url_for('main.add_payment_mode') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Mode Name <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control" required
+                               placeholder="e.g. Cash, UPI, Credit Card, Bank Transfer">
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch"
+                               name="is_active" value="1" id="addPmActive" checked>
+                        <label class="form-check-label" for="addPmActive">Active</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-plus-circle me-1"></i>Add Mode
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Payment Mode -->
+<div class="modal fade" id="editPaymentModeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Edit Payment Mode</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" id="editPaymentModeForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Mode Name <span class="text-danger">*</span></label>
+                        <input type="text" name="name" id="editPmName" class="form-control" required>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch"
+                               name="is_active" value="1" id="editPmActive">
+                        <label class="form-check-label" for="editPmActive">Active</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i>Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Add Rooms Modal (spreadsheet-like) -->
+<div class="modal fade" id="bulkAddRoomModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white py-2">
+                <h6 class="modal-title"><i class="bi bi-table me-2"></i>Bulk Add Rooms</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-2">
+                <div class="alert alert-info py-2 small mb-2">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Fill rows like a spreadsheet. <strong>Room No.</strong>, <strong>Floor</strong>, and <strong>Room Type</strong> are required.
+                    Click <strong>+ Add Row</strong> to add more. Empty rows are ignored.
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered align-middle mb-0" id="bulkRoomTable">
+                        <thead class="table-dark" style="font-size:0.8rem;">
+                            <tr>
+                                <th style="width:35px">#</th>
+                                <th style="width:90px">Room No. *</th>
+                                <th>Name</th>
+                                <th style="width:70px">Floor *</th>
+                                <th style="width:80px">Wing</th>
+                                <th style="width:140px">Room Type *</th>
+                                <th style="width:60px">Adults</th>
+                                <th style="width:60px">Children</th>
+                                <th style="width:65px">Extra Bed</th>
+                                <th style="width:35px"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="bulkRoomBody">
+                        </tbody>
+                    </table>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="bulkAddRowBtn">
+                    <i class="bi bi-plus me-1"></i>Add Row
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="bulkAdd5RowsBtn">
+                    <i class="bi bi-plus me-1"></i>Add 5 Rows
+                </button>
+            </div>
+            <div class="modal-footer py-2">
+                <span class="text-muted small me-auto" id="bulkRoomCount">0 rooms to add</span>
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-sm btn-success" id="bulkRoomSaveBtn">
+                    <i class="bi bi-check2-all me-1"></i>Save All Rooms
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Shared Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content border-danger">
+            <div class="modal-header bg-danger text-white py-2">
+                <h6 class="modal-title mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Confirm Delete</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center py-3">
+                <p class="mb-1 fw-semibold" id="deleteConfirmMsg"></p>
+                <p class="text-muted small mb-0">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer py-2 justify-content-center">
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="post" id="deleteConfirmForm" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-sm btn-danger">
+                        <i class="bi bi-trash me-1"></i>Yes, Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block styles %}
+<style>
+/* ── Settings Dashboard ──────────────────────────────────────────────────── */
+.settings-section {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+}
+.settings-section-header {
+    padding: .9rem 1.25rem .7rem;
+    border-bottom: 1px solid #f0f0f0;
+    background: #fafafa;
+}
+.settings-section-title {
+    font-size: .875rem;
+    font-weight: 700;
+    margin-bottom: .15rem;
+    color: #111827;
+}
+.settings-section-desc {
+    font-size: .78rem;
+    color: #6b7280;
+    margin-bottom: 0;
+}
+.settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: .85rem 1.25rem;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background .12s;
+}
+.settings-row:hover { background: #fafafa; }
+.settings-row.settings-row-last { border-bottom: none; }
+.settings-row-info {
+    display: flex;
+    flex-direction: column;
+    gap: .18rem;
+    flex: 1 1 0;
+    min-width: 0;
+}
+.settings-label {
+    font-size: .85rem;
+    font-weight: 600;
+    color: #1f2937;
+    white-space: nowrap;
+}
+.settings-hint {
+    font-size: .76rem;
+    color: #9ca3af;
+    line-height: 1.4;
+}
+.settings-row-ctrl {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+}
+/* Toggle switch sizing */
+.settings-switch .form-check-input {
+    width: 2.6em;
+    height: 1.35em;
+    cursor: pointer;
+}
+.settings-switch .form-check-input:checked { background-color: #0d6efd; border-color: #0d6efd; }
+.settings-switch-label { margin-left: .5rem; }
+
+/* Input widths */
+.settings-input-xs  { width: 80px  !important; }
+.settings-input-sm  { width: 130px !important; }
+.settings-input-md  { width: 240px !important; }
+.settings-input-lg  { width: 340px !important; }
+
+/* Dependency: hidden rows get display:none */
+.settings-dep[data-hidden="1"] { display: none !important; }
+
+/* Unsaved bar */
+.settings-unsaved-bar {
+    display: flex;
+    align-items: center;
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-radius: 8px;
+    padding: .5rem 1rem;
+    margin-bottom: 1rem;
+    font-size: .83rem;
+    color: #92400e;
+}
+/* Sticky save bar */
+.settings-save-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: .85rem 1.25rem;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    position: sticky;
+    bottom: 1rem;
+    box-shadow: 0 -2px 12px rgba(0,0,0,.06);
+    z-index: 10;
+}
+/* Pulse on dirty */
+.settings-save-bar.dirty #settingsSaveBtn {
+    animation: pulse-once .4s ease;
+}
+@keyframes pulse-once {
+    0%   { box-shadow: 0 0 0 0 rgba(13,110,253,.5); }
+    70%  { box-shadow: 0 0 0 8px rgba(13,110,253,0); }
+    100% { box-shadow: none; }
+}
+/* monospace API key */
+.font-monospace { font-family: 'Consolas', 'SFMono-Regular', monospace; font-size: .82rem !important; }
+/* responsive */
+@media (max-width: 640px) {
+    .settings-row { flex-direction: column; align-items: flex-start; gap: .5rem; }
+    .settings-input-md, .settings-input-lg { width: 100% !important; }
+}
+/* text-purple helper */
+.text-purple { color: #7c3aed !important; }
+</style>
+{% endblock %}
+
+
+{% block scripts %}
+<script nonce="{{ csp_nonce }}">
+(function () {
+
+    // ── Tab persistence ──────────────────────────────────────────────────────
+    document.getElementById('mastersTabs').addEventListener('shown.bs.tab', function (e) {
+        sessionStorage.setItem('mastersTab', e.target.dataset.bsTarget);
+    });
+    var savedTab = sessionStorage.getItem('mastersTab');
+    if (savedTab && savedTab !== '#pane-roomtypes') {
+        var btn = document.querySelector('#mastersTabs [data-bs-target="' + savedTab + '"]');
+        if (btn) bootstrap.Tab.getOrCreateInstance(btn).show();
+    }
+
+    // ── Rooms Master — edit modal population ────────────────────────────────
+    document.querySelectorAll('.btn-edit-room').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var form = document.getElementById('editRoomForm');
+            form.action = '/masters/room/' + btn.dataset.id + '/edit';
+            document.getElementById('editRoomNumber').value        = btn.dataset.roomNumber;
+            document.getElementById('editRoomName').value          = btn.dataset.roomName;
+            document.getElementById('editRoomFloor').value         = btn.dataset.floor;
+            document.getElementById('editRoomWing').value          = btn.dataset.wing;
+            document.getElementById('editRoomTypeId').value        = btn.dataset.roomTypeId;
+            document.getElementById('editRoomMaxAdults').value     = btn.dataset.maxAdults;
+            document.getElementById('editRoomMaxChildren').value   = btn.dataset.maxChildren;
+            document.getElementById('editRoomSortOrder').value     = btn.dataset.sortOrder;
+            document.getElementById('editExtraBed').checked        = btn.dataset.extraBed === 'true';
+            document.getElementById('editRoomActive').checked      = btn.dataset.isActive === 'true';
+            document.getElementById('editRoomSellable').checked    = btn.dataset.isSellable === 'true';
+            document.getElementById('editRoomOOO').checked         = btn.dataset.isOoo === 'true';
+            document.getElementById('editRoomMaintenanceNote').value = btn.dataset.maintenanceNote;
+        });
+    });
+
+    // ── Rooms Master — live search + filter ─────────────────────────────────
+    function filterRoomTable() {
+        var q         = (document.getElementById('roomMasterSearch').value || '').toLowerCase();
+        var floor     = document.getElementById('roomMasterFilterFloor').value;
+        var status    = document.getElementById('roomMasterFilterStatus').value;
+        var lifecycle = document.getElementById('roomMasterFilterLifecycle').value;
+        var rows      = document.querySelectorAll('#roomMasterBody tr[data-room-number]');
+        var visible = 0;
+        rows.forEach(function (row) {
+            var matchQ         = !q || row.dataset.roomNumber.includes(q) || row.dataset.type.includes(q);
+            var matchFloor     = !floor  || row.dataset.floor  === floor;
+            var matchStatus    = !status || row.dataset.status === status;
+            var matchLifecycle = !lifecycle || row.dataset.lifecycle === lifecycle;
+            var show = matchQ && matchFloor && matchStatus && matchLifecycle;
+            row.style.display = show ? '' : 'none';
+            if (show) visible++;
+        });
+        var empty = document.getElementById('roomMasterEmpty');
+        if (empty) empty.style.display = visible === 0 ? '' : 'none';
+    }
+    var roomSearchEl = document.getElementById('roomMasterSearch');
+    if (roomSearchEl) {
+        roomSearchEl.addEventListener('input', filterRoomTable);
+        document.getElementById('roomMasterFilterFloor').addEventListener('change', filterRoomTable);
+        document.getElementById('roomMasterFilterStatus').addEventListener('change', filterRoomTable);
+        document.getElementById('roomMasterFilterLifecycle').addEventListener('change', filterRoomTable);
+        // Apply initial filter (defaults to "active only")
+        filterRoomTable();
+    }
+
+    // ── Edit Room Type — populate modal ──────────────────────────────────────
+    document.querySelectorAll('.btn-edit-rt').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var form = document.getElementById('editRoomTypeForm');
+            form.action = '/masters/room-type/' + btn.dataset.id + '/edit';
+            document.getElementById('editRtName').value  = btn.dataset.name;
+            document.getElementById('editRtFloor').value = btn.dataset.floor;
+            document.getElementById('editRtDesc').value  = btn.dataset.description;
+            var gstRate     = parseFloat(btn.dataset.gst || 0);
+            var isExempted  = btn.dataset.gstExempted === 'true';
+            var isInclusive = btn.dataset.gstInclusive === 'true';
+            var isTaxable   = !isExempted;
+            document.getElementById('editRtGstRate').value   = gstRate;
+            document.getElementById('editIsTaxable').checked = isTaxable;
+            document.getElementById('editRtActive').checked  = btn.dataset.active === 'true';
+            // Rate type radio
+            document.getElementById('editRtTypeIncl').checked = isInclusive && isTaxable;
+            document.getElementById('editRtTypeExcl').checked = !isInclusive || !isTaxable;
+            // Show display rate: for inclusive, show guest-pays amount; for exclusive, show stored base
+            var storedBase  = parseFloat(btn.dataset.rate || 0);
+            var displayRate = (isInclusive && isTaxable && gstRate > 0)
+                ? +(storedBase * (1 + gstRate / 100)).toFixed(2)
+                : storedBase;
+            document.getElementById('editRtRate').value = displayRate;
+            updateEditRateTypeUI();
+            updateEditGstPreview();
+        });
+    });
+
+    // ── Edit Payment Mode — populate modal ───────────────────────────────────
+    document.querySelectorAll('.btn-edit-pm').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var form = document.getElementById('editPaymentModeForm');
+            form.action = '/masters/payment-mode/' + btn.dataset.id + '/edit';
+            document.getElementById('editPmName').value     = btn.dataset.name;
+            document.getElementById('editPmActive').checked = btn.dataset.active === 'true';
+        });
+    });
+
+    // ── Shared Delete confirmation ────────────────────────────────────────────
+    document.querySelectorAll('.btn-delete').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            document.getElementById('deleteConfirmMsg').textContent =
+                'Are you sure you want to delete ' + btn.dataset.label + ' "' + btn.dataset.name + '"?';
+            document.getElementById('deleteConfirmForm').action = btn.dataset.url;
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('deleteConfirmModal')).show();
+        });
+    });
+
+    // ── GST Breakdown Preview — shared helper ────────────────────────────────
+    function calcGstBreakdown(rate, gstRate, isTaxable, isInclusive) {
+        if (!isTaxable || rate === 0) return { taxable: rate, cgst: 0, sgst: 0, gstAmt: 0 };
+        var taxable, gstAmt;
+        if (isInclusive && gstRate > 0) {
+            taxable = rate / (1 + gstRate / 100);
+            gstAmt  = rate - taxable;
+        } else {
+            taxable = rate;
+            gstAmt  = rate * gstRate / 100;
+        }
+        return { taxable: taxable, cgst: gstAmt / 2, sgst: gstAmt / 2, gstAmt: gstAmt };
+    }
+    function applyPreview(prefix, bd, gstRate, isTaxable) {
+        var halfPct = (isTaxable && gstRate > 0) ? '(' + (gstRate / 2) + '%)' : '';
+        document.getElementById(prefix + 'PreviewTaxable').value  = bd.taxable.toFixed(2);
+        document.getElementById(prefix + 'PreviewCgst').value     = bd.cgst.toFixed(2);
+        document.getElementById(prefix + 'PreviewSgst').value     = bd.sgst.toFixed(2);
+        document.getElementById(prefix + 'PreviewCgstPct').textContent = halfPct;
+        document.getElementById(prefix + 'PreviewSgstPct').textContent = halfPct;
+    }
+
+    // ── Add modal ─────────────────────────────────────────────────────────────
+    function updateAddRateTypeUI() {
+        var isTaxable  = document.getElementById('addIsTaxable').checked;
+        var isExcl     = document.getElementById('addRtTypeExcl').checked;
+        var rateTypeRow = document.getElementById('addRateTypeRow');
+        var gstRateEl  = document.getElementById('addGstRate');
+        // Show/hide Rate Type row; disable GST % when not taxable
+        rateTypeRow.style.display = isTaxable ? '' : 'none';
+        if (!isTaxable) { gstRateEl.value = '0'; gstRateEl.disabled = true; }
+        else            { gstRateEl.disabled = false; }
+        // Base Rate label
+        document.getElementById('addRtRateLabel').innerHTML = !isTaxable
+            ? 'Base Rate <span class="text-danger">*</span>'
+            : (isExcl
+                ? 'Base Rate (Excl. GST) <span class="text-danger">*</span>'
+                : 'Base Rate (Incl. GST) <span class="text-danger">*</span>');
+        // Rate Type help text
+        var helpEl = document.getElementById('addRtTypeHelp');
+        if (helpEl) helpEl.textContent = isExcl
+            ? 'GST will be added on top during billing.'
+            : 'GST is included in this price.';
+        updateAddGstPreview();
+    }
+    function updateAddGstPreview() {
+        var rate       = parseFloat(document.getElementById('addRtRateInput').value) || 0;
+        var gstRate    = parseFloat(document.getElementById('addGstRate').value) || 0;
+        var isTaxable  = document.getElementById('addIsTaxable').checked;
+        var isInclusive= document.getElementById('addRtTypeIncl').checked;
+        applyPreview('add', calcGstBreakdown(rate, gstRate, isTaxable, isInclusive), gstRate, isTaxable);
+    }
+    document.getElementById('addIsTaxable').addEventListener('change', updateAddRateTypeUI);
+    document.querySelectorAll('#addRoomTypeModal input[name="rate_type"]').forEach(function (r) {
+        r.addEventListener('change', updateAddRateTypeUI);
+    });
+    document.getElementById('addRtRateInput').addEventListener('input', updateAddGstPreview);
+    document.getElementById('addGstRate').addEventListener('change', updateAddGstPreview);
+    // Initialize Add modal UI state
+    updateAddRateTypeUI();
+
+    // ── Edit modal ────────────────────────────────────────────────────────────
+    function updateEditRateTypeUI() {
+        var isTaxable  = document.getElementById('editIsTaxable').checked;
+        var isExcl     = document.getElementById('editRtTypeExcl').checked;
+        var rateTypeRow = document.getElementById('editRateTypeRow');
+        var gstRateEl  = document.getElementById('editRtGstRate');
+        rateTypeRow.style.display = isTaxable ? '' : 'none';
+        if (!isTaxable) { gstRateEl.value = '0'; gstRateEl.disabled = true; }
+        else            { gstRateEl.disabled = false; }
+        document.getElementById('editRtRateLabel').innerHTML = !isTaxable
+            ? 'Base Rate <span class="text-danger">*</span>'
+            : (isExcl
+                ? 'Base Rate (Excl. GST) <span class="text-danger">*</span>'
+                : 'Base Rate (Incl. GST) <span class="text-danger">*</span>');
+        var helpEl = document.getElementById('editRtTypeHelp');
+        if (helpEl) helpEl.textContent = isExcl
+            ? 'GST will be added on top during billing.'
+            : 'GST is included in this price.';
+        updateEditGstPreview();
+    }
+    function updateEditGstPreview() {
+        var rate       = parseFloat(document.getElementById('editRtRate').value) || 0;
+        var gstRate    = parseFloat(document.getElementById('editRtGstRate').value) || 0;
+        var isTaxable  = document.getElementById('editIsTaxable').checked;
+        var isInclusive= document.getElementById('editRtTypeIncl').checked;
+        applyPreview('edit', calcGstBreakdown(rate, gstRate, isTaxable, isInclusive), gstRate, isTaxable);
+    }
+    document.getElementById('editIsTaxable').addEventListener('change', updateEditRateTypeUI);
+    document.querySelectorAll('#editRoomTypeModal input[name="rate_type"]').forEach(function (r) {
+        r.addEventListener('change', updateEditRateTypeUI);
+    });
+    document.getElementById('editRtRate').addEventListener('input', updateEditGstPreview);
+    document.getElementById('editRtGstRate').addEventListener('change', updateEditGstPreview);
+
+
+    // ════════════════════════════════════════════════════════════════════
+    //  SETTINGS DASHBOARD LOGIC
+    // ════════════════════════════════════════════════════════════════════
+
+    // ── updateDependentFields ─────────────────────────────────────────────────
+    // Reads every [data-ctrl-id] control and shows/hides [data-dep] elements.
+    function updateDependentFields() {
+
+        // Build current values map
+        var vals = {};
+        document.querySelectorAll('[data-ctrl-id]').forEach(function (el) {
+            var key = el.dataset.ctrlId;
+            if (el.type === 'checkbox') {
+                vals[key] = el.checked ? el.value : 'false';
+            } else {
+                vals[key] = el.value;
+            }
+        });
+
+        // Show/hide dependent blocks
+        document.querySelectorAll('.settings-dep[data-dep]').forEach(function (block) {
+            var depKey = block.dataset.dep;
+            var depVal = block.dataset.depVal;
+            var match  = vals[depKey] === depVal;
+            block.dataset.hidden = match ? '0' : '1';
+            // also disable inputs inside hidden blocks so they aren't submitted
+            block.querySelectorAll('input, select, textarea').forEach(function (inp) {
+                inp.disabled = !match;
+            });
+        });
+
+        // ── No-show fee mode label & prefix/suffix swap ───────────────────────
+        var feeMode = vals['noshow_fee_mode'] || 'fixed';
+        var isFixed = feeMode === 'fixed';
+        var labelFixed = document.getElementById('noshow_amount_label_fixed');
+        var labelPct   = document.getElementById('noshow_amount_label_pct');
+        var prefix     = document.getElementById('noshow_prefix');
+        var suffix     = document.getElementById('noshow_suffix');
+        if (labelFixed && labelPct) {
+            labelFixed.classList.toggle('d-none', !isFixed);
+            labelPct.classList.toggle('d-none', isFixed);
+        }
+        if (prefix && suffix) {
+            prefix.classList.toggle('d-none', !isFixed);
+            suffix.classList.toggle('d-none', isFixed);
+        }
+    }
+
+    // Wire up toggles and selects
+    document.querySelectorAll('[data-ctrl-id]').forEach(function (el) {
+        el.addEventListener('change', updateDependentFields);
+    });
+
+    // Run once on load to set initial state
+    updateDependentFields();
+
+
+    // ── Unsaved-changes indicator ─────────────────────────────────────────────
+    var settingsForm = document.getElementById('settingsForm');
+    var unsavedBar   = document.getElementById('settingsUnsavedBar');
+    var saveBar      = document.querySelector('.settings-save-bar');
+    var savedHint    = document.getElementById('settingsSavedHint');
+    var dirty        = false;
+
+    if (settingsForm) {
+        settingsForm.addEventListener('input', function () {
+            if (!dirty) {
+                dirty = true;
+                unsavedBar.classList.remove('d-none');
+                saveBar.classList.add('dirty');
+                savedHint.textContent = 'Unsaved changes';
+                savedHint.className = 'small text-warning fw-semibold';
+            }
+        });
+        settingsForm.addEventListener('change', function () {
+            settingsForm.dispatchEvent(new Event('input'));
+        });
+        settingsForm.addEventListener('submit', function () {
+            dirty = false;
+            unsavedBar.classList.add('d-none');
+        });
+    }
+
+    // Auto-show success toast from flash message
+    var flashSuccess = document.querySelector('.alert-success');
+    if (flashSuccess && flashSuccess.textContent.indexOf('Settings') !== -1) {
+        savedHint.textContent = 'All changes saved';
+        savedHint.className = 'small text-success fw-semibold';
+    }
+
+
+    // ── Copy API key ──────────────────────────────────────────────────────────
+    var copyBtn = document.getElementById('copyApiKeyBtn');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', function () {
+            var val = document.getElementById('apiKeyInput').value;
+            if (!val) return;
+            navigator.clipboard.writeText(val).then(function () {
+                copyBtn.innerHTML = '<i class="bi bi-check2 me-1"></i>Copied!';
+                copyBtn.classList.replace('btn-outline-secondary', 'btn-outline-success');
+                setTimeout(function () {
+                    copyBtn.innerHTML = '<i class="bi bi-copy me-1"></i>Copy';
+                    copyBtn.classList.replace('btn-outline-success', 'btn-outline-secondary');
+                }, 2000);
+            });
+        });
+    }
+
+
+    // ── Client-side validation ────────────────────────────────────────────────
+    if (settingsForm) {
+        settingsForm.addEventListener('submit', function (e) {
+            var errors = [];
+
+            var gstin = settingsForm.querySelector('[name="hotel_gstin"]');
+            if (gstin && gstin.value && gstin.value.length !== 15) {
+                errors.push('GST Number must be exactly 15 characters.');
+            }
+
+            var stateCode = settingsForm.querySelector('[name="hotel_state_code"]');
+            if (stateCode && stateCode.value && !/^\d{2}$/.test(stateCode.value)) {
+                errors.push('State Code must be a 2-digit number.');
+            }
+
+            var occ = settingsForm.querySelector('[name="high_demand_threshold"]');
+            if (occ && (parseInt(occ.value) < 1 || parseInt(occ.value) > 100)) {
+                errors.push('Occupancy threshold must be between 1 and 100.');
+            }
+
+            var variance = settingsForm.querySelector('[name="shift_variance_threshold"]');
+            if (variance && parseFloat(variance.value) < 0) {
+                errors.push('Cash variance cannot be negative.');
+            }
+
+            if (errors.length) {
+                e.preventDefault();
+                alert(errors.join('\n'));
+            }
+        });
+    }
+
+}());
+
+// ═══════════════════════════════════════════════════════════════════════
+// BULK ADD ROOMS — Spreadsheet-like interface
+// ═══════════════════════════════════════════════════════════════════════
+(function() {
+    var body = document.getElementById('bulkRoomBody');
+    var countEl = document.getElementById('bulkRoomCount');
+    if (!body) return;
+
+    var roomTypes = [{% for rt in room_types %}
+        {id: {{ rt.id }}, name: "{{ rt.name }}"}{% if not loop.last %},{% endif %}
+    {% endfor %}];
+
+    var rowIdx = 0;
+
+    function createRow() {
+        rowIdx++;
+        var tr = document.createElement('tr');
+        var typeOpts = '<option value="">— Select —</option>' +
+            roomTypes.map(function(t){ return '<option value="'+t.id+'">'+t.name+'</option>'; }).join('');
+        tr.innerHTML =
+            '<td class="text-muted small text-center">' + rowIdx + '</td>' +
+            '<td><input type="text" class="form-control form-control-sm bulk-room-no" placeholder="101" style="font-weight:600;"></td>' +
+            '<td><input type="text" class="form-control form-control-sm bulk-room-name" placeholder="Optional"></td>' +
+            '<td><input type="number" class="form-control form-control-sm bulk-floor" min="0" max="99" placeholder="1"></td>' +
+            '<td><input type="text" class="form-control form-control-sm bulk-wing" placeholder="A"></td>' +
+            '<td><select class="form-select form-select-sm bulk-type">' + typeOpts + '</select></td>' +
+            '<td><input type="number" class="form-control form-control-sm bulk-adults" value="2" min="1" max="10"></td>' +
+            '<td><input type="number" class="form-control form-control-sm bulk-children" value="2" min="0" max="10"></td>' +
+            '<td class="text-center"><input type="checkbox" class="form-check-input bulk-extrabed"></td>' +
+            '<td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger py-0 px-1 bulk-remove-row"><i class="bi bi-x"></i></button></td>';
+        body.appendChild(tr);
+
+        // Tab from last cell of this row → auto-add new row
+        var inputs = tr.querySelectorAll('input,select');
+        var lastInput = inputs[inputs.length - 2]; // before remove button
+        lastInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Tab' && !e.shiftKey && tr === body.lastElementChild) {
+                e.preventDefault();
+                createRow();
+                body.lastElementChild.querySelector('.bulk-room-no').focus();
+            }
+        });
+
+        tr.querySelector('.bulk-remove-row').addEventListener('click', function() {
+            tr.remove();
+            updateCount();
+            renumber();
+        });
+
+        updateCount();
+        return tr;
+    }
+
+    function renumber() {
+        var rows = body.querySelectorAll('tr');
+        rows.forEach(function(r, i) { r.cells[0].textContent = i + 1; });
+        rowIdx = rows.length;
+    }
+
+    function updateCount() {
+        var filled = 0;
+        body.querySelectorAll('tr').forEach(function(r) {
+            if (r.querySelector('.bulk-room-no').value.trim()) filled++;
+        });
+        countEl.textContent = filled + ' room(s) to add';
+    }
+
+    body.addEventListener('input', updateCount);
+
+    // Add initial 5 rows
+    for (var i = 0; i < 5; i++) createRow();
+
+    document.getElementById('bulkAddRowBtn').addEventListener('click', function() {
+        var tr = createRow();
+        tr.querySelector('.bulk-room-no').focus();
+    });
+
+    document.getElementById('bulkAdd5RowsBtn').addEventListener('click', function() {
+        for (var i = 0; i < 5; i++) createRow();
+    });
+
+    // Reset when modal opens
+    document.getElementById('bulkAddRoomModal').addEventListener('show.bs.modal', function() {
+        body.innerHTML = '';
+        rowIdx = 0;
+        for (var i = 0; i < 5; i++) createRow();
+    });
+
+    // Save
+    document.getElementById('bulkRoomSaveBtn').addEventListener('click', function() {
+        var rooms = [];
+        var errors = [];
+        body.querySelectorAll('tr').forEach(function(r, idx) {
+            var roomNo = r.querySelector('.bulk-room-no').value.trim();
+            if (!roomNo) return; // skip empty rows
+            var floor = r.querySelector('.bulk-floor').value.trim();
+            var typeId = r.querySelector('.bulk-type').value;
+            if (!floor) { errors.push('Row ' + (idx+1) + ': Floor is required'); return; }
+            if (!typeId) { errors.push('Row ' + (idx+1) + ': Room Type is required'); return; }
+            rooms.push({
+                room_number: roomNo,
+                room_name: r.querySelector('.bulk-room-name').value.trim(),
+                floor: parseInt(floor),
+                wing: r.querySelector('.bulk-wing').value.trim(),
+                room_type_id: parseInt(typeId),
+                max_adults: parseInt(r.querySelector('.bulk-adults').value) || 2,
+                max_children: parseInt(r.querySelector('.bulk-children').value) || 2,
+                extra_bed_allowed: r.querySelector('.bulk-extrabed').checked
+            });
+        });
+
+        if (errors.length) {
+            alert(errors.join('\n'));
+            return;
+        }
+        if (!rooms.length) {
+            alert('No rooms to add. Fill at least one row.');
+            return;
+        }
+
+        var btn = document.getElementById('bulkRoomSaveBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving...';
+
+        fetch('{{ url_for("main.bulk_add_rooms") }}', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({rooms: rooms})
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-check2-all me-1"></i>Save All Rooms';
+            if (d.success) {
+                bootstrap.Modal.getInstance(document.getElementById('bulkAddRoomModal')).hide();
+                location.reload();
+            } else {
+                alert(d.error || 'Failed to save rooms.');
+            }
+        })
+        .catch(function() {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-check2-all me-1"></i>Save All Rooms';
+            alert('Network error. Please try again.');
+        });
+    });
+})();
+</script>
+{% endblock %}

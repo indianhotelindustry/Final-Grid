@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Webhook Logs — {{ config.HOTEL_NAME }}{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="mb-0"><i class="bi bi-plug me-2"></i>OTA / Channel Manager Webhook Logs</h4>
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Back
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 small">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Source</th>
+                    <th>Event</th>
+                    <th>Status</th>
+                    <th>Reservation</th>
+                    <th>IP</th>
+                    <th>Received</th>
+                    <th>Error</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td class="text-muted">{{ log.id }}</td>
+                    <td><span class="badge bg-secondary">{{ log.source }}</span></td>
+                    <td>{{ log.event_type }}</td>
+                    <td>
+                        <span class="badge
+                            {% if log.status == 'processed' %}bg-success
+                            {% elif log.status == 'failed' %}bg-danger
+                            {% elif log.status == 'skipped' %}bg-warning text-dark
+                            {% else %}bg-secondary{% endif %}">
+                            {{ log.status }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if log.reservation %}
+                        <a href="{{ url_for('main.invoice', reservation_id=log.reservation_id) }}" class="text-decoration-none">
+                            {{ log.reservation.booking_reference or log.reservation_id }}
+                        </a>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td><small class="text-muted">{{ log.ip_address }}</small></td>
+                    <td><small>{{ log.received_at.strftime('%d %b %H:%M:%S') }}</small></td>
+                    <td>
+                        {% if log.error_message %}
+                        <span class="text-danger" title="{{ log.error_message }}">
+                            <i class="bi bi-exclamation-circle"></i> {{ log.error_message[:40] }}
+                        </span>
+                        {% else %}—{% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="8" class="text-center text-muted py-4">No webhook calls received yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

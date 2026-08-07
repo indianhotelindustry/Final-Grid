@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Credit Notes{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0"><i class="bi bi-receipt-cutoff text-danger me-2"></i>Credit Notes</h4>
+    <small class="text-muted">GST-compliant invoice reversals issued against checked-out reservations.</small>
+  </div>
+</div>
+
+{% if notes %}
+<div class="table-responsive">
+  <table class="table table-sm table-hover align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>CN Number</th>
+        <th>Date</th>
+        <th>Original Invoice</th>
+        <th>Reservation</th>
+        <th>Reason</th>
+        <th class="text-end">Taxable</th>
+        <th class="text-end">CGST</th>
+        <th class="text-end">SGST</th>
+        <th class="text-end">IGST</th>
+        <th class="text-end">Total</th>
+        <th>Issued By</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for cn in notes %}
+      <tr>
+        <td><strong>{{ cn.credit_note_number }}</strong></td>
+        <td>{{ cn.issued_at.strftime('%d %b %Y %H:%M') if cn.issued_at else '-' }}</td>
+        <td>{{ cn.original_invoice_number }}</td>
+        <td>
+          {% if cn.reservation %}
+            <a href="{{ url_for('main.reservation_folio', reservation_id=cn.reservation_id) }}">
+              {{ cn.reservation.booking_reference or ('RES-' ~ cn.reservation_id) }}
+            </a>
+          {% else %}
+            #{{ cn.reservation_id }}
+          {% endif %}
+        </td>
+        <td>{{ cn.reason }}</td>
+        <td class="text-end">{{ "%.2f"|format(cn.taxable_amount) }}</td>
+        <td class="text-end">{{ "%.2f"|format(cn.cgst_amount) }}</td>
+        <td class="text-end">{{ "%.2f"|format(cn.sgst_amount) }}</td>
+        <td class="text-end">{{ "%.2f"|format(cn.igst_amount) }}</td>
+        <td class="text-end"><strong>{{ "%.2f"|format(cn.total_amount) }}</strong></td>
+        <td>{{ cn.issued_by.full_name if cn.issued_by else '-' }}</td>
+      </tr>
+      {% if cn.notes %}
+      <tr>
+        <td colspan="11" class="ps-4 text-muted small border-0 pt-0">
+          <i class="bi bi-chat-text me-1"></i>{{ cn.notes }}
+        </td>
+      </tr>
+      {% endif %}
+      {% endfor %}
+    </tbody>
+    <tfoot class="table-light">
+      <tr>
+        <th colspan="5" class="text-end">Totals:</th>
+        <th class="text-end">{{ "%.2f"|format(notes|sum(attribute='taxable_amount')) }}</th>
+        <th class="text-end">{{ "%.2f"|format(notes|sum(attribute='cgst_amount')) }}</th>
+        <th class="text-end">{{ "%.2f"|format(notes|sum(attribute='sgst_amount')) }}</th>
+        <th class="text-end">{{ "%.2f"|format(notes|sum(attribute='igst_amount')) }}</th>
+        <th class="text-end">{{ "%.2f"|format(notes|sum(attribute='total_amount')) }}</th>
+        <th></th>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-info">
+  <i class="bi bi-info-circle me-1"></i>No credit notes have been issued yet.
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,32 @@
+{
+  "anon_location": "/auth/login?next=%2Floyalty%2Fapi%2Fbalance%2F1",
+  "anon_status": 302,
+  "body_bytes": 43,
+  "body_sha256": "44ba25e3063b75025fab45388986e0834bbdee3a8072feb3aac1ff8ce5c19a62",
+  "category": "OPERATIONAL",
+  "content_type": "application/json",
+  "duration_ms": 3,
+  "endpoint": "loyalty.api_balance",
+  "error": "",
+  "figure_source": "json",
+  "figures": {
+    "$.balance": "0",
+    "$.enrolled": "False",
+    "$[len]": "3"
+  },
+  "location": "",
+  "normalisation_hits": {},
+  "note": "Loyalty point balance, redeemable against a bill.",
+  "origin": "declared",
+  "params": {
+    "id": 1,
+    "resolver": "any_guest",
+    "rule": "lowest guest id"
+  },
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "loyalty.api_balance__any_guest",
+  "templates": [],
+  "truncations": [],
+  "url": "/loyalty/api/balance/1"
+}

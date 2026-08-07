@@ -1,0 +1,27 @@
+{
+  "anon_location": "/auth/login?next=%2Fapi%2Fai%2Fpredictive-maintenance%2Fschedules",
+  "anon_status": 302,
+  "body_bytes": 31,
+  "body_sha256": "bb4e155c7a9840c61e6df7ba9ac52bca837678fb4cfbfa9d0e5d6cd7aa48830d",
+  "category": "ADVISORY",
+  "content_type": "application/json",
+  "duration_ms": 3,
+  "endpoint": "ai.api_pm_schedules",
+  "error": "",
+  "figure_source": "json",
+  "figures": {
+    "$.schedules[len]": "0",
+    "$[len]": "2"
+  },
+  "location": "",
+  "normalisation_hits": {},
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "INFO",
+  "status": 200,
+  "surface_id": "ai.api_pm_schedules",
+  "templates": [],
+  "truncations": [],
+  "url": "/api/ai/predictive-maintenance/schedules"
+}

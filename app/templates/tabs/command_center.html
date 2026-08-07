@@ -1,0 +1,1778 @@
+{#
+  KPI Command Center — Phase 1 SHELL ONLY.
+  No business logic, no fetches, no calculations. Every number slot renders
+  "Loading…" or "No data available" so the page is safe to open in a meeting
+  without showing stale/hardcoded figures. Phase 2 will wire the data endpoint.
+#}
+<style>
+/* ── Command Center — local styles only ──────────────────────────── */
+.cc-wrap { font-size: 0.9rem; }
+.cc-filters {
+    display: flex; flex-wrap: wrap; align-items: end; gap: 8px;
+    background: #fff; border: 1px solid #e5e7eb; border-radius: 6px;
+    padding: 10px 12px; margin-bottom: 14px;
+}
+.cc-filters .fld { display: flex; flex-direction: column; gap: 2px; min-width: 140px; }
+.cc-filters label { font-size: 0.72rem; color: #6b7280; font-weight: 600; }
+.cc-filters .form-select-sm, .cc-filters .form-control-sm { font-size: 0.82rem; }
+.cc-filters .custom-range { display: none; gap: 8px; }
+.cc-filters .custom-range.active { display: flex; }
+
+.cc-section-title {
+    font-size: 0.82rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; color: #374151; margin: 18px 0 8px;
+    display: flex; align-items: center; gap: 6px;
+}
+.cc-section-title .hint { font-size: 0.72rem; color: #9ca3af; font-weight: 500;
+    text-transform: none; letter-spacing: 0; margin-left: auto; }
+
+.cc-grid { display: grid; gap: 10px; }
+.cc-grid-4 { grid-template-columns: repeat(4, 1fr); }
+.cc-grid-6 { grid-template-columns: repeat(6, 1fr); }
+.cc-grid-3 { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 991px) {
+    .cc-grid-4, .cc-grid-6, .cc-grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 575px) {
+    .cc-grid-4, .cc-grid-6, .cc-grid-3 { grid-template-columns: 1fr; }
+}
+
+.cc-card {
+    background: #fff; border: 1px solid #e5e7eb; border-radius: 6px;
+    padding: 10px 12px; min-height: 78px;
+    display: flex; flex-direction: column; justify-content: space-between;
+}
+.cc-card.highlight { border-color: #0d6efd; border-left-width: 3px; }
+.cc-card.warn      { border-left: 3px solid #dc3545; }
+
+.cc-label { font-size: 0.72rem; color: #6b7280; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.03em; display: flex;
+    align-items: center; gap: 4px; }
+.cc-value { font-size: 1.25rem; font-weight: 700; color: #111827;
+    line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cc-sub { font-size: 0.7rem; color: #6b7280; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis; }
+
+.cc-loading { color: #9ca3af; font-style: italic; font-weight: 500; }
+
+/* Inline basis tag — "Cash" / "Accrual" pill inside a revenue card. Styled
+   distinct from .cc-label so it doesn't look like a second section header. */
+.cc-tag {
+    display: inline-block; font-size: 0.62rem; font-weight: 700;
+    padding: 1px 6px; border-radius: 10px; letter-spacing: 0.04em;
+    text-transform: uppercase; background: #f3f4f6; color: #6b7280;
+    margin-left: 6px; vertical-align: middle;
+}
+.cc-tag.cash    { background: #dcfce7; color: #166534; }
+.cc-tag.accrual { background: #dbeafe; color: #1e40af; }
+
+/* Target line inside Sales-vs-Target cards. */
+.cc-target {
+    font-size: 0.72rem; color: #6b7280; font-weight: 600;
+    display: flex; justify-content: space-between; gap: 6px;
+}
+.cc-target .lbl { color: #9ca3af; font-weight: 500; }
+
+.cc-placeholder {
+    background: #fff; border: 1px dashed #d1d5db; border-radius: 6px;
+    padding: 28px; text-align: center; color: #9ca3af; font-size: 0.82rem;
+}
+.cc-placeholder .ph-title { font-weight: 600; color: #6b7280; margin-bottom: 4px; }
+
+.cc-bar-row { display: grid; grid-template-columns: 140px 1fr 120px; gap: 10px;
+    align-items: center; padding: 6px 0; border-bottom: 1px solid #f3f4f6; }
+.cc-bar-row:last-child { border-bottom: none; }
+.cc-bar-label { font-size: 0.82rem; color: #374151; font-weight: 600; }
+.cc-bar-track { height: 8px; background: #f3f4f6; border-radius: 4px; overflow: hidden; }
+.cc-bar-fill { height: 100%; background: #0d6efd; border-radius: 4px; width: 0;
+    transition: width 220ms ease, background-color 220ms ease; }
+.cc-bar-val { font-size: 0.82rem; color: #6b7280; text-align: right; font-weight: 600; }
+
+/* ── Phase 6: progress-bar colour rules (Sales vs Target) ──────── */
+.cc-bar-fill.good { background: #16a34a; }   /* >= 100%  → green */
+.cc-bar-fill.warn { background: #f59e0b; }   /* 80-99%   → amber */
+.cc-bar-fill.bad  { background: #dc2626; }   /* < 80%    → red   */
+
+/* Progress row: bar + raw-pct readout side by side. The label shows the
+   UNCAPPED percentage so over-performance (e.g. 120%) is visible even
+   though the bar itself is clamped to 100% for visual consistency. */
+.cc-bar-row-v2 {
+    display: grid; grid-template-columns: 1fr auto; gap: 8px;
+    align-items: center; margin-top: 4px;
+}
+.cc-bar-pct {
+    font-size: 0.72rem; font-weight: 700; color: #6b7280;
+    min-width: 42px; text-align: right; white-space: nowrap;
+}
+.cc-bar-pct.good { color: #166534; }
+.cc-bar-pct.warn { color: #92400e; }
+.cc-bar-pct.bad  { color: #991b1b; }
+
+/* ── Critical-card emphasis (Today Sales, MTD, Surplus, Run Rate) ── */
+.cc-card.critical { border-left: 3px solid #0d6efd; background: #f8fbff; }
+.cc-card.critical .cc-value { font-size: 1.45rem; letter-spacing: -0.01em; }
+.cc-card.surplus-pos { border-left: 3px solid #16a34a; background: #f0fdf4; }
+.cc-card.surplus-pos .cc-value { color: #14532d; }
+.cc-card.surplus-neg { border-left: 3px solid #dc2626; background: #fef2f2; }
+.cc-card.surplus-neg .cc-value { color: #991b1b; }
+.cc-card.run-rate-hot { border-left: 3px solid #dc2626; background: #fef2f2; }
+.cc-card.run-rate-hot .cc-value { color: #991b1b; }
+
+/* ── Phase 6: comparison summary — arrow badges & colour rules ── */
+.cc-trend-badge {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 0.7rem; font-weight: 700; padding: 1px 7px;
+    border-radius: 10px; letter-spacing: 0.01em;
+    background: #f3f4f6; color: #6b7280;
+}
+/* Intensity-graded greens & reds — |pct| drives the visual weight so
+   a 2% move looks like a whisper and a 25% move like a shout. Tiers:
+     light   (<5%)   — pastel background, muted text
+     medium  (5-15%) — standard semantic colour
+     strong  (>15%)  — solid fill, white text; inline padding bumped
+*/
+.cc-trend-badge.up.intensity-light    { background: #ecfdf5; color: #047857; }
+.cc-trend-badge.up.intensity-medium,
+.cc-trend-badge.up                    { background: #dcfce7; color: #166534; }
+.cc-trend-badge.up.intensity-strong   { background: #16a34a; color: #ffffff; padding: 1px 9px; }
+.cc-trend-badge.down.intensity-light  { background: #fef2f2; color: #b91c1c; }
+.cc-trend-badge.down.intensity-medium,
+.cc-trend-badge.down                  { background: #fee2e2; color: #991b1b; }
+.cc-trend-badge.down.intensity-strong { background: #dc2626; color: #ffffff; padding: 1px 9px; }
+.cc-trend-badge.flat { background: #f3f4f6; color: #6b7280; }
+.cc-card .cc-value .cc-arrow { font-size: 0.95rem; margin-right: 4px; }
+/* Card value colour per direction × intensity */
+.cc-card.compare-up   .cc-value { color: #166534; }
+.cc-card.compare-down .cc-value { color: #991b1b; }
+.cc-card.compare-up.intensity-light   .cc-value { color: #047857; }
+.cc-card.compare-up.intensity-strong  .cc-value { color: #14532d; font-weight: 800; }
+.cc-card.compare-down.intensity-light .cc-value { color: #b91c1c; }
+.cc-card.compare-down.intensity-strong.cc-value,
+.cc-card.compare-down.intensity-strong .cc-value { color: #7f1d1d; font-weight: 800; }
+
+/* ── Phase 6: skeleton shimmer (replaces "Loading…" text) ─────── */
+.cc-skeleton {
+    background: linear-gradient(90deg, #e5e7eb 0%, #f3f4f6 50%, #e5e7eb 100%);
+    background-size: 200% 100%;
+    animation: cc-shimmer 1.2s ease-in-out infinite;
+    border-radius: 4px; color: transparent !important;
+    display: inline-block; min-width: 60%; height: 0.95em;
+}
+.cc-value.cc-skeleton { height: 1.2em; min-width: 70%; }
+@keyframes cc-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ── Phase 6: chart canvas wrappers ───────────────────────────── */
+.cc-chart-card {
+    background: #fff; border: 1px solid #e5e7eb; border-radius: 6px;
+    padding: 10px 12px; min-height: 260px;
+    display: flex; flex-direction: column;
+}
+.cc-chart-header {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 8px; margin-bottom: 6px;
+}
+.cc-chart-title {
+    font-size: 0.82rem; font-weight: 700; color: #374151;
+    display: flex; align-items: center; gap: 5px;
+}
+.cc-chart-controls { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.cc-chart-controls select { font-size: 0.78rem; width: auto; }
+.cc-chart-body { position: relative; flex: 1; min-height: 220px; }
+.cc-chart-body canvas { max-width: 100%; }
+
+/* Mobile refinement — on very small screens (< 576px) the three chart
+   header selects eat too much space. Collapse chart-type and window
+   selects to keep only the Metric toggle visible; the others can still
+   be used by rotating the device or resizing. Default metric is 'Sales'
+   (selected in the option list) so the first paint is meaningful even
+   when the toggles are hidden. */
+@media (max-width: 575px) {
+    .cc-chart-controls select#cc-trend-chart-type,
+    .cc-chart-controls select#cc-trend-mode {
+        display: none;
+    }
+    /* Also shrink the metric select so it sits comfortably next to the
+       chart title on a narrow card. */
+    .cc-chart-controls select#cc-trend-metric {
+        max-width: 110px;
+    }
+    /* Grid drops to a single column below 575 — give charts a bit more
+       vertical breathing room so axes aren't cramped. */
+    .cc-chart-card { min-height: 280px; }
+}
+.cc-chart-empty {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #9ca3af; font-size: 0.82rem; text-align: center; padding: 20px;
+}
+.cc-chart-empty .ph-title { font-weight: 600; color: #6b7280; margin-bottom: 4px; }
+
+/* ── Phase 7: Alert strip + action panel + root-cause box ──────── */
+.cc-alert-strip {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px;
+    padding: 10px 14px; margin: 10px 0 14px;
+}
+.cc-alert-strip.red   { border-left: 4px solid #dc2626; background: #fef2f2; }
+.cc-alert-strip.amber { border-left: 4px solid #f59e0b; background: #fffbeb; }
+.cc-alert-strip.clear { border-left: 4px solid #16a34a; background: #f0fdf4; }
+
+.cc-alert-count {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 0.82rem; font-weight: 700; letter-spacing: 0.02em;
+}
+.cc-alert-count .dot {
+    width: 10px; height: 10px; border-radius: 50%; display: inline-block;
+}
+.cc-alert-count.red   .dot { background: #dc2626; }
+.cc-alert-count.red           { color: #991b1b; }
+.cc-alert-count.amber .dot { background: #f59e0b; }
+.cc-alert-count.amber         { color: #92400e; }
+.cc-alert-count.green .dot { background: #16a34a; }
+.cc-alert-count.green         { color: #166534; }
+
+.cc-alert-top {
+    flex: 1; min-width: 220px; font-size: 0.9rem; font-weight: 600;
+    color: #374151; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.cc-alert-top.red   { color: #991b1b; }
+.cc-alert-top.amber { color: #92400e; }
+
+.cc-alerts-section { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-top: 8px; }
+@media (max-width: 991px) { .cc-alerts-section { grid-template-columns: 1fr; } }
+
+.cc-alerts-panel {
+    background: #fff; border: 1px solid #e5e7eb; border-radius: 6px; padding: 6px;
+}
+.cc-alerts-panel .cc-alerts-hint {
+    font-size: 0.72rem; color: #6b7280; padding: 4px 6px; text-align: center;
+}
+
+.cc-alert-card {
+    border-left: 3px solid #9ca3af; border-radius: 4px;
+    background: #f9fafb; padding: 8px 10px; margin-bottom: 6px;
+    display: grid; grid-template-columns: 1fr auto; gap: 4px 10px;
+    align-items: start;
+}
+/* Severity visual distinction (Phase 7 refinement):
+   - Red cards get a THICKER left border (5px) to draw the eye first.
+   - Amber keeps the standard 3px.
+   - Duplicates (downgraded from red by dedup) are visibly quieter —
+     thinner border, muted background — so they don't compete for
+     attention with the headline they duplicate. */
+.cc-alert-card.red {
+    border-left-color: #dc2626; border-left-width: 5px; background: #fef2f2;
+    box-shadow: 0 1px 2px rgba(220, 38, 38, 0.08);
+}
+.cc-alert-card.amber { border-left-color: #f59e0b; background: #fffbeb; }
+.cc-alert-card.green { border-left-color: #16a34a; background: #f0fdf4; }
+.cc-alert-card.is-duplicate {
+    border-left-width: 2px; background: #fafafa; opacity: 0.86;
+}
+.cc-alert-card.is-persistent {
+    border-top: 1px dashed #d1d5db;  /* quiet hint that this isn't new */
+}
+.cc-alert-head {
+    display: flex; align-items: center; gap: 8px; font-weight: 700;
+    font-size: 0.88rem; color: #1f2937;
+}
+.cc-alert-icon {
+    display: inline-flex; width: 22px; height: 22px; align-items: center;
+    justify-content: center; border-radius: 50%; font-size: 0.85rem;
+    background: #f3f4f6; color: #6b7280; flex-shrink: 0;
+}
+.cc-alert-icon.red   { background: #dc2626; color: #ffffff; }
+.cc-alert-icon.amber { background: #f59e0b; color: #1f2937; }
+.cc-alert-icon.green { background: #16a34a; color: #ffffff; }
+.cc-alert-sev {
+    font-size: 0.65rem; font-weight: 800; letter-spacing: 0.05em;
+    padding: 1px 7px; border-radius: 10px; text-transform: uppercase;
+}
+.cc-alert-sev.red   { background: #dc2626; color: #fff; }
+.cc-alert-sev.amber { background: #f59e0b; color: #1f2937; }
+.cc-alert-sev.green { background: #16a34a; color: #fff; }
+.cc-alert-reason { font-size: 0.82rem; color: #4b5563; line-height: 1.45; grid-column: 1 / -1; }
+.cc-alert-rc {
+    grid-column: 1 / -1; margin: 4px 0 0 0; padding-left: 18px;
+    font-size: 0.78rem; line-height: 1.5;
+}
+.cc-alert-rc li.confidence-primary   { color: #1f2937; font-weight: 600; }
+.cc-alert-rc li.confidence-secondary { color: #374151; }
+.cc-alert-rc li.confidence-possible  { color: #6b7280; font-style: italic; }
+.cc-alert-actions {
+    grid-column: 1 / -1; margin: 4px 0 0 0; padding-left: 18px;
+    font-size: 0.8rem; color: #374151; line-height: 1.5;
+}
+.cc-alert-actions li::marker { color: #9ca3af; }
+.cc-alert-meta {
+    font-size: 0.7rem; color: #6b7280; text-align: right; white-space: nowrap;
+    align-self: start; padding-top: 2px;
+}
+.cc-alert-meta .owner { display: block; font-weight: 600; color: #374151; }
+.cc-alert-pct { font-size: 0.72rem; color: #6b7280; margin-left: 6px; font-weight: 600; }
+.cc-alert-scope {
+    font-size: 0.66rem; font-weight: 700; letter-spacing: 0.04em;
+    text-transform: uppercase; color: #6b7280;
+    padding: 1px 6px; border-radius: 10px; background: #f3f4f6;
+    margin-left: 4px; white-space: nowrap;
+}
+.cc-alert-days {
+    font-size: 0.66rem; font-weight: 700; color: #6b7280;
+    padding: 1px 6px; border-radius: 10px; background: #e5e7eb;
+    margin-left: 4px; white-space: nowrap;
+}
+.cc-alert-days.persistent { background: #fef3c7; color: #92400e; }
+
+.cc-alerts-more {
+    display: block; width: 100%; border: none; background: transparent;
+    font-size: 0.78rem; font-weight: 600; color: #0d6efd; padding: 6px;
+    cursor: pointer; text-align: center;
+}
+.cc-alerts-more:hover { text-decoration: underline; }
+.cc-alerts-empty {
+    padding: 18px; text-align: center; color: #16a34a;
+    font-size: 0.86rem; font-weight: 600;
+}
+
+.cc-root-cause-box {
+    background: #f8fafc; border: 1px solid #e5e7eb; border-left: 3px solid #0d6efd;
+    border-radius: 6px; padding: 10px 14px;
+}
+.cc-root-cause-box .cc-rc-title {
+    font-size: 0.78rem; font-weight: 700; color: #1e40af;
+    text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;
+}
+.cc-root-cause-box .cc-rc-list {
+    margin: 0; padding-left: 18px; font-size: 0.85rem; color: #1f2937;
+}
+.cc-root-cause-box .cc-rc-list li { line-height: 1.55; }
+.cc-root-cause-box .cc-rc-list li.confidence-primary   { font-weight: 700; color: #1e3a8a; }
+.cc-root-cause-box .cc-rc-list li.confidence-secondary { color: #1f2937; }
+.cc-root-cause-box .cc-rc-list li.confidence-possible  { color: #6b7280; font-style: italic; }
+.cc-root-cause-box.muted { border-left-color: #9ca3af; }
+.cc-root-cause-box.muted .cc-rc-title { color: #6b7280; }
+
+/* ── Phase 6: insight box (optional auto-generated signals) ───── */
+.cc-insight-box {
+    background: #fffbeb; border: 1px solid #fde68a; border-left: 3px solid #f59e0b;
+    border-radius: 6px; padding: 10px 14px; margin: 12px 0;
+}
+.cc-insight-box .cc-insight-title {
+    font-size: 0.78rem; font-weight: 700; color: #92400e;
+    text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;
+}
+.cc-insight-box .cc-insight-list {
+    margin: 0; padding-left: 18px; font-size: 0.85rem; color: #78350f;
+}
+.cc-insight-box .cc-insight-list li { line-height: 1.55; }
+.cc-insight-box.muted { background: #f9fafb; border-color: #e5e7eb; border-left-color: #9ca3af; }
+.cc-insight-box.muted .cc-insight-title { color: #6b7280; }
+.cc-insight-box.muted .cc-insight-list   { color: #6b7280; }
+</style>
+
+<div class="cc-wrap">
+
+    {# ── Title row ─────────────────────────────────────────────────── #}
+    <div class="d-flex align-items-center justify-content-between mb-2">
+        <h5 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>KPI Command Center</h5>
+        <span class="cc-loading" id="cc-range-label">Loading…</span>
+    </div>
+
+    {# ── Alert strip (Phase 7) — counts + top headline ─────────────── #}
+    <div class="cc-alert-strip clear" id="cc-alert-strip" style="display:none;">
+        <span class="cc-alert-count red"   id="cc-alert-count-red">
+            <span class="dot"></span><span id="cc-alert-count-red-n">0</span> Red
+        </span>
+        <span class="cc-alert-count amber" id="cc-alert-count-amber">
+            <span class="dot"></span><span id="cc-alert-count-amber-n">0</span> Amber
+        </span>
+        <span class="cc-alert-days persistent" id="cc-alert-persistent"
+              style="display:none;"></span>
+        <span class="cc-alert-top" id="cc-alert-top">—</span>
+    </div>
+
+    {# ── A. Top Filters Row ───────────────────────────────────────── #}
+    <div class="cc-filters" id="cc-filters">
+        <div class="fld">
+            <label for="cc-property">Property</label>
+            <select id="cc-property" class="form-select form-select-sm" disabled>
+                <option>{{ property_name or 'Current property' }}</option>
+            </select>
+        </div>
+        <div class="fld">
+            <label for="cc-preset">Date Preset</label>
+            <select id="cc-preset" class="form-select form-select-sm">
+                <option value="today">Today</option>
+                <option value="yesterday">Yesterday</option>
+                <option value="last_7_days">Last 7 Days</option>
+                <option value="last_30_days" selected>Last 30 Days</option>
+                <option value="mtd">This Month (MTD)</option>
+                <option value="last_month">Last Month</option>
+                <option value="same_month_last_year">Same Month Last Year</option>
+                <option value="custom">Custom…</option>
+            </select>
+        </div>
+        <div class="fld">
+            <label for="cc-source">Source</label>
+            <select id="cc-source" class="form-select form-select-sm">
+                {# Normalized (uppercase) canonical values. Phase 2 maps each
+                   to the raw Reservation.source values ('Walk-in' / 'OTA' /
+                   'Calling' / 'Website' / 'Agent'). Keep this list stable —
+                   reports and analytics will key off the same constants. #}
+                <option value="ALL" selected>All Sources</option>
+                <option value="DIRECT">Direct</option>
+                <option value="OTA">OTA</option>
+                <option value="CORPORATE">Corporate</option>
+                <option value="AGENT">Agent</option>
+                <option value="WALKIN">Walk-in</option>
+            </select>
+        </div>
+        <div class="fld custom-range" id="cc-custom-range">
+            <div>
+                <label for="cc-date-from">From</label>
+                <input type="date" id="cc-date-from" class="form-control form-control-sm">
+            </div>
+            <div>
+                <label for="cc-date-to">To</label>
+                <input type="date" id="cc-date-to" class="form-control form-control-sm">
+            </div>
+            <div style="align-self:end;">
+                <button type="button" id="cc-apply-custom"
+                        class="btn btn-sm btn-primary" disabled>Apply</button>
+            </div>
+        </div>
+        <div class="fld" style="min-width:auto;">
+            <label for="cc-compare">Compare</label>
+            <div class="form-check form-switch" style="padding-top:4px;">
+                <input class="form-check-input" type="checkbox" id="cc-compare">
+                <label class="form-check-label small" for="cc-compare">vs. prior period</label>
+            </div>
+        </div>
+        <div class="fld ms-auto" style="min-width:auto; align-self:end;">
+            <button type="button" id="cc-refresh" class="btn btn-sm btn-outline-secondary" disabled>
+                <i class="bi bi-arrow-clockwise"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    {# ── B. Meeting Quick Answers ─────────────────────────────────── #}
+    <div class="cc-section-title">
+        <i class="bi bi-patch-question-fill text-primary"></i> Meeting Quick Answers
+        <span class="hint">Numbers your owner asks first</span>
+    </div>
+    <div class="cc-grid cc-grid-4">
+        <div class="cc-card highlight critical">
+            <div class="cc-label"><i class="bi bi-cash-stack"></i> Today Sales</div>
+            <div class="cc-value cc-skeleton" id="cc-today-sales" data-key="today_sales">&nbsp;</div>
+            <div class="cc-sub" id="cc-today-sales-sub">&nbsp;</div>
+        </div>
+        <div class="cc-card highlight critical">
+            <div class="cc-label"><i class="bi bi-calendar-week"></i> MTD Sales</div>
+            <div class="cc-value cc-skeleton" id="cc-mtd-sales" data-key="mtd_sales">&nbsp;</div>
+            <div class="cc-sub" id="cc-mtd-sales-sub">&nbsp;</div>
+        </div>
+        <div class="cc-card highlight">
+            <div class="cc-label"><i class="bi bi-pie-chart-fill"></i> Occupancy Today</div>
+            <div class="cc-value cc-skeleton" id="cc-occ-today" data-key="occupancy_today">&nbsp;</div>
+            <div class="cc-sub" id="cc-occ-today-sub">&nbsp;</div>
+        </div>
+        <div class="cc-card highlight">
+            <div class="cc-label"><i class="bi bi-pie-chart"></i> Occupancy MTD</div>
+            <div class="cc-value cc-skeleton" id="cc-occ-mtd" data-key="occupancy_mtd">&nbsp;</div>
+            <div class="cc-sub" id="cc-occ-mtd-sub">&nbsp;</div>
+        </div>
+        <div class="cc-card">
+            <div class="cc-label"><i class="bi bi-bullseye"></i> Today Target</div>
+            <div class="cc-value cc-skeleton" id="cc-today-target" data-key="today_target">&nbsp;</div>
+            <div class="cc-sub" id="cc-today-target-sub">&nbsp;</div>
+        </div>
+        <div class="cc-card">
+            <div class="cc-label"><i class="bi bi-bullseye"></i> MTD Target</div>
+            <div class="cc-value cc-skeleton" id="cc-mtd-target" data-key="mtd_target">&nbsp;</div>
+            <div class="cc-sub" id="cc-mtd-target-sub">&nbsp;</div>
+        </div>
+        <div class="cc-card critical" id="cc-card-surplus-deficit">
+            <div class="cc-label"><i class="bi bi-plus-slash-minus"></i> Surplus / Deficit</div>
+            <div class="cc-value cc-skeleton" id="cc-surplus-deficit" data-key="surplus_deficit">&nbsp;</div>
+            <div class="cc-sub" id="cc-surplus-deficit-sub">&nbsp;</div>
+        </div>
+        <div class="cc-card critical" id="cc-card-run-rate">
+            <div class="cc-label"><i class="bi bi-speedometer2"></i> Required Run Rate</div>
+            <div class="cc-value cc-skeleton" id="cc-run-rate" data-key="required_run_rate">&nbsp;</div>
+            <div class="cc-sub" id="cc-run-rate-sub">&nbsp;</div>
+        </div>
+        <div class="cc-card highlight">
+            <div class="cc-label"><i class="bi bi-graph-up-arrow"></i> Forecast Month-End</div>
+            <div class="cc-value cc-skeleton" id="cc-forecast" data-key="forecast_month_end">&nbsp;</div>
+            <div class="cc-sub" id="cc-forecast-sub">&nbsp;</div>
+        </div>
+    </div>
+
+    {# ── Insight box — auto-generated one-liners from current payload ── #}
+    <div id="cc-insights" class="cc-insight-box muted" style="display:none;">
+        <div class="cc-insight-title">
+            <i class="bi bi-lightbulb me-1"></i>What the numbers say
+        </div>
+        <ul class="cc-insight-list" id="cc-insights-list"></ul>
+    </div>
+
+    {# ── Alert panel + Root cause summary (Phase 7) ───────────────── #}
+    <div class="cc-section-title">
+        <i class="bi bi-exclamation-triangle-fill text-danger"></i> Action Alerts
+        <span class="hint" id="cc-alerts-hint">—</span>
+    </div>
+    <div class="cc-alerts-section">
+        <div class="cc-alerts-panel" id="cc-alerts-panel">
+            <div class="cc-alerts-empty" id="cc-alerts-empty" style="display:none;">
+                <i class="bi bi-check-circle me-1"></i>
+                No major issues detected today.
+            </div>
+            <div id="cc-alerts-list"></div>
+            <button type="button" class="cc-alerts-more" id="cc-alerts-more" style="display:none;">
+                Show all alerts
+            </button>
+        </div>
+        <div class="cc-root-cause-box muted" id="cc-root-cause-box" style="display:none;">
+            <div class="cc-rc-title"><i class="bi bi-compass me-1"></i>Root Cause</div>
+            <ul class="cc-rc-list" id="cc-root-cause-list"></ul>
+        </div>
+    </div>
+
+    {# ── C. Summary Cards Grid ────────────────────────────────────── #}
+    <div class="cc-section-title">
+        <i class="bi bi-bar-chart-line text-success"></i> Summary
+    </div>
+    <div class="cc-grid cc-grid-6">
+        <div class="cc-card">
+            <div class="cc-label"><i class="bi bi-cash-coin"></i> ADR</div>
+            <div class="cc-value cc-loading" id="cc-adr" data-key="adr">Loading…</div>
+            <div class="cc-sub" id="cc-adr-sub">&nbsp;</div>
+        </div>
+        <div class="cc-card">
+            <div class="cc-label"><i class="bi bi-graph-up-arrow"></i> RevPAR</div>
+            <div class="cc-value cc-loading" id="cc-revpar" data-key="revpar">Loading…</div>
+            <div class="cc-sub" id="cc-revpar-sub">&nbsp;</div>
+        </div>
+        <div class="cc-card">
+            <div class="cc-label"><i class="bi bi-calendar-range"></i> ALOS</div>
+            <div class="cc-value cc-loading" id="cc-alos" data-key="alos">Loading…</div>
+            <div class="cc-sub" id="cc-alos-sub">&nbsp;</div>
+        </div>
+        <div class="cc-card">
+            <div class="cc-label"><i class="bi bi-door-closed-fill"></i> Rooms Sold</div>
+            <div class="cc-value cc-loading" id="cc-rooms-sold" data-key="rooms_sold">Loading…</div>
+            <div class="cc-sub" id="cc-rooms-sold-sub">&nbsp;</div>
+        </div>
+        <div class="cc-card">
+            <div class="cc-label"><i class="bi bi-door-open-fill"></i> Available Rooms</div>
+            <div class="cc-value cc-loading" id="cc-rooms-available" data-key="rooms_available">Loading…</div>
+            <div class="cc-sub" id="cc-rooms-available-sub">&nbsp;</div>
+        </div>
+        <div class="cc-card warn">
+            <div class="cc-label">
+                <i class="bi bi-exclamation-circle"></i> Outstanding Due
+                <span class="cc-tag" id="cc-outstanding-due-tag"></span>
+            </div>
+            <div class="cc-value cc-loading" id="cc-outstanding-due" data-key="outstanding_due">Loading…</div>
+            <div class="cc-sub" id="cc-outstanding-due-sub">&nbsp;</div>
+        </div>
+    </div>
+
+    {# ── D. Sales vs Target ───────────────────────────────────────── #}
+    <div class="cc-section-title">
+        <i class="bi bi-bullseye text-danger"></i> Sales vs Target
+    </div>
+    <div class="cc-grid cc-grid-3">
+        {# data-scope = key under payload.sales_vs_target; children resolve via
+           data-scope-field against the nested object (actual/target/variance). #}
+        <div class="cc-card" id="cc-vs-today" data-scope="today">
+            <div class="cc-label">Today vs Target</div>
+            <div class="cc-value cc-loading" data-scope-field="actual">Loading…</div>
+            <div class="cc-target" id="cc-vs-today-target">
+                <span class="lbl">Target</span>
+                <span class="val cc-loading" data-scope-field="target">Loading…</span>
+            </div>
+            <div class="cc-bar-row-v2 mt-1">
+                <div class="cc-bar-track" data-scope-field="progress_track" title="">
+                    <div class="cc-bar-fill" data-scope-field="progress_pct"></div>
+                </div>
+                <span class="cc-bar-pct" data-scope-field="progress_label">—</span>
+            </div>
+            <div class="cc-sub" data-scope-field="variance">&nbsp;</div>
+        </div>
+        <div class="cc-card" id="cc-vs-mtd" data-scope="mtd">
+            <div class="cc-label">MTD vs Target</div>
+            <div class="cc-value cc-loading" data-scope-field="actual">Loading…</div>
+            <div class="cc-target" id="cc-vs-mtd-target">
+                <span class="lbl">Target</span>
+                <span class="val cc-loading" data-scope-field="target">Loading…</span>
+            </div>
+            <div class="cc-bar-row-v2 mt-1">
+                <div class="cc-bar-track" data-scope-field="progress_track" title="">
+                    <div class="cc-bar-fill" data-scope-field="progress_pct"></div>
+                </div>
+                <span class="cc-bar-pct" data-scope-field="progress_label">—</span>
+            </div>
+            <div class="cc-sub" data-scope-field="variance">&nbsp;</div>
+        </div>
+        <div class="cc-card" id="cc-vs-last-month" data-scope="last_month">
+            <div class="cc-label">Last Month vs Target</div>
+            <div class="cc-value cc-loading" data-scope-field="actual">Loading…</div>
+            <div class="cc-target" id="cc-vs-last-month-target">
+                <span class="lbl">Target</span>
+                <span class="val cc-loading" data-scope-field="target">Loading…</span>
+            </div>
+            <div class="cc-bar-row-v2 mt-1">
+                <div class="cc-bar-track" data-scope-field="progress_track" title="">
+                    <div class="cc-bar-fill" data-scope-field="progress_pct"></div>
+                </div>
+                <span class="cc-bar-pct" data-scope-field="progress_label">—</span>
+            </div>
+            <div class="cc-sub" data-scope-field="variance">&nbsp;</div>
+        </div>
+    </div>
+
+    {# ── E0. Comparison Summary (Phase 5) ─────────────────────────── #}
+    <div class="cc-section-title">
+        <i class="bi bi-arrows-move text-primary"></i> Comparison Summary
+        <span class="hint" id="cc-comp-type">—</span>
+    </div>
+    <div class="cc-grid cc-grid-4" id="cc-comparison-grid">
+        <div class="cc-card" data-compare-metric="sales">
+            <div class="cc-label"><i class="bi bi-cash-stack"></i> Sales Δ</div>
+            <div class="cc-value cc-loading" data-compare-field="delta">Loading…</div>
+            <div class="cc-sub" data-compare-field="current-vs-previous">&nbsp;</div>
+        </div>
+        <div class="cc-card" data-compare-metric="occupancy">
+            <div class="cc-label"><i class="bi bi-pie-chart-fill"></i> Occupancy Δ</div>
+            <div class="cc-value cc-loading" data-compare-field="delta">Loading…</div>
+            <div class="cc-sub" data-compare-field="current-vs-previous">&nbsp;</div>
+        </div>
+        <div class="cc-card" data-compare-metric="adr">
+            <div class="cc-label"><i class="bi bi-cash-coin"></i> ADR Δ</div>
+            <div class="cc-value cc-loading" data-compare-field="delta">Loading…</div>
+            <div class="cc-sub" data-compare-field="current-vs-previous">&nbsp;</div>
+        </div>
+        <div class="cc-card" data-compare-metric="revpar">
+            <div class="cc-label"><i class="bi bi-graph-up-arrow"></i> RevPAR Δ</div>
+            <div class="cc-value cc-loading" data-compare-field="delta">Loading…</div>
+            <div class="cc-sub" data-compare-field="current-vs-previous">&nbsp;</div>
+        </div>
+    </div>
+
+    {# ── E. Monthly Trend ─────────────────────────────────────────── #}
+    <div class="cc-section-title">
+        <i class="bi bi-graph-up text-info"></i> Monthly Trend
+    </div>
+    <div class="cc-grid" style="grid-template-columns: 2fr 1fr;">
+        <div class="cc-chart-card" id="cc-trend-continuous" data-key="trend_continuous">
+            <div class="cc-chart-header">
+                <div class="cc-chart-title"><i class="bi bi-activity"></i> Continuous Trend</div>
+                <div class="cc-chart-controls">
+                    <select id="cc-trend-metric" class="form-select form-select-sm" aria-label="Metric">
+                        <option value="sales" selected>Sales</option>
+                        <option value="occupancy">Occupancy %</option>
+                        <option value="adr">ADR</option>
+                        <option value="revpar">RevPAR</option>
+                    </select>
+                    <select id="cc-trend-chart-type" class="form-select form-select-sm" aria-label="Chart type">
+                        <option value="line" selected>Line</option>
+                        <option value="bar">Bar</option>
+                    </select>
+                    <select id="cc-trend-mode" class="form-select form-select-sm" aria-label="Window">
+                        <option value="6m" selected>Last 6 Months</option>
+                        <option value="12m">Last 12 Months</option>
+                        <option value="fy">This Financial Year</option>
+                    </select>
+                </div>
+            </div>
+            <div class="cc-chart-body">
+                <canvas id="cc-trend-canvas"></canvas>
+                <div class="cc-chart-empty" id="cc-trend-empty" style="display:none;">
+                    <div class="ph-title"><i class="bi bi-inbox me-1"></i>No data for selected period</div>
+                    <div>Try widening the window or changing filters.</div>
+                </div>
+            </div>
+        </div>
+        <div class="cc-chart-card" id="cc-trend-compare" data-key="trend_compare">
+            <div class="cc-chart-header">
+                <div class="cc-chart-title"><i class="bi bi-columns-gap"></i> Months Compared</div>
+                <div class="cc-chart-controls">
+                    <span class="cc-sub" id="cc-compare-note">&nbsp;</span>
+                </div>
+            </div>
+            <div class="cc-chart-body">
+                <canvas id="cc-compare-canvas"></canvas>
+                <div class="cc-chart-empty" id="cc-compare-empty" style="display:none;">
+                    <div class="ph-title"><i class="bi bi-inbox me-1"></i>No data to compare</div>
+                    <div>Last-month totals aren't available yet.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# ── F. Occupancy & Revenue ───────────────────────────────────── #}
+    <div class="cc-section-title">
+        <i class="bi bi-bar-chart-steps text-warning"></i> Occupancy &amp; Revenue
+    </div>
+    <div class="cc-grid cc-grid-4">
+        <div class="cc-card">
+            <div class="cc-label">Occupancy %</div>
+            <div class="cc-value cc-loading" id="cc-occ-range" data-key="occupancy_range">Loading…</div>
+            <div class="cc-sub" id="cc-occ-range-sub">&nbsp;</div>
+        </div>
+        <div class="cc-card">
+            <div class="cc-label">
+                Room Revenue
+                <span class="cc-tag" id="cc-room-revenue-tag"></span>
+            </div>
+            <div class="cc-value cc-loading" id="cc-room-revenue" data-key="room_revenue">Loading…</div>
+            <div class="cc-sub" id="cc-room-revenue-sub">&nbsp;</div>
+        </div>
+        <div class="cc-card">
+            <div class="cc-label">
+                F&amp;B / Extras
+                <span class="cc-tag" id="cc-extras-revenue-tag"></span>
+            </div>
+            <div class="cc-value cc-loading" id="cc-extras-revenue" data-key="extras_revenue">Loading…</div>
+            <div class="cc-sub" id="cc-extras-revenue-sub">&nbsp;</div>
+        </div>
+        <div class="cc-card">
+            <div class="cc-label">OTA Receivable</div>
+            <div class="cc-value cc-loading" id="cc-ota-receivable" data-key="ota_receivable">Loading…</div>
+            <div class="cc-sub" id="cc-ota-receivable-sub">&nbsp;</div>
+        </div>
+    </div>
+
+    {# ── Phase 2 debug sink — toggle with ?debug=1 to dump last API payload.
+         Hidden by default; production users never see it. #}
+    <div id="cc-debug" style="display:none;"></div>
+
+    {# ── Empty-state banner (hidden until Phase 2 confirms no data) ── #}
+    <div id="cc-empty-banner" class="cc-placeholder mt-3" style="display:none;">
+        <div class="ph-title"><i class="bi bi-inbox me-1"></i>No data available for selected period</div>
+        <div class="mb-3" id="cc-empty-msg">
+            Try a wider date range or check that stays exist in the selected period.
+        </div>
+        <button type="button" id="cc-retry" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-arrow-clockwise me-1"></i>Retry
+        </button>
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='vendor/chartjs/chart.umd.min.js') }}"></script>
+<script nonce="{{ csp_nonce }}">
+// ─────────────────────────────────────────────────────────────────
+// KPI Command Center — Phase 6 wiring.
+//   - Chart.js trend + comparison charts (local bundle, graceful
+//     degradation if Chart global is absent).
+//   - Sales-vs-Target progress-bar colour rules.
+//   - Comparison summary arrow/badge visuals.
+//   - Skeleton shimmer until first render; debounced filter changes;
+//     last-response cache keyed on filter string.
+//   - Auto-generated rule-based insight lines.
+// ─────────────────────────────────────────────────────────────────
+(function () {
+    var API_URL = '/api/dashboard/command-center/data';
+
+    var preset      = document.getElementById('cc-preset');
+    var source      = document.getElementById('cc-source');
+    var trendMode   = document.getElementById('cc-trend-mode');
+    var trendMetric = document.getElementById('cc-trend-metric');
+    var trendType   = document.getElementById('cc-trend-chart-type');
+    var compareCb   = document.getElementById('cc-compare');
+    var customWrap  = document.getElementById('cc-custom-range');
+    var dateFrom    = document.getElementById('cc-date-from');
+    var dateTo      = document.getElementById('cc-date-to');
+    var applyBtn    = document.getElementById('cc-apply-custom');
+    var refreshBtn  = document.getElementById('cc-refresh');
+    var rangeLabel  = document.getElementById('cc-range-label');
+    var retryBtn    = document.getElementById('cc-retry');
+    var emptyBanner = document.getElementById('cc-empty-banner');
+    var emptyMsg    = document.getElementById('cc-empty-msg');
+    var debugSink   = document.getElementById('cc-debug');
+
+    // Phase 3: data-key binder pulls values from these top-level sections.
+    // Anything not covered here stays "Loading…" until a later phase.
+    var BOUND_SECTIONS = ['quick_answers', 'summary_cards', 'range_revenue'];
+    // data-key → element-id override. Filled only when the element's id
+    // doesn't follow the default "cc-<snake-to-dash>" pattern.
+    var KEY_ID_OVERRIDES = {
+        'forecast_month_end': 'cc-forecast',
+    };
+
+    var debugMode = /[\?&]debug=1\b/.test(window.location.search);
+
+    // Last-response cache — keyed on the filter querystring. Prevents a
+    // refetch when the user toggles a local-only control (metric / chart
+    // type) that doesn't change filters.
+    var lastFilterStr = '';
+    var lastPayload   = null;
+
+    // Debounce — collapses multiple rapid filter changes into one fetch.
+    var debounceTimer = null;
+    function schedule() {
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(load, 300);
+    }
+
+    // Chart handles — destroyed before re-render so Chart.js canvases
+    // don't end up double-initialised.
+    var trendChart = null;
+    var compareChart = null;
+
+    // Custom-range UX
+    function syncCustom() {
+        if (preset.value === 'custom') customWrap.classList.add('active');
+        else customWrap.classList.remove('active');
+    }
+    function syncApply() {
+        applyBtn.disabled = !(dateFrom.value && dateTo.value && dateFrom.value <= dateTo.value);
+    }
+    preset.addEventListener('change', function () {
+        syncCustom();
+        if (preset.value !== 'custom') schedule();
+    });
+    dateFrom.addEventListener('input', syncApply);
+    dateTo.addEventListener('input', syncApply);
+
+    // Filter / button handlers. Filter changes go through the debouncer
+    // so a user quickly flipping through presets fires only one request.
+    if (source)     source.addEventListener('change', schedule);
+    if (trendMode)  trendMode.addEventListener('change', schedule);
+    if (compareCb)  compareCb.addEventListener('change', schedule);
+    if (applyBtn)   applyBtn.addEventListener('click', function () {
+        // Apply is an explicit user action — force a fetch even if the
+        // filter string hasn't structurally changed (user may have retyped
+        // the same date).
+        lastFilterStr = '';
+        schedule();
+    });
+    if (refreshBtn) {
+        refreshBtn.disabled = false;
+        refreshBtn.addEventListener('click', function () {
+            lastFilterStr = '';   // force refetch
+            schedule();
+        });
+    }
+    if (retryBtn) retryBtn.addEventListener('click', function () {
+        lastFilterStr = '';
+        schedule();
+    });
+
+    // Trend metric / chart-type toggles are LOCAL-only — they re-render
+    // from the cached payload without a network round-trip.
+    if (trendMetric) trendMetric.addEventListener('change', function () {
+        if (lastPayload) renderTrendChart(lastPayload.monthly_trend &&
+                                          lastPayload.monthly_trend.trend_continuous);
+    });
+    if (trendType) trendType.addEventListener('change', function () {
+        if (lastPayload) renderTrendChart(lastPayload.monthly_trend &&
+                                          lastPayload.monthly_trend.trend_continuous);
+    });
+
+    function currentFilters() {
+        var params = new URLSearchParams();
+        params.set('preset', preset.value || 'today');
+        if (preset.value === 'custom') {
+            if (dateFrom.value) params.set('date_from', dateFrom.value);
+            if (dateTo.value)   params.set('date_to',   dateTo.value);
+        }
+        if (source && source.value)        params.set('source',     source.value);
+        if (trendMode && trendMode.value)  params.set('trend_mode', trendMode.value);
+        if (compareCb && compareCb.checked) params.set('compare', '1');
+        if (debugMode)                     params.set('debug', '1');
+        return params.toString();
+    }
+
+    function setRangeLabel(meta) {
+        if (!meta || !meta.date_from) {
+            rangeLabel.textContent = 'No range';
+            rangeLabel.style.color = '#9ca3af';
+            return;
+        }
+        rangeLabel.style.color = '';
+        rangeLabel.textContent = meta.date_from === meta.date_to
+            ? meta.date_from
+            : meta.date_from + ' → ' + meta.date_to;
+    }
+
+    function applyMetric(elId, metric) {
+        var el = document.getElementById(elId);
+        if (!el) return;
+        if (!metric) {
+            el.textContent = '—';
+            el.classList.remove('cc-loading', 'cc-skeleton');
+            return;
+        }
+        el.textContent = metric.display != null ? metric.display : '—';
+        el.classList.remove('cc-loading', 'cc-skeleton');
+        var subEl = document.getElementById(elId + '-sub');
+        if (subEl && metric.sub != null) subEl.textContent = metric.sub;
+        // Basis tag — only fill if the metric carries one (cash/accrual).
+        var tagEl = document.getElementById(elId + '-tag');
+        if (tagEl) {
+            var tag = (metric.tag || '').trim();
+            tagEl.textContent = tag;
+            tagEl.classList.remove('cash', 'accrual');
+            if (tag.toLowerCase() === 'cash')    tagEl.classList.add('cash');
+            if (tag.toLowerCase() === 'accrual') tagEl.classList.add('accrual');
+        }
+    }
+
+    function idForKey(key) {
+        if (KEY_ID_OVERRIDES[key]) return KEY_ID_OVERRIDES[key];
+        // today_sales → cc-today-sales ; occupancy_mtd → cc-occ-mtd? No —
+        // we standardised id="cc-<key-with-underscores-to-dashes>". The one
+        // oddball (forecast_month_end → cc-forecast) is overridden above.
+        var slug = key.replace(/_/g, '-');
+        // Minor legacy fix-ups where the id was shortened for space.
+        if (slug === 'occupancy-today') return 'cc-occ-today';
+        if (slug === 'occupancy-mtd')   return 'cc-occ-mtd';
+        if (slug === 'occupancy-range') return 'cc-occ-range';
+        return 'cc-' + slug;
+    }
+
+    function bindSection(obj) {
+        if (!obj) return;
+        Object.keys(obj).forEach(function (key) {
+            applyMetric(idForKey(key), obj[key]);
+        });
+    }
+
+    function bindComparison(block) {
+        // Phase 6 — arrow + coloured-badge summary strip.
+        var typeEl = document.getElementById('cc-comp-type');
+        var grid = document.getElementById('cc-comparison-grid');
+        var hasAnyDelta = block && block.delta && Object.keys(block.delta).length > 0;
+        if (!block || !block.type || block.type === 'none' || !hasAnyDelta) {
+            if (typeEl) { typeEl.textContent = 'No comparison data'; typeEl.style.color = '#9ca3af'; }
+            document.querySelectorAll('#cc-comparison-grid .cc-card').forEach(function (card) {
+                card.classList.remove('compare-up', 'compare-down');
+            });
+            document.querySelectorAll('#cc-comparison-grid .cc-value').forEach(function (el) {
+                el.innerHTML = '—';
+                el.classList.remove('cc-loading', 'cc-skeleton');
+                el.style.color = '';
+            });
+            document.querySelectorAll('#cc-comparison-grid .cc-sub').forEach(function (el) {
+                el.innerHTML = '';
+            });
+            return;
+        }
+        if (typeEl) {
+            typeEl.textContent = block.type.replace(/_/g, ' ') + ' · ' +
+                (block.previous_range ? block.previous_range.from + ' → ' + block.previous_range.to : '');
+            typeEl.style.color = '#6b7280';
+        }
+        // Arrow + badge rules:
+        //   ↑ green  — direction 'up'   (positive trend)
+        //   ↓ red    — direction 'down' (negative trend)
+        //   → grey   — direction 'flat' (unchanged)
+        // Intensity (|pct|) drives visual weight so small noise doesn't
+        // shout:  < 5% → light,  5-15% → medium,  > 15% → strong.
+        // The card itself also gets compare-up / compare-down and an
+        // intensity-* class so value text + badge pick up the shade
+        // without JS having to restyle each metric.
+        var ARROWS = { up: '↑', down: '↓', flat: '→' };
+        function intensityClass(pct) {
+            if (pct === null || pct === undefined) return 'intensity-medium'; // 'New'
+            var a = Math.abs(Number(pct) || 0);
+            if (a > 15) return 'intensity-strong';
+            if (a >= 5) return 'intensity-medium';
+            return 'intensity-light';
+        }
+        grid.querySelectorAll('[data-compare-metric]').forEach(function (card) {
+            var metric = card.dataset.compareMetric;
+            var delta  = (block.delta || {})[metric];
+            var cur    = (block.current  || {})[metric];
+            var prev   = (block.previous || {})[metric];
+            card.classList.remove(
+                'compare-up', 'compare-down',
+                'intensity-light', 'intensity-medium', 'intensity-strong'
+            );
+            var valEl = card.querySelector('[data-compare-field="delta"]');
+            var subEl = card.querySelector('[data-compare-field="current-vs-previous"]');
+            if (!delta) {
+                if (valEl) { valEl.innerHTML = '—'; valEl.classList.remove('cc-loading', 'cc-skeleton'); }
+                if (subEl) subEl.textContent = '';
+                return;
+            }
+            var dir = delta.direction || 'flat';
+            if (dir === 'up')   card.classList.add('compare-up');
+            if (dir === 'down') card.classList.add('compare-down');
+            // Flat direction stays intensity-neutral (no-op class); only
+            // up / down get graded because only signed moves carry weight.
+            var intensity = (dir === 'flat') ? '' : intensityClass(delta.pct);
+            if (intensity) card.classList.add(intensity);
+            if (valEl) {
+                var raw = delta.display || '—';
+                var signed = raw;
+                if (dir === 'up' && !raw.startsWith('+'))   signed = '+' + raw.replace(/^-/, '');
+                if (dir === 'down' && !raw.startsWith('-')) signed = '-' + raw.replace(/^-/, '');
+                var badgeText;
+                if (delta.pct === null || delta.pct === undefined) {
+                    badgeText = (dir === 'flat') ? '0%' : 'New';
+                } else {
+                    badgeText = (delta.pct > 0 ? '+' : '') + delta.pct + '%';
+                }
+                // Arrow rides next to the value; trend badge sits after,
+                // carrying the same intensity class for coordinated shade.
+                var badgeClass = 'cc-trend-badge ' + dir +
+                                 (intensity ? ' ' + intensity : '');
+                valEl.innerHTML =
+                    '<span class="cc-arrow">' + escapeHtml(ARROWS[dir] || '→') + '</span>' +
+                    escapeHtml(signed) +
+                    ' <span class="' + badgeClass + '">' + escapeHtml(badgeText) + '</span>';
+                valEl.classList.remove('cc-loading', 'cc-skeleton');
+                // Clear inline colour — card class now drives it.
+                valEl.style.color = '';
+            }
+            if (subEl) {
+                if (cur && prev) {
+                    subEl.textContent = (cur.display || '—') + '  ←  ' + (prev.display || '—');
+                } else {
+                    subEl.textContent = '';
+                }
+            }
+        });
+    }
+
+    // ── Phase 6: critical-card emphasis ──────────────────────────────
+    // Apply red/green accents to Surplus-Deficit and Run-Rate cards based
+    // on the value in the payload (sign / relative size). Called after
+    // quick_answers is bound so we have the raw numbers available.
+    function emphasiseCriticalCards(quick) {
+        if (!quick) return;
+        var sdCard = document.getElementById('cc-card-surplus-deficit');
+        var sd = quick.surplus_deficit;
+        if (sdCard && sd) {
+            sdCard.classList.remove('surplus-pos', 'surplus-neg');
+            if (typeof sd.value === 'number') {
+                if (sd.value > 0)      sdCard.classList.add('surplus-pos');
+                else if (sd.value < 0) sdCard.classList.add('surplus-neg');
+            } else if (sd.direction === 'up')   sdCard.classList.add('surplus-pos');
+            else if (sd.direction === 'down')   sdCard.classList.add('surplus-neg');
+        }
+        var rrCard = document.getElementById('cc-card-run-rate');
+        var rr = quick.required_run_rate;
+        var todaySales = quick.today_sales;
+        if (rrCard && rr && typeof rr.value === 'number') {
+            rrCard.classList.remove('run-rate-hot');
+            // If required run rate exceeds today's pace by more than 40%,
+            // flag it as hot (hard to catch up).
+            var pace = (todaySales && typeof todaySales.value === 'number') ? todaySales.value : 0;
+            if (pace > 0 && rr.value > pace * 1.4) rrCard.classList.add('run-rate-hot');
+            else if (pace === 0 && rr.value > 0)   rrCard.classList.add('run-rate-hot');
+        }
+    }
+
+    // ── Phase 6: Chart renderers ─────────────────────────────────────
+    //
+    // Both renderers destroy the previous chart instance before creating a
+    // new one so repeated fetches / metric toggles never leak canvases.
+    // They degrade gracefully when Chart is not loaded (shows the inline
+    // empty state) and when the data arrays are empty.
+
+    var METRIC_CONFIG = {
+        sales:     { label: 'Sales',     unit: 'currency', decimals: 0 },
+        occupancy: { label: 'Occupancy', unit: 'percent',  decimals: 1 },
+        adr:       { label: 'ADR',       unit: 'currency', decimals: 0 },
+        revpar:    { label: 'RevPAR',    unit: 'currency', decimals: 0 },
+    };
+
+    function fmtNumber(v, unit, decimals) {
+        if (v == null || isNaN(v)) return '—';
+        var n = Number(v);
+        var str;
+        try {
+            str = n.toLocaleString('en-IN', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals,
+            });
+        } catch (e) { str = n.toFixed(decimals); }
+        if (unit === 'currency') return '₹' + str;
+        if (unit === 'percent')  return str + '%';
+        return str;
+    }
+
+    function hasChart() { return typeof window.Chart !== 'undefined'; }
+
+    function toggleEmpty(canvasId, emptyId, isEmpty) {
+        var cv = document.getElementById(canvasId);
+        var em = document.getElementById(emptyId);
+        if (cv) cv.style.display = isEmpty ? 'none' : '';
+        if (em) em.style.display = isEmpty ? 'flex' : 'none';
+    }
+
+    function renderTrendChart(data) {
+        // Empty / missing data → show inline empty state, no chart.
+        var labels = (data && data.labels) || [];
+        if (!data || labels.length === 0) {
+            toggleEmpty('cc-trend-canvas', 'cc-trend-empty', true);
+            if (trendChart) { trendChart.destroy(); trendChart = null; }
+            return;
+        }
+        if (!hasChart()) {
+            toggleEmpty('cc-trend-canvas', 'cc-trend-empty', true);
+            var em = document.getElementById('cc-trend-empty');
+            if (em) em.querySelector('.ph-title').textContent = 'Chart library not loaded';
+            return;
+        }
+        toggleEmpty('cc-trend-canvas', 'cc-trend-empty', false);
+
+        var metricKey = (trendMetric && trendMetric.value) || 'sales';
+        var cfg = METRIC_CONFIG[metricKey] || METRIC_CONFIG.sales;
+        var values = (data[metricKey] || []).map(function (v) { return Number(v) || 0; });
+        // Target overlay rules (refined Phase 6):
+        //   - Only draws on the Sales metric (target on Occ/ADR/RevPAR
+        //     would be misleading since those use different units).
+        //   - Shows whenever ANY target value is > 0 — a flat constant
+        //     target across every bucket is still important information
+        //     (it's the configured monthly goal), so we don't hide it.
+        //   - When the target is constant and non-zero, we label the
+        //     dataset "Monthly Target" to make the flat-line obvious.
+        //     Otherwise (historical targets differ per bucket) we use
+        //     the shorter "Target" label.
+        var targets = (data.target || []).map(function (t) { return Number(t) || 0; });
+        var positiveTargets = targets.filter(function (t) { return t > 0; });
+        var showTarget = (metricKey === 'sales') && positiveTargets.length > 0;
+        var targetIsConstant = showTarget && positiveTargets.every(function (t) {
+            return t === positiveTargets[0];
+        }) && positiveTargets.length === targets.length;
+        var targetLabel = targetIsConstant ? 'Monthly Target' : 'Target';
+        var kind = (trendType && trendType.value === 'bar') ? 'bar' : 'line';
+
+        var datasets = [{
+            label: cfg.label,
+            data: values,
+            borderColor: '#0d6efd',
+            backgroundColor: kind === 'bar' ? 'rgba(13,110,253,0.55)' : 'rgba(13,110,253,0.12)',
+            borderWidth: 2,
+            tension: 0.3,
+            fill: kind === 'line',
+            pointRadius: 3,
+            pointHoverRadius: 5,
+        }];
+        if (showTarget) {
+            datasets.push({
+                type: 'line',
+                label: targetLabel,
+                data: targets,
+                borderColor: '#dc2626',
+                borderDash: [6, 4],
+                borderWidth: 1.5,
+                pointRadius: 0,
+                fill: false,
+                tension: 0,
+            });
+        }
+
+        var ctx = document.getElementById('cc-trend-canvas').getContext('2d');
+        if (trendChart) { trendChart.destroy(); trendChart = null; }
+        trendChart = new Chart(ctx, {
+            type: kind,
+            data: { labels: labels, datasets: datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { display: showTarget, labels: { boxWidth: 12, font: { size: 11 } } },
+                    tooltip: {
+                        callbacks: {
+                            label: function (item) {
+                                var lbl = item.dataset.label || '';
+                                var v = item.parsed.y;
+                                var out = lbl + ': ' + fmtNumber(v, cfg.unit, cfg.decimals);
+                                // Add variance vs target in the main-series tooltip.
+                                // Target dataset uses either 'Target' or
+                                // 'Monthly Target' so we key off cfg.label
+                                // (the main metric) instead of 'Target'.
+                                if (showTarget && item.dataset.label === cfg.label) {
+                                    var t = Number(targets[item.dataIndex]) || 0;
+                                    if (t > 0) {
+                                        var pct = ((v - t) / t) * 100;
+                                        var sign = pct >= 0 ? '+' : '';
+                                        out += '  (' + sign + pct.toFixed(1) + '% vs target)';
+                                    }
+                                }
+                                return out;
+                            },
+                        },
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: cfg.unit !== 'percent',
+                        ticks: {
+                            font: { size: 11 },
+                            callback: function (v) { return fmtNumber(v, cfg.unit, 0); },
+                        },
+                        grid: { color: '#f3f4f6' },
+                    },
+                    x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+                },
+            },
+        });
+    }
+
+    function renderComparisonChart(data) {
+        // Grouped-bar: Sales / Occupancy / ADR / RevPAR for two months.
+        // A single data point (one month) still draws but tells less of a
+        // story; the empty-state banner only triggers when labels is empty.
+        var labels = (data && data.labels) || [];
+        var noteEl = document.getElementById('cc-compare-note');
+        if (noteEl) noteEl.textContent = (data && data.note) || '';
+        if (!data || labels.length === 0) {
+            toggleEmpty('cc-compare-canvas', 'cc-compare-empty', true);
+            if (compareChart) { compareChart.destroy(); compareChart = null; }
+            return;
+        }
+        if (!hasChart()) {
+            toggleEmpty('cc-compare-canvas', 'cc-compare-empty', true);
+            return;
+        }
+        toggleEmpty('cc-compare-canvas', 'cc-compare-empty', false);
+
+        // All four metrics share the X axis (the month labels). Sales is
+        // on its own scale (left); the rest share a right-side scale.
+        function numArr(a) { return (a || []).map(function (v) { return Number(v) || 0; }); }
+        var ctx = document.getElementById('cc-compare-canvas').getContext('2d');
+        if (compareChart) { compareChart.destroy(); compareChart = null; }
+        compareChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'Sales',     data: numArr(data.sales),     backgroundColor: 'rgba(13,110,253,0.80)', yAxisID: 'y' },
+                    { label: 'Occupancy', data: numArr(data.occupancy), backgroundColor: 'rgba(22,163,74,0.75)',  yAxisID: 'y1' },
+                    { label: 'ADR',       data: numArr(data.adr),       backgroundColor: 'rgba(245,158,11,0.80)', yAxisID: 'y' },
+                    { label: 'RevPAR',    data: numArr(data.revpar),    backgroundColor: 'rgba(139,92,246,0.80)', yAxisID: 'y' },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+                    tooltip: {
+                        callbacks: {
+                            label: function (item) {
+                                var unit = item.dataset.label === 'Occupancy' ? 'percent' : 'currency';
+                                return item.dataset.label + ': ' + fmtNumber(item.parsed.y, unit, item.dataset.label === 'Occupancy' ? 1 : 0);
+                            },
+                        },
+                    },
+                },
+                scales: {
+                    y:  { beginAtZero: true,  position: 'left',  grid: { color: '#f3f4f6' },
+                          ticks: { font: { size: 11 }, callback: function (v) { return '₹' + v.toLocaleString('en-IN'); } } },
+                    y1: { beginAtZero: true,  position: 'right', grid: { display: false },
+                          min: 0, max: 100,
+                          ticks: { font: { size: 11 }, callback: function (v) { return v + '%'; } } },
+                    x:  { grid: { display: false }, ticks: { font: { size: 11 } } },
+                },
+            },
+        });
+    }
+
+    // ── Phase 6: auto-generated insight lines (simple rules, no AI) ─
+    //
+    // Each rule produces a candidate { priority, text }. We then sort by
+    // priority (lower = more urgent) and keep at most MAX_INSIGHTS so
+    // meeting readers see the sharpest 3, not a dilution of 6.
+    //
+    // Priority bands (refined per the "priority order" feedback):
+    //    1  — run-rate warning    (most urgent: unlikely to hit the number)
+    //    2  — sales delta vs prev (topline direction)
+    //    3  — occ strong / price weak (classic diagnostic signal)
+    //    4  — MTD pacing vs target
+    //    5  — ADR movement
+    //    6  — trend shape across the window
+    var MAX_INSIGHTS = 3;
+
+    function renderInsights(payload) {
+        var box = document.getElementById('cc-insights');
+        var list = document.getElementById('cc-insights-list');
+        if (!box || !list) return;
+        var candidates = [];
+        var q = (payload && payload.quick_answers) || {};
+        var cmp = (payload && payload.comparison) || {};
+        var trend = ((payload && payload.monthly_trend) || {}).trend_continuous || {};
+        var svt = (payload && payload.sales_vs_target) || {};
+
+        // Pri 1 — Run-rate alert (most urgent).
+        var rr = q.required_run_rate, ts = q.today_sales;
+        if (rr && ts && typeof rr.value === 'number' && typeof ts.value === 'number' && ts.value > 0) {
+            var ratio = rr.value / ts.value;
+            if (ratio >= 1.4) {
+                candidates.push({
+                    priority: 1,
+                    text: 'Required run rate is ' + ratio.toFixed(1) +
+                          'x today\'s pace — unlikely to close the gap without a push.',
+                });
+            }
+        }
+
+        // Pri 2 — Sales delta vs previous period.
+        var salesDelta = cmp.delta && cmp.delta.sales;
+        if (salesDelta && salesDelta.pct != null && salesDelta.pct !== 0) {
+            candidates.push({
+                priority: 2,
+                text: 'Sales ' + (salesDelta.pct > 0 ? 'up' : 'down') + ' ' +
+                      Math.abs(salesDelta.pct) + '% vs ' +
+                      (cmp.type || 'previous period').replace(/_/g, ' ') + '.',
+            });
+        }
+
+        // Pri 3 — Occupancy strong, pricing weak (classic diagnostic).
+        var occDelta = cmp.delta && cmp.delta.occupancy;
+        var adrDelta = cmp.delta && cmp.delta.adr;
+        if (occDelta && adrDelta &&
+            typeof occDelta.pct === 'number' && typeof adrDelta.pct === 'number' &&
+            occDelta.pct >= 5 && adrDelta.pct <= -5) {
+            candidates.push({
+                priority: 3,
+                text: 'Occupancy strong, pricing weak — filling rooms by dropping rate.',
+            });
+        }
+
+        // Pri 4 — MTD pacing band.
+        var mtdProg = svt.mtd && Number(svt.mtd.progress_pct);
+        if (!isNaN(mtdProg)) {
+            if (mtdProg >= 100) {
+                candidates.push({ priority: 4,
+                    text: 'MTD target met (' + Math.round(mtdProg) + '% of goal).' });
+            } else if (mtdProg >= 80) {
+                candidates.push({ priority: 4,
+                    text: 'MTD pacing on-track at ' + Math.round(mtdProg) + '% of goal.' });
+            } else if (mtdProg > 0) {
+                candidates.push({ priority: 4,
+                    text: 'MTD behind target — at ' + Math.round(mtdProg) + '% of goal.' });
+            }
+        }
+
+        // Pri 5 — ADR movement (only when meaningful).
+        if (adrDelta && typeof adrDelta.value === 'number' && Math.abs(adrDelta.value) >= 50) {
+            candidates.push({
+                priority: 5,
+                text: 'ADR ' + (adrDelta.value > 0 ? 'up' : 'down') + ' ₹' +
+                      Math.abs(Math.round(adrDelta.value)) +
+                      (adrDelta.value > 0 ? ' — pricing firming up.' : ' — watch discounting.'),
+            });
+        }
+
+        // Pri 6 — Trend shape across the whole window.
+        var sales = (trend.sales || []).map(Number);
+        if (sales.length >= 3) {
+            var first = sales[0], last = sales[sales.length - 1];
+            if (first > 0) {
+                var chg = ((last - first) / first) * 100;
+                if (Math.abs(chg) >= 15) {
+                    candidates.push({
+                        priority: 6,
+                        text: 'Sales ' + (chg > 0 ? 'trending up' : 'trending down') + ' ' +
+                              Math.abs(Math.round(chg)) + '% across the window.',
+                    });
+                }
+            }
+        }
+
+        if (candidates.length === 0) {
+            box.style.display = 'none';
+            list.innerHTML = '';
+            return;
+        }
+
+        // Sort by priority asc (1 = most urgent) then truncate.
+        candidates.sort(function (a, b) { return a.priority - b.priority; });
+        var lines = candidates.slice(0, MAX_INSIGHTS);
+
+        list.innerHTML = lines.map(function (item) {
+            return '<li>' + escapeHtml(item.text) + '</li>';
+        }).join('');
+        box.style.display = '';
+    }
+
+    function bindSalesVsTarget(block) {
+        if (!block) return;
+        // Walk each scope card (data-scope) and fill its child fields.
+        document.querySelectorAll('.cc-card[data-scope]').forEach(function (card) {
+            var scope = card.dataset.scope;
+            var data  = block[scope];
+            if (!data) return;
+            card.querySelectorAll('[data-scope-field]').forEach(function (el) {
+                var field = el.dataset.scopeField;
+                if (field === 'progress_pct') {
+                    // Apply Phase-6 colour rules:
+                    //   >= 100%  → green (goal met / exceeded)
+                    //    80-99% → amber (on track, under)
+                    //    < 80%  → red   (needs attention)
+                    // The raw value can exceed 100% when the team over-performs;
+                    // width is clamped for display but the colour uses the raw.
+                    var raw = Number(data.progress_pct) || 0;
+                    var pct = Math.max(0, Math.min(100, raw));
+                    el.style.width = pct + '%';
+                    el.classList.remove('good', 'warn', 'bad');
+                    if (raw >= 100) el.classList.add('good');
+                    else if (raw >= 80) el.classList.add('warn');
+                    else el.classList.add('bad');
+                    return;
+                }
+                if (field === 'progress_label') {
+                    // Raw-percent readout next to the bar. Shows the
+                    // UNCAPPED value (120%, 45%, etc.) so the bar width
+                    // can stay clamped while the user still sees how
+                    // far above/below target the number actually is.
+                    var raw2 = Number(data.progress_pct);
+                    if (isNaN(raw2)) {
+                        el.textContent = '—';
+                        el.classList.remove('good', 'warn', 'bad');
+                    } else {
+                        el.textContent = Math.round(raw2) + '%';
+                        el.classList.remove('good', 'warn', 'bad');
+                        if (raw2 >= 100) el.classList.add('good');
+                        else if (raw2 >= 80) el.classList.add('warn');
+                        else el.classList.add('bad');
+                    }
+                    return;
+                }
+                if (field === 'progress_track') {
+                    // Hover-tooltip on the bar itself — "120% of target".
+                    // Redundant with the label for over-performance, but
+                    // useful on very narrow cards where the label wraps.
+                    var raw3 = Number(data.progress_pct);
+                    el.title = isNaN(raw3) ? '' : Math.round(raw3) + '% of target';
+                    return;
+                }
+                var metric = data[field];
+                if (!metric) return;
+                el.textContent = metric.display != null ? metric.display : '—';
+                el.classList.remove('cc-loading', 'cc-skeleton');
+                // Variance direction → colour hint.
+                if (field === 'variance' && metric.direction) {
+                    el.style.color = metric.direction === 'up'   ? '#166534'
+                                   : metric.direction === 'down' ? '#b91c1c'
+                                   : '';
+                }
+            });
+        });
+    }
+
+    function dumpDebug(payload) {
+        if (!debugMode || !debugSink) return;
+        debugSink.style.display = 'block';
+        debugSink.innerHTML =
+            '<div style="background:#111;color:#e5e7eb;border-radius:6px;padding:10px;' +
+            'font-family:ui-monospace,Menlo,monospace;font-size:11px;margin-top:14px;' +
+            'max-height:360px;overflow:auto;"><strong style="color:#fbbf24;">debug payload:</strong>\n' +
+            escapeHtml(JSON.stringify(payload, null, 2)) + '</div>';
+    }
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, function (c) {
+            return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+        });
+    }
+
+    function showEmpty(msg) {
+        emptyBanner.style.display = '';
+        if (emptyMsg) emptyMsg.textContent = msg || 'No data available for selected period.';
+    }
+    function hideEmpty() {
+        emptyBanner.style.display = 'none';
+    }
+
+    // ── Phase 7: Alert bindings ──────────────────────────────────────
+    //
+    // Three surfaces:
+    //   (a) strip at the top — counts + top headline, coloured by the
+    //       most severe alert present.
+    //   (b) action panel — top 5 alert cards; "Show all" expands the rest.
+    //   (c) root-cause box — 1-4 diagnostic lines from the engine.
+    //
+    // All three always render (or hide) together so we never end up in
+    // mixed-state where the strip says 2 reds but the panel is empty.
+    var MAX_VISIBLE_ALERTS = 5;
+
+    function renderAlertStrip(summary) {
+        var strip = document.getElementById('cc-alert-strip');
+        var redN  = document.getElementById('cc-alert-count-red-n');
+        var ambN  = document.getElementById('cc-alert-count-amber-n');
+        var persEl = document.getElementById('cc-alert-persistent');
+        var top   = document.getElementById('cc-alert-top');
+        if (!strip) return;
+        var redCount        = (summary && summary.red_count)        || 0;
+        var amberCount      = (summary && summary.amber_count)      || 0;
+        var persistentCount = (summary && summary.persistent_count) || 0;
+        var topTitle        = summary && summary.top_alert_title;
+        redN.textContent = redCount;
+        ambN.textContent = amberCount;
+        // Persistent-count badge — visible only when there's at least one
+        // alert that has been active for PERSISTENT_DAYS_THRESHOLD+ days.
+        // Warns the manager that the issue isn't new noise.
+        if (persEl) {
+            if (persistentCount > 0) {
+                persEl.textContent = persistentCount + ' persistent';
+                persEl.style.display = '';
+            } else {
+                persEl.style.display = 'none';
+            }
+        }
+        // Colour the strip by the worst-severity present.
+        strip.classList.remove('red', 'amber', 'clear');
+        top.classList.remove('red', 'amber');
+        if (redCount > 0)        { strip.classList.add('red');   top.classList.add('red'); }
+        else if (amberCount > 0) { strip.classList.add('amber'); top.classList.add('amber'); }
+        else                       strip.classList.add('clear');
+        top.textContent = topTitle ||
+            (redCount + amberCount === 0 ? 'No major issues detected.' : '—');
+        strip.style.display = '';
+    }
+
+    // Severity glyph — bigger visual difference than just colour:
+    //   red    → ⚠ (warning triangle)
+    //   amber  → ⚡ (bolt)
+    //   green  → ℹ (info)
+    // These are simple unicode so no icon-font dependency is added.
+    var SEVERITY_GLYPHS = { red: '⚠', amber: '⚡', green: 'ℹ' };
+
+    function _renderRootCauseItems(rcArr) {
+        // rcArr can be legacy strings (pre-refinement) OR objects
+        // {text, confidence}. Normalise in one place.
+        if (!Array.isArray(rcArr) || rcArr.length === 0) return '';
+        var items = rcArr.slice(0, 3).map(function (item) {
+            var text, conf;
+            if (typeof item === 'string') { text = item; conf = 'secondary'; }
+            else { text = item.text || ''; conf = item.confidence || 'secondary'; }
+            if (!text) return '';
+            return '<li class="confidence-' + escapeHtml(conf) + '">' +
+                    escapeHtml(text) + '</li>';
+        }).filter(Boolean);
+        if (items.length === 0) return '';
+        return '<ul class="cc-alert-rc">' + items.join('') + '</ul>';
+    }
+
+    function renderAlertCard(alertObj) {
+        var sev = alertObj.severity || 'amber';
+        var classes = ['cc-alert-card', sev];
+        if (alertObj.is_duplicate_of) classes.push('is-duplicate');
+        if (alertObj.is_persistent)   classes.push('is-persistent');
+
+        // Percent variance chip.
+        var pctText = '';
+        if (alertObj.variance_pct != null) {
+            var v = Number(alertObj.variance_pct);
+            var sign = v >= 0 ? '+' : '';
+            pctText = '<span class="cc-alert-pct">' +
+                      escapeHtml(sign + v.toFixed(1) + '%') + '</span>';
+        }
+        // Scope chip (e.g. "Based on MTD performance").
+        var scopeChip = '';
+        if (alertObj.scope_note) {
+            scopeChip = '<span class="cc-alert-scope">' +
+                        escapeHtml(alertObj.scope_note) + '</span>';
+        }
+        // Days-active chip — only visible on persistent alerts.
+        var daysChip = '';
+        if (alertObj.is_persistent && alertObj.days_active) {
+            daysChip = '<span class="cc-alert-days persistent">' +
+                       escapeHtml(alertObj.days_active + ' day' +
+                                  (alertObj.days_active === 1 ? '' : 's')) +
+                       '</span>';
+        }
+        // Severity glyph in a coloured pill.
+        var glyph = SEVERITY_GLYPHS[sev] || 'ℹ';
+        var iconHtml = '<span class="cc-alert-icon ' + sev + '" aria-hidden="true">' +
+                       escapeHtml(glyph) + '</span>';
+
+        var rcHtml      = _renderRootCauseItems(alertObj.root_cause);
+        var actionsHtml = '';
+        if (alertObj.suggested_actions && alertObj.suggested_actions.length) {
+            actionsHtml = '<ol class="cc-alert-actions">' +
+                alertObj.suggested_actions.slice(0, 3).map(function (a) {
+                    return '<li>' + escapeHtml(a) + '</li>';
+                }).join('') +
+                '</ol>';
+        }
+
+        return '' +
+            '<div class="' + classes.join(' ') + '">' +
+                '<div class="cc-alert-head">' +
+                    iconHtml +
+                    '<span class="cc-alert-sev ' + sev + '">' + escapeHtml(sev) + '</span>' +
+                    '<span>' + escapeHtml(alertObj.title || '—') + '</span>' +
+                    pctText + scopeChip + daysChip +
+                '</div>' +
+                '<div class="cc-alert-meta">' +
+                    '<span class="owner">' + escapeHtml(alertObj.owner_role || 'Manager') + '</span>' +
+                    '<span>' + escapeHtml(alertObj.code || '') + '</span>' +
+                '</div>' +
+                '<div class="cc-alert-reason">' + escapeHtml(alertObj.reason || '') + '</div>' +
+                rcHtml +
+                actionsHtml +
+            '</div>';
+    }
+
+    function renderAlertsPanel(alerts) {
+        var listEl  = document.getElementById('cc-alerts-list');
+        var moreBtn = document.getElementById('cc-alerts-more');
+        var emptyEl = document.getElementById('cc-alerts-empty');
+        var hintEl  = document.getElementById('cc-alerts-hint');
+        if (!listEl || !moreBtn || !emptyEl) return;
+        var arr = Array.isArray(alerts) ? alerts : [];
+        if (arr.length === 0) {
+            listEl.innerHTML = '';
+            moreBtn.style.display = 'none';
+            emptyEl.style.display = '';
+            if (hintEl) hintEl.textContent = '0 alerts';
+            return;
+        }
+        emptyEl.style.display = 'none';
+        // Render top-5 visibly, rest into a hidden sibling section.
+        var visible = arr.slice(0, MAX_VISIBLE_ALERTS);
+        var hidden  = arr.slice(MAX_VISIBLE_ALERTS);
+        listEl.innerHTML =
+            visible.map(renderAlertCard).join('') +
+            (hidden.length
+                ? '<div id="cc-alerts-hidden" style="display:none;">' +
+                  hidden.map(renderAlertCard).join('') +
+                  '</div>'
+                : '');
+        moreBtn.style.display = hidden.length ? '' : 'none';
+        moreBtn.textContent = 'Show all ' + arr.length + ' alerts';
+        // Reset the collapsed state on every render so a new fetch starts
+        // with only the top 5 visible, even if the user had expanded before.
+        moreBtn.dataset.expanded = '0';
+        if (hintEl) {
+            hintEl.textContent = arr.length +
+                ' alert' + (arr.length === 1 ? '' : 's') + ' · showing top ' +
+                Math.min(MAX_VISIBLE_ALERTS, arr.length);
+        }
+    }
+
+    // Expand / collapse toggle — bound once at load; uses data-expanded
+    // marker on the button so the handler can flip in either direction.
+    (function () {
+        var moreBtn = document.getElementById('cc-alerts-more');
+        if (!moreBtn) return;
+        moreBtn.addEventListener('click', function () {
+            var hidden = document.getElementById('cc-alerts-hidden');
+            if (!hidden) return;
+            var expanded = moreBtn.dataset.expanded === '1';
+            hidden.style.display = expanded ? 'none' : '';
+            moreBtn.dataset.expanded = expanded ? '0' : '1';
+            moreBtn.textContent = expanded
+                ? moreBtn.textContent.replace(/^Hide /, 'Show all ')
+                : moreBtn.textContent.replace(/^Show all /, 'Hide ');
+        });
+    })();
+
+    function renderRootCause(lines) {
+        // Accepts either legacy string[] or the refined
+        // Array<{text, confidence}>. The latter gets styled so the
+        // primary diagnosis stands out and weaker signals stay muted.
+        var box = document.getElementById('cc-root-cause-box');
+        var ul  = document.getElementById('cc-root-cause-list');
+        if (!box || !ul) return;
+        var arr = Array.isArray(lines) ? lines.filter(function (l) {
+            return l && (typeof l === 'string' || l.text);
+        }) : [];
+        if (arr.length === 0) {
+            box.style.display = 'none';
+            ul.innerHTML = '';
+            return;
+        }
+        ul.innerHTML = arr.map(function (item) {
+            var text, conf;
+            if (typeof item === 'string') { text = item; conf = 'secondary'; }
+            else { text = item.text; conf = item.confidence || 'secondary'; }
+            return '<li class="confidence-' + escapeHtml(conf) + '">' +
+                   escapeHtml(text) + '</li>';
+        }).join('');
+        box.style.display = '';
+    }
+
+    function bindAlerts(payload) {
+        renderAlertStrip(payload.alerts_summary);
+        renderAlertsPanel(payload.alerts);
+        renderRootCause(payload.root_cause_summary);
+    }
+
+    function renderAll(payload) {
+        // Binds everything from a known-good payload. Called both on fresh
+        // fetch and (via the metric/chart-type toggles) on cache hits.
+        hideEmpty();
+        setRangeLabel(payload.metadata);
+        BOUND_SECTIONS.forEach(function (name) { bindSection(payload[name]); });
+        bindSalesVsTarget(payload.sales_vs_target);
+        bindComparison(payload.comparison);
+        emphasiseCriticalCards(payload.quick_answers);
+        renderTrendChart((payload.monthly_trend || {}).trend_continuous);
+        renderComparisonChart((payload.monthly_trend || {}).trend_compare);
+        renderInsights(payload);
+        bindAlerts(payload);
+    }
+
+    function load() {
+        var qs = currentFilters();
+        // Cache hit — same filters as last successful fetch. Skip the
+        // network round-trip; re-render from cached payload so local-only
+        // controls (metric toggle) still respond instantly.
+        if (qs === lastFilterStr && lastPayload) {
+            renderAll(lastPayload);
+            return;
+        }
+        fetch(API_URL + '?' + qs, {credentials: 'same-origin'})
+            .then(function (res) { return res.json().catch(function () { return null; }); })
+            .then(function (payload) {
+                if (!payload) {
+                    rangeLabel.textContent = 'API error';
+                    rangeLabel.style.color = '#dc3545';
+                    showEmpty('Could not reach the server. Retry in a moment.');
+                    return;
+                }
+                dumpDebug(payload);
+
+                if (payload.success === false ||
+                    (payload.empty_state && payload.empty_state.is_empty)) {
+                    setRangeLabel(payload.metadata);
+                    showEmpty((payload.empty_state && payload.empty_state.message) ||
+                              (payload.metadata && payload.metadata.message) ||
+                              'No data for the selected period. Try changing the date range or filters.');
+                    // Destroy charts so the empty banner isn't overlaid on
+                    // stale data from the previous successful load.
+                    if (trendChart) { trendChart.destroy(); trendChart = null; }
+                    if (compareChart) { compareChart.destroy(); compareChart = null; }
+                    toggleEmpty('cc-trend-canvas',   'cc-trend-empty',   true);
+                    toggleEmpty('cc-compare-canvas', 'cc-compare-empty', true);
+                    // Phase 7 — clear any prior alert UI so stale reds
+                    // from the previous successful load don't linger on
+                    // top of an empty-state banner.
+                    bindAlerts({alerts: [], alerts_summary: {red_count: 0, amber_count: 0,
+                                                             top_alert_title: null},
+                                root_cause_summary: []});
+                    return;
+                }
+
+                // Commit the cache only on a successful render.
+                lastFilterStr = qs;
+                lastPayload   = payload;
+                renderAll(payload);
+            })
+            .catch(function (err) {
+                console.error('Command Center load failed:', err);
+                rangeLabel.textContent = 'Network error';
+                rangeLabel.style.color = '#dc3545';
+                showEmpty('Network error — retry to reload.');
+            });
+    }
+
+    // Initial load.
+    load();
+})();
+</script>

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Void History — {{ reservation.booking_reference or 'RES-' ~ reservation.id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Void History
+    — {{ reservation.guest.name }}</h5>
+  <a href="{{ request.referrer or url_for('main.reservations') }}"
+     class="btn btn-outline-secondary btn-sm">Back</a>
+</div>
+
+{% if not void_requests %}
+  <div class="alert alert-info">No void requests for this reservation.</div>
+{% else %}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>Request #</th>
+          <th>Payment</th>
+          <th>Amount</th>
+          <th>Mode</th>
+          <th>Requested By</th>
+          <th>Reason</th>
+          <th>Status</th>
+          <th>Decided By</th>
+          <th>Decided At</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for vr in void_requests %}
+        <tr>
+          <td><code>#{{ vr.id }}</code></td>
+          <td><code>#{{ vr.payment_id }}</code></td>
+          <td class="fw-semibold">&#8377;{{ '%.2f'|format(vr.payment.amount) }}</td>
+          <td>{{ vr.payment.payment_mode.name }}</td>
+          <td>{{ vr.requested_by.full_name }}<br>
+            <small class="text-muted">{{ vr.requested_at.strftime('%d %b %Y %H:%M') }}</small>
+          </td>
+          <td><small>{{ vr.reason }}</small></td>
+          <td>
+            {% if vr.status == 'Approved' %}
+              <span class="badge bg-success">Approved</span>
+            {% elif vr.status == 'Rejected' %}
+              <span class="badge bg-danger">Rejected</span>
+              {% if vr.rejection_reason %}
+                <br><small class="text-danger">{{ vr.rejection_reason }}</small>
+              {% endif %}
+            {% else %}
+              <span class="badge bg-warning text-dark">Pending</span>
+            {% endif %}
+          </td>
+          <td>{{ vr.decided_by.full_name if vr.decided_by else '—' }}</td>
+          <td>{{ vr.decided_at.strftime('%d %b %Y %H:%M') if vr.decided_at else '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endif %}
+{% endblock %}

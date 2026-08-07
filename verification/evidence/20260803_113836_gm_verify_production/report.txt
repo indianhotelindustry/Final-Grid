@@ -1,0 +1,24 @@
+====================================================================================================
+DSBC FRONTLINE — GOLDEN MASTER VERIFICATION
+Production Verification Framework, Wave 0 Deliverable 2
+====================================================================================================
+Master set      : production
+Master captured : 2026-08-03T11:38:16 (app v2.2.18)
+Current run     : 2026-08-03T11:38:36 (app v2.2.18)
+Master clock    : 2026-05-28T12:00:00
+Current clock   : 2026-05-28T12:00:00
+Read-only       : VERIFIED
+
+Surfaces compared : 158
+Surfaces clean    : 158
+Differences       : 0
+Blocking          : 0
+
+VERDICT           : PASS
+
+  No differences. Every captured surface renders exactly what it
+  rendered when the master was taken.
+
+====================================================================================================
+END OF REPORT
+====================================================================================================

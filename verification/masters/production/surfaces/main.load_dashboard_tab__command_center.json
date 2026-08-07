@@ -1,0 +1,34 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/api/dashboard/command-center",
+  "anon_status": 302,
+  "body_bytes": 85022,
+  "body_sha256": "e1d34b3cb3b9155cfd2fdcbe47966b357543933bc698d76373a4f52ef659727c",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 16,
+  "endpoint": "main.load_dashboard_tab",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 1
+  },
+  "note": "KPI command centre tab shell \u2014 targets, variance, forecast.",
+  "origin": "declared",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "main.load_dashboard_tab__command_center",
+  "templates": [
+    "tabs/command_center.html"
+  ],
+  "truncations": [],
+  "url": "/api/dashboard/command-center"
+}

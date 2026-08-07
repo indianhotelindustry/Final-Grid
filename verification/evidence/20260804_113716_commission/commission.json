@@ -1,0 +1,312 @@
+{
+  "baseline_verdicts": {
+    "P01": {
+      "divergences": 0,
+      "implementations": {
+        "reservations.count": "28"
+      },
+      "verdict": "SINGLE_SOURCE"
+    },
+    "P02": {
+      "divergences": 0,
+      "implementations": {
+        "raw sum(amount)": "729.85",
+        "signed sum (correction-aware)": "729.85"
+      },
+      "verdict": "AGREED"
+    },
+    "P03": {
+      "divergences": 0,
+      "implementations": {
+        "D1 canonical (get_room_revenue)": "37217.12",
+        "D3 report style (rate x nights)": "37217.12"
+      },
+      "verdict": "AGREED"
+    },
+    "P04": {
+      "divergences": 0,
+      "implementations": {
+        "NightAuditService.revenue_summary": "37217.12",
+        "kpi_helpers.get_accrual_room_revenue": "37217.12"
+      },
+      "verdict": "AGREED"
+    },
+    "P05": {
+      "divergences": 0,
+      "implementations": {
+        "NightAuditService.revenue_summary": "729.85",
+        "kpi_helpers.get_accrual_extras": "729.85"
+      },
+      "verdict": "AGREED"
+    },
+    "P06": {
+      "divergences": 2,
+      "implementations": {
+        "deduplicated by charge source": "37946.67",
+        "raw sum of all tax lines": "75893.34"
+      },
+      "verdict": "DIVERGED"
+    },
+    "P07": {
+      "divergences": 0,
+      "implementations": {
+        "live compute_stay_gst": "1897.28",
+        "stored TaxLine rows": "1897.24"
+      },
+      "verdict": "AGREED"
+    },
+    "P08": {
+      "divergences": 0,
+      "implementations": {
+        "NightAuditService.discount_total": "0.0",
+        "calculate_stay_amount.discount": "0.0",
+        "reservations.discount_amount field": "0.00"
+      },
+      "verdict": "AGREED"
+    },
+    "P09": {
+      "divergences": 0,
+      "implementations": {
+        "raw ORM sum": "39644.29",
+        "raw SQL func.sum": "39644.29",
+        "signed (signed_payment_amount)": "39644.29",
+        "via calculate_stay_amount": "39644.29"
+      },
+      "verdict": "AGREED"
+    },
+    "P10": {
+      "divergences": 0,
+      "implementations": {
+        "ORM by category (direct_payment)": "31666.37",
+        "kpi_helpers.get_cash_revenue summed": "31666.37"
+      },
+      "verdict": "AGREED"
+    },
+    "P11": {
+      "divergences": 0,
+      "implementations": {
+        "payment_purpose = refund (true refunds)": "0",
+        "voided payments (what night audit calls refunds)": "0"
+      },
+      "verdict": "VACUOUS"
+    },
+    "P12": {
+      "divergences": 6,
+      "implementations": {
+        "balance (unrounded grand total)": "199.96",
+        "settlement_balance (invoiced total)": "199.71"
+      },
+      "verdict": "DIVERGED"
+    },
+    "P13": {
+      "divergences": 4,
+      "implementations": {
+        "by balance basis": "{'overpaid': 1, 'owing': 4, 'settled': 23}",
+        "by settlement basis": "{'overpaid': 2, 'owing': 1, 'settled': 25}"
+      },
+      "verdict": "DIVERGED"
+    },
+    "P14": {
+      "divergences": 1,
+      "implementations": {
+        "sum over folios (charges)": "0.0",
+        "sum over reservations (charges)": "729.85"
+      },
+      "verdict": "DIVERGED"
+    },
+    "P15": {
+      "divergences": 0,
+      "implementations": {
+        "recomputed NightAuditService (\u03a3 compared fields)": "33779.09",
+        "stored NightAuditLog (\u03a3 compared fields)": "33779.09"
+      },
+      "verdict": "AGREED"
+    },
+    "P16": {
+      "divergences": 0,
+      "implementations": {
+        "ADR::kpi_helpers.get_adr": "0.0",
+        "ADR::reports.flash.arr": "0.0",
+        "RevPAR::kpi_helpers.get_revpar": "0.0",
+        "RevPAR::reports.flash.revpar": "0.0",
+        "accrual revenue::kpi_helpers.get_accrual_revenue": "20282.38",
+        "accrual revenue::reports.flash.accrual_net": "20282.38",
+        "daily collections::kpi_helpers.get_daily_revenue": "15565.87",
+        "daily collections::reports.flash.day_revenue": "15565.87",
+        "month-to-date collections::kpi_helpers.get_monthly_revenue": "31666.37",
+        "month-to-date collections::reports.flash.mtd_revenue": "31666.37",
+        "occupancy pct::kpi_helpers.get_occupancy": "0.0",
+        "occupancy pct::reports.flash.occ_pct": "0.0",
+        "sellable rooms::kpi_helpers.get_occupancy.total": "39",
+        "sellable rooms::reports.flash.total_rooms": "39"
+      },
+      "verdict": "AGREED"
+    },
+    "P17": {
+      "divergences": 5,
+      "implementations": {
+        "ADR::kpi_helpers.get_adr": "0.0",
+        "ADR::reports.mis.business.arr": "1303.51",
+        "daily collections (report-to-report)::reports.flash.day_revenue": "15565.87",
+        "daily collections (report-to-report)::reports.mis.billing.total_collected": "18796.15",
+        "daily collections::kpi_helpers.get_daily_revenue": "15565.87",
+        "daily collections::reports.mis.billing.total_collected": "18796.15",
+        "departures completed::reports.flash.departures_done": "12",
+        "departures completed::reports.mis.movement.departures_done": "0",
+        "occupancy pct::kpi_helpers.get_occupancy": "0.0",
+        "occupancy pct::reports.mis.business.occupancy_pct": "38.5",
+        "occupied rooms::kpi_helpers.get_occupancy.occupied": "0",
+        "occupied rooms::reports.mis.business.occupied_rooms": "0"
+      },
+      "verdict": "DIVERGED"
+    },
+    "P18": {
+      "divergences": 1,
+      "implementations": {
+        "arrivals completed::dashboard.checked_in_today": "0",
+        "arrivals completed::reports.flash.arrivals_done": "0",
+        "daily collections (tile-to-report)::dashboard.cash_collected_today": "15565.87",
+        "daily collections (tile-to-report)::reports.flash.day_revenue": "15565.87",
+        "daily collections (tile-to-summary)::dashboard.cash_collected_today": "15565.87",
+        "daily collections (tile-to-summary)::dashboard.daily_financial_summary.total_collected": "15565.87",
+        "daily collections::dashboard.cash_collected_today": "15565.87",
+        "daily collections::kpi_helpers.get_daily_revenue": "15565.87",
+        "departures completed::dashboard.checked_out_today": "0",
+        "departures completed::reports.flash.departures_done": "12",
+        "rooms available::dashboard.available_rooms": "39",
+        "rooms available::kpi_helpers.get_occupancy.sellable": "39"
+      },
+      "verdict": "DIVERGED"
+    },
+    "P19": {
+      "divergences": 0,
+      "implementations": {
+        "kpi_helpers.get_occupied_count": "0",
+        "occupancy_engine.occupied_rooms": "0"
+      },
+      "verdict": "AGREED"
+    },
+    "P20": {
+      "divergences": 1,
+      "implementations": {
+        "kpi_helpers.get_adr (AVG rate_per_night, no date scope)": "0.0",
+        "room revenue / occupied room-nights (date-scoped)": "1283.35"
+      },
+      "verdict": "DIVERGED"
+    },
+    "P21": {
+      "divergences": 0,
+      "implementations": {
+        "recomputed calculate_expected_cash": "0",
+        "stored Shift.expected_cash": "0"
+      },
+      "verdict": "VACUOUS"
+    },
+    "P22": {
+      "divergences": 1,
+      "implementations": {
+        "compute_ota_outstanding (gross)": "7977.92",
+        "get_ota_pending (net of payouts)": "0.0"
+      },
+      "verdict": "DIVERGED"
+    }
+  },
+  "constitutional_basis": "Principle 9",
+  "generated_at": "2026-08-04T11:37:16",
+  "kind": "PVF D1 seeded-fault commissioning",
+  "not_seedable": {
+    "P01": "Census quantity \u2014 single source by design, nothing to compare.",
+    "P05": "Both implementations apply the same room_rent exclusion filter over the same rows. Agreement is structural; no data mutation can separate them. Divergence would require a code change.",
+    "P06": "Already DIVERGED on production data \u2014 detection demonstrated live.",
+    "P08": "Discount suppression only triggers when nightly rows or room_rent rows exist; covered indirectly by S-P03.",
+    "P10": "kpi_helpers and the ORM aggregation read identical rows with identical filters. Structural agreement.",
+    "P11": "VACUOUS \u2014 requires refund/void regression data (Wave 0 D6).",
+    "P12": "Already DIVERGED on production data \u2014 detection demonstrated live.",
+    "P13": "Already DIVERGED on production data \u2014 detection demonstrated live.",
+    "P16": "Implemented in D2. The flash report delegates to the same canonical helpers it is compared against, so no data mutation can separate them \u2014 a divergence would require a code change. Structural agreement.",
+    "P17": "Already DIVERGED on production data \u2014 detection demonstrated live.",
+    "P18": "Already DIVERGED on production data \u2014 detection demonstrated live.",
+    "P19": "Both implementations delegate to occupancy_engine, which is already the converged canonical source (Phase 2 \u00a73).",
+    "P20": "Already DIVERGED on production data \u2014 detection demonstrated live.",
+    "P21": "VACUOUS \u2014 requires shift regression data (Wave 0 D6)."
+  },
+  "production_hash_after": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+  "production_untouched": true,
+  "result": "PASS",
+  "seeds": [
+    {
+      "baseline_verdict": "AGREED",
+      "description": "Post a room_rent ledger row for one reservation. This is the exact condition under which the three room-revenue definitions stop agreeing \u2014 the trap Wave 1 disarms.",
+      "detected": true,
+      "note": "divergence count 0 -> 1; values moved: True",
+      "seed_id": "S-P03",
+      "seeded_verdict": "DIVERGED",
+      "target": "P03"
+    },
+    {
+      "baseline_verdict": "AGREED",
+      "description": "Same room_rent posting seen at date level: the ledger-posted implementation becomes non-zero and must be compared.",
+      "detected": true,
+      "note": "divergence count 0 -> 2; values moved: True",
+      "seed_id": "S-P04",
+      "seeded_verdict": "DIVERGED",
+      "target": "P04"
+    },
+    {
+      "baseline_verdict": "AGREED",
+      "description": "Insert a payment reversal row. Raw summation adds it; signed summation subtracts it. This is the 29-of-31 defect.",
+      "detected": true,
+      "note": "divergence count 0 -> 4; values moved: True",
+      "seed_id": "S-P09",
+      "seeded_verdict": "DIVERGED",
+      "target": "P09"
+    },
+    {
+      "baseline_verdict": "AGREED",
+      "description": "Insert an extra-charge reversal row \u2014 the charge-side twin of S-P09.",
+      "detected": true,
+      "note": "divergence count 0 -> 1; values moved: True",
+      "seed_id": "S-P02",
+      "seeded_verdict": "DIVERGED",
+      "target": "P02"
+    },
+    {
+      "baseline_verdict": "AGREED",
+      "description": "Corrupt one stored tax line. Stored tax must then disagree with live recomputation \u2014 an invoice-versus-balance gap.",
+      "detected": true,
+      "note": "divergence count 0 -> 1; values moved: True",
+      "seed_id": "S-P07",
+      "seeded_verdict": "DIVERGED",
+      "target": "P07"
+    },
+    {
+      "baseline_verdict": "AGREED",
+      "description": "Tamper with a stored night-audit total. The recomputation must no longer match what was frozen.",
+      "detected": true,
+      "note": "divergence count 0 -> 1; values moved: True",
+      "seed_id": "S-P15",
+      "seeded_verdict": "DIVERGED",
+      "target": "P15"
+    },
+    {
+      "baseline_verdict": "DIVERGED",
+      "description": "Record an OTA payout. Gross outstanding ignores it; net outstanding must fall. Proves the receivable comparison is live.",
+      "detected": true,
+      "note": "already DIVERGED; divergence count 1 -> 1; values moved: get_ota_pending (net of payouts): 0.0 -> -1000.0",
+      "seed_id": "S-P22",
+      "seeded_verdict": "DIVERGED",
+      "target": "P22"
+    },
+    {
+      "baseline_verdict": "DIVERGED",
+      "description": "Route one charge to a folio. The folio partition sum must move toward the reservation sum, proving the partition check reads live routing rather than a constant.",
+      "detected": true,
+      "note": "already DIVERGED; divergence count 1 -> 1; values moved: sum over folios (charges): 0.0 -> 0.15",
+      "seed_id": "S-P14",
+      "seeded_verdict": "DIVERGED",
+      "target": "P14"
+    }
+  ],
+  "seeds_detected": 8,
+  "seeds_total": 8
+}

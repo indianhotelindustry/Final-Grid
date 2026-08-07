@@ -1,0 +1,372 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<style>
+.rf-page { max-width: 760px; margin: 0 auto; }
+
+/* ── Top bar ──────────────────────────────────────────────────── */
+.rf-topbar {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+.rf-topbar-title {
+    font-size: 1rem; font-weight: 700; color: #0d1b2a;
+}
+.rf-topbar-sub { font-size: .78rem; color: #6c757d; margin-top: 1px; }
+.rf-nav { display: flex; gap: 8px; flex-wrap: wrap; }
+.rf-nav-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 12px; border-radius: 6px; font-size: .75rem; font-weight: 600;
+    text-decoration: none; border: 1px solid #d1d5db;
+    color: #374151; background: #fff; transition: all .12s;
+}
+.rf-nav-btn:hover { background: #f3f4f6; color: #111827; }
+.rf-nav-btn.invoice-btn { background: #1967d2; color: #fff; border-color: #1967d2; }
+.rf-nav-btn.invoice-btn:hover { background: #1558b0; color: #fff; }
+
+/* ── Guest strip ──────────────────────────────────────────────── */
+.rf-guest-strip {
+    display: flex; gap: 12px; align-items: center;
+    background: #f8f9fa; border: 1px solid #e9ecef;
+    border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;
+    font-size: .84rem;
+}
+.rf-guest-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: #e8f0fe; color: #1967d2;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .9rem; flex-shrink: 0;
+}
+.rf-guest-name { font-weight: 700; color: #0d1b2a; }
+.rf-guest-meta { font-size: .75rem; color: #6c757d; }
+
+/* ── Stay summary ─────────────────────────────────────────────── */
+.rf-stay-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px; margin-bottom: 20px;
+}
+.rf-stay-tile {
+    background: #fff; border: 1px solid #e9ecef; border-radius: 8px;
+    padding: 10px 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+.rf-tile-label { font-size: .65rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .08em; color: #9ca3af; margin-bottom: 3px; }
+.rf-tile-val { font-size: .88rem; font-weight: 600; color: #1a1a2e; }
+
+/* ── Section heading ──────────────────────────────────────────── */
+.rf-section-head {
+    font-size: .65rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .1em; color: #9ca3af;
+    margin: 20px 0 8px;
+    padding-bottom: 4px; border-bottom: 1px solid #e9ecef;
+}
+
+/* ── Charges table ────────────────────────────────────────────── */
+.rf-table thead th {
+    font-size: .72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .04em; color: #374151;
+    background: #f3f4f6; border-color: #e5e7eb;
+    padding: 8px 12px;
+}
+.rf-table tbody td {
+    padding: 9px 12px; font-size: .84rem;
+    border-color: #f3f4f6; vertical-align: middle;
+}
+.rf-table tfoot td {
+    padding: 8px 12px; font-size: .84rem;
+    border-top: 2px solid #e5e7eb;
+}
+
+/* ── Grand total ──────────────────────────────────────────────── */
+.rf-grand-total td {
+    background: #0d1b2a !important; color: #fff !important;
+    font-weight: 700; font-size: .95rem;
+    border-color: #0d1b2a !important;
+}
+
+/* ── Balance block ────────────────────────────────────────────── */
+.rf-balance-block {
+    border-radius: 10px; padding: 16px 20px; margin-top: 16px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 10px;
+}
+.rf-balance-block.settled  { background: #d1fae5; border: 1px solid #6ee7b7; }
+.rf-balance-block.due      { background: #fee2e2; border: 1px solid #fca5a5; }
+.rf-balance-block.partial  { background: #fef3c7; border: 1px solid #fcd34d; }
+.rf-balance-block.overpaid { background: #eff6ff; border: 1px solid #bfdbfe; }
+.rf-bal-label { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.rf-bal-label.settled  { color: #065f46; }
+.rf-bal-label.due      { color: #991b1b; }
+.rf-bal-label.partial  { color: #92400e; }
+.rf-bal-label.overpaid { color: #1d4ed8; }
+.rf-bal-amount { font-size: 1.5rem; font-weight: 800; }
+.rf-bal-amount.settled  { color: #065f46; }
+.rf-bal-amount.due      { color: #991b1b; }
+.rf-bal-amount.partial  { color: #92400e; }
+.rf-bal-amount.overpaid { color: #1d4ed8; }
+
+/* ── Payment rows ─────────────────────────────────────────────── */
+.rf-voided { text-decoration: line-through; color: #9ca3af; }
+</style>
+{% endblock %}
+
+{% block content %}
+{% set nights  = (reservation.departure_date - reservation.arrival_date).days %}
+{% set is_settled  = billing.balance <= 0.01 and billing.balance >= -0.01 %}
+{% set is_due      = billing.balance > 0.01 %}
+{% set is_overpaid = billing.balance < -0.01 %}
+{% set bal_class   = 'settled' if is_settled else 'due' if is_due else 'overpaid' %}
+
+<div class="container-fluid pb-5">
+<div class="rf-page">
+
+    {# ── Top bar ──────────────────────────────────────────────────
+       Apr 2026 trust fix: distinguish the four numbering systems so
+       staff don't confuse them.
+       •  Folio No.       — operational stay account, derived from guest id
+       •  Booking Ref.    — public-facing reservation reference (if set)
+       •  Reservation ID  — internal DB primary key (debugging only)
+       •  Invoice No.     — assigned by /invoice/<id> on first view
+       (the latter is in the View Invoice page header) #}
+    <div class="rf-topbar">
+        <div>
+            <div class="rf-topbar-title">
+                <i class="bi bi-wallet2 text-primary me-2"></i>Stay Folio
+                {% if reservation.guest_id %}
+                <span class="badge bg-primary ms-2"
+                      style="font-family:monospace;font-size:.78rem;letter-spacing:.04em;"
+                      title="Operational folio number — derived from guest ID, stable across stays">
+                    Folio No: F{{ '%04d' % reservation.guest_id }}
+                </span>
+                {% endif %}
+                {% if reservation.booking_reference %}
+                <span class="badge bg-info text-dark ms-1"
+                      style="font-family:monospace;font-size:.78rem;letter-spacing:.04em;"
+                      title="Booking reference — public-facing (used on confirmation email / WhatsApp)">
+                    Booking: {{ reservation.booking_reference }}
+                </span>
+                {% endif %}
+                <span class="badge bg-light text-muted ms-1"
+                      style="font-family:monospace;font-size:.72rem;"
+                      title="Internal database ID — for support / debugging">
+                    Internal Res. ID: #{{ reservation.id }}
+                </span>
+                {% if reservation.invoice_number %}
+                <span class="badge bg-success ms-1"
+                      style="font-family:monospace;font-size:.78rem;letter-spacing:.04em;"
+                      title="Tax invoice number — assigned at first invoice view, sequential">
+                    Invoice: {{ reservation.invoice_number }}
+                </span>
+                {% endif %}
+            </div>
+            <div class="rf-topbar-sub">
+                {{ reservation.arrival_date.strftime('%d %b %Y') }} — {{ reservation.departure_date.strftime('%d %b %Y') }}
+                &bull; {{ nights }}&nbsp;{{ 'hr' if reservation.booking_type == 'Hourly' else ('Night' if nights == 1 else 'Nights') }}
+            </div>
+        </div>
+        <div class="rf-nav">
+            <a href="{{ url_for('main.invoice', reservation_id=reservation.id) }}"
+               class="rf-nav-btn invoice-btn">
+                <i class="bi bi-receipt"></i> View Invoice
+            </a>
+            {% if reservation.guest_id %}
+            <a href="{{ url_for('main.guest_history', guest_id=reservation.guest_id) }}"
+               class="rf-nav-btn">
+                <i class="bi bi-calendar3-range"></i> Visit History
+            </a>
+            <a href="{{ url_for('main.guest_folio', guest_id=reservation.guest_id) }}"
+               class="rf-nav-btn">
+                <i class="bi bi-person-circle"></i> Guest Profile
+            </a>
+            {% endif %}
+            <a href="{{ url_for('main.dashboard') }}" class="rf-nav-btn">
+                <i class="bi bi-arrow-left"></i> Dashboard
+            </a>
+        </div>
+    </div>
+
+    {# ── Guest strip ────────────────────────────────────────────── #}
+    {% if reservation.guest %}
+    <div class="rf-guest-strip">
+        <div class="rf-guest-avatar"><i class="bi bi-person-fill"></i></div>
+        <div>
+            <div class="rf-guest-name">{{ reservation.guest.name }}</div>
+            <div class="rf-guest-meta">
+                {% if reservation.guest.phone %}<i class="bi bi-telephone me-1"></i>{{ reservation.guest.phone }}{% endif %}
+                {% if reservation.guest.email %}&ensp;<i class="bi bi-envelope me-1"></i>{{ reservation.guest.email }}{% endif %}
+            </div>
+        </div>
+        <div class="ms-auto">
+            {% if reservation.invoice_number %}
+            <span class="badge text-bg-primary" style="font-size:.72rem">{{ reservation.invoice_number }}</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {# ── Stay summary tiles ─────────────────────────────────────── #}
+    <div class="rf-stay-grid">
+        <div class="rf-stay-tile">
+            <div class="rf-tile-label">Check-in</div>
+            <div class="rf-tile-val">{{ reservation.arrival_date.strftime('%d %b %Y') }}</div>
+        </div>
+        <div class="rf-stay-tile">
+            <div class="rf-tile-label">Check-out</div>
+            <div class="rf-tile-val">{{ reservation.departure_date.strftime('%d %b %Y') }}</div>
+        </div>
+        <div class="rf-stay-tile">
+            <div class="rf-tile-label">Duration</div>
+            <div class="rf-tile-val">{{ nights }}&nbsp;{{ 'hr' if reservation.booking_type == 'Hourly' else ('Night' if nights == 1 else 'Nights') }}</div>
+        </div>
+        <div class="rf-stay-tile">
+            <div class="rf-tile-label">Room</div>
+            <div class="rf-tile-val">{{ reservation.room.room_number if reservation.room else '—' }}</div>
+        </div>
+        <div class="rf-stay-tile">
+            <div class="rf-tile-label">Room Type</div>
+            <div class="rf-tile-val">{{ reservation.room_type.name }}</div>
+        </div>
+        <div class="rf-stay-tile">
+            <div class="rf-tile-label">Rate / Night</div>
+            <div class="rf-tile-val">₹{{ '{:,.0f}'.format(reservation.rate_per_night) }}</div>
+        </div>
+    </div>
+
+    {# ── Charges ────────────────────────────────────────────────── #}
+    <div class="rf-section-head"><i class="bi bi-list-check me-1"></i>Charges</div>
+    <div class="card border-0 shadow-sm">
+        <table class="table rf-table mb-0">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th class="text-end" style="width:130px">Amount (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {# Room charge #}
+                <tr>
+                    <td>
+                        Room Accommodation
+                        <span class="text-muted" style="font-size:.75rem">
+                            ({{ nights }}&nbsp;{{ 'hr' if reservation.booking_type == 'Hourly' else ('night' if nights == 1 else 'nights') }}
+                            &times; ₹{{ '{:,.0f}'.format(reservation.rate_per_night) }})
+                        </span>
+                    </td>
+                    <td class="text-end fw-semibold">₹{{ '{:,.2f}'.format(billing.room_charges) }}</td>
+                </tr>
+                {# Extra charges — skip night-audit room_rent rows so
+                   the per-night room charge isn't listed twice on the
+                   folio (row 234 already carries nights × rate). #}
+                {% for ec in reservation.extra_charges if (ec.charge_type or '') != 'room_rent' %}
+                <tr>
+                    <td>
+                        {{ ec.description }}
+                        <span class="text-muted" style="font-size:.75rem">({{ ec.charge_date.strftime('%d %b') }})</span>
+                    </td>
+                    <td class="text-end fw-semibold">₹{{ '{:,.2f}'.format(ec.amount) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                {% if reservation.extra_charges %}
+                <tr>
+                    <td class="text-end text-muted" style="font-size:.8rem">Sub-total (pre-tax):</td>
+                    <td class="text-end text-muted" style="font-size:.8rem">₹{{ '{:,.2f}'.format(billing.total) }}</td>
+                </tr>
+                {% endif %}
+                {% if billing.gst_amount > 0 %}
+                <tr>
+                    <td class="text-end text-muted" style="font-size:.8rem">GST:</td>
+                    <td class="text-end text-muted" style="font-size:.8rem">₹{{ '{:,.2f}'.format(billing.gst_amount) }}</td>
+                </tr>
+                {% endif %}
+                <tr class="rf-grand-total">
+                    <td class="text-end fw-bold">Total Charges</td>
+                    <td class="text-end fw-bold">₹{{ '{:,.2f}'.format(billing.grand_total) }}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    {# ── Payments ────────────────────────────────────────────────── #}
+    <div class="rf-section-head"><i class="bi bi-credit-card me-1"></i>Payments</div>
+    <div class="card border-0 shadow-sm">
+        <table class="table rf-table mb-0">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Mode</th>
+                    <th>Reference</th>
+                    <th class="text-end" style="width:130px">Amount (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in reservation.payments %}
+                <tr class="{{ 'rf-voided' if p.is_voided else '' }}">
+                    <td>{{ p.payment_date.strftime('%d %b %Y') }}</td>
+                    <td>{{ p.payment_mode.name }}</td>
+                    <td class="text-muted" style="font-size:.78rem">
+                        {{ p.reference_number or '—' }}
+                        {% if p.is_voided %}<span class="badge bg-secondary ms-1" style="font-size:.6rem">VOID</span>{% endif %}
+                    </td>
+                    <td class="text-end fw-semibold">₹{{ '{:,.2f}'.format(p.amount) }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted" style="font-size:.82rem">No payments recorded.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% if reservation.payments %}
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="text-end fw-semibold" style="font-size:.84rem">Total Paid:</td>
+                    <td class="text-end fw-semibold text-success">₹{{ '{:,.2f}'.format(billing.paid) }}</td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+
+    {# ── Balance block ───────────────────────────────────────────── #}
+    <div class="rf-balance-block {{ bal_class }}">
+        <div>
+            {% if is_settled %}
+            <div class="rf-bal-label settled"><i class="bi bi-check-circle-fill me-1"></i>Payment Settled</div>
+            <div class="rf-bal-amount settled">₹0.00</div>
+            {% elif is_due %}
+            <div class="rf-bal-label due"><i class="bi bi-exclamation-circle-fill me-1"></i>Balance Due</div>
+            <div class="rf-bal-amount due">₹{{ '{:,.2f}'.format(billing.balance) }}</div>
+            {% else %}
+            <div class="rf-bal-label overpaid"><i class="bi bi-info-circle-fill me-1"></i>Overpaid</div>
+            <div class="rf-bal-amount overpaid">₹{{ '{:,.2f}'.format(billing.balance | abs) }}</div>
+            {% endif %}
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ url_for('main.invoice', reservation_id=reservation.id) }}"
+               class="rf-nav-btn invoice-btn">
+                <i class="bi bi-receipt"></i> View Invoice
+            </a>
+            {% if reservation.guest_id %}
+            <a href="{{ url_for('main.guest_history', guest_id=reservation.guest_id) }}"
+               class="rf-nav-btn">
+                <i class="bi bi-calendar3-range"></i> Visit History
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+</div>
+{% endblock %}

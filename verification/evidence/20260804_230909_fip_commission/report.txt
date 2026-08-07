@@ -1,0 +1,32 @@
+====================================================================================================
+DSBC FRONTLINE — FAULT INJECTION PLATFORM COMMISSIONING
+Wave 0 Deliverable 5 — Principles 6, 9, 11, 13
+====================================================================================================
+Result: 2/2 COMMISSIONED
+
+[PASS] FLT-A01  Walk-in reservation settled through an OTA receivable head
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D1_PARITY, D3_REPLAY, D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+    ok   repeatability            two challenges gave the same classification
+    ok   isolation                baseline and production byte-identical after every injection
+
+[PASS] PLATFORM  Platform self-verification
+    ok   repeatability            proven per fault by the repeatability and determinism elements of fault commissioning
+    ok   isolation                the pristine baseline and production are byte-identical after every injection in this run
+    ok   registry_validation      6/6 malformed declarations refused
+    ok   injection_validation     an injection that changed no rows was refused
+    ok   evidence_validation      every one of 1 results carries injection, timestamp and root-cause candidates
+    ok   cleanup_validation       no seeded copy survived
+    ok   repeatability            proven per fault by the repeatability and determinism elements of fault commissioning
+    ok   isolation                the pristine baseline and production are byte-identical after every injection in this run
+    ok   false_positive_resistance an unmutated copy moved nothing in any layer
+    ok   false_negative_resistance all 1 covered faults were attributed by a declared layer
+    ok   parallel_safety          4 probes run concurrently agreed with the same probes run serially
+

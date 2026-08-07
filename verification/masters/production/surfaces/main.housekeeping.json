@@ -1,0 +1,44 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/housekeeping",
+  "anon_status": 302,
+  "body_bytes": 25817,
+  "body_sha256": "8a76dd31071f104a929d5ee498def4f1f985f6213e7cd89a1eae4ebc68337a4c",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 21,
+  "endpoint": "main.housekeeping",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "dirty_rooms[0][type]": "Room",
+    "dirty_rooms[1][type]": "Room",
+    "dirty_rooms[2][type]": "Room",
+    "dirty_rooms[len]": "3",
+    "floors[0]": "1",
+    "floors[1]": "2",
+    "floors[2]": "3",
+    "floors[len]": "3",
+    "floors[sum]": "6",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "main.housekeeping",
+  "templates": [
+    "housekeeping.html"
+  ],
+  "truncations": [],
+  "url": "/housekeeping"
+}

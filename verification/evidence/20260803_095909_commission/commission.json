@@ -1,0 +1,190 @@
+{
+  "baseline_verdicts": {
+    "P01": {
+      "divergences": 0,
+      "verdict": "SINGLE_SOURCE"
+    },
+    "P02": {
+      "divergences": 0,
+      "verdict": "AGREED"
+    },
+    "P03": {
+      "divergences": 0,
+      "verdict": "AGREED"
+    },
+    "P04": {
+      "divergences": 0,
+      "verdict": "AGREED"
+    },
+    "P05": {
+      "divergences": 0,
+      "verdict": "AGREED"
+    },
+    "P06": {
+      "divergences": 2,
+      "verdict": "DIVERGED"
+    },
+    "P07": {
+      "divergences": 0,
+      "verdict": "AGREED"
+    },
+    "P08": {
+      "divergences": 0,
+      "verdict": "AGREED"
+    },
+    "P09": {
+      "divergences": 0,
+      "verdict": "AGREED"
+    },
+    "P10": {
+      "divergences": 0,
+      "verdict": "AGREED"
+    },
+    "P11": {
+      "divergences": 0,
+      "verdict": "VACUOUS"
+    },
+    "P12": {
+      "divergences": 6,
+      "verdict": "DIVERGED"
+    },
+    "P13": {
+      "divergences": 4,
+      "verdict": "DIVERGED"
+    },
+    "P14": {
+      "divergences": 1,
+      "verdict": "DIVERGED"
+    },
+    "P15": {
+      "divergences": 0,
+      "verdict": "AGREED"
+    },
+    "P16": {
+      "divergences": 0,
+      "verdict": "NOT_IMPLEMENTED"
+    },
+    "P17": {
+      "divergences": 0,
+      "verdict": "NOT_IMPLEMENTED"
+    },
+    "P18": {
+      "divergences": 0,
+      "verdict": "NOT_IMPLEMENTED"
+    },
+    "P19": {
+      "divergences": 0,
+      "verdict": "AGREED"
+    },
+    "P20": {
+      "divergences": 1,
+      "verdict": "DIVERGED"
+    },
+    "P21": {
+      "divergences": 0,
+      "verdict": "VACUOUS"
+    },
+    "P22": {
+      "divergences": 1,
+      "verdict": "DIVERGED"
+    }
+  },
+  "constitutional_basis": "Principle 9",
+  "generated_at": "2026-08-03T09:59:09",
+  "kind": "PVF D1 seeded-fault commissioning",
+  "not_seedable": {
+    "P01": "Census quantity \u2014 single source by design, nothing to compare.",
+    "P05": "Both implementations apply the same room_rent exclusion filter over the same rows. Agreement is structural; no data mutation can separate them. Divergence would require a code change.",
+    "P06": "Already DIVERGED on production data \u2014 detection demonstrated live.",
+    "P08": "Discount suppression only triggers when nightly rows or room_rent rows exist; covered indirectly by S-P03.",
+    "P10": "kpi_helpers and the ORM aggregation read identical rows with identical filters. Structural agreement.",
+    "P11": "VACUOUS \u2014 requires refund/void regression data (Wave 0 D6).",
+    "P12": "Already DIVERGED on production data \u2014 detection demonstrated live.",
+    "P13": "Already DIVERGED on production data \u2014 detection demonstrated live.",
+    "P16": "NOT_IMPLEMENTED \u2014 deferred to D2 (Golden Master Framework).",
+    "P17": "NOT_IMPLEMENTED \u2014 deferred to D2.",
+    "P18": "NOT_IMPLEMENTED \u2014 deferred to D2.",
+    "P19": "Both implementations delegate to occupancy_engine, which is already the converged canonical source (Phase 2 \u00a73).",
+    "P20": "Already DIVERGED on production data \u2014 detection demonstrated live.",
+    "P21": "VACUOUS \u2014 requires shift regression data (Wave 0 D6)."
+  },
+  "production_hash_after": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+  "production_untouched": true,
+  "result": "FAIL",
+  "seeds": [
+    {
+      "baseline_verdict": "AGREED",
+      "description": "Post a room_rent ledger row for one reservation. This is the exact condition under which the three room-revenue definitions stop agreeing \u2014 the trap Wave 1 disarms.",
+      "detected": true,
+      "note": "divergence count 0 -> 1",
+      "seed_id": "S-P03",
+      "seeded_verdict": "DIVERGED",
+      "target": "P03"
+    },
+    {
+      "baseline_verdict": "AGREED",
+      "description": "Same room_rent posting seen at date level: the ledger-posted implementation becomes non-zero and must be compared.",
+      "detected": true,
+      "note": "divergence count 0 -> 2",
+      "seed_id": "S-P04",
+      "seeded_verdict": "DIVERGED",
+      "target": "P04"
+    },
+    {
+      "baseline_verdict": "AGREED",
+      "description": "Insert a payment reversal row. Raw summation adds it; signed summation subtracts it. This is the 29-of-31 defect.",
+      "detected": true,
+      "note": "divergence count 0 -> 4",
+      "seed_id": "S-P09",
+      "seeded_verdict": "DIVERGED",
+      "target": "P09"
+    },
+    {
+      "baseline_verdict": "AGREED",
+      "description": "Insert an extra-charge reversal row \u2014 the charge-side twin of S-P09.",
+      "detected": true,
+      "note": "divergence count 0 -> 1",
+      "seed_id": "S-P02",
+      "seeded_verdict": "DIVERGED",
+      "target": "P02"
+    },
+    {
+      "baseline_verdict": "AGREED",
+      "description": "Corrupt one stored tax line. Stored tax must then disagree with live recomputation \u2014 an invoice-versus-balance gap.",
+      "detected": true,
+      "note": "divergence count 0 -> 1",
+      "seed_id": "S-P07",
+      "seeded_verdict": "DIVERGED",
+      "target": "P07"
+    },
+    {
+      "baseline_verdict": "AGREED",
+      "description": "Tamper with a stored night-audit total. The recomputation must no longer match what was frozen.",
+      "detected": true,
+      "note": "divergence count 0 -> 1",
+      "seed_id": "S-P15",
+      "seeded_verdict": "DIVERGED",
+      "target": "P15"
+    },
+    {
+      "baseline_verdict": "DIVERGED",
+      "description": "Record an OTA payout. Gross outstanding ignores it; net outstanding must fall. Proves the receivable comparison is live.",
+      "detected": false,
+      "note": "already DIVERGED; divergence count 1 -> 1",
+      "seed_id": "S-P22",
+      "seeded_verdict": "DIVERGED",
+      "target": "P22"
+    },
+    {
+      "baseline_verdict": "DIVERGED",
+      "description": "Route one charge to a folio. The folio partition sum must move toward the reservation sum, proving the partition check reads live routing rather than a constant.",
+      "detected": false,
+      "note": "already DIVERGED; divergence count 1 -> 1",
+      "seed_id": "S-P14",
+      "seeded_verdict": "DIVERGED",
+      "target": "P14"
+    }
+  ],
+  "seeds_detected": 6,
+  "seeds_total": 8
+}

@@ -1,0 +1,176 @@
+{
+  "app_version": "2.2.18",
+  "captured_at": "2026-08-03T10:00:24",
+  "pvf_version": "0.1.0",
+  "quantities": {
+    "P01": {
+      "implementations": {
+        "reservations.count": "28"
+      },
+      "label": "Reservation count and status distribution",
+      "verdict": "SINGLE_SOURCE"
+    },
+    "P02": {
+      "implementations": {
+        "raw sum(amount)": "729.85",
+        "signed sum (correction-aware)": "729.85"
+      },
+      "label": "Charge count and total by category",
+      "verdict": "AGREED"
+    },
+    "P03": {
+      "implementations": {
+        "D1 canonical (get_room_revenue)": "37217.12",
+        "D3 report style (rate x nights)": "37217.12"
+      },
+      "label": "Room revenue per reservation (3 definitions)",
+      "verdict": "AGREED"
+    },
+    "P04": {
+      "implementations": {
+        "NightAuditService.revenue_summary": "37217.12",
+        "kpi_helpers.get_accrual_room_revenue": "37217.12"
+      },
+      "label": "Room revenue per business date",
+      "verdict": "AGREED"
+    },
+    "P05": {
+      "implementations": {
+        "NightAuditService.revenue_summary": "729.85",
+        "kpi_helpers.get_accrual_extras": "729.85"
+      },
+      "label": "Ancillary revenue by category",
+      "verdict": "AGREED"
+    },
+    "P06": {
+      "implementations": {
+        "deduplicated by charge source": "37946.67",
+        "raw sum of all tax lines": "75893.34"
+      },
+      "label": "Taxable base (deduplicated vs raw)",
+      "verdict": "DIVERGED"
+    },
+    "P07": {
+      "implementations": {
+        "live compute_stay_gst": "1897.28",
+        "stored TaxLine rows": "1897.24"
+      },
+      "label": "Tax by component (CGST / SGST / IGST)",
+      "verdict": "AGREED"
+    },
+    "P08": {
+      "implementations": {
+        "NightAuditService.discount_total": "0.0",
+        "calculate_stay_amount.discount": "0.0",
+        "reservations.discount_amount field": "0.00"
+      },
+      "label": "Discount applied per reservation",
+      "verdict": "AGREED"
+    },
+    "P09": {
+      "implementations": {
+        "raw ORM sum": "39644.29",
+        "raw SQL func.sum": "39644.29",
+        "signed (signed_payment_amount)": "39644.29",
+        "via calculate_stay_amount": "39644.29"
+      },
+      "label": "Payments total (signed vs raw)",
+      "verdict": "AGREED"
+    },
+    "P10": {
+      "implementations": {
+        "ORM by category (direct_payment)": "31666.37",
+        "kpi_helpers.get_cash_revenue summed": "31666.37"
+      },
+      "label": "Payments by mode and purpose",
+      "verdict": "AGREED"
+    },
+    "P11": {
+      "implementations": {
+        "payment_purpose = refund (true refunds)": "0",
+        "voided payments (what night audit calls refunds)": "0"
+      },
+      "label": "Refunds, separated from voids",
+      "verdict": "VACUOUS"
+    },
+    "P12": {
+      "implementations": {
+        "balance (unrounded grand total)": "199.96",
+        "settlement_balance (invoiced total)": "199.71"
+      },
+      "label": "Outstanding per reservation (2 bases)",
+      "verdict": "DIVERGED"
+    },
+    "P13": {
+      "implementations": {
+        "by balance basis": "{'overpaid': 1, 'owing': 4, 'settled': 23}",
+        "by settlement basis": "{'overpaid': 2, 'owing': 1, 'settled': 25}"
+      },
+      "label": "Settlement status distribution",
+      "verdict": "DIVERGED"
+    },
+    "P14": {
+      "implementations": {
+        "sum over folios (charges)": "0.0",
+        "sum over reservations (charges)": "729.85"
+      },
+      "label": "Folio balances / partition integrity",
+      "verdict": "DIVERGED"
+    },
+    "P15": {
+      "implementations": {
+        "recomputed NightAuditService (\u03a3 compared fields)": "33779.09",
+        "stored NightAuditLog (\u03a3 compared fields)": "33779.09"
+      },
+      "label": "Night audit \u2014 stored vs recomputed sections",
+      "verdict": "AGREED"
+    },
+    "P16": {
+      "implementations": {},
+      "label": "Daily report totals",
+      "verdict": "NOT_IMPLEMENTED"
+    },
+    "P17": {
+      "implementations": {},
+      "label": "MIS aggregates",
+      "verdict": "NOT_IMPLEMENTED"
+    },
+    "P18": {
+      "implementations": {},
+      "label": "Executive dashboard tiles",
+      "verdict": "NOT_IMPLEMENTED"
+    },
+    "P19": {
+      "implementations": {
+        "kpi_helpers.get_occupied_count": "0",
+        "occupancy_engine.occupied_rooms": "0"
+      },
+      "label": "Occupancy and rooms sold",
+      "verdict": "AGREED"
+    },
+    "P20": {
+      "implementations": {
+        "kpi_helpers.get_adr (AVG rate_per_night, no date scope)": "0.0",
+        "room revenue / occupied room-nights (date-scoped)": "1283.35"
+      },
+      "label": "ADR and RevPAR (multiple definitions)",
+      "verdict": "DIVERGED"
+    },
+    "P21": {
+      "implementations": {
+        "recomputed calculate_expected_cash": "0",
+        "stored Shift.expected_cash": "0"
+      },
+      "label": "Cash position and variance",
+      "verdict": "VACUOUS"
+    },
+    "P22": {
+      "implementations": {
+        "compute_ota_outstanding (gross)": "7977.92",
+        "get_ota_pending (net of payouts)": "0.0"
+      },
+      "label": "Receivables \u2014 OTA, corporate, individual",
+      "verdict": "DIVERGED"
+    }
+  }
+}

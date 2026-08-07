@@ -1,0 +1,36 @@
+{
+  "anon_location": "/auth/login?next=%2Fgroups%2F",
+  "anon_status": 302,
+  "body_bytes": 24149,
+  "body_sha256": "cff6c788719b15d9953957902265b3dc3a47e922352f1d342b9795c11045a522",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 23,
+  "endpoint": "groups.index",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "groups[len]": "0",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "groups.index",
+  "templates": [
+    "groups/index.html"
+  ],
+  "truncations": [],
+  "url": "/groups/"
+}

@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+{% block title %}Demand Calendar - AI Insights{% endblock %}
+
+{% block styles %}
+<style>
+.demand-calendar { border-radius: 12px; border: none; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-header { text-align: center; font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+              color: #6b7280; padding: 6px 0; letter-spacing: 0.5px; }
+.cal-cell {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    cursor: pointer; transition: transform 0.12s, box-shadow 0.12s;
+    position: relative; min-height: 64px; font-size: 0.82rem;
+}
+.cal-cell:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(0,0,0,0.12); z-index: 2; }
+.cal-cell.empty { background: transparent; cursor: default; }
+.cal-cell.empty:hover { transform: none; box-shadow: none; }
+.cal-day { font-weight: 700; font-size: 1rem; line-height: 1; }
+.cal-occ { font-size: 0.65rem; font-weight: 600; margin-top: 2px; }
+.cal-rooms { font-size: 0.58rem; color: rgba(0,0,0,0.45); }
+.cal-cell.today { outline: 2px solid #3b82f6; outline-offset: -2px; }
+.legend-item { display: inline-flex; align-items: center; gap: 4px; font-size: 0.78rem; }
+.legend-swatch { width: 16px; height: 16px; border-radius: 4px; }
+.spike-card { border-left: 4px solid; border-radius: 8px; }
+.spike-high { border-color: #ef4444; background: #fff5f5; }
+.spike-low { border-color: #3b82f6; background: #eff6ff; }
+.month-nav { user-select: none; }
+.month-nav button { border: none; background: none; font-size: 1.2rem; cursor: pointer; color: #3b82f6; padding: 4px 8px; }
+.month-nav button:hover { color: #1d4ed8; }
+.detail-popover { position: absolute; z-index: 100; background: #fff; border-radius: 10px;
+                  box-shadow: 0 8px 24px rgba(0,0,0,0.15); padding: 12px 16px;
+                  min-width: 180px; font-size: 0.82rem; pointer-events: auto; }
+.spinner-overlay { display: flex; justify-content: center; align-items: center; min-height: 300px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h4 class="mb-1"><i class="bi bi-calendar-event me-2 text-primary"></i>Demand Calendar</h4>
+        <p class="text-muted mb-0" style="font-size:0.85rem;">Color-coded occupancy forecast by date</p>
+    </div>
+    <div class="d-flex gap-3 align-items-center">
+        <!-- Legend -->
+        <div class="d-flex gap-3 flex-wrap">
+            <span class="legend-item"><span class="legend-swatch" style="background:#dcfce7;border:1px solid #22c55e;"></span> Low &lt;40%</span>
+            <span class="legend-item"><span class="legend-swatch" style="background:#fef9c3;border:1px solid #eab308;"></span> Moderate 40-65%</span>
+            <span class="legend-item"><span class="legend-swatch" style="background:#ffedd5;border:1px solid #f97316;"></span> High 65-85%</span>
+            <span class="legend-item"><span class="legend-swatch" style="background:#fee2e2;border:1px solid #ef4444;"></span> Peak &gt;85%</span>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Calendar Column -->
+    <div class="col-lg-8">
+        <div class="card demand-calendar">
+            <div class="card-header bg-white border-bottom-0 pt-3 pb-2">
+                <div class="d-flex justify-content-between align-items-center month-nav">
+                    <button onclick="changeMonth(-1)" title="Previous month"><i class="bi bi-chevron-left"></i></button>
+                    <h5 class="mb-0 fw-bold" id="calMonthLabel"></h5>
+                    <button onclick="changeMonth(1)" title="Next month"><i class="bi bi-chevron-right"></i></button>
+                </div>
+            </div>
+            <div class="card-body pt-1">
+                <div class="spinner-overlay" id="calSpinner">
+                    <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+                </div>
+                <div id="calContainer" style="display:none;">
+                    <div class="cal-grid mb-1">
+                        <div class="cal-header">Sun</div><div class="cal-header">Mon</div>
+                        <div class="cal-header">Tue</div><div class="cal-header">Wed</div>
+                        <div class="cal-header">Thu</div><div class="cal-header">Fri</div>
+                        <div class="cal-header">Sat</div>
+                    </div>
+                    <div class="cal-grid" id="calGrid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar: Spikes & Details -->
+    <div class="col-lg-4">
+        <!-- Date Detail Card -->
+        <div class="card demand-calendar mb-3" id="dateDetail" style="display:none;">
+            <div class="card-header bg-white pt-3">
+                <h6 class="fw-semibold mb-0"><i class="bi bi-info-circle me-1"></i> Date Details</h6>
+            </div>
+            <div class="card-body" id="dateDetailBody"></div>
+        </div>
+
+        <!-- Demand Spikes -->
+        <div class="card demand-calendar">
+            <div class="card-header bg-white pt-3">
+                <h6 class="fw-semibold mb-0"><i class="bi bi-lightning-charge me-1 text-warning"></i> Demand Anomalies</h6>
+            </div>
+            <div class="card-body" id="spikesBody">
+                <div class="text-center text-muted py-3" style="font-size:0.85rem;">Loading...</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script nonce="{{ csp_nonce }}">
+let currentYear, currentMonth;
+let calendarCache = {};
+let spikesData = null;
+
+function init() {
+    const today = new Date();
+    currentYear = today.getFullYear();
+    currentMonth = today.getMonth();  // 0-based
+    loadMonth();
+    loadSpikes();
+}
+
+function changeMonth(delta) {
+    currentMonth += delta;
+    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+    if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+    loadMonth();
+}
+
+function loadMonth() {
+    const key = currentYear + '-' + String(currentMonth + 1).padStart(2, '0');
+    document.getElementById('calMonthLabel').textContent =
+        new Date(currentYear, currentMonth, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+
+    // Compute date range for this month
+    const firstDay = new Date(currentYear, currentMonth, 1);
+    const lastDay = new Date(currentYear, currentMonth + 1, 0);
+    const start = firstDay.toISOString().slice(0, 10);
+    const end = lastDay.toISOString().slice(0, 10);
+
+    if (calendarCache[key]) {
+        renderCalendar(calendarCache[key]);
+        return;
+    }
+
+    document.getElementById('calSpinner').style.display = 'flex';
+    document.getElementById('calContainer').style.display = 'none';
+
+    fetch('/api/ai/demand-calendar?start=' + start + '&end=' + end)
+        .then(r => r.json())
+        .then(data => {
+            calendarCache[key] = data.calendar;
+            renderCalendar(data.calendar);
+        })
+        .catch(err => {
+            console.error('Calendar load error:', err);
+            document.getElementById('calSpinner').innerHTML =
+                '<span class="text-danger"><i class="bi bi-exclamation-triangle"></i> Failed to load.</span>';
+        });
+}
+
+function renderCalendar(days) {
+    document.getElementById('calSpinner').style.display = 'none';
+    document.getElementById('calContainer').style.display = 'block';
+    const grid = document.getElementById('calGrid');
+    grid.innerHTML = '';
+
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const firstDate = new Date(currentYear, currentMonth, 1);
+    const startDow = firstDate.getDay();  // 0=Sun
+
+    // Empty cells before first day
+    for (let i = 0; i < startDow; i++) {
+        const el = document.createElement('div');
+        el.className = 'cal-cell empty';
+        grid.appendChild(el);
+    }
+
+    // Build lookup
+    const dayMap = {};
+    days.forEach(d => { dayMap[d.date] = d; });
+
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = currentYear + '-' + String(currentMonth + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+        const info = dayMap[dateStr];
+        const el = document.createElement('div');
+        el.className = 'cal-cell';
+        if (dateStr === todayStr) el.classList.add('today');
+
+        if (info) {
+            el.style.background = info.bg_color;
+            el.style.border = '1px solid ' + info.color;
+            el.innerHTML = `<div class="cal-day">${day}</div>
+                <div class="cal-occ" style="color:${info.color}">${info.projected_occ}%</div>
+                <div class="cal-rooms">${info.otb_rooms} rm</div>`;
+            el.onclick = () => showDateDetail(info);
+        } else {
+            el.style.background = '#f9fafb';
+            el.innerHTML = `<div class="cal-day" style="color:#d1d5db;">${day}</div>`;
+        }
+        grid.appendChild(el);
+    }
+}
+
+function showDateDetail(info) {
+    const card = document.getElementById('dateDetail');
+    const body = document.getElementById('dateDetailBody');
+    card.style.display = 'block';
+
+    const levelColors = { low: '#22c55e', moderate: '#eab308', high: '#f97316', peak: '#ef4444' };
+    const col = levelColors[info.demand_level] || '#6b7280';
+    const dt = new Date(info.date);
+    const dateLabel = dt.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+    body.innerHTML = `
+        <div class="fw-bold mb-2">${dateLabel}</div>
+        <table class="table table-sm table-borderless mb-2" style="font-size:0.82rem;">
+            <tr><td class="text-muted">Demand Level</td>
+                <td class="text-end"><span class="badge" style="background:${col};color:#fff;">${info.demand_level.toUpperCase()}</span></td></tr>
+            <tr><td class="text-muted">OTB Rooms</td><td class="text-end fw-semibold">${info.otb_rooms}</td></tr>
+            <tr><td class="text-muted">Projected Occupancy</td><td class="text-end fw-semibold">${info.projected_occ}%</td></tr>
+            <tr><td class="text-muted">Day of Week</td><td class="text-end">${info.weekday}</td></tr>
+        </table>
+    `;
+}
+
+function loadSpikes() {
+    fetch('/api/ai/demand-spikes?days=90')
+        .then(r => r.json())
+        .then(data => {
+            spikesData = data;
+            renderSpikes(data);
+        })
+        .catch(() => {
+            document.getElementById('spikesBody').innerHTML =
+                '<div class="text-muted text-center py-3">Could not load anomalies.</div>';
+        });
+}
+
+function renderSpikes(data) {
+    const body = document.getElementById('spikesBody');
+    const spikes = data.spikes || [];
+    const events = data.potential_events || [];
+
+    if (!spikes.length) {
+        body.innerHTML = '<div class="text-muted text-center py-3" style="font-size:0.85rem;">No significant demand anomalies detected in the next 90 days.</div>';
+        return;
+    }
+
+    let html = '';
+
+    // Potential events first
+    if (events.length) {
+        html += '<div class="mb-3"><small class="text-muted fw-bold text-uppercase">Potential Events</small></div>';
+        events.forEach(ev => {
+            const s = new Date(ev.start).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+            const e = new Date(ev.end).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+            html += `<div class="spike-card spike-high p-2 mb-2">
+                <div class="fw-semibold" style="font-size:0.82rem;"><i class="bi bi-lightning-charge text-danger"></i> ${s} - ${e} (${ev.days} days)</div>
+                <div class="text-muted" style="font-size:0.72rem;">${ev.label}</div>
+            </div>`;
+        });
+    }
+
+    // Top spikes (limit to 10)
+    const topSpikes = spikes.slice(0, 10);
+    html += '<div class="mb-2 mt-3"><small class="text-muted fw-bold text-uppercase">Top Anomalies</small></div>';
+    topSpikes.forEach(sp => {
+        const cls = sp.spike_type === 'high' ? 'spike-high' : 'spike-low';
+        const icon = sp.spike_type === 'high' ? 'arrow-up-circle text-danger' : 'arrow-down-circle text-primary';
+        const dt = new Date(sp.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', weekday: 'short' });
+        const sign = sp.deviation > 0 ? '+' : '';
+        html += `<div class="spike-card ${cls} p-2 mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+                <span style="font-size:0.8rem;"><i class="bi bi-${icon}"></i> ${dt}</span>
+                <span class="fw-bold" style="font-size:0.8rem;">${sign}${sp.deviation}%</span>
+            </div>
+            <div class="text-muted" style="font-size:0.7rem;">Projected: ${sp.projected_occ}% | Avg: ${sp.historical_avg}%</div>
+        </div>`;
+    });
+
+    body.innerHTML = html;
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+{% endblock %}

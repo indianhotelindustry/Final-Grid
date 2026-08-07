@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+{% block title %}Maintenance{% endblock %}
+
+{% block content %}
+<!-- Global Secondary Tab Bar — Housekeeping context active -->
+<ul class="nav nav-tabs" role="tablist" id="globalTabs">
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.dashboard') }}"><i class="bi bi-grid-3x3"></i> Dashboard</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.reservations') }}"><i class="bi bi-list-ul"></i> Front Desk</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link active" href="{{ url_for('main.housekeeping') }}"><i class="bi bi-brush"></i> Housekeeping</a>
+    </li>
+    {% if current_user.has_role('Admin','Manager','FrontDesk','Accountant') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.invoice_manager') }}"><i class="bi bi-receipt-cutoff"></i> Invoice Manager</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.room_grid') }}"><i class="bi bi-calendar3"></i> Calendar View</a>
+    </li>
+    {% endif %}
+    {% if current_user.has_role('Admin','Manager') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('groups.index') }}"><i class="bi bi-people-fill"></i> Group Bookings</a>
+    </li>
+    {% endif %}
+    {% if current_user.has_role('Admin','Manager','Accountant') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.night_audit') }}"><i class="bi bi-moon-stars"></i> Night Audit</a>
+    </li>
+    {% endif %}
+</ul>
+
+{% set hk_subtab = 'maintenance' %}
+{% include 'partials/housekeeping_subtabs.html' %}
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="mb-0"><i class="bi bi-wrench me-2"></i>Maintenance</h4>
+    <div class="d-flex gap-2">
+        {% if current_user.role in ('Admin', 'Manager') %}
+        <a href="{{ url_for('ai.predictive_maintenance_dashboard') }}" class="btn btn-outline-info btn-sm">
+            <i class="bi bi-graph-up me-1"></i>AI Predictions
+        </a>
+        {% endif %}
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createModal">
+            <i class="bi bi-plus-lg me-1"></i>Report Issue
+        </button>
+    </div>
+</div>
+
+<!-- Summary cards -->
+<div class="row g-2 mb-3">
+    <div class="col-auto">
+        <div class="card border-0 bg-warning text-dark px-3 py-2 shadow-sm">
+            <div class="fw-bold fs-5">{{ open_count }}</div>
+            <div class="small">Open Issues</div>
+        </div>
+    </div>
+    <div class="col-auto">
+        <div class="card border-0 bg-danger text-white px-3 py-2 shadow-sm">
+            <div class="fw-bold fs-5">{{ urgent_count }}</div>
+            <div class="small">Urgent</div>
+        </div>
+    </div>
+    <div class="col-auto">
+        <div class="card border-0 bg-success text-white px-3 py-2 shadow-sm">
+            <div class="fw-bold fs-5">{{ resolved_today }}</div>
+            <div class="small">Resolved Today</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="d-flex gap-2 mb-3 flex-wrap">
+    <a href="{{ url_for('maintenance.index', status='open') }}"
+       class="btn btn-sm {% if status_filter=='open' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+        Open
+    </a>
+    <a href="{{ url_for('maintenance.index', status='resolved') }}"
+       class="btn btn-sm {% if status_filter=='resolved' %}btn-success{% else %}btn-outline-success{% endif %}">
+        Resolved
+    </a>
+    <a href="{{ url_for('maintenance.index', status='all') }}"
+       class="btn btn-sm {% if status_filter=='all' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
+        All
+    </a>
+    {% for p in priorities %}
+    <a href="{{ url_for('maintenance.index', status=status_filter, priority=p) }}"
+       class="btn btn-sm {% if priority_filter==p %}btn-dark{% else %}btn-outline-dark{% endif %}">
+        {{ p }}
+    </a>
+    {% endfor %}
+    {% if priority_filter %}
+    <a href="{{ url_for('maintenance.index', status=status_filter) }}" class="btn btn-sm btn-outline-secondary">
+        Clear
+    </a>
+    {% endif %}
+</div>
+
+<!-- Requests list -->
+<div class="row g-3">
+{% for req in requests_list %}
+<div class="col-12">
+    <div class="card shadow-sm border-start border-4
+        {% if req.priority == 'Urgent' %}border-danger
+        {% elif req.priority == 'High' %}border-warning
+        {% elif req.priority == 'Medium' %}border-primary
+        {% else %}border-secondary{% endif %}">
+        <div class="card-body py-2">
+            <div class="row align-items-start g-2">
+                <div class="col-md-7">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="badge
+                            {% if req.priority == 'Urgent' %}bg-danger
+                            {% elif req.priority == 'High' %}bg-warning text-dark
+                            {% elif req.priority == 'Medium' %}bg-primary
+                            {% else %}bg-secondary{% endif %}">
+                            {{ req.priority }}
+                        </span>
+                        <span class="badge bg-light text-dark border">{{ req.category }}</span>
+                        <span class="fw-bold">Room {{ req.room.room_number }}</span>
+                        <small class="text-muted">#{{ req.id }}</small>
+                    </div>
+                    <div class="mb-1">{{ req.description }}</div>
+                    <div class="small text-muted">
+                        Reported by {{ req.reported_by or 'Staff' }} — {{ req.created_at.strftime('%d %b %Y %H:%M') }}
+                        {% if req.assigned_to %}
+                        | Assigned to: <strong>{{ req.assigned_to }}</strong>
+                        {% endif %}
+                    </div>
+                    {% if req.notes %}
+                    <div class="small text-secondary mt-1 fst-italic" style="white-space:pre-line;">{{ req.notes[-200:] }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-5 d-flex gap-2 justify-content-md-end flex-wrap align-items-start mt-1">
+                    {% if req.status != 'Resolved' %}
+
+                    <!-- Update form -->
+                    <form method="POST" action="{{ url_for('maintenance.update', req_id=req.id) }}" class="d-inline">
+                        <select name="status" class="form-select form-select-sm d-inline-block" style="width:130px;"
+                                onchange="this.form.submit()">
+                            <option {% if req.status=='Open' %}selected{% endif %} value="Open">Open</option>
+                            <option {% if req.status=='InProgress' %}selected{% endif %} value="InProgress">In Progress</option>
+                        </select>
+                    </form>
+
+                    <!-- Assign -->
+                    <form method="POST" action="{{ url_for('maintenance.update', req_id=req.id) }}"
+                          class="d-inline-flex gap-1">
+                        <input type="text" name="assigned_to" class="form-control form-control-sm"
+                               style="width:120px;" placeholder="Assign to…"
+                               value="{{ req.assigned_to or '' }}">
+                        <button class="btn btn-sm btn-outline-primary py-0">Go</button>
+                    </form>
+
+                    <!-- Resolve button -->
+                    <button class="btn btn-sm btn-success" data-bs-toggle="modal"
+                            data-bs-target="#resolveModal{{ req.id }}">
+                        <i class="bi bi-check2-circle me-1"></i>Resolve
+                    </button>
+
+                    {% else %}
+                    <span class="badge bg-success py-2">
+                        <i class="bi bi-check-circle me-1"></i>Resolved
+                        {{ req.resolved_at.strftime('%d %b') if req.resolved_at else '' }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Resolve modal -->
+{% if req.status != 'Resolved' %}
+<div class="modal fade" id="resolveModal{{ req.id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('maintenance.resolve', req_id=req.id) }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Resolve — Room {{ req.room.room_number }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label">Resolution Notes</label>
+                    <textarea name="resolution_note" class="form-control" rows="3"
+                              placeholder="Describe what was fixed…"></textarea>
+                    <div class="form-text mt-1">
+                        If this was the only Urgent issue, the room will automatically be released to Vacant.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle me-1"></i>Mark Resolved
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% else %}
+<div class="col-12 text-center text-muted py-4">
+    No maintenance requests found.
+</div>
+{% endfor %}
+</div>
+
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('maintenance.create') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-wrench me-1"></i>Report Maintenance Issue</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Room <span class="text-danger">*</span></label>
+                        <select class="form-select" name="room_id" required>
+                            <option value="">Select room…</option>
+                            {% for room in rooms %}
+                            <option value="{{ room.id }}">Room {{ room.room_number }} ({{ room.status }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-semibold">Category</label>
+                            <select class="form-select" name="category">
+                                {% for cat in categories %}
+                                <option>{{ cat }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-semibold">Priority</label>
+                            <select class="form-select" name="priority">
+                                {% for p in priorities %}
+                                <option {% if p == 'Medium' %}selected{% endif %}>{{ p }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Description <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="description" rows="3" required
+                                  placeholder="Describe the issue clearly…"></textarea>
+                    </div>
+                    <div class="alert alert-warning py-2 mb-0 small">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        <strong>Urgent</strong> issues will automatically set the room to <strong>Maintenance</strong>
+                        status, blocking new check-ins.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-wrench me-1"></i>Report Issue
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

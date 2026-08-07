@@ -1,0 +1,71 @@
+# DSBC Frontline — repository exclusions
+#
+# The governing question for every line here is "would committing this
+# either leak live data or destroy the signal in the history?"
+#
+# Note the deliberate INCLUSIONS at the bottom: verification evidence is
+# tracked, because Phase 2.6 §13 makes evidence packs release evidence and
+# P12 makes them immutable. Untracked evidence is not evidence.
+
+# ---------------------------------------------------------------------------
+# Live financial data — must never enter version control
+# ---------------------------------------------------------------------------
+instance/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# ---------------------------------------------------------------------------
+# Secrets
+# ---------------------------------------------------------------------------
+.env
+.env.local
+.env.*.local
+# .env.example IS tracked — it is the documented contract, with no values.
+
+# ---------------------------------------------------------------------------
+# Interpreters and dependencies — reproducible from requirements.txt
+# ---------------------------------------------------------------------------
+venv/
+python/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# ---------------------------------------------------------------------------
+# Runtime output
+# ---------------------------------------------------------------------------
+logs/
+backups/
+uninstall_data/
+app/private_uploads/
+
+# ---------------------------------------------------------------------------
+# Verification framework — disposable working area only
+# ---------------------------------------------------------------------------
+# _work/ holds throwaway copies of the production database. It is
+# documented as disposable (verification/README.md), it reaches hundreds of
+# megabytes, and each file is a copy of live financial data. Never tracked.
+verification/_work/
+
+# Everything else under verification/ IS tracked, explicitly:
+#   evidence/    the 81 retained evidence packs      (Phase 2.6 §13)
+#   baselines/   named D1 baselines                  (release gate input)
+#   masters/     D2 golden master sets               (release gate input)
+#   ledgers/     D3 stored replays                   (release gate input)
+!verification/evidence/
+!verification/baselines/
+!verification/masters/
+!verification/ledgers/
+
+# ---------------------------------------------------------------------------
+# Editor / OS noise
+# ---------------------------------------------------------------------------
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+*.swp
+*~

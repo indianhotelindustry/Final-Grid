@@ -1,0 +1,35 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/ceo",
+  "anon_status": 302,
+  "body_bytes": 36766,
+  "body_sha256": "c1e3414afe16728d79c406f51878d8f948a34a575f078073f2115b7ca0a3871e",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 13,
+  "endpoint": "main.ceo_dashboard",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "main.ceo_dashboard",
+  "templates": [
+    "ceo_dashboard.html"
+  ],
+  "truncations": [],
+  "url": "/ceo"
+}

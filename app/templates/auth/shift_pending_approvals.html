@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block title %}Pending Shift Approvals{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">
+    <i class="bi bi-hourglass-split text-warning me-2"></i>Pending Shift Approvals
+    {% if pending %}
+      <span class="badge bg-warning text-dark ms-1">{{ pending | length }}</span>
+    {% endif %}
+  </h4>
+  <a href="{{ url_for('auth.shifts') }}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-clock-history me-1"></i>All Shifts
+  </a>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for cat, msg in messages %}
+    <div class="alert alert-{{ cat }} alert-dismissible fade show">
+      {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  {% endfor %}
+{% endwith %}
+
+{% if not pending %}
+  <div class="alert alert-success">
+    <i class="bi bi-check-circle me-1"></i>No shift closures pending approval.
+  </div>
+{% else %}
+  <div class="alert alert-warning">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <strong>{{ pending | length }}</strong> shift{{ 's' if pending|length != 1 }} require your approval.
+    Review the variance carefully before approving.
+  </div>
+
+  {% for shift in pending %}
+  <div class="card mb-3 border-warning shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center bg-warning bg-opacity-10">
+      <div>
+        <span class="fw-semibold">{{ shift.user.full_name }}</span>
+        <span class="badge bg-secondary ms-2">{{ shift.shift_type }}</span>
+        <span class="badge bg-warning text-dark ms-1">Pending Approval</span>
+      </div>
+      <small class="text-muted">Closed {{ shift.end_time.strftime('%d %b %Y %H:%M') if shift.end_time else '—' }}</small>
+    </div>
+
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-5">
+          <table class="table table-sm table-borderless mb-0">
+            <tr>
+              <td class="text-muted ps-0">Shift Period</td>
+              <td>
+                {{ shift.start_time.strftime('%d %b %H:%M') }}
+                → {{ shift.end_time.strftime('%H:%M') if shift.end_time else 'ongoing' }}
+              </td>
+            </tr>
+            <tr>
+              <td class="text-muted ps-0">Opening Cash</td>
+              <td>₹{{ '%.2f'|format(shift.opening_cash or 0) }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted ps-0">Expected Cash</td>
+              <td class="fw-semibold">₹{{ '%.2f'|format(shift.expected_cash or 0) }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted ps-0">Declared Cash</td>
+              <td class="fw-semibold">₹{{ '%.2f'|format(shift.declared_closing_cash or 0) }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted ps-0">Variance</td>
+              <td class="fw-bold fs-5
+                {{ 'text-success' if (shift.variance or 0) > 0 else 'text-danger' }}">
+                {% set v = shift.variance | float %}
+                {% if v > 0 %}+{% elif v < 0 %}−{% endif %}
+                ₹{{ '%.2f'|format(v | abs) }}
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="col-md-7">
+          {% if shift.payment_summary %}
+          <p class="mb-1 small fw-semibold text-muted">Payment Mode Summary:</p>
+          <table class="table table-sm table-bordered mb-2">
+            {% for mode, total in shift.payment_summary.items() %}
+            <tr>
+              <td class="small">{{ mode }}</td>
+              <td class="text-end small">₹{{ '%.2f'|format(total) }}</td>
+            </tr>
+            {% endfor %}
+          </table>
+          {% endif %}
+
+          {% if shift.close_notes %}
+          <p class="mb-1 small text-muted">Handover Notes:</p>
+          <div class="alert alert-secondary py-1 small mb-0">{{ shift.close_notes }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 mt-3 align-items-center">
+        <form method="POST" action="{{ url_for('auth.approve_shift', shift_id=shift.id) }}"
+              onsubmit="return confirm('Approve shift close for {{ shift.user.full_name }}?');">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-success btn-sm">
+            <i class="bi bi-check-circle me-1"></i>Approve
+          </button>
+        </form>
+        <a href="{{ url_for('auth.shift_handover', shift_id=shift.id) }}"
+           class="btn btn-outline-secondary btn-sm" target="_blank">
+          <i class="bi bi-eye me-1"></i>View Full Report
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+{% endif %}
+{% endblock %}

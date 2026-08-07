@@ -1,0 +1,36 @@
+{
+  "anon_location": "/auth/login?next=%2Fota%2Fwebhook%2Flogs",
+  "anon_status": 302,
+  "body_bytes": 24204,
+  "body_sha256": "876ef1ff93794b2a27083f89b07d80c518d51e5bd3fe0f59bdf92aa9ec4bbdb8",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 20,
+  "endpoint": "ota.webhook_logs",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "logs[type]": "QueryPagination",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 5,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "ota.webhook_logs",
+  "templates": [
+    "ota/webhook_logs.html"
+  ],
+  "truncations": [],
+  "url": "/ota/webhook/logs"
+}

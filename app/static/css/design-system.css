@@ -1,0 +1,439 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   DESIGN SYSTEM (S0 scaffold)
+   Loaded AFTER style.css. Additive only — no existing class is modified.
+   All component classes are `.ds-*` prefixed; they are inert until opted in.
+   Rollback: remove the <link> in base.html.
+   ═════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Tokens ───────────────────────────────────────────────────────────── */
+:root {
+    /* Spacing scale */
+    --sp-1: 0.25rem;
+    --sp-2: 0.5rem;
+    --sp-3: 0.75rem;
+    --sp-4: 1rem;
+    --sp-5: 1.25rem;
+    --sp-6: 1.5rem;
+    --sp-8: 2rem;
+
+    /* Typography scale */
+    --fs-xs:   0.75rem;     /* badges, captions, KPI labels */
+    --fs-sm:   0.8125rem;   /* table cells, helper text */
+    --fs-md:   0.875rem;    /* form labels, table headers */
+    --fs-base: 0.9375rem;   /* body (matches existing --bs-body-font-size) */
+    --fs-lg:   1rem;        /* card titles */
+    --fs-xl:   1.125rem;    /* section titles */
+    --fs-2xl:  1.375rem;    /* page titles */
+
+    /* Line heights */
+    --lh-tight:  1.2;
+    --lh-snug:   1.4;
+    --lh-normal: 1.6;
+
+    /* Font weights */
+    --fw-normal:   400;
+    --fw-medium:   500;
+    --fw-semibold: 600;
+    --fw-bold:     700;
+
+    /* Radius scale (aligns with existing --bs-* radii) */
+    --rad-sm: 0.375rem;
+    --rad-md: 0.5rem;
+    --rad-lg: 0.625rem;
+    --rad-xl: 0.75rem;
+
+    /* Shadow scale (built on existing --warm-shadow tokens) */
+    --shadow-1: 0 1px 2px var(--warm-shadow);
+    --shadow-2: 0 2px 6px var(--warm-shadow);
+    --shadow-3: 0 4px 12px var(--warm-shadow-md);
+
+    /* Z-index scale */
+    --z-sticky:         100;
+    --z-dropdown:       1000;
+    --z-modal-backdrop: 1040;
+    --z-modal:          1050;
+
+    /* Touch / row heights */
+    --touch-target:   40px;
+    --row-h-compact:  36px;
+    --row-h-default: 44px;
+}
+
+/* ── 2. Typography helpers ──────────────────────────────────────────────── */
+.ds-page-title {
+    font-size: var(--fs-2xl);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-tight);
+    color: var(--warm-text);
+    margin: 0 0 var(--sp-3) 0;
+}
+
+.ds-section-title {
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-semibold);
+    line-height: var(--lh-snug);
+    color: var(--warm-text);
+    margin: 0 0 var(--sp-3) 0;
+}
+
+.ds-card-title {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-semibold);
+    color: var(--warm-text);
+    margin: 0;
+}
+
+.ds-label {
+    font-size: var(--fs-md);
+    font-weight: var(--fw-semibold);
+    color: var(--warm-text);
+}
+
+.ds-helper {
+    font-size: var(--fs-xs);
+    color: var(--warm-text-muted);
+    line-height: var(--lh-snug);
+}
+
+.ds-muted {
+    color: var(--warm-text-muted);
+}
+
+.ds-eyebrow {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    color: var(--warm-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* ── 3. Card pattern ────────────────────────────────────────────────────── */
+.ds-card {
+    background: #fff;
+    border: 1px solid var(--warm-border);
+    border-radius: var(--rad-lg);
+    box-shadow: var(--shadow-1);
+    margin-bottom: var(--sp-4);
+    overflow: hidden;
+}
+
+.ds-card-header {
+    padding: var(--sp-3) var(--sp-4);
+    border-bottom: 1px solid var(--warm-border);
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+}
+
+.ds-card-header > .ds-card-title { flex: 1 1 auto; }
+
+.ds-card-body {
+    padding: var(--sp-4);
+}
+
+.ds-card-compact .ds-card-header { padding: var(--sp-2) var(--sp-3); }
+.ds-card-compact .ds-card-body   { padding: var(--sp-3); }
+
+.ds-card-footer {
+    padding: var(--sp-2) var(--sp-4);
+    border-top: 1px solid var(--warm-border);
+    background: var(--warm-cream);
+    font-size: var(--fs-xs);
+    color: var(--warm-text-muted);
+}
+
+/* ── 4. KPI tile pattern ────────────────────────────────────────────────── */
+.ds-kpi {
+    background: #fff;
+    border: 1px solid var(--warm-border);
+    border-radius: var(--rad-lg);
+    padding: var(--sp-3) var(--sp-4);
+    box-shadow: var(--shadow-1);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    min-width: 0;     /* allow values to truncate inside grid */
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+a.ds-kpi,
+.ds-kpi.is-clickable {
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+}
+
+a.ds-kpi:hover,
+.ds-kpi.is-clickable:hover {
+    box-shadow: var(--shadow-2);
+    transform: translateY(-1px);
+}
+
+.ds-kpi-label {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    color: var(--warm-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: var(--lh-snug);
+}
+
+.ds-kpi-value {
+    font-size: var(--fs-2xl);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-tight);
+    color: var(--warm-text);
+    word-break: break-word;
+}
+
+.ds-kpi-sub {
+    font-size: var(--fs-xs);
+    color: var(--warm-text-muted);
+    line-height: var(--lh-snug);
+}
+
+.ds-kpi.is-positive .ds-kpi-value { color: var(--warm-accent-dark); }
+.ds-kpi.is-negative .ds-kpi-value { color: var(--bs-danger); }
+.ds-kpi.is-warning  .ds-kpi-value { color: var(--bs-warning); }
+.ds-kpi.is-info     .ds-kpi-value { color: var(--bs-info); }
+
+/* Responsive KPI strip — 6/3/2 columns */
+.ds-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: var(--sp-3);
+    margin-bottom: var(--sp-4);
+}
+
+@media (max-width: 1199px) {
+    .ds-kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 575px) {
+    .ds-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* 4-column variant for payment summaries etc. */
+.ds-kpi-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--sp-3);
+}
+
+@media (max-width: 991px) {
+    .ds-kpi-grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 575px) {
+    .ds-kpi-grid-4 { grid-template-columns: 1fr; }
+}
+
+/* 3-column widget grid */
+.ds-widget-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--sp-4);
+}
+
+@media (max-width: 1199px) {
+    .ds-widget-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 767px) {
+    .ds-widget-grid { grid-template-columns: 1fr; }
+}
+
+/* ── 5. Table pattern ───────────────────────────────────────────────────── */
+.ds-table {
+    width: 100%;
+    font-size: var(--fs-sm);
+    color: var(--warm-text);
+    border-collapse: collapse;
+}
+
+.ds-table thead th {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    color: var(--warm-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: var(--sp-2) var(--sp-3);
+    border-bottom: 2px solid var(--warm-border);
+    background: var(--warm-cream);
+    text-align: left;
+    white-space: nowrap;
+}
+
+.ds-table tbody td {
+    padding: var(--sp-2) var(--sp-3);
+    border-bottom: 1px solid var(--warm-border);
+    vertical-align: middle;
+    line-height: var(--lh-snug);
+}
+
+.ds-table tbody tr:last-child td { border-bottom: 0; }
+
+.ds-table tbody tr:hover {
+    background: var(--warm-primary-pale);
+}
+
+.ds-table .ds-actions,
+.ds-table .text-end {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.ds-table .num,
+.ds-table .ds-num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.ds-table-compact tbody td {
+    padding: var(--sp-1) var(--sp-3);
+    height: var(--row-h-compact);
+}
+
+.ds-table-empty {
+    padding: var(--sp-6) var(--sp-4);
+    text-align: center;
+    color: var(--warm-text-muted);
+    font-size: var(--fs-sm);
+}
+
+/* ── 6. Form helpers (do NOT change existing form-control sizing) ───────── */
+.ds-form-section {
+    background: #fff;
+    border: 1px solid var(--warm-border);
+    border-radius: var(--rad-lg);
+    padding: var(--sp-4);
+    margin-bottom: var(--sp-4);
+}
+
+.ds-form-section > .ds-form-section-title {
+    font-size: var(--fs-md);
+    font-weight: var(--fw-semibold);
+    color: var(--warm-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 var(--sp-3) 0;
+}
+
+.ds-form-group {
+    margin-bottom: var(--sp-3);
+}
+
+.ds-form-group > label,
+.ds-form-group > .ds-label {
+    display: block;
+    font-size: var(--fs-md);
+    font-weight: var(--fw-semibold);
+    color: var(--warm-text);
+    margin-bottom: var(--sp-1);
+}
+
+.ds-form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--sp-3);
+}
+
+.ds-form-actions {
+    display: flex;
+    gap: var(--sp-2);
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: var(--sp-4);
+    padding-top: var(--sp-3);
+    border-top: 1px solid var(--warm-border);
+}
+
+.ds-form-actions.is-start { justify-content: flex-start; }
+.ds-form-actions.is-between { justify-content: space-between; }
+
+/* ── 7. Button helpers (alongside existing .btn-*; no overrides) ────────── */
+.ds-btn-icon {
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    flex: 0 0 auto;
+}
+
+.ds-btn-row {
+    display: inline-flex;
+    gap: var(--sp-2);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* ── 8. Badge helpers (compact status pills) ────────────────────────────── */
+.ds-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-1);
+    padding: 0.15rem 0.5rem;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    border-radius: 999px;
+    line-height: var(--lh-snug);
+    white-space: nowrap;
+}
+
+.ds-badge.is-success { background: var(--warm-accent-light); color: var(--warm-accent-dark); }
+.ds-badge.is-warning { background: #FEF3C7; color: #92400E; }
+.ds-badge.is-danger  { background: #FEE2E2; color: #991B1B; }
+.ds-badge.is-info    { background: #E0F2FE; color: #075985; }
+.ds-badge.is-muted   { background: var(--warm-cream); color: var(--warm-text-muted); }
+.ds-badge.is-primary { background: var(--warm-primary-pale); color: var(--warm-primary-dark); }
+
+/* ── 9. Empty / placeholder states ──────────────────────────────────────── */
+.ds-empty {
+    padding: var(--sp-6) var(--sp-4);
+    text-align: center;
+    color: var(--warm-text-muted);
+}
+
+.ds-empty .ds-empty-icon {
+    font-size: 2rem;
+    color: var(--warm-border);
+    margin-bottom: var(--sp-2);
+}
+
+.ds-empty .ds-empty-title {
+    font-size: var(--fs-md);
+    font-weight: var(--fw-semibold);
+    color: var(--warm-text);
+    margin-bottom: var(--sp-1);
+}
+
+.ds-empty .ds-empty-text {
+    font-size: var(--fs-sm);
+    color: var(--warm-text-muted);
+}
+
+/* ── 10. Spacing utility helpers (additive — coexist with Bootstrap mt/mb) ─ */
+.ds-stack-1 > * + * { margin-top: var(--sp-1); }
+.ds-stack-2 > * + * { margin-top: var(--sp-2); }
+.ds-stack-3 > * + * { margin-top: var(--sp-3); }
+.ds-stack-4 > * + * { margin-top: var(--sp-4); }
+
+.ds-cluster {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    align-items: center;
+}
+
+/* ── 11. Tablet density tightening ──────────────────────────────────────── */
+@media (max-width: 1024px) {
+    .ds-card-body         { padding: var(--sp-3); }
+    .ds-kpi               { padding: var(--sp-2) var(--sp-3); }
+    .ds-kpi-value         { font-size: var(--fs-xl); }
+    .ds-form-section      { padding: var(--sp-3); }
+}

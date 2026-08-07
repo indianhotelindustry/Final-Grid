@@ -1,0 +1,32 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/api/dashboard/analytics",
+  "anon_status": 302,
+  "body_bytes": 17587,
+  "body_sha256": "9acd89d83f779b6f32d89d7412e966d7494baaf9e11897c8711d43b03744112c",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 8,
+  "endpoint": "main.load_dashboard_tab",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {},
+  "note": "Dashboard analytics tab shell.",
+  "origin": "declared",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "main.load_dashboard_tab__analytics",
+  "templates": [
+    "tabs/analytics.html"
+  ],
+  "truncations": [],
+  "url": "/api/dashboard/analytics"
+}

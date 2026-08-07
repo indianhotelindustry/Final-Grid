@@ -1,0 +1,118 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Credit Aging{% endblock %}
+{% block report_name %}Credit Aging{% endblock %}
+
+{% block report_content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h5 class="mb-0">
+        <i class="bi bi-bar-chart-steps text-warning me-2"></i>Credit Aging
+        <small class="text-muted fs-6 ms-1">as of {{ today.strftime('%d %b %Y') }}</small>
+    </h5>
+    <div class="d-flex gap-2 d-print-none">
+        <a href="{{ url_for('reports.credit_ledger') }}" class="btn btn-sm btn-outline-warning">
+            <i class="bi bi-list-ul me-1"></i>Ledger View
+        </a>
+        <a href="{{ url_for('reports.credit_aging', format='excel') }}"
+           class="btn btn-sm btn-success">
+            <i class="bi bi-file-earmark-excel me-1"></i>Excel
+        </a>
+        <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i>Print
+        </button>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    {% set _bucket_styles = {
+        '0-7':   {'border': 'border-success', 'text': 'text-success', 'icon': 'bi-check-circle'},
+        '8-15':  {'border': 'border-info',    'text': 'text-info',    'icon': 'bi-clock'},
+        '16-30': {'border': 'border-warning', 'text': 'text-warning', 'icon': 'bi-exclamation-triangle'},
+        '30+':   {'border': 'border-danger',  'text': 'text-danger',  'icon': 'bi-fire'},
+    } %}
+    {% for key in ['0-7', '8-15', '16-30', '30+'] %}
+        {% set b = buckets[key] %}
+        {% set s = _bucket_styles[key] %}
+        <div class="col-md-3 col-6">
+            <div class="card shadow-sm {{ s.border }}">
+                <div class="card-body text-center py-3">
+                    <i class="bi {{ s.icon }} {{ s.text }} fs-4 mb-1"></i>
+                    <div class="fw-semibold small text-muted">{{ b.label }}</div>
+                    <div class="fs-4 fw-bold {{ s.text }}">₹{{ '{:,.0f}'.format(b.amount) }}</div>
+                    <div class="small text-muted">{{ b.count }} account{{ 's' if b.count != 1 }}</div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{% if overdue_30 and overdue_30.count > 0 %}
+<div class="alert alert-danger d-flex align-items-center gap-2 mb-3">
+    <i class="bi bi-exclamation-octagon-fill fs-4"></i>
+    <div>
+        <strong>{{ overdue_30.count }} receivable{{ 's' if overdue_30.count != 1 }}</strong>
+        overdue more than 30 days · <strong>₹{{ '{:,.2f}'.format(overdue_30.amount) }}</strong> at risk.
+        Escalate to recovery or write-off review.
+    </div>
+</div>
+{% endif %}
+
+<div class="alert alert-light border mb-4">
+    <strong>Total Outstanding:</strong>
+    <span class="text-warning fw-bold fs-5">₹{{ '{:,.2f}'.format(grand_total) }}</span>
+    across <strong>{{ buckets['0-7'].count + buckets['8-15'].count + buckets['16-30'].count + buckets['30+'].count }}</strong> open credit accounts.
+    <span class="text-muted small ms-2">
+      <i class="bi bi-info-circle me-1"></i>Receivable is a post-checkout debt, not revenue.
+    </span>
+</div>
+
+{% for key in ['30+', '16-30', '8-15', '0-7'] %}
+    {% set b = buckets[key] %}
+    {% if b.records %}
+    <div class="card shadow-sm mb-3">
+        <div class="card-header py-2 d-flex justify-content-between align-items-center
+                    {% if key == '30+' %}bg-danger text-white
+                    {% elif key == '16-30' %}bg-warning
+                    {% elif key == '8-15' %}bg-info text-white
+                    {% else %}bg-success text-white{% endif %}">
+            <span class="fw-semibold">{{ b.label }} ({{ b.count }})</span>
+            <span class="fw-bold">₹{{ '{:,.2f}'.format(b.amount) }}</span>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-sm table-striped mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Guest</th>
+                        <th>Reservation</th>
+                        <th>Room</th>
+                        <th class="text-end">Amount (₹)</th>
+                        <th class="text-end">Days Open</th>
+                        <th>Approved On</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rec in b.records %}
+                    <tr>
+                        <td class="fw-semibold">{{ rec.guest_name }}</td>
+                        <td><a href="{{ url_for('main.invoice', reservation_id=rec.reservation.id) }}" target="_blank">{{ rec.reservation.booking_reference or rec.reservation.id }}</a></td>
+                        <td>{{ rec.room_no }}</td>
+                        <td class="text-end fw-bold">₹{{ '{:,.2f}'.format(rec.amount) }}</td>
+                        <td class="text-end">{{ rec.days_open }}d</td>
+                        <td class="small text-muted">{{ rec.approved_at.strftime('%d %b %Y, %H:%M') if rec.approved_at else '—' }}</td>
+                        <td class="small">{{ rec.reason or '—' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+{% endfor %}
+
+{% if grand_total <= 0.01 %}
+<div class="text-center text-muted py-5">
+    <i class="bi bi-check-circle fs-1 text-success"></i>
+    <div class="mt-2">No open credit accounts.</div>
+</div>
+{% endif %}
+{% endblock %}

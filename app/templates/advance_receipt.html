@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+{% block title %}Advance Receipt — {{ reservation.guest.name }}{% endblock %}
+
+{% block content %}
+<style>
+  .ar-page { max-width: 820px; margin: 0 auto; }
+  .ar-card { border: 2px solid #f59e0b; border-radius: 8px; background: #fff; }
+  .ar-header { background: #fef3c7; padding: 16px 20px; border-bottom: 2px solid #f59e0b; }
+  .ar-header.cancelled { background: #fee2e2; border-bottom-color: #dc2626; }
+  .ar-header.no-advance { background: #e0e7ff; border-bottom-color: #6366f1; }
+  .ar-stamp { font-family: monospace; font-size: .85rem; color: #92400e; letter-spacing: .05em; }
+  .ar-stamp.cancelled { color: #991b1b; }
+  .ar-stamp.no-advance { color: #3730a3; }
+  .ar-section { padding: 16px 20px; }
+  .ar-table { width: 100%; border-collapse: collapse; }
+  .ar-table th { text-align: left; font-weight: 600; color: #6b7280; font-size: .8rem; padding: 6px 8px; }
+  .ar-table td { padding: 6px 8px; font-size: .9rem; }
+  .ar-amount-row td { background: #fffbeb; border-top: 1px solid #fde68a; border-bottom: 1px solid #fde68a; font-weight: 700; }
+  .ar-disclaimer {
+    background: #1f2937; color: #fef3c7; padding: 12px 16px; border-radius: 6px;
+    font-size: .85rem; margin-top: 16px;
+  }
+  @media print {
+    .d-print-none { display: none !important; }
+    .ar-card { border-color: #92400e; }
+  }
+</style>
+
+<div class="ar-page">
+
+  <div class="d-flex justify-content-between align-items-center mb-2 d-print-none">
+    <a href="{{ url_for('main.guest_database') }}" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Back to Guest Database
+    </a>
+    <div class="d-flex gap-2">
+      <button type="button" class="btn btn-sm btn-warning" data-action="print">
+        <i class="bi bi-printer me-1"></i>Print Receipt
+      </button>
+    </div>
+  </div>
+
+  {# Banner-style status — sets the document type unambiguously #}
+  {% set _has_advance = advance.advance_received|float > 0.005 %}
+  {% set _is_cancelled = reservation.status == 'Cancelled' %}
+
+  <div class="ar-card shadow-sm">
+
+    <div class="ar-header
+                {% if _is_cancelled %}cancelled{% elif not _has_advance %}no-advance{% endif %}
+                d-flex justify-content-between align-items-center">
+      <div>
+        <div class="ar-stamp {% if _is_cancelled %}cancelled{% elif not _has_advance %}no-advance{% endif %}">
+          <i class="bi
+            {% if _is_cancelled %}bi-x-circle-fill
+            {% elif _has_advance %}bi-cash-coin
+            {% else %}bi-calendar-check{% endif %} me-1"></i>
+          {% if _is_cancelled %}CANCELLED BOOKING
+          {% elif _has_advance %}ADVANCE RECEIPT — NOT A TAX INVOICE
+          {% else %}BOOKING CONFIRMATION{% endif %}
+        </div>
+        <h4 class="mb-0 mt-1 text-dark">
+          {{ inv.get('hotel_name') or 'Sukoon PMS' }}
+        </h4>
+        {% if inv.get('hotel_address') %}
+        <div class="small text-muted">{{ inv.get('hotel_address') }}</div>
+        {% endif %}
+      </div>
+      <div class="text-end">
+        <div class="small text-muted">Receipt No.</div>
+        <div class="fw-bold" style="font-family:monospace;font-size:1.05rem;">{{ receipt_number }}</div>
+        <div class="small text-muted mt-1">Issued</div>
+        <div class="small">{{ receipt_date.strftime('%d %b %Y, %H:%M') if receipt_date else '—' }}</div>
+        <div class="small text-muted mt-1">Booking Created</div>
+        <div class="small">{{ reservation.created_at.strftime('%d %b %Y') if reservation.created_at else '—' }}</div>
+      </div>
+    </div>
+
+    <div class="ar-section">
+      {# Guest + booking details #}
+      <div class="row g-3 mb-3">
+        <div class="col-6">
+          <p class="text-muted small mb-1">Guest</p>
+          <div class="fw-semibold">{{ reservation.guest.name }}</div>
+          <div class="small text-muted">{{ reservation.guest.phone }}</div>
+          {% if reservation.guest.email %}
+          <div class="small text-muted">{{ reservation.guest.email }}</div>
+          {% endif %}
+        </div>
+        <div class="col-6">
+          <p class="text-muted small mb-1">Booking Reference</p>
+          <div class="fw-semibold" style="font-family:monospace;">
+            {{ reservation.booking_reference or ('R' ~ '%06d' % reservation.id) }}
+          </div>
+          <div class="small text-muted">
+            Status: <strong>{{ reservation.status }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <table class="ar-table mb-3">
+        <tbody>
+          <tr>
+            <th style="width:35%;">Stay From</th>
+            <td>{{ reservation.arrival_date.strftime('%a, %d %b %Y') }}</td>
+          </tr>
+          <tr>
+            <th>Stay To</th>
+            <td>{{ reservation.departure_date.strftime('%a, %d %b %Y') }}</td>
+          </tr>
+          <tr>
+            <th>Nights</th>
+            <td>{{ nights }}</td>
+          </tr>
+          <tr>
+            <th>Room Type</th>
+            <td>{{ reservation.room_type.name if reservation.room_type else '—' }}{% if reservation.room %} · Room {{ reservation.room.room_number }}{% endif %}</td>
+          </tr>
+          <tr>
+            <th>Guests</th>
+            <td>{{ reservation.adults }} adult{{ 's' if reservation.adults != 1 }}{% if reservation.children %} + {{ reservation.children }} child{{ 'ren' if reservation.children != 1 }}{% endif %}</td>
+          </tr>
+          {% if reservation.rate_per_night %}
+          <tr>
+            <th>Quoted Rate</th>
+            <td>₹{{ '{:,.0f}'.format(reservation.rate_per_night|float) }} / night
+              <span class="small text-muted">(estimated stay value: ₹{{ '{:,.0f}'.format((reservation.rate_per_night|float) * nights) }})</span>
+            </td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+
+      {# Advance payment trail — only shown when a payment exists #}
+      {% if advance_payments %}
+      <h6 class="mb-2"><i class="bi bi-cash-coin text-warning me-1"></i>Advance Received</h6>
+      <table class="ar-table mb-1">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Mode</th>
+            <th>Reference</th>
+            <th class="text-end" style="text-align:right;">Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in advance_payments %}
+          <tr>
+            <td>{{ p.payment_date.strftime('%d %b %Y') if p.payment_date else '—' }}</td>
+            <td>{{ p.payment_mode.name if p.payment_mode else '—' }}</td>
+            <td class="small text-muted">{{ p.reference_number or '—' }}</td>
+            <td style="text-align:right;">₹{{ '{:,.0f}'.format(p.amount|float) }}</td>
+          </tr>
+          {% endfor %}
+          {% for p in refund_payments %}
+          <tr style="color:#991b1b;">
+            <td>{{ p.payment_date.strftime('%d %b %Y') if p.payment_date else '—' }}</td>
+            <td>{{ p.payment_mode.name if p.payment_mode else '—' }} <span class="badge bg-danger">Refund</span></td>
+            <td class="small">{{ p.reference_number or p.correction_reason or '—' }}</td>
+            <td style="text-align:right;">−₹{{ '{:,.0f}'.format(p.amount|float) }}</td>
+          </tr>
+          {% endfor %}
+          <tr class="ar-amount-row">
+            <td colspan="3" style="text-align:right;">Net Advance on File:</td>
+            <td style="text-align:right;">₹{{ '{:,.0f}'.format(advance.net_advance|float) }}</td>
+          </tr>
+        </tbody>
+      </table>
+      {% if _is_cancelled %}
+      <div class="small text-muted mt-2">
+        <i class="bi bi-info-circle me-1"></i>
+        Cancellation disposition: <strong>{{ reservation.cancellation_disposition or '—' }}</strong>
+        {% if reservation.cancellation_reason %} — {{ reservation.cancellation_reason }}{% endif %}
+      </div>
+      {% endif %}
+
+      {# ── GST on advance — visible only when operator has enabled the toggle ── #}
+      {% if apply_gst_on_advance and advance_gst %}
+      <div class="mt-3 p-2 rounded" style="background:#fef9c3;border:1px solid #facc15;">
+        <div class="small fw-semibold mb-2" style="color:#854d0e;">
+          <i class="bi bi-percent me-1"></i>GST on Advance ({{ '%.0f'|format(advance_gst.rate) }}% — inclusive)
+        </div>
+        <table class="ar-table mb-0">
+          <tbody>
+            <tr><th style="width:40%;">Taxable Amount</th>
+                <td style="text-align:right;">₹{{ advance_gst.taxable_amount | inr }}</td></tr>
+            <tr><th>CGST</th>
+                <td style="text-align:right;">₹{{ advance_gst.cgst | inr }}</td></tr>
+            <tr><th>SGST</th>
+                <td style="text-align:right;">₹{{ advance_gst.sgst | inr }}</td></tr>
+            <tr style="border-top:1px solid #facc15;">
+              <th>Receipt Total (incl. GST)</th>
+              <td style="text-align:right;font-weight:700;">₹{{ advance_gst.grand_total | inr }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="small text-muted mt-2">
+          <i class="bi bi-info-circle me-1"></i>
+          GST on advance is enabled in Settings (operator opt-in).
+        </div>
+      </div>
+      {% endif %}
+      {% else %}
+      <div class="alert alert-light border mb-0">
+        <i class="bi bi-info-circle me-1 text-info"></i>
+        <strong>No advance payment recorded</strong> — this confirmation reserves the room for the dates above.
+        Payment will be collected at check-in / check-out.
+      </div>
+      {% endif %}
+
+      {# Legal disclaimer — locks the document type. Wording adapts to the
+         GST-on-advance toggle so the receipt never contradicts itself. #}
+      <div class="ar-disclaimer">
+        <i class="bi bi-shield-exclamation me-1"></i>
+        {% if _has_advance %}
+        <strong>This is an advance receipt, not a tax invoice.</strong>
+        Tax invoice will be generated after stay / check-out.
+        {% else %}
+        <strong>This is a booking confirmation, not a tax invoice.</strong>
+        Tax invoice will be generated after stay / check-out.
+        {% endif %}
+        {% if apply_gst_on_advance and advance_gst %}
+        GST has been computed on the advance per the operator's tax settings;
+        the final tax invoice at check-out will adjust for any difference.
+        {% else %}
+        GST is not applied at this stage; advance payment is held as a guest deposit (liability)
+        until revenue is recognised on the stay date.
+        {% endif %}
+      </div>
+
+      {% if inv.get('invoice_thankyou') %}
+      <div class="text-center small text-muted mt-3">{{ inv.get('invoice_thankyou') }}</div>
+      {% endif %}
+      {% if inv.get('invoice_footer') %}
+      <div class="text-center small text-muted mt-1">{{ inv.get('invoice_footer') }}</div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

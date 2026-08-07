@@ -1,0 +1,35 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/api/tab/reservations",
+  "anon_status": 302,
+  "body_bytes": 22203,
+  "body_sha256": "a8eade16d8b6cd21ffcde5063aa3bbfc87268f7d4ae1de43e9a6923f782f060d",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 117,
+  "endpoint": "main.load_tab",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "Reservations tab.",
+  "origin": "declared",
+  "params": {},
+  "severity": "WARN",
+  "status": 500,
+  "surface_id": "main.load_tab__reservations",
+  "templates": [
+    "errors/500.html"
+  ],
+  "truncations": [],
+  "url": "/api/tab/reservations"
+}

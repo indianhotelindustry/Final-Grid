@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% block title %}GST Report{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0"><i class="bi bi-percent text-success me-2"></i>GST Summary Report</h4>
+    {% if hotel_gstin %}
+      <small class="text-muted">GSTIN: <strong>{{ hotel_gstin }}</strong> &nbsp;|&nbsp; State: {{ hotel_state }}</small>
+    {% else %}
+      <small class="text-warning"><i class="bi bi-exclamation-triangle me-1"></i>GSTIN not set — configure in Settings.</small>
+    {% endif %}
+  </div>
+  <button onclick="window.print()" class="btn btn-outline-secondary btn-sm d-print-none">
+    <i class="bi bi-printer me-1"></i>Print
+  </button>
+</div>
+
+<!-- Date filter -->
+<form method="GET" class="row g-2 align-items-end mb-4 d-print-none">
+  <div class="col-auto">
+    <label class="form-label mb-1">From</label>
+    <input type="date" name="from_date" class="form-control form-control-sm" value="{{ data.from_date.isoformat() }}">
+  </div>
+  <div class="col-auto">
+    <label class="form-label mb-1">To</label>
+    <input type="date" name="to_date" class="form-control form-control-sm" value="{{ data.to_date.isoformat() }}">
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-primary btn-sm">
+      <i class="bi bi-search me-1"></i>Filter
+    </button>
+  </div>
+</form>
+
+<!-- Summary cards -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-lg-3">
+    <div class="card border-0 shadow-sm text-center">
+      <div class="card-body py-3">
+        <div class="fs-4 fw-bold">&#8377;{{ '%.2f'|format(data.total_taxable) }}</div>
+        <div class="text-muted small">Taxable Turnover</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card border-0 shadow-sm text-center border-start border-3 border-primary">
+      <div class="card-body py-3">
+        <div class="fs-4 fw-bold text-primary">&#8377;{{ '%.2f'|format(data.cgst_total) }}</div>
+        <div class="text-muted small">CGST Collected</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card border-0 shadow-sm text-center border-start border-3 border-warning">
+      <div class="card-body py-3">
+        <div class="fs-4 fw-bold text-warning">&#8377;{{ '%.2f'|format(data.sgst_total) }}</div>
+        <div class="text-muted small">SGST Collected</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card border-0 shadow-sm text-center border-start border-3 border-info">
+      <div class="card-body py-3">
+        <div class="fs-4 fw-bold text-info">&#8377;{{ '%.2f'|format(data.igst_total) }}</div>
+        <div class="text-muted small">IGST Collected</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Total tax box -->
+<div class="alert alert-success d-flex justify-content-between align-items-center">
+  <div>
+    <strong>Total Tax Liability ({{ data.from_date.strftime('%d %b %Y') }} – {{ data.to_date.strftime('%d %b %Y') }})</strong>
+  </div>
+  <div class="fs-5 fw-bold">&#8377;{{ '%.2f'|format(data.total_tax) }}</div>
+</div>
+
+<!-- Rate-wise breakdown (GSTR-1 style) -->
+{% if data.rate_groups %}
+<h6 class="mt-4 mb-2">Tax Rate-Wise Summary</h6>
+<table class="table table-bordered table-sm">
+  <thead class="table-dark">
+    <tr>
+      <th>GST Rate</th>
+      <th class="text-end">Taxable Amount (₹)</th>
+      <th class="text-end">CGST (₹)</th>
+      <th class="text-end">SGST (₹)</th>
+      <th class="text-end">IGST (₹)</th>
+      <th class="text-end">Total Tax (₹)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for rate_key, g in data.rate_groups.items() %}
+    <tr>
+      <td>{{ rate_key }}</td>
+      <td class="text-end">{{ '%.2f'|format(g.taxable) }}</td>
+      <td class="text-end">{{ '%.2f'|format(g.cgst) }}</td>
+      <td class="text-end">{{ '%.2f'|format(g.sgst) }}</td>
+      <td class="text-end">{{ '%.2f'|format(g.igst) }}</td>
+      <td class="text-end fw-semibold">{{ '%.2f'|format(g.cgst + g.sgst + g.igst) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot class="table-secondary fw-semibold">
+    <tr>
+      <td>Total</td>
+      <td class="text-end">{{ '%.2f'|format(data.total_taxable) }}</td>
+      <td class="text-end">{{ '%.2f'|format(data.cgst_total) }}</td>
+      <td class="text-end">{{ '%.2f'|format(data.sgst_total) }}</td>
+      <td class="text-end">{{ '%.2f'|format(data.igst_total) }}</td>
+      <td class="text-end">{{ '%.2f'|format(data.total_tax) }}</td>
+    </tr>
+  </tfoot>
+</table>
+{% endif %}
+
+<!-- Detailed tax lines -->
+{% if data.rows %}
+<h6 class="mt-4 mb-2">Detailed Tax Lines
+  <span class="badge bg-secondary ms-1">{{ data.rows | length }} entries</span>
+</h6>
+<div class="table-responsive">
+  <table class="table table-hover table-sm align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>Date</th>
+        <th>Reservation</th>
+        <th>Type</th>
+        <th>SAC</th>
+        <th class="text-end">Taxable (₹)</th>
+        <th>Tax Type</th>
+        <th class="text-end">Rate %</th>
+        <th class="text-end">Tax (₹)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for tl in data.rows %}
+      <tr>
+        <td>{{ tl.charge_date.strftime('%d %b %Y') }}</td>
+        <td>
+          <a href="{{ url_for('main.invoice', reservation_id=tl.reservation_id) }}" class="text-decoration-none">
+            {{ tl.reservation.booking_reference or ('RES-' ~ tl.reservation_id) }}
+          </a>
+        </td>
+        <td>
+          <span class="badge {{ 'bg-primary' if tl.charge_source_type == 'room_night' else 'bg-secondary' }}">
+            {{ tl.charge_source_type.replace('_', ' ').title() }}
+          </span>
+        </td>
+        <td class="text-muted small">{{ tl.sac_code or '—' }}</td>
+        <td class="text-end">{{ '%.2f'|format(tl.taxable_amount) }}</td>
+        <td>
+          <span class="badge {{ 'bg-danger' if tl.tax_type == 'IGST' else 'bg-success' if tl.tax_type == 'EXEMPT' else 'bg-info text-dark' }}">
+            {{ tl.tax_type }}
+          </span>
+        </td>
+        <td class="text-end">{{ '%.3f'|format(tl.tax_rate) }}%</td>
+        <td class="text-end fw-semibold">{{ '%.2f'|format(tl.tax_amount) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-info mt-3">No tax lines found for the selected period.</div>
+{% endif %}
+
+<style>
+@media print {
+  .d-print-none { display: none !important; }
+  .table { font-size: 10px; }
+}
+</style>
+{% endblock %}

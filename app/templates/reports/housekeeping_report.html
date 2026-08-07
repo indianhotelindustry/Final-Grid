@@ -1,0 +1,94 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Housekeeping Status — {{ report_date.strftime('%d %b %Y') }}{% endblock %}
+{% block report_name %}Housekeeping Status Report{% endblock %}
+
+{% block report_content %}
+<div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+  <h5 class="mb-0">
+    <i class="bi bi-house-heart-fill text-success me-2"></i>
+    Housekeeping Status — {{ report_date.strftime('%d %B %Y') }}
+    <span class="badge bg-secondary ms-1">{{ rooms|length }} rooms</span>
+  </h5>
+  <div class="d-flex gap-2 d-print-none">
+    <a href="{{ url_for('reports.housekeeping_report', format='excel') }}"
+       class="btn btn-sm btn-success">
+      <i class="bi bi-file-earmark-excel me-1"></i>Excel
+    </a>
+    <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+      <i class="bi bi-printer me-1"></i>Print
+    </button>
+  </div>
+</div>
+
+{# Summary badges #}
+<div class="row g-2 mb-3">
+  <div class="col-auto">
+    <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+      <i class="bi bi-box-arrow-right me-1"></i>Checkout Due: {{ checkout_rooms|length }}
+    </span>
+  </div>
+  <div class="col-auto">
+    <span class="badge bg-success fs-6 px-3 py-2">
+      <i class="bi bi-box-arrow-in-right me-1"></i>Arrivals Due: {{ arrival_rooms|length }}
+    </span>
+  </div>
+  <div class="col-auto">
+    <span class="badge bg-primary fs-6 px-3 py-2">
+      <i class="bi bi-house-door me-1"></i>In-House: {{ res_by_room|length }}
+    </span>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover table-sm align-middle mb-0 small">
+      <thead class="table-success">
+        <tr>
+          <th>Room</th>
+          <th>Floor</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Priority</th>
+          <th>Guest</th>
+          <th>Departure</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rooms %}
+        {% set res = res_by_room.get(r.id) %}
+        {% set is_checkout = r.id in checkout_rooms %}
+        {% set is_arrival  = r.id in arrival_rooms %}
+        <tr class="{{ 'table-warning' if is_checkout else ('table-success' if is_arrival else '') }}">
+          <td class="fw-semibold">{{ r.room_number }}</td>
+          <td>{{ r.floor or '—' }}</td>
+          <td>{{ r.room_type.name if r.room_type else '—' }}</td>
+          <td>
+            {% set sc = {'Available':'success','Occupied':'primary','Dirty':'warning','OutOfOrder':'danger','Maintenance':'secondary'} %}
+            <span class="badge bg-{{ sc.get(r.status,'secondary') }}">{{ r.status }}</span>
+          </td>
+          <td>
+            {% if is_checkout %}
+              <span class="badge bg-warning text-dark"><i class="bi bi-box-arrow-right me-1"></i>Checkout Due</span>
+            {% elif is_arrival %}
+              <span class="badge bg-success"><i class="bi bi-box-arrow-in-right me-1"></i>Arrival Due</span>
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if res and res.guest %}{{ res.guest.name }}{% else %}<span class="text-muted">—</span>{% endif %}
+          </td>
+          <td>
+            {% if res %}{{ res.departure_date.strftime('%d %b %Y') }}{% else %}<span class="text-muted">—</span>{% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-center text-muted py-4">No rooms found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>@media print { .d-print-none { display:none !important; } }</style>
+{% endblock %}

@@ -1,0 +1,43 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Fpending-payments",
+  "anon_status": 302,
+  "body_bytes": 24961,
+  "body_sha256": "4d59f2a6f3b5a717caa43905aabece4e4903dd5245057d46d2f7874a2bb46a8e",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 977,
+  "endpoint": "reports.pending_payments_report",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "rows[0].balance": "200",
+    "rows[0].balance_unrounded": "200",
+    "rows[0].paid": "2000",
+    "rows[0].reservation[type]": "Reservation",
+    "rows[0].total": "2095.24",
+    "rows[0][len]": "5",
+    "rows[len]": "1",
+    "total_outstanding": "200"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.pending_payments_report",
+  "templates": [
+    "reports/pending_payments.html"
+  ],
+  "truncations": [],
+  "url": "/reports/pending-payments"
+}

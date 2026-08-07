@@ -1,0 +1,443 @@
+{% extends 'base.html' %}
+{% block title %}GRC — {{ guest.first_name or '' }}{% if guest.last_name %} {{ guest.last_name }}{% endif %}{% endblock %}
+
+{% block content %}
+<style>
+/* ── GRC Preview — A4 page, responsive, print-ready ─────────────── */
+:root {
+    --grc-ink: #0d1b2a;
+    --grc-muted: #6b7280;
+    --grc-border: #d1d5db;
+    --grc-soft: #f3f4f6;
+}
+
+.grc-toolbar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.grc-page {
+    /* A4 portrait: 210mm × 297mm. Scale via max-width on wide screens;
+       stack naturally on narrow screens. */
+    width: 210mm;
+    min-height: 297mm;
+    max-width: 100%;
+    margin: 0 auto 24px;
+    padding: 14mm 12mm;
+    background: #fff;
+    color: #111827;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 11px;
+    line-height: 1.35;
+    box-sizing: border-box;
+}
+
+.grc-accent { height: 4px; background: var(--grc-ink); margin-bottom: 10px; }
+
+.grc-header {
+    display: grid;
+    grid-template-columns: 72px 1fr 180px;
+    gap: 12px;
+    align-items: start;
+    margin-bottom: 12px;
+}
+.grc-header .logo { max-width: 68px; max-height: 56px; }
+.grc-header h1 { font-size: 16px; margin: 0 0 2px; color: var(--grc-ink); }
+.grc-header .hotel-meta { font-size: 10px; color: var(--grc-muted); }
+.grc-header .ref-box { text-align: right; font-size: 10px; }
+
+.grc-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 3px;
+    font-size: 10px; font-weight: 700; color: #fff; background: #0d6efd;
+    letter-spacing: 0.3px;
+}
+.grc-badge.badge-warning { background: #ffc107; color: #000; }
+
+.grc-section { margin-bottom: 10px; }
+.grc-section h2 {
+    font-size: 11.5px; margin: 10px 0 5px; color: var(--grc-ink);
+    border-bottom: 1px solid #e5e7eb; padding-bottom: 3px;
+}
+
+.grc-info-grid {
+    display: grid;
+    grid-template-columns: 88px 1fr 1fr;
+    gap: 2px 10px;
+    align-items: start;
+}
+.grc-info-grid .photo {
+    grid-row: span 6;
+    width: 88px; height: 110px;
+    border: 1px solid var(--grc-border);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+}
+.grc-info-grid .photo img { max-width: 100%; max-height: 100%; object-fit: cover; }
+.grc-info-grid .photo .placeholder {
+    color: var(--grc-muted); font-size: 9px; text-align: center;
+}
+.grc-info-row { display: contents; }
+.grc-info-row .label { color: var(--grc-muted); font-size: 10px; }
+.grc-info-row .value { font-weight: 600; font-size: 11px; }
+
+.grc-stay-grid {
+    display: grid;
+    grid-template-columns: 110px 1fr 110px 1fr;
+    gap: 3px 10px;
+}
+.grc-stay-grid .label { color: var(--grc-muted); font-size: 10px; }
+.grc-stay-grid .value { font-weight: 600; font-size: 11px; }
+
+.grc-id-docs { display: flex; gap: 12px; flex-wrap: wrap; }
+.grc-id-docs .id-slot { text-align: center; }
+.grc-id-docs .id-slot .label { font-size: 9px; color: var(--grc-muted); margin-bottom: 2px; }
+.grc-id-docs img { max-width: 200px; max-height: 130px; border: 1px solid var(--grc-border); }
+
+.grc-guest-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+.grc-guest-table th, .grc-guest-table td {
+    border: 1px solid var(--grc-border); padding: 4px 6px; text-align: left;
+}
+.grc-guest-table th { background: var(--grc-soft); font-weight: 600; }
+
+.grc-declaration {
+    background: #f9fafb; border: 1px solid var(--grc-border);
+    padding: 8px 10px; font-size: 10px; line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.grc-sig-row {
+    display: grid;
+    grid-template-columns: 1fr 40px 1fr;
+    gap: 12px;
+    margin-top: 8px;
+}
+.grc-sig-row .sig-box {
+    border: 1px solid var(--grc-border); min-height: 70px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 6px;
+}
+.grc-sig-row .sig-box img { max-width: 100%; max-height: 60px; }
+.grc-sig-row .sig-meta { font-size: 9px; color: var(--grc-muted); margin-top: 3px; }
+.grc-sig-row .auth {
+    border-top: 1px solid #000; padding-top: 5px; text-align: center;
+    margin-top: auto;
+}
+.grc-sig-row .auth .name { font-size: 10px; }
+.grc-sig-row .auth .title { font-size: 9px; color: var(--grc-muted); }
+
+.grc-footer {
+    margin-top: 12px; border-top: 1px solid #e5e7eb; padding-top: 6px;
+    text-align: center; font-size: 9px; color: var(--grc-muted);
+}
+
+/* ── Print rules ────────────────────────────────────────────────── */
+@media print {
+    /* Hide everything except the GRC content — toolbar, nav, tabs, chat bubbles,
+       the floating voice-assistant mic, Bootstrap alerts, toasts, etc. */
+    .grc-toolbar, nav, header, footer, .navbar, #globalTabs,
+    .voice-mic-btn, #voiceAssistantBtn, #voiceListeningBadge,
+    .toast-container, .alert, .flash-messages, .modal, .modal-backdrop {
+        display: none !important;
+    }
+    body { background: #fff !important; }
+    .grc-page {
+        box-shadow: none !important; margin: 0 !important; padding: 10mm !important;
+        width: 100% !important; min-height: auto !important;
+    }
+    /* Zero @page margins — Chrome/Edge honour this by dropping the
+       default browser header (date / title) and footer (URL). Inner
+       padding on .grc-page restores the visible margin. */
+    @page { size: A4 portrait; margin: 0; }
+}
+
+/* ── Narrow viewports: allow the page to shrink gracefully ──────── */
+@media (max-width: 768px) {
+    .grc-page { padding: 12px; }
+    .grc-header { grid-template-columns: 1fr; }
+    .grc-header .ref-box { text-align: left; }
+    .grc-info-grid { grid-template-columns: 1fr 1fr; }
+    .grc-info-grid .photo { grid-row: auto; grid-column: span 2; width: 100%; height: auto; max-height: 180px; }
+    .grc-stay-grid { grid-template-columns: 1fr 1fr; }
+    .grc-sig-row { grid-template-columns: 1fr; }
+}
+</style>
+
+<!-- Toolbar (hidden on print) -->
+<div class="grc-toolbar">
+    <a href="{{ url_for('main.reservations') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Back
+    </a>
+    <button type="button" class="btn btn-sm btn-primary" id="grcPrintBtn">
+        <i class="bi bi-printer"></i> Print GRC
+    </button>
+    <a href="{{ pdf_download_url }}" class="btn btn-sm btn-success">
+        <i class="bi bi-file-earmark-pdf"></i> Export to PDF
+    </a>
+</div>
+
+<!-- A4 page -->
+<div class="grc-page">
+    <div class="grc-accent"></div>
+
+    <!-- Header: logo | hotel info | ref/date -->
+    <div class="grc-header">
+        <div>
+            {% if logo_url %}<img class="logo" src="{{ logo_url }}" alt="Logo">{% endif %}
+        </div>
+        <div>
+            <h1>{{ hotel.get('hotel_name', 'Hotel') }}</h1>
+            <div class="hotel-meta">
+                {{ hotel.get('hotel_address', '') }}
+                {% if hotel.get('hotel_contact') %}<br>Tel: {{ hotel.hotel_contact }}{% endif %}
+                {% if hotel.get('hotel_email') %} · {{ hotel.hotel_email }}{% endif %}
+                {% if hotel.get('hotel_gstin') %}<br>GSTIN: {{ hotel.hotel_gstin }}{% endif %}
+            </div>
+        </div>
+        <div class="ref-box">
+            <span class="grc-badge">GUEST REGISTRATION CARD</span>
+            <div style="margin-top: 6px;">
+                Ref: <strong>{{ reservation.booking_reference or reservation.id }}</strong><br>
+                {{ generated_at.strftime('%d %b %Y %H:%M') }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Guest Information -->
+    <div class="grc-section">
+        <h2>Guest Information</h2>
+        <div class="grc-info-grid">
+            <div class="photo">
+                {% if guest_photo_url %}
+                    <img src="{{ guest_photo_url }}" alt="Guest photo">
+                {% else %}
+                    <div class="placeholder">No Photo</div>
+                {% endif %}
+            </div>
+            <div class="grc-info-row"><div class="label">Name</div><div class="value">{{ guest.first_name or '' }}{% if guest.last_name %} {{ guest.last_name }}{% endif %}</div></div>
+            <div class="grc-info-row"><div class="label">Phone</div><div class="value">{{ guest.phone }}</div></div>
+            <div class="grc-info-row"><div class="label">Email</div><div class="value">{{ guest.email or '—' }}</div></div>
+            <div class="grc-info-row"><div class="label">Date of Birth</div><div class="value">{{ guest.date_of_birth.strftime('%d %b %Y') if guest.date_of_birth else '—' }}</div></div>
+            <div class="grc-info-row"><div class="label">Gender</div><div class="value">{{ guest.gender or '—' }}</div></div>
+            <div class="grc-info-row"><div class="label">Nationality</div><div class="value">{{ guest.country or 'India' }}</div></div>
+            <div class="grc-info-row"><div class="label">ID Type</div><div class="value">{{ guest.id_proof_type or (id_doc.document_type if id_doc else '—') }}</div></div>
+            <div class="grc-info-row"><div class="label">ID Number</div><div class="value">{{ guest.id_proof_number or (id_doc.document_number if id_doc else '—') }}</div></div>
+            <div class="grc-info-row"><div class="label">Purpose of Visit</div><div class="value">{{ guest.purpose_of_visit or '—' }}</div></div>
+            <div class="grc-info-row"><div class="label">Company</div><div class="value">{{ guest.company or '—' }}</div></div>
+        </div>
+        <div style="margin-top: 4px; font-size: 10.5px;">
+            <span style="color: var(--grc-muted);">Address</span>:
+            <strong>{{ guest.address or '—' }}{% if guest.city %}, {{ guest.city }}{% endif %}{% if guest.state %} {{ guest.state }}{% endif %}{% if guest.pin_code %} {{ guest.pin_code }}{% endif %}{% if guest.country %}, {{ guest.country }}{% endif %}</strong>
+        </div>
+    </div>
+
+    <!-- Stay Details -->
+    <div class="grc-section">
+        <h2>Stay Details</h2>
+        <div class="grc-stay-grid">
+            <div class="label">Room</div>
+            <div class="value">{{ reservation.room.room_number if reservation.room else '—' }} ({{ reservation.room_type.name if reservation.room_type else '—' }})</div>
+            <div class="label">Booking Ref</div>
+            <div class="value">{{ reservation.booking_reference or '—' }}</div>
+
+            <div class="label">Check-in</div>
+            <div class="value">
+                {{ reservation.arrival_date.strftime('%d %b %Y') }}
+                {% if checkin and checkin.checkin_date %}
+                    · {{ checkin.checkin_date.strftime('%I:%M %p').lstrip('0') }}
+                {% elif reservation.checkin_time %}
+                    · {{ reservation.checkin_time }}
+                {% endif %}
+            </div>
+            <div class="label">Check-out</div>
+            <div class="value">
+                {{ reservation.departure_date.strftime('%d %b %Y') }}
+                {% if checkin and checkin.checkout_date %}
+                    · {{ checkin.checkout_date.strftime('%I:%M %p').lstrip('0') }}
+                {% elif reservation.checkout_time %}
+                    · {{ reservation.checkout_time }}
+                {% endif %}
+            </div>
+
+            <div class="label">Duration</div>
+            <div class="value">{{ nights }} Night{{ 's' if nights != 1 }}</div>
+            <div class="label">Guests</div>
+            <div class="value">{{ reservation.adults }} Adult{{ 's' if reservation.adults != 1 }}, {{ reservation.children }} Child{{ 'ren' if reservation.children != 1 }}</div>
+
+            <div class="label">Rate / Night</div>
+            <div class="value">₹{{ "{:,.2f}".format(reservation.rate_per_night) }}</div>
+            <div class="label">Source</div>
+            <div class="value">
+                {{ source_display }}
+                {% if ota_channel_display %}<span style="color: var(--grc-muted); font-weight: 500;"> · {{ ota_channel_display }}</span>{% endif %}
+            </div>
+
+            <div class="label">Advance Paid</div>
+            <div class="value">₹{{ "{:,.2f}".format(stay_amount.paid|default(0)) }}</div>
+            <div class="label">Balance Due</div>
+            <div class="value {% if (stay_amount.balance|default(0)) > 0 %}text-danger{% endif %}">₹{{ "{:,.2f}".format(stay_amount.balance|default(0)) }}</div>
+
+            <div class="label">Mode of Payment</div>
+            <div class="value" style="grid-column: span 3;">{{ payment_mode_summary }}</div>
+        </div>
+    </div>
+
+    <!-- ID Documents -->
+    {% if id_front_url or id_back_url %}
+    <div class="grc-section">
+        <h2>ID Document</h2>
+        <div class="grc-id-docs">
+            {% if id_front_url %}
+            <div class="id-slot">
+                <div class="label">Front</div>
+                <img src="{{ id_front_url }}" alt="ID Front">
+            </div>
+            {% endif %}
+            {% if id_back_url %}
+            <div class="id-slot">
+                <div class="label">Back</div>
+                <img src="{{ id_back_url }}" alt="ID Back">
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Additional Passengers -->
+    {% if passengers %}
+    <div class="grc-section">
+        <h2>Additional Guests</h2>
+        <table class="grc-guest-table">
+            <thead>
+                <tr><th>Name</th><th>Gender</th><th>Age</th><th>ID Type</th><th>ID Number</th><th>Relation</th></tr>
+            </thead>
+            <tbody>
+            {% for p in passengers %}
+                <tr>
+                    <td>{{ p.name }}</td>
+                    <td>{{ p.gender or '—' }}</td>
+                    <td>{{ p.age or '—' }}</td>
+                    <td>{{ p.id_type or '—' }}</td>
+                    <td>{{ p.id_number or '—' }}</td>
+                    <td>{{ p.relationship or '—' }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Foreign National -->
+    {% if is_foreign and foreign_info %}
+    <div class="grc-section">
+        <h2><span class="grc-badge badge-warning">Foreign National</span> Passport &amp; Visa</h2>
+        <div class="grc-stay-grid">
+            <div class="label">Nationality</div>
+            <div class="value">{{ foreign_info.nationality }}</div>
+            <div class="label">Passport No.</div>
+            <div class="value">{{ foreign_info.passport_number or '—' }}</div>
+
+            <div class="label">Passport Issue</div>
+            <div class="value">{{ foreign_info.passport_issue_place or '—' }}{% if foreign_info.passport_issue_date %} · {{ foreign_info.passport_issue_date.strftime('%d %b %Y') }}{% endif %}</div>
+            <div class="label">Passport Expiry</div>
+            <div class="value">{{ foreign_info.passport_expiry_date.strftime('%d %b %Y') if foreign_info.passport_expiry_date else '—' }}</div>
+
+            <div class="label">Visa No.</div>
+            <div class="value">{{ foreign_info.visa_number or '—' }}</div>
+            <div class="label">Visa Type</div>
+            <div class="value">{{ foreign_info.visa_type or '—' }}</div>
+
+            <div class="label">Visa Issue</div>
+            <div class="value">{{ foreign_info.visa_issue_place or '—' }}{% if foreign_info.visa_issue_date %} · {{ foreign_info.visa_issue_date.strftime('%d %b %Y') }}{% endif %}</div>
+            <div class="label">Visa Expiry</div>
+            <div class="value">{{ foreign_info.visa_expiry_date.strftime('%d %b %Y') if foreign_info.visa_expiry_date else '—' }}</div>
+
+            <div class="label">Arrived From</div>
+            <div class="value">{{ foreign_info.arrival_from or '—' }}</div>
+            <div class="label">Next Destination</div>
+            <div class="value">{{ foreign_info.next_destination or '—' }}</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Declaration -->
+    <div class="grc-section">
+        <h2>Guest Declaration &amp; Signature</h2>
+        <div class="grc-declaration">
+            I hereby declare that the particulars given above are true and correct to the best of my knowledge.
+            I agree to abide by the rules and regulations of the hotel. I am personally responsible for the payment
+            of all charges incurred during my stay unless otherwise arranged. I authorise the hotel to charge any
+            outstanding balance to my payment method on file. I understand that the hotel is not responsible for
+            any loss of valuables not deposited in the hotel safe. I consent to my personal data being processed
+            for the purpose of this stay and regulatory compliance.
+            {% if is_foreign %}
+            I acknowledge that my details will be shared with the Foreigners Regional Registration Office (FRRO)
+            as required under the Registration of Foreigners Act, 1939.
+            {% endif %}
+        </div>
+
+        <div class="grc-sig-row">
+            <div>
+                <div class="sig-box">
+                    {% if signature_url %}
+                        <img src="{{ signature_url }}" alt="Guest signature">
+                    {% else %}
+                        <span style="color: var(--grc-muted); font-size: 10px;">No digital signature on file</span>
+                    {% endif %}
+                </div>
+                <div class="sig-meta">
+                    Guest Signature
+                    {% if checkin and checkin.grc_signature_timestamp %}
+                        — Signed {{ checkin.grc_signature_timestamp.strftime('%d %b %Y at %H:%M IST') }}
+                    {% endif %}
+                    {% if checkin and checkin.grc_signature_ip %}
+                        from IP {{ checkin.grc_signature_ip }}
+                    {% endif %}
+                </div>
+            </div>
+            <div></div>
+            <div class="auth">
+                <div class="name">For <strong>{{ hotel.get('hotel_name', 'Hotel') }}</strong></div>
+                <div class="title">Authorised Signatory</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grc-footer">
+        Computer-generated Guest Registration Card — {{ hotel.get('hotel_name', '') }}
+        {% if hotel.get('hotel_cin') %} — CIN: {{ hotel.hotel_cin }}{% endif %}
+        <br>
+        <span style="color: #374151;">
+            Operator:
+            <strong>{{ current_user.full_name if current_user.full_name else current_user.username }}</strong>
+            {% if current_user.role %}({{ current_user.role }}){% endif %}
+        </span>
+    </div>
+</div>
+
+<script nonce="{{ csp_nonce }}">
+// Print: clear the document title briefly so Chrome/Edge don't print
+// "GRC — Guest Name — …" as the browser-chrome center header.
+// Restored on afterprint so the browser tab title stays intact.
+(function() {
+    var btn = document.getElementById('grcPrintBtn');
+    if (!btn) return;
+    var savedTitle = null;
+    btn.addEventListener('click', function() {
+        savedTitle = document.title;
+        document.title = '';
+        window.print();
+    });
+    window.addEventListener('afterprint', function() {
+        if (savedTitle !== null) {
+            document.title = savedTitle;
+            savedTitle = null;
+        }
+    });
+})();
+</script>
+{% endblock %}

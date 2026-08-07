@@ -1,0 +1,39 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Fcompany-billing",
+  "anon_status": 302,
+  "body_bytes": 24165,
+  "body_sha256": "ce93ca62e4109c9f30835b2b39c0bd4700ea262df08aa6ef5074b4fc01fa35b7",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 30,
+  "endpoint": "reports.company_billing_report",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "companies[len]": "0",
+    "dev_seed_enabled": "False",
+    "from_date": "2026-05-01",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "rows[len]": "0",
+    "to_date": "2026-05-28"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.company_billing_report",
+  "templates": [
+    "reports/company_billing.html"
+  ],
+  "truncations": [],
+  "url": "/reports/company-billing"
+}

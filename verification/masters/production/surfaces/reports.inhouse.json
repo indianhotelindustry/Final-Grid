@@ -1,0 +1,39 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Finhouse",
+  "anon_status": 302,
+  "body_bytes": 25074,
+  "body_sha256": "c8022f09f039bbbcdd20edf0662f8b5c0ad54177fee2799409b040812a06babd",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 31,
+  "endpoint": "reports.inhouse",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "occ_pct": "0",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "records[len]": "0",
+    "today": "2026-05-28",
+    "total_rooms": "39"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.inhouse",
+  "templates": [
+    "reports/inhouse.html"
+  ],
+  "truncations": [],
+  "url": "/reports/inhouse"
+}

@@ -1,0 +1,37 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Fmaintenance",
+  "anon_status": 302,
+  "body_bytes": 24095,
+  "body_sha256": "3b25bf1cff032325cacabd7c02fda0af4c45cc9804f7165e49bad9a7d84681d8",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 20,
+  "endpoint": "reports.maintenance_report",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "by_status[len]": "0",
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "records[len]": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.maintenance_report",
+  "templates": [
+    "reports/maintenance_report.html"
+  ],
+  "truncations": [],
+  "url": "/reports/maintenance"
+}

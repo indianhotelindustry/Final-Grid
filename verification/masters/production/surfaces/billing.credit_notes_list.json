@@ -1,0 +1,36 @@
+{
+  "anon_location": "/auth/login?next=%2Fbilling%2Fcredit-notes",
+  "anon_status": 302,
+  "body_bytes": 22152,
+  "body_sha256": "0f48a651af7affdac6f583d949c886de741c8ba511c13f320c874deb7123fa00",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 21,
+  "endpoint": "billing.credit_notes_list",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "notes[len]": "0",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "billing.credit_notes_list",
+  "templates": [
+    "billing/credit_notes.html"
+  ],
+  "truncations": [],
+  "url": "/billing/credit-notes"
+}

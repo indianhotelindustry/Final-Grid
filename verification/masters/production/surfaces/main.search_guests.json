@@ -1,0 +1,26 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/api/search-guests",
+  "anon_status": 302,
+  "body_bytes": 3,
+  "body_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+  "category": "OPERATIONAL",
+  "content_type": "application/json",
+  "duration_ms": 3,
+  "endpoint": "main.search_guests",
+  "error": "",
+  "figure_source": "json",
+  "figures": {
+    "$[len]": "0"
+  },
+  "location": "",
+  "normalisation_hits": {},
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "main.search_guests",
+  "templates": [],
+  "truncations": [],
+  "url": "/api/search-guests"
+}

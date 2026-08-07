@@ -1,0 +1,862 @@
+{
+  "commissioned": true,
+  "elements": [
+    "positive_case",
+    "negative_case",
+    "fault_injection",
+    "detection",
+    "evidence",
+    "repeatability",
+    "determinism",
+    "order_independence"
+  ],
+  "outcomes": [
+    {
+      "baseline_status": "HOLDS",
+      "baseline_violations": 0,
+      "blast_radius": [],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-A01",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "app.services.calculate_stay_amount return value 'balance' moved by 1000.0 inside the commissioning subprocess only",
+        "negative_case": "status HOLDS -> VIOLATED",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status HOLDS over 28 row(s), 0 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "engine patch",
+      "rows_changed": 0,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 28,
+      "title": "Settlement identity: grand total - payments - company credit = balance"
+    },
+    {
+      "baseline_status": "VIOLATED",
+      "baseline_violations": 40,
+      "blast_radius": [
+        "INV-B03: VIOLATED/1 -> VIOLATED/3"
+      ],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-A02",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "already violated on live data; violations 40 -> 41",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status VIOLATED over 40 row(s), 40 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 41,
+      "title": "Every financial row belongs to a folio"
+    },
+    {
+      "baseline_status": "VIOLATED",
+      "baseline_violations": 5,
+      "blast_radius": [
+        "INV-B01: HOLDS/0 -> VIOLATED/1",
+        "INV-B03: VIOLATED/1 -> VIOLATED/2"
+      ],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-A03",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "2 row(s) changed by the declared seed",
+        "negative_case": "already violated on live data; violations 5 -> 6",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status VIOLATED over 5 row(s), 5 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 2,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 6,
+      "title": "Charges summed over folios equal charges summed over reservations"
+    },
+    {
+      "baseline_status": "HOLDS",
+      "baseline_violations": 0,
+      "blast_radius": [
+        "INV-D03: HOLDS/0 -> VIOLATED/1"
+      ],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-A04",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "status HOLDS -> VIOLATED",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status HOLDS over 35 row(s), 0 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 1,
+      "title": "Daily collections equal the direct payments recorded for the day"
+    },
+    {
+      "baseline_status": "HOLDS",
+      "baseline_violations": 0,
+      "blast_radius": [
+        "INV-B03: VIOLATED/1 -> VIOLATED/2"
+      ],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-A05",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "status HOLDS -> VIOLATED",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status HOLDS over 66 row(s), 0 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 1,
+      "title": "Every stored tax line equals its taxable base times its rate"
+    },
+    {
+      "baseline_status": "VACUOUS",
+      "baseline_violations": 0,
+      "blast_radius": [
+        "INV-A02: VIOLATED/40 -> VIOLATED/41",
+        "INV-B01: HOLDS/0 -> VIOLATED/1",
+        "INV-B03: VIOLATED/1 -> VIOLATED/3"
+      ],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-A06",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "status VACUOUS -> VIOLATED",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status VACUOUS over 0 row(s), 0 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 1,
+      "title": "A guest who has paid more than they owe has an overpayment record"
+    },
+    {
+      "baseline_status": "HOLDS",
+      "baseline_violations": 0,
+      "blast_radius": [
+        "INV-A02: VIOLATED/40 -> VIOLATED/41",
+        "INV-A06: VACUOUS/0 -> VIOLATED/1",
+        "INV-B03: VIOLATED/1 -> VIOLATED/3"
+      ],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-B01",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "status HOLDS -> VIOLATED",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status HOLDS over 17 row(s), 0 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 1,
+      "title": "No financial row was created into a business date after that date closed"
+    },
+    {
+      "baseline_status": "HOLDS",
+      "baseline_violations": 0,
+      "blast_radius": [],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-B02",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "status HOLDS -> VIOLATED",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status HOLDS over 1 row(s), 0 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 1,
+      "title": "Every frozen night-audit snapshot matches its stored hash"
+    },
+    {
+      "baseline_status": "VIOLATED",
+      "baseline_violations": 1,
+      "blast_radius": [
+        "INV-B02: HOLDS/0 -> VIOLATED/1"
+      ],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-B03",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "already violated on live data; violations 1 -> 2",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status VIOLATED over 8 row(s), 1 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 2,
+      "title": "Recomputing a closed day reproduces the figures it reported"
+    },
+    {
+      "baseline_status": "HOLDS",
+      "baseline_violations": 0,
+      "blast_radius": [],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-B04",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "status HOLDS -> VIOLATED",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status HOLDS over 1 row(s), 0 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 1,
+      "title": "Exactly one business date exists and no activity is dated beyond it"
+    },
+    {
+      "baseline_status": "HOLDS",
+      "baseline_violations": 0,
+      "blast_radius": [
+        "INV-B01: HOLDS/0 -> VACUOUS/0",
+        "INV-B03: VIOLATED/1 -> VIOLATED/8"
+      ],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-B05",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "status HOLDS -> VIOLATED",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status HOLDS over 1 row(s), 0 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 5,
+      "title": "Night audits form an unbroken sequence up to the business date"
+    },
+    {
+      "baseline_status": "HOLDS",
+      "baseline_violations": 0,
+      "blast_radius": [
+        "INV-B03: VIOLATED/1 -> VIOLATED/3"
+      ],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-B06",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "status HOLDS -> VIOLATED",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status HOLDS over 35 row(s), 0 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 1,
+      "title": "A payment is never dated outside the stay it belongs to"
+    },
+    {
+      "baseline_status": "VIOLATED",
+      "baseline_violations": 5,
+      "blast_radius": [
+        "INV-B03: VIOLATED/1 -> VIOLATED/3",
+        "INV-C05: VIOLATED/5 -> VIOLATED/6"
+      ],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-C01",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "already violated on live data; violations 5 -> 6",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status VIOLATED over 5 row(s), 5 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 6,
+      "title": "A walk-in reservation is never settled through an OTA receivable"
+    },
+    {
+      "baseline_status": "HOLDS",
+      "baseline_violations": 0,
+      "blast_radius": [
+        "INV-A02: VIOLATED/40 -> VIOLATED/41",
+        "INV-A03: VIOLATED/5 -> VIOLATED/6"
+      ],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-C02",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "status HOLDS -> VIOLATED",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status HOLDS over 28 row(s), 0 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 1,
+      "title": "A checked-out reservation is settled, or its balance is explained"
+    },
+    {
+      "baseline_status": "HOLDS",
+      "baseline_violations": 0,
+      "blast_radius": [],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-C03",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "status HOLDS -> VIOLATED",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status HOLDS over 106 row(s), 0 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 1,
+      "title": "Every financial event belongs to a reservation that exists"
+    },
+    {
+      "baseline_status": "VIOLATED",
+      "baseline_violations": 1,
+      "blast_radius": [
+        "INV-B03: VIOLATED/1 -> VIOLATED/4",
+        "INV-C02: HOLDS/0 -> VIOLATED/1"
+      ],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-C04",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "already violated on live data; violations 1 -> 3",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status VIOLATED over 30 row(s), 1 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 3,
+      "title": "No room is occupied by two reservations on the same night"
+    },
+    {
+      "baseline_status": "VIOLATED",
+      "baseline_violations": 5,
+      "blast_radius": [
+        "INV-C01: VIOLATED/5 -> VIOLATED/6"
+      ],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-C05",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "already violated on live data; violations 5 -> 6",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status VIOLATED over 5 row(s), 5 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 6,
+      "title": "An OTA settlement identifies the agent it will be collected from"
+    },
+    {
+      "baseline_status": "VACUOUS",
+      "baseline_violations": 0,
+      "blast_radius": [],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-C06",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "status VACUOUS -> VIOLATED",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status VACUOUS over 0 row(s), 0 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 1,
+      "title": "Corporate credit is backed by a company account that exists"
+    },
+    {
+      "baseline_status": "HOLDS",
+      "baseline_violations": 0,
+      "blast_radius": [],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-D01",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "status HOLDS -> VIOLATED",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status HOLDS over 28 row(s), 0 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 1,
+      "title": "Every folio references a reservation that exists"
+    },
+    {
+      "baseline_status": "VACUOUS",
+      "baseline_violations": 0,
+      "blast_radius": [
+        "INV-B03: VIOLATED/1 -> VIOLATED/2"
+      ],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-D02",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "status VACUOUS -> VIOLATED",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status VACUOUS over 0 row(s), 0 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 1,
+      "title": "Every correction and reversal references the transaction it corrects"
+    },
+    {
+      "baseline_status": "HOLDS",
+      "baseline_violations": 0,
+      "blast_radius": [
+        "INV-A04: HOLDS/0 -> VIOLATED/1"
+      ],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-D03",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "status HOLDS -> VIOLATED",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status HOLDS over 35 row(s), 0 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 1,
+      "title": "Every payment references a payment mode that exists"
+    },
+    {
+      "baseline_status": "HOLDS",
+      "baseline_violations": 0,
+      "blast_radius": [],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-D04",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "status HOLDS -> VIOLATED",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status HOLDS over 66 row(s), 0 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 1,
+      "title": "Every tax line names the charge it was raised on"
+    },
+    {
+      "baseline_status": "VACUOUS",
+      "baseline_violations": 0,
+      "blast_radius": [],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-D05",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "status VACUOUS -> VIOLATED",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status VACUOUS over 0 row(s), 0 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 1,
+      "title": "Every void request and credit note references what it cancels"
+    },
+    {
+      "baseline_status": "HOLDS",
+      "baseline_violations": 0,
+      "blast_radius": [
+        "INV-D04: HOLDS/0 -> VIOLATED/2"
+      ],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-D06",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "status HOLDS -> VIOLATED",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status HOLDS over 30 row(s), 0 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 1,
+      "title": "Every priced room night belongs to a stay that covers that night"
+    },
+    {
+      "baseline_status": "",
+      "baseline_violations": 0,
+      "blast_radius": [],
+      "checks": {
+        "determinism": true
+      },
+      "invariant_id": "NULL-CONTROL",
+      "not_seedable_reason": "",
+      "notes": {
+        "determinism": "no invariant moved on unmutated data"
+      },
+      "route": "none",
+      "rows_changed": 0,
+      "seeded_status": "",
+      "seeded_violations": 0,
+      "title": "Identical data must produce identical results"
+    },
+    {
+      "baseline_status": "",
+      "baseline_violations": 0,
+      "blast_radius": [],
+      "checks": {
+        "evidence": true
+      },
+      "invariant_id": "WRITE-CONTROL",
+      "not_seedable_reason": "",
+      "notes": {
+        "evidence": "0 write statement(s) counted across the whole registry"
+      },
+      "route": "none",
+      "rows_changed": 0,
+      "seeded_status": "",
+      "seeded_violations": 0,
+      "title": "The engine performs zero database writes"
+    }
+  ],
+  "passed": 26,
+  "total": 26
+}

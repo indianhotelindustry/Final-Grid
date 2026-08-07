@@ -1,0 +1,71 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Shift Cash Reconciliation{% endblock %}
+{% block report_name %}Shift Cash Reconciliation{% endblock %}
+
+{% block report_content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h5 class="mb-0"><i class="bi bi-cash-coin me-2"></i>Shift Cash Reconciliation</h5>
+    <a href="javascript:window.print()" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-printer me-1"></i>Print
+    </a>
+</div>
+
+<form class="row g-2 mb-4">
+    <div class="col-auto">
+        <label class="form-label">Date</label>
+        <input type="date" name="date" class="form-control" value="{{ report_date.isoformat() }}">
+    </div>
+    <div class="col-auto align-self-end">
+        <button class="btn btn-primary">Apply</button>
+    </div>
+</form>
+
+{% if reconciliation %}
+<div class="table-responsive">
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Staff</th>
+                <th>Shift</th>
+                <th>Start</th>
+                <th>End</th>
+                <th class="text-end">Opening Cash</th>
+                <th class="text-end">Cash Received</th>
+                <th class="text-end">Expected Closing</th>
+                <th class="text-end">Declared Closing</th>
+                <th class="text-end">Variance</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rec in reconciliation %}
+            {% set variance = rec.variance %}
+            <tr class="{% if variance | abs > 1 %}table-warning{% endif %}">
+                <td>{{ rec.shift.user.full_name }}</td>
+                <td>{{ rec.shift.shift_type }}</td>
+                <td>{{ rec.shift.start_time.strftime('%H:%M') }}</td>
+                <td>{{ rec.shift.end_time.strftime('%H:%M') if rec.shift.end_time else '—' }}</td>
+                <td class="text-end">₹{{ '{:,.0f}'.format(rec.shift.opening_cash or 0) }}</td>
+                <td class="text-end">₹{{ '{:,.0f}'.format(rec.cash_received) }}</td>
+                <td class="text-end fw-semibold">₹{{ '{:,.0f}'.format(rec.expected_closing) }}</td>
+                <td class="text-end fw-semibold">₹{{ '{:,.0f}'.format(rec.declared_closing) }}</td>
+                <td class="text-end fw-bold {% if variance > 1 %}text-success{% elif variance < -1 %}text-danger{% else %}text-muted{% endif %}">
+                    {% if variance > 0.5 %}+{% endif %}₹{{ '{:,.0f}'.format(variance) }}
+                </td>
+                <td class="small text-muted">{{ rec.shift.notes or '—' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<p class="text-muted small mt-2">
+    <i class="bi bi-info-circle me-1"></i>
+    Variance = Declared Closing − Expected Closing. Positive = surplus. Negative = shortage.
+    Rows highlighted in yellow have a variance &gt; ₹1.
+</p>
+{% else %}
+<div class="alert alert-info">
+    No closed shifts found for {{ report_date.strftime('%d %b %Y') }}.
+</div>
+{% endif %}
+{% endblock %}

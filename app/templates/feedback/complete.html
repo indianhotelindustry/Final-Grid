@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You!</title>
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container py-5 text-center" style="max-width:480px;">
+    <div class="card shadow-sm p-5 rounded-4">
+        {% if already_done %}
+        <div class="fs-1 mb-3">✅</div>
+        <h4>Already Submitted</h4>
+        <p class="text-muted">You've already shared your feedback. Thank you!</p>
+        {% else %}
+        <div class="fs-1 mb-3">🙏</div>
+        <h4>Thank You!</h4>
+        <p class="text-muted">Your feedback has been recorded. We look forward to welcoming you again!</p>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>

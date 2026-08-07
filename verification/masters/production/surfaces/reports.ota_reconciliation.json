@@ -1,0 +1,48 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Fota-reconciliation",
+  "anon_status": 302,
+  "body_bytes": 31495,
+  "body_sha256": "f35492b5a9a8835751e765907ae1f49c2f87f4a8c2798221e0dad1c77a4ad9cc",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 28,
+  "endpoint": "reports.ota_reconciliation",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "from_date": "2026-04-28",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "ota_sources[len]": "9",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "recent_payouts[len]": "0",
+    "summary.rows[len]": "0",
+    "summary.totals.channel_count": "0",
+    "summary.totals.max_delay_days": "0",
+    "summary.totals.paid_in_range": "0",
+    "summary.totals.pending": "0",
+    "summary.totals.revenue_in_range": "0",
+    "summary.totals[len]": "5",
+    "summary[len]": "5",
+    "to_date": "2026-05-28"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_input": 1,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.ota_reconciliation",
+  "templates": [
+    "reports/ota_reconciliation.html"
+  ],
+  "truncations": [],
+  "url": "/reports/ota-reconciliation"
+}

@@ -1,0 +1,59 @@
+{# ===========================================================================
+   OTA Revenue Intelligence — Phase A: KPI Strip (S1)
+   ---------------------------------------------------------------------------
+   Append-only partial. Rendered ONLY when the parent route has populated
+   the `intel` context (i.e. OTA_INTELLIGENCE_ENABLED is on). Existing
+   dashboard layout is unchanged when this block is absent.
+
+   Six tiles, single row on desktop. Collapses to 3 cols at <1200px and
+   2 cols at <576px (rules in design-system.css §4).
+   =========================================================================== #}
+<div class="ds-kpi-grid mb-4" aria-label="OTA Revenue Intelligence">
+
+    {# 1. OTA Revenue Today — accrual-basis room revenue from in-house OTA stays.
+        Mirrors the canonical compute_live_today_charges() shape, narrowed to
+        source=OTA. See _ota_revenue_today() in app/ota.py. #}
+    <div class="ds-kpi is-positive" title="Room revenue accruing today from in-house OTA stays (rate × nights). Mirrors the dashboard 'Live (Unsettled)' calculation, narrowed to source=OTA.">
+        <span class="ds-kpi-label">OTA Revenue Today</span>
+        <span class="ds-kpi-value">&#8377;{{ '{:,.0f}'.format(intel.ota_revenue_today or 0) }}</span>
+        <span class="ds-kpi-sub">In-house OTA stays</span>
+    </div>
+
+    {# 2. OTA Bookings Today — new OTA reservations created in today's UTC window. #}
+    <div class="ds-kpi" title="OTA reservations created today (booking velocity).">
+        <span class="ds-kpi-label">OTA Bookings Today</span>
+        <span class="ds-kpi-value">{{ intel.ota_bookings_today or 0 }}</span>
+        <span class="ds-kpi-sub">Created today</span>
+    </div>
+
+    {# 3. Arrivals Today (OTA) — front-desk load. #}
+    <div class="ds-kpi is-info" title="OTA reservations with arrival date = today, awaiting or in check-in.">
+        <span class="ds-kpi-label">Arrivals Today</span>
+        <span class="ds-kpi-value">{{ intel.ota_arrivals_today or 0 }}</span>
+        <span class="ds-kpi-sub">OTA only</span>
+    </div>
+
+    {# 4. Departures Today (OTA). #}
+    <div class="ds-kpi" title="OTA reservations with departure date = today (in-house or already checked out).">
+        <span class="ds-kpi-label">Departures Today</span>
+        <span class="ds-kpi-value">{{ intel.ota_departures_today or 0 }}</span>
+        <span class="ds-kpi-sub">OTA only</span>
+    </div>
+
+    {# 5. Pending Collections — lifetime OTA receivable (compute_ota_outstanding). #}
+    <div class="ds-kpi {% if (intel.ota_pending_collection or 0) > 0 %}is-warning{% endif %}"
+         title="Lifetime OTA receivable balance — same number used by reconciliation reports.">
+        <span class="ds-kpi-label">Pending Collection</span>
+        <span class="ds-kpi-value">&#8377;{{ '{:,.0f}'.format(intel.ota_pending_collection or 0) }}</span>
+        <span class="ds-kpi-sub">All OTA channels</span>
+    </div>
+
+    {# 6. Cancelled OTA Today (cancelled-on date proxy via updated_at window). #}
+    <div class="ds-kpi {% if (intel.ota_cancelled_today or 0) > 0 %}is-negative{% endif %}"
+         title="OTA bookings cancelled today (cancellation event happened today).">
+        <span class="ds-kpi-label">Cancelled Today</span>
+        <span class="ds-kpi-value">{{ intel.ota_cancelled_today or 0 }}</span>
+        <span class="ds-kpi-sub">OTA only</span>
+    </div>
+
+</div>

@@ -1,0 +1,28 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/advance-receipt/1",
+  "anon_status": 302,
+  "body_bytes": 207,
+  "body_sha256": "21eedd109dc2c727722de8f69eee6397ba2c9abaf9307f65c800285f1f1082f7",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 5,
+  "endpoint": "main.advance_receipt",
+  "error": "",
+  "figure_source": "none",
+  "figures": {},
+  "location": "/invoice/1",
+  "normalisation_hits": {},
+  "note": "Advance receipt document.",
+  "origin": "declared",
+  "params": {
+    "id": 1,
+    "resolver": "any_reservation",
+    "rule": "lowest reservation id"
+  },
+  "severity": "BLOCK",
+  "status": 302,
+  "surface_id": "main.advance_receipt__any_reservation",
+  "templates": [],
+  "truncations": [],
+  "url": "/advance-receipt/1"
+}

@@ -1,0 +1,136 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Void & Adjustments Report{% endblock %}
+{% block report_name %}Void &amp; Adjustments Report{% endblock %}
+
+{% block report_content %}
+<div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+  <h5 class="mb-0">
+    <i class="bi bi-slash-circle text-danger me-2"></i>
+    Void &amp; Adjustments
+  </h5>
+  <div class="d-flex gap-2 align-items-center d-print-none">
+    <form class="d-flex gap-1 align-items-center" action="{{ url_for('reports.void_adjustments_report') }}">
+      <input type="date" class="form-control form-control-sm" name="from"
+             value="{{ from_date.isoformat() }}">
+      <span class="small">→</span>
+      <input type="date" class="form-control form-control-sm" name="to"
+             value="{{ to_date.isoformat() }}">
+      <button class="btn btn-sm btn-danger">View</button>
+      <button class="btn btn-sm btn-outline-success" name="format" value="excel"
+              title="Export Excel"><i class="bi bi-file-earmark-excel"></i></button>
+    </form>
+    <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+      <i class="bi bi-printer me-1"></i>Print
+    </button>
+  </div>
+</div>
+
+<div class="text-muted small mb-3">
+  Period: {{ from_date.strftime('%d %b %Y') }} — {{ to_date.strftime('%d %b %Y') }}
+</div>
+
+{# Summary cards #}
+<div class="row g-3 mb-4">
+  <div class="col-auto">
+    <div class="card border-danger shadow-sm px-3 py-2 text-center">
+      <div class="fs-5 fw-bold text-danger">{{ voided_payments|length }}</div>
+      <div class="small text-muted">Voided Payments</div>
+    </div>
+  </div>
+  <div class="col-auto">
+    <div class="card border-danger shadow-sm px-3 py-2 text-center">
+      <div class="fs-5 fw-bold text-danger">₹{{ '{:,.2f}'.format(total_voided) }}</div>
+      <div class="small text-muted">Total Voided Amount</div>
+    </div>
+  </div>
+  <div class="col-auto">
+    <div class="card border-warning shadow-sm px-3 py-2 text-center">
+      <div class="fs-5 fw-bold text-warning">{{ void_reqs|length }}</div>
+      <div class="small text-muted">Void Requests</div>
+    </div>
+  </div>
+</div>
+
+{# Voided Payments #}
+<div class="card shadow-sm mb-4">
+  <div class="card-header fw-semibold bg-danger text-white py-2">
+    Voided Payments ({{ voided_payments|length }})
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover table-sm align-middle mb-0 small">
+      <thead class="table-dark">
+        <tr>
+          <th>Booking Ref</th>
+          <th>Guest</th>
+          <th>Payment Mode</th>
+          <th class="text-end">Amount</th>
+          <th>Voided On</th>
+          <th>Reason</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in voided_payments %}
+        <tr>
+          <td class="fw-semibold text-primary">
+            {{ p.reservation.booking_reference if p.reservation else '—' }}
+          </td>
+          <td>{{ p.reservation.guest.name if p.reservation and p.reservation.guest else '—' }}</td>
+          <td>{{ p.payment_mode.name if p.payment_mode else '—' }}</td>
+          <td class="text-end text-danger fw-semibold">₹{{ '{:,.2f}'.format(p.amount) }}</td>
+          <td>{{ p.voided_at.strftime('%d %b %Y %H:%M') if p.voided_at else '—' }}</td>
+          <td class="text-muted">{{ p.void_reason or '—' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-3">No voided payments in this period.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{# Void Requests #}
+<div class="card shadow-sm">
+  <div class="card-header fw-semibold bg-warning text-dark py-2">
+    Void Requests ({{ void_reqs|length }})
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover table-sm align-middle mb-0 small">
+      <thead class="table-dark">
+        <tr>
+          <th>Request ID</th>
+          <th>Booking Ref</th>
+          <th>Requested By</th>
+          <th>Status</th>
+          <th class="text-end">Amount</th>
+          <th>Requested At</th>
+          <th>Reason</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for vr in void_reqs %}
+        <tr>
+          <td class="fw-semibold">#{{ vr.id }}</td>
+          <td class="text-primary">
+            {{ vr.payment.reservation.booking_reference if vr.payment and vr.payment.reservation else '—' }}
+          </td>
+          <td>{{ vr.requested_by.full_name if vr.requested_by else '—' }}</td>
+          <td>
+            {% set sc = {'Pending':'warning','Approved':'success','Rejected':'danger'} %}
+            <span class="badge bg-{{ sc.get(vr.status,'secondary') }}">{{ vr.status }}</span>
+          </td>
+          <td class="text-end">
+            ₹{{ '{:,.2f}'.format(vr.payment.amount) if vr.payment else '—' }}
+          </td>
+          <td>{{ vr.requested_at.strftime('%d %b %Y %H:%M') if vr.requested_at else '—' }}</td>
+          <td class="text-muted">{{ vr.reason or '—' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-center text-muted py-3">No void requests in this period.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>@media print { .d-print-none { display:none !important; } }</style>
+{% endblock %}

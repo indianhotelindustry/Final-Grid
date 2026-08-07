@@ -1,0 +1,98 @@
+{
+  "cleanup": {
+    "baseline_unchanged": true,
+    "copies_left_behind": [],
+    "copies_removed": 3,
+    "production_sha256": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+    "production_unchanged": true
+  },
+  "commissioned": true,
+  "elements": [
+    "positive_injection",
+    "negative_injection",
+    "detection",
+    "evidence",
+    "repeatability",
+    "determinism",
+    "order_independence",
+    "isolation",
+    "cleanup"
+  ],
+  "outcomes": [
+    {
+      "checks": {
+        "cleanup": true,
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "isolation": true,
+        "negative_injection": true,
+        "order_independence": true,
+        "positive_injection": true,
+        "repeatability": true
+      },
+      "detected_by": [
+        "D1_PARITY",
+        "D3_REPLAY",
+        "D4_INVARIANTS"
+      ],
+      "fault_id": "FLT-A01",
+      "missed_by": [],
+      "notes": {
+        "cleanup": "every private copy removed and verified gone",
+        "detection": "attributed by D1_PARITY, D3_REPLAY, D4_INVARIANTS",
+        "determinism": "identical injection and identical detection across runs",
+        "evidence": "complete",
+        "isolation": "baseline and production byte-identical after every injection",
+        "negative_injection": "the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)",
+        "order_independence": "reversing the layer order changed nothing",
+        "positive_injection": "1 row(s) changed by SQL",
+        "repeatability": "two challenges gave the same classification"
+      },
+      "title": "Walk-in reservation settled through an OTA receivable head",
+      "uncovered_reason": ""
+    },
+    {
+      "checks": {
+        "cleanup_validation": true,
+        "evidence_validation": true,
+        "false_negative_resistance": true,
+        "false_positive_resistance": true,
+        "injection_validation": true,
+        "isolation": true,
+        "parallel_safety": true,
+        "registry_validation": true,
+        "repeatability": true
+      },
+      "detected_by": [],
+      "fault_id": "PLATFORM",
+      "missed_by": [],
+      "notes": {
+        "cleanup_validation": "no seeded copy survived",
+        "evidence_validation": "every one of 1 results carries injection, timestamp and root-cause candidates",
+        "false_negative_resistance": "all 1 covered faults were attributed by a declared layer",
+        "false_positive_resistance": "an unmutated copy moved nothing in any layer",
+        "injection_validation": "an injection that changed no rows was refused",
+        "isolation": "the pristine baseline and production are byte-identical after every injection in this run",
+        "parallel_safety": "4 probes run concurrently agreed with the same probes run serially",
+        "registry_validation": "6/6 malformed declarations refused",
+        "repeatability": "proven per fault by the repeatability and determinism elements of fault commissioning"
+      },
+      "title": "Platform self-verification",
+      "uncovered_reason": ""
+    }
+  ],
+  "passed": 2,
+  "self_checks": [
+    "registry_validation",
+    "injection_validation",
+    "evidence_validation",
+    "cleanup_validation",
+    "repeatability",
+    "isolation",
+    "false_positive_resistance",
+    "false_negative_resistance",
+    "parallel_safety"
+  ],
+  "total": 2
+}

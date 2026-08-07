@@ -1,0 +1,1146 @@
+{% extends "base.html" %}
+{% block title %}Calendar View — {{ config.HOTEL_NAME }}{% endblock %}
+
+{% block content %}
+<!-- Global Tab Bar -->
+<ul class="nav nav-tabs" role="tablist" id="globalTabs">
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.dashboard') }}"><i class="bi bi-grid-3x3"></i> Dashboard</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.reservations') }}"><i class="bi bi-list-ul"></i> Front Desk</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.housekeeping') }}"><i class="bi bi-brush"></i> Housekeeping</a>
+    </li>
+    {% if current_user.has_role('Admin','Manager','FrontDesk','Accountant') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.invoice_manager') }}"><i class="bi bi-receipt-cutoff"></i> Invoice Manager</a>
+    </li>
+    {% endif %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link active" href="{{ url_for('main.room_grid') }}"><i class="bi bi-calendar3"></i> Calendar View</a>
+    </li>
+    {% if current_user.has_role('Admin','Manager') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('groups.index') }}"><i class="bi bi-people-fill"></i> Group Bookings</a>
+    </li>
+    {% endif %}
+    {% if current_user.has_role('Admin','Manager','Accountant') %}
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('main.night_audit') }}"><i class="bi bi-moon-stars"></i> Night Audit</a>
+    </li>
+    {% endif %}
+</ul>
+
+<!-- Tab bar — same as Front Desk, filter tabs navigate back to reservations list -->
+<div class="filter-row mb-3">
+    <div class="filter-tabs">
+        <a href="{{ url_for('main.reservations') }}" class="filter-btn">All Reservations</a>
+        <a href="{{ url_for('main.reservations') }}" class="filter-btn">OTA</a>
+        <a href="{{ url_for('main.reservations') }}" class="filter-btn">Direct Calling</a>
+        <a href="{{ url_for('main.reservations') }}" class="filter-btn">Walk-in</a>
+        <a href="{{ url_for('main.reservations') }}" class="filter-btn">Confirmed</a>
+        <a href="{{ url_for('main.reservations') }}" class="filter-btn">Checked-in</a>
+        <a href="{{ url_for('main.reservations') }}" class="filter-btn">Checked Out</a>
+        <a href="{{ url_for('main.reservations') }}" class="filter-btn">Cancelled</a>
+        <a href="{{ url_for('main.reservations') }}" class="filter-btn">Blocked</a>
+        <a href="{{ url_for('main.reservations') }}" class="btn btn-express control-btn">
+            <i class="bi bi-door-open-fill"></i> New Check-in
+        </a>
+    </div>
+</div>
+
+<!-- Local page tabs: Calendar View | Rooms Overview -->
+<ul class="nav nav-tabs mb-3" id="roomViewTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tabCalendar" data-bs-toggle="tab" data-bs-target="#calendarView"
+                type="button" role="tab" aria-selected="true">
+            <i class="bi bi-calendar3"></i> Calendar View
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tabOverview" data-bs-toggle="tab" data-bs-target="#roomsOverview"
+                type="button" role="tab" aria-selected="false">
+            <i class="bi bi-grid-3x3-gap"></i> Rooms Overview
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content">
+
+<!-- ===== CALENDAR VIEW ===== -->
+<div class="tab-pane fade show active" id="calendarView" role="tabpanel">
+    <!-- Date view filter buttons -->
+    <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+        <div class="btn-group btn-group-sm" role="group">
+            <a href="{{ url_for('main.room_grid', view='today',  offset=0) }}"
+               class="btn btn-outline-secondary {% if view == 'today'  %}active{% endif %}">Today</a>
+            <a href="{{ url_for('main.room_grid', view='7days',  offset=0) }}"
+               class="btn btn-outline-secondary {% if view == '7days'  %}active{% endif %}">7 Days</a>
+            <a href="{{ url_for('main.room_grid', view='14days', offset=0) }}"
+               class="btn btn-outline-secondary {% if view == '14days' %}active{% endif %}">14 Days</a>
+            <a href="{{ url_for('main.room_grid', view='monthly',offset=0) }}"
+               class="btn btn-outline-secondary {% if view == 'monthly' %}active{% endif %}">Monthly</a>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+        <h4 class="mb-0"><i class="bi bi-calendar3 me-2 text-primary"></i>Calendar View
+            <small class="text-muted fs-6 ms-2">{{ start_date.strftime('%d %b') }} – {{ end_date.strftime('%d %b %Y') }}</small>
+        </h4>
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <!-- Date navigation -->
+            <a href="{{ url_for('main.room_grid', view=view, offset=offset-nav_step*2) }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-chevron-double-left"></i>
+            </a>
+            <a href="{{ url_for('main.room_grid', view=view, offset=offset-nav_step) }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+            <a href="{{ url_for('main.room_grid', view=view, offset=0) }}" class="btn btn-sm btn-outline-primary">Today</a>
+            <a href="{{ url_for('main.room_grid', view=view, offset=offset+nav_step) }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+            <a href="{{ url_for('main.room_grid', view=view, offset=offset+nav_step*2) }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-chevron-double-right"></i>
+            </a>
+            <!-- Floor filter -->
+            <select id="floorFilter" class="form-select form-select-sm" style="width:auto"
+                    onchange="filterFloor(this.value)">
+                <option value="">All Floors</option>
+                {% for f in floors %}
+                <option value="{{ f }}">Floor {{ f }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- Legend — 6 distinct statuses -->
+    <div class="d-flex gap-3 mb-3 flex-wrap" style="font-size:0.78rem;">
+        <span><span class="cal-legend cal-vacant-dot"></span> Vacant</span>
+        <span><span class="cal-legend cal-reserved-dot"></span> Reserved</span>
+        <span><span class="cal-legend cal-confirmed-dot"></span> Confirmed</span>
+        <span><span class="cal-legend cal-checkedin-dot"></span> Checked In</span>
+        <span><span class="cal-legend cal-dirty-dot"></span> Dirty</span>
+        <span><span class="cal-legend cal-maintenance-dot"></span> Maintenance</span>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive" id="calendarScroll" style="max-height:75vh; overflow:auto;">
+                <table class="table table-bordered table-sm mb-0" id="gridTable" style="min-width:900px;">
+                    <thead class="sticky-top bg-white">
+                        <tr>
+                            <th class="sticky-col bg-white" style="min-width:80px; z-index:3;">Room</th>
+                            {% for d in dates %}
+                            <th class="text-center small {% if d == today %}table-primary{% endif %}"
+                                style="min-width:56px; white-space:nowrap;">
+                                <div>{{ d.strftime('%a') }}</div>
+                                <div class="fw-bold">{{ d.strftime('%d') }}</div>
+                                <div class="text-muted" style="font-size:10px;">{{ d.strftime('%b') }}</div>
+                            </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for room in rooms %}
+                        <tr class="floor-row" data-floor="{{ room.floor }}">
+                            <td class="sticky-col bg-light fw-semibold small" style="z-index:2;">
+                                <div>{{ room.room_number }}</div>
+                                <div class="text-muted" style="font-size:10px;">{{ room.room_type.name[:4] }}</div>
+                                <div class="text-muted" style="font-size:9px;">F{{ room.floor }}</div>
+                            </td>
+                            {% for d in dates %}
+                            {% set cell = grid.get(room.id, {}).get(d) %}
+                            {% if cell %}
+                                {% if cell.type in ('reserved', 'confirmed', 'checkedin') %}
+                                {# — Reservation cell — #}
+                                {% set _drag_ok = cell.type in ('reserved', 'confirmed') %}
+                                {% set _ci_drag = cell.type == 'checkedin' %}
+                                <td class="cal-{{ cell.type }} cal-res-cell p-0"
+                                    data-room-id="{{ room.id }}"
+                                    data-date="{{ d.isoformat() }}"
+                                    data-res-id="{{ cell.res_id }}"
+                                    data-res-type="{{ cell.type }}"
+                                    data-res-room="{{ cell.room_id }}"
+                                    data-res-arrival="{{ cell.arrival_iso }}"
+                                    data-res-departure="{{ cell.departure_iso }}"
+                                    data-res-nights="{{ cell.nights }}"
+                                    data-res-guest="{{ cell.guest }}"
+                                    data-res-room-type="{{ cell.room_type_id }}"
+                                    {% if _drag_ok %}draggable="true"{% endif %}
+                                    {% if _ci_drag %}data-ci-drag="1"{% endif %}
+                                    style="vertical-align:middle; position:relative; height:38px;">
+                                    {% if cell.start %}
+                                    <div class="cal-block-inner"
+                                         data-res-id="{{ cell.res_id }}"
+                                         onclick="openResPopover(event, {{ cell.res_id }})">
+                                        <span class="cal-guest-name">{{ cell.guest_fmt }}</span>
+                                        {% if cell.source %}
+                                        <span class="cal-src-tag">{{ cell.source[:3]|upper }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                    {% if cell.end %}
+                                    <div class="resize-handle"
+                                         draggable="true"
+                                         data-action="resize"
+                                         data-res-id="{{ cell.res_id }}"
+                                         data-res-arrival="{{ cell.arrival_iso }}"
+                                         data-res-departure="{{ cell.departure_iso }}"
+                                         data-res-room="{{ cell.room_id }}"
+                                         data-res-guest="{{ cell.guest }}"
+                                         title="Drag to extend/shorten stay">&#x21D4;</div>
+                                    {% endif %}
+                                </td>
+                                {% elif cell.type == 'dirty' %}
+                                <td class="cal-dirty text-center p-0"
+                                    data-room-id="{{ room.id }}"
+                                    data-date="{{ d.isoformat() }}"
+                                    style="vertical-align:middle; height:38px;">
+                                    <i class="bi bi-brush" style="font-size:11px;"></i>
+                                </td>
+                                {% elif cell.type == 'maintenance' %}
+                                <td class="cal-maintenance text-center p-0"
+                                    data-room-id="{{ room.id }}"
+                                    data-date="{{ d.isoformat() }}"
+                                    style="vertical-align:middle; height:38px;">
+                                    <i class="bi bi-wrench" style="font-size:11px;"></i>
+                                </td>
+                                {% else %}
+                                <td class="cal-vacant drop-zone p-0"
+                                    data-room-id="{{ room.id }}"
+                                    data-date="{{ d.isoformat() }}"
+                                    data-room-type="{{ room.room_type_id }}"
+                                    style="height:38px;"></td>
+                                {% endif %}
+                            {% else %}
+                            <td class="cal-vacant drop-zone p-0"
+                                data-room-id="{{ room.id }}"
+                                data-date="{{ d.isoformat() }}"
+                                data-room-type="{{ room.room_type_id }}"
+                                style="height:38px;"></td>
+                            {% endif %}
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div><!-- /calendarView tab-pane -->
+
+<!-- ===== ROOMS OVERVIEW ===== -->
+<div class="tab-pane fade" id="roomsOverview" role="tabpanel">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h4 class="mb-0"><i class="bi bi-grid-3x3-gap me-2 text-primary"></i>Rooms Overview</h4>
+        <!-- Floor filter for overview -->
+        <select id="overviewFloorFilter" class="form-select form-select-sm" style="width:auto"
+                onchange="filterOverviewFloor(this.value)">
+            <option value="">All Floors</option>
+            {% for f in floors %}
+            <option value="{{ f }}">Floor {{ f }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Legend -->
+    <div class="d-flex gap-3 mb-3 flex-wrap" style="font-size:0.78rem;">
+        <span><span style="display:inline-block;width:12px;height:12px;background:#6B8E23;border-radius:3px;margin-right:4px;vertical-align:middle;"></span> Vacant</span>
+        <span><span style="display:inline-block;width:12px;height:12px;background:#3b82f6;border-radius:3px;margin-right:4px;vertical-align:middle;"></span> Reserved</span>
+        <span><span style="display:inline-block;width:12px;height:12px;background:#1d4ed8;border-radius:3px;margin-right:4px;vertical-align:middle;"></span> Confirmed</span>
+        <span><span style="display:inline-block;width:12px;height:12px;background:#C2410C;border-radius:3px;margin-right:4px;vertical-align:middle;"></span> Occupied</span>
+        <span><span style="display:inline-block;width:12px;height:12px;background:#D97706;border-radius:3px;margin-right:4px;vertical-align:middle;"></span> Dirty</span>
+        <span><span style="display:inline-block;width:12px;height:12px;background:#6B7280;border-radius:3px;margin-right:4px;vertical-align:middle;"></span> Maintenance</span>
+    </div>
+
+    <!-- Checkout alert summary bar -->
+    <div id="alertSummaryBar" class="d-none alert py-2 mb-3 d-flex align-items-center gap-3 small" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span id="alertSummaryText"></span>
+    </div>
+
+    <div class="row g-3" id="overviewGrid">
+        {% for room in rooms %}
+        {% set today_cell = grid.get(room.id, {}).get(today) %}
+        {% if today_cell and today_cell.type == 'checkedin' %}
+            {% set room_status = 'occupied' %}
+            {% set room_guest = today_cell.guest %}
+            {% set room_res_id = today_cell.res_id %}
+        {% elif today_cell and today_cell.type == 'confirmed' %}
+            {% set room_status = 'confirmed' %}
+            {% set room_guest = today_cell.guest %}
+            {% set room_res_id = today_cell.res_id %}
+        {% elif today_cell and today_cell.type == 'reserved' %}
+            {% set room_status = 'reserved' %}
+            {% set room_guest = today_cell.guest %}
+            {% set room_res_id = today_cell.res_id %}
+        {% elif today_cell and today_cell.type == 'dirty' %}
+            {% set room_status = 'dirty' %}
+            {% set room_guest = '' %}
+            {% set room_res_id = '' %}
+        {% elif today_cell and today_cell.type == 'maintenance' %}
+            {% set room_status = 'maintenance' %}
+            {% set room_guest = '' %}
+            {% set room_res_id = '' %}
+        {% else %}
+            {% set room_status = 'vacant' %}
+            {% set room_guest = '' %}
+            {% set room_res_id = '' %}
+        {% endif %}
+        <div class="col-6 col-sm-4 col-md-3 col-lg-2 overview-room-card"
+             data-floor="{{ room.floor }}"
+             data-res-status="{{ room_status }}"
+             {% if room_status == 'occupied' and today_cell %}
+             data-booking-type="{{ today_cell.booking_type }}"
+             data-checkout-date="{{ today_cell.departure_iso }}"
+             data-checkout-time="{{ today_cell.checkout_time }}"
+             data-checkout-initiated="{{ today_cell.checkout_initiated | lower }}"
+             {% endif %}>
+            <div class="card h-100 border-0 shadow-sm overview-card overview-card-{{ room_status }}"
+                 {% if room_status == 'occupied' and room_res_id %}
+                 style="cursor:pointer;" onclick="window.location='{{ url_for('main.checkout', reservation_id=room_res_id) }}'"
+                 {% elif room_status in ('confirmed', 'reserved') and room_res_id %}
+                 style="cursor:pointer;" onclick="window.location='{{ url_for('main.checkin', reservation_id=room_res_id) }}'"
+                 {% elif room_status == 'vacant' %}
+                 style="cursor:pointer;" onclick="window.location='{{ url_for('main.reservations') }}?checkin_room_id={{ room.id }}&checkin_room_num={{ room.room_number }}'"
+                 {% endif %}>
+                <div class="card-body p-2 text-center text-white">
+                    <div class="fw-bold fs-5">{{ room.room_number }}</div>
+                    <div class="small opacity-75">{{ room.room_type.name }}</div>
+                    <div class="small opacity-75">Floor {{ room.floor }}</div>
+                    {% if room_status == 'occupied' %}
+                    {% if today_cell %}
+                    <div class="card-co-time text-white">
+                        <div class="co-time-val">{{ today_cell.checkout_time or default_checkout_hm }}</div>
+                        <div class="co-time-lbl">checkout</div>
+                    </div>
+                    {% endif %}
+                    <div class="mt-1 small fw-semibold text-truncate">{{ room_guest[:12] if room_guest else '' }}</div>
+                    <span class="badge mt-1" style="background:rgba(255,255,255,0.25);">Occupied</span>
+                    {% if today_cell %}
+                        {% if today_cell.booking_type == 'Hourly' %}
+                        <span class="badge ms-1 mt-1" style="background:#1D6FA4; font-size:9px;">Hourly</span>
+                        {% else %}
+                        <span class="badge ms-1 mt-1" style="background:rgba(255,255,255,0.3); font-size:9px;">Regular</span>
+                        {% endif %}
+                    {% endif %}
+                    <span class="ci-alert-badge"></span>
+                    {% elif room_status == 'confirmed' %}
+                    <div class="mt-1 small fw-semibold text-truncate">{{ room_guest[:12] if room_guest else '' }}</div>
+                    <span class="badge mt-1" style="background:rgba(255,255,255,0.25);">Confirmed</span>
+                    {% elif room_status == 'reserved' %}
+                    <div class="mt-1 small fw-semibold text-truncate">{{ room_guest[:12] if room_guest else '' }}</div>
+                    <span class="badge mt-1" style="background:rgba(255,255,255,0.25);">Reserved</span>
+                    {% elif room_status == 'dirty' %}
+                    <div class="mt-1"><i class="bi bi-brush fs-5"></i></div>
+                    <span class="badge mt-1" style="background:rgba(255,255,255,0.25);">Dirty</span>
+                    {% elif room_status == 'maintenance' %}
+                    <div class="mt-1"><i class="bi bi-wrench fs-5"></i></div>
+                    <span class="badge mt-1" style="background:rgba(255,255,255,0.25);">Maintenance</span>
+                    {% else %}
+                    <div class="mt-1"><i class="bi bi-check-circle fs-5"></i></div>
+                    <span class="badge mt-1" style="background:rgba(255,255,255,0.25);">Vacant</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div><!-- /roomsOverview tab-pane -->
+
+</div><!-- /tab-content -->
+
+<style>
+.sticky-col { position: sticky; left: 0; }
+#gridTable td, #gridTable th { padding: 0; }
+
+/* ── Calendar cell colours ─────────────────────────────────── */
+.cal-vacant      { background: #f8fafc; }
+.cal-reserved    { background: #bfdbfe; color: #1e3a5f; }
+.cal-confirmed   { background: #1d4ed8; color: #fff; }
+.cal-checkedin   { background: #dc2626; color: #fff; }
+.cal-dirty       { background: #fef3c7; color: #92400e; }
+.cal-maintenance { background: #e5e7eb; color: #374151; }
+
+/* ── Reservation block inner layout ───────────────────────── */
+.cal-res-cell { border-left: 3px solid rgba(0,0,0,.12) !important; }
+.cal-reserved.cal-res-cell  { border-left-color: #3b82f6 !important; }
+.cal-confirmed.cal-res-cell { border-left-color: #1e40af !important; }
+.cal-checkedin.cal-res-cell { border-left-color: #991b1b !important; }
+
+.cal-block-inner {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 4px 3px 3px;
+    cursor: pointer;
+    height: 100%;
+    min-height: 32px;
+    user-select: none;
+}
+.cal-block-inner:hover { filter: brightness(0.93); }
+
+.cal-guest-name {
+    font-size: 10px; font-weight: 700;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    max-width: 46px; flex: 1;
+    line-height: 1.2;
+}
+.cal-src-tag {
+    font-size: 8px; font-weight: 700;
+    background: rgba(0,0,0,.18); border-radius: 3px;
+    padding: 1px 3px; flex-shrink: 0;
+}
+
+/* ── Resize handle ─────────────────────────────────────────── */
+.resize-handle {
+    position: absolute; right: 0; top: 0; bottom: 0;
+    width: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 900;
+    cursor: col-resize;
+    background: rgba(0,0,0,.15);
+    color: rgba(255,255,255,.8);
+    border-radius: 0 2px 2px 0;
+    user-select: none;
+}
+.resize-handle:hover { background: rgba(0,0,0,.35); }
+
+/* ── DnD states ────────────────────────────────────────────── */
+.cal-dragging    { opacity: .4; outline: 2px dashed #6366f1; }
+.drop-zone.drop-valid   { background: #dcfce7 !important; outline: 2px solid #22c55e; }
+.drop-zone.drop-invalid { background: #fee2e2 !important; outline: 2px solid #ef4444; }
+.drop-zone.drop-hover   { background: #dbeafe !important; }
+.cal-res-cell.drag-source { opacity: .45; }
+
+/* ── Legend dots ───────────────────────────────────────────── */
+.cal-legend {
+    display: inline-block; width: 12px; height: 12px;
+    border-radius: 3px; margin-right: 4px; vertical-align: middle;
+}
+.cal-vacant-dot      { background: #e2e8f0; border: 1px solid #cbd5e1; }
+.cal-reserved-dot    { background: #bfdbfe; border: 1px solid #60a5fa; }
+.cal-confirmed-dot   { background: #1d4ed8; }
+.cal-checkedin-dot   { background: #dc2626; }
+.cal-dirty-dot       { background: #fef3c7; border: 1px solid #fcd34d; }
+.cal-maintenance-dot { background: #e5e7eb; border: 1px solid #9ca3af; }
+
+/* ── Rooms Overview card colors ────────────────────────────── */
+.overview-card-vacant      { background: #6B8E23; }
+.overview-card-reserved    { background: #3b82f6; }
+.overview-card-confirmed   { background: #1d4ed8; }
+.overview-card-occupied    { background: #C2410C; }
+.overview-card-dirty       { background: #D97706; }
+.overview-card-maintenance { background: #6B7280; }
+
+/* ── Quick-action popover ──────────────────────────────────── */
+#resPopover {
+    position: fixed; z-index: 9999;
+    background: #fff; border: 1px solid #e2e8f0;
+    border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.14);
+    padding: 0; min-width: 200px; font-size: .82rem;
+    display: none;
+}
+#resPopover .pop-header {
+    padding: 10px 14px 8px; border-bottom: 1px solid #f1f5f9;
+}
+#resPopover .pop-name   { font-weight: 700; font-size: .88rem; color: #0f172a; }
+#resPopover .pop-sub    { font-size: .72rem; color: #64748b; margin-top: 1px; }
+#resPopover .pop-actions { padding: 6px 0; }
+#resPopover .pop-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 14px; width: 100%;
+    background: none; border: none; text-align: left;
+    font-size: .8rem; color: #1e293b; cursor: pointer;
+    transition: background .1s;
+}
+#resPopover .pop-btn:hover { background: #f8fafc; }
+#resPopover .pop-btn i { width: 14px; }
+#resPopover .pop-divider { height: 1px; background: #f1f5f9; margin: 4px 0; }
+
+/* ── Move confirm toast ────────────────────────────────────── */
+#planToast {
+    position: fixed; bottom: 24px; right: 24px; z-index: 9998;
+    min-width: 300px; max-width: 420px;
+    background: #fff; border: 1px solid #e2e8f0;
+    border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,.12);
+    padding: 14px 16px; display: none;
+    font-size: .82rem;
+}
+#planToast .toast-title { font-weight: 700; margin-bottom: 6px; }
+#planToast .toast-btns  { display: flex; gap: 8px; margin-top: 10px; justify-content: flex-end; }
+#planToast .btn-confirm { background:#16a34a; color:#fff; border:none; border-radius:6px; padding:5px 14px; cursor:pointer; font-size:.8rem; }
+#planToast .btn-cancel  { background:#f1f5f9; color:#374151; border:none; border-radius:6px; padding:5px 14px; cursor:pointer; font-size:.8rem; }
+#planToast .toast-err   { color:#dc2626; font-size:.78rem; margin-top:5px; display:none; }
+
+#roomViewTabs .nav-link { color: var(--warm-text, #4a3728); }
+#roomViewTabs .nav-link.active { font-weight: 600; color: var(--warm-primary, #8B5E3C); border-bottom-color: var(--warm-primary, #8B5E3C); }
+
+/* Checkout alert — pulse animations */
+@keyframes pulseRed {
+    0%   { box-shadow: 0 0 0 0   rgba(220,53,69,0.75); }
+    70%  { box-shadow: 0 0 0 10px rgba(220,53,69,0); }
+    100% { box-shadow: 0 0 0 0   rgba(220,53,69,0); }
+}
+@keyframes pulseAmber {
+    0%   { box-shadow: 0 0 0 0   rgba(249,115,22,0.7); }
+    70%  { box-shadow: 0 0 0 8px rgba(249,115,22,0); }
+    100% { box-shadow: 0 0 0 0   rgba(249,115,22,0); }
+}
+
+/* card needs relative so checkout time can be positioned absolute */
+.overview-card { position: relative; overflow: hidden; }
+
+/* ── Overdue escalation ─────────────────────────────────────── */
+/* 30–120 min overdue, checkout not yet started → soft amber */
+.overview-card.alert-overdue-verify {
+    outline: 3px solid #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245,158,11,0.30);
+}
+/* 120+ min overdue, no checkout initiated → orange action needed */
+.overview-card.alert-overstay {
+    outline: 3px solid #ea580c;
+    animation: pulseAmber 1.4s ease-out infinite;
+}
+/* 120+ min overdue AND checkout was initiated → deepest red, fastest pulse */
+.overview-card.alert-overdue-critical {
+    outline: 4px solid #7f1d1d;
+    animation: pulseRed 0.8s ease-out infinite;
+}
+
+/* ── Due-soon gradient ─────────────────────────────────────── */
+/* <30 min → orange urgent */
+.overview-card.alert-due-urgent {
+    outline: 3px solid #f97316;
+    animation: pulseAmber 1.8s ease-out infinite;
+}
+/* 30–120 min → amber (static) */
+.overview-card.alert-due-soon {
+    outline: 3px solid #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245,158,11,0.35);
+}
+
+/* ── Alert badge inside card ──────────────────────────────── */
+.ci-alert-badge {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 3px;
+    margin-top: 5px;
+    line-height: 1.4;
+    cursor: default;
+}
+.ci-alert-badge.due-soon        { background: #fef3c7; color: #92400e; }
+.ci-alert-badge.due-urgent      { background: #ffedd5; color: #c2410c; }
+.ci-alert-badge.overdue-verify  { background: #fef9c3; color: #854d0e; }
+.ci-alert-badge.overstay        { background: #fed7aa; color: #9a3412; font-weight: 800; }
+.ci-alert-badge.overdue-critical{ background: #7f1d1d; color: #fff; font-weight: 900; letter-spacing: 0.4px; }
+
+/* ── Checkout time — top-right absolute ─────────────────── */
+.card-co-time {
+    position: absolute;
+    top: 5px; right: 6px;
+    text-align: right;
+    line-height: 1.1;
+    pointer-events: none;
+}
+.card-co-time .co-time-val  { font-size: 13px; font-weight: 800; letter-spacing: 0.4px; }
+.card-co-time .co-time-lbl  { font-size: 9px; opacity: 0.75; }
+</style>
+{% endblock %}
+
+<!-- Quick-action popover -->
+<div id="resPopover">
+    <div class="pop-header">
+        <div class="pop-name" id="popGuestName">—</div>
+        <div class="pop-sub"  id="popSubLine">—</div>
+    </div>
+    <div class="pop-actions" id="popActions"></div>
+</div>
+
+<!-- Move/resize confirmation toast -->
+<div id="planToast">
+    <div class="toast-title" id="toastTitle"></div>
+    <div id="toastBody"></div>
+    <div class="toast-err" id="toastErr"></div>
+    <div class="toast-btns">
+        <button class="btn-cancel"  onclick="cancelPlan()">Cancel</button>
+        <button class="btn-confirm" onclick="confirmPlan()">Confirm</button>
+    </div>
+</div>
+
+{% block scripts %}
+<script nonce="{{ csp_nonce }}">
+function filterFloor(val) {
+    document.querySelectorAll('.floor-row').forEach(row => {
+        row.style.display = (!val || row.dataset.floor === val) ? '' : 'none';
+    });
+}
+
+function filterOverviewFloor(val) {
+    document.querySelectorAll('.overview-room-card').forEach(card => {
+        card.style.display = (!val || card.dataset.floor === val) ? '' : 'none';
+    });
+}
+
+// Persist active local tab across refresh
+document.getElementById('roomViewTabs').addEventListener('shown.bs.tab', function (e) {
+    sessionStorage.setItem('roomGridTab', e.target.dataset.bsTarget);
+});
+
+(function () {
+    const saved = sessionStorage.getItem('roomGridTab');
+    if (saved && saved !== '#calendarView') {
+        const btn = document.querySelector(`#roomViewTabs [data-bs-target="${saved}"]`);
+        if (btn) bootstrap.Tab.getOrCreateInstance(btn).show();
+    }
+})();
+
+// ── Checkout Alert Engine ────────────────────────────────────────────────────
+(function () {
+    'use strict';
+
+    var MS_30M  =  30 * 60 * 1000;
+    var MS_120M = 120 * 60 * 1000;
+
+    // All CSS classes ever applied — cleared atomically each tick
+    var ALL_ALERT_CLASSES = [
+        'alert-overdue-verify', 'alert-overstay', 'alert-overdue-critical',
+        'alert-due-urgent', 'alert-due-soon'
+    ];
+
+    // Hotel's configured default checkout time for Regular bookings.
+    // Comes from Settings table (key: default_checkout_time); falls back to noon.
+    var RG_DEFAULT_CHECKOUT_HM = {{ default_checkout_hm | tojson }};
+
+    // Safe datetime builder — uses local ISO, never UTC midnight.
+    // For Regular bookings with no stored checkout_time, uses RG_DEFAULT_CHECKOUT_HM.
+    function buildCheckoutDateTime(dateStr, timeStr, bookingType) {
+        if (!dateStr) return null;
+        var t = (timeStr || '').trim();
+        if (!t) {
+            if (bookingType === 'Hourly') return null;   // Hourly must have explicit time
+            t = RG_DEFAULT_CHECKOUT_HM;
+        }
+        if (!/^\d{1,2}:\d{2}$/.test(t)) t = RG_DEFAULT_CHECKOUT_HM;
+        var dt = new Date(dateStr + 'T' + t);
+        return isNaN(dt.getTime()) ? null : dt;
+    }
+
+    // Human-readable: "25 min" | "1 hr 10 min" | "2 hr"
+    function fmtDuration(ms) {
+        var totalMin = Math.round(Math.abs(ms) / 60000);
+        if (totalMin < 1) totalMin = 1;
+        if (totalMin < 60) return totalMin + ' min';
+        var h = Math.floor(totalMin / 60), m = totalMin % 60;
+        return m > 0 ? h + ' hr ' + m + ' min' : h + ' hr';
+    }
+
+    // Single reusable alert-state function.
+    // Returns: { state, cardClass, badgeClass, label, sortOrder }
+    //
+    // States (by priority):
+    //   overdue_critical  — 120+ min past checkout AND checkout was initiated (staff stuck)
+    //   overstay          — 120+ min past checkout, no checkout started yet
+    //   overdue_verify    — 30–120 min past checkout (soft: go check on guest)
+    //   due_urgent        — within 30 min before checkout
+    //   due_soon          — within threshold before checkout
+    //   normal            — no alert
+    //
+    // 0–30 min past checkout: silent (guest packing / brief delay — normal hotel ops)
+    function getCheckoutAlertState(bookingType, checkoutDate, checkoutTime, checkoutInitiated) {
+        var NORMAL = { state: 'normal', cardClass: '', badgeClass: '', label: '', sortOrder: 99 };
+        var dt = buildCheckoutDateTime(checkoutDate, checkoutTime, bookingType);
+        if (!dt) return NORMAL;
+
+        var msUntil   = dt.getTime() - Date.now();
+        var threshold = (bookingType === 'Hourly') ? MS_30M : MS_120M;
+
+        // ── Before checkout ──────────────────────────────────────────────────
+        if (msUntil > 0) {
+            if (msUntil <= threshold) {
+                if (msUntil <= MS_30M) {
+                    return { state: 'due_urgent', cardClass: 'alert-due-urgent',
+                             badgeClass: 'due-urgent',
+                             label: '\u23f1 Due in ' + fmtDuration(msUntil), sortOrder: 3 };
+                }
+                return { state: 'due_soon', cardClass: 'alert-due-soon',
+                         badgeClass: 'due-soon',
+                         label: '\u23f1 Due in ' + fmtDuration(msUntil), sortOrder: 4 };
+            }
+            return NORMAL;
+        }
+
+        // ── Past checkout ────────────────────────────────────────────────────
+        var msOver = -msUntil;   // total ms since checkout time
+
+        // 0–30 min: silent (normal packing / brief checkout delay)
+        if (msOver <= MS_30M) return NORMAL;
+
+        // 30–120 min: soft prompt — go verify with guest
+        if (msOver <= MS_120M) {
+            return { state: 'overdue_verify', cardClass: 'alert-overdue-verify',
+                     badgeClass: 'overdue-verify',
+                     label: '\u26a0 Overdue \u2014 verify', sortOrder: 2 };
+        }
+
+        // 120+ min: escalate based on whether checkout was initiated
+        if (checkoutInitiated) {
+            // Staff opened checkout form but never completed it — true process blocker
+            return { state: 'overdue_critical', cardClass: 'alert-overdue-critical',
+                     badgeClass: 'overdue-critical',
+                     label: '\u26a0\ufe0f CRITICAL \u2014 ' + fmtDuration(msOver), sortOrder: 0 };
+        }
+        // No checkout started — operational issue, guest may be extending
+        return { state: 'overstay', cardClass: 'alert-overstay',
+                 badgeClass: 'overstay',
+                 label: '\u26a0 Overstay \u2014 action needed', sortOrder: 1 };
+    }
+
+    function updateOverviewAlerts() {
+        var dueSoon = 0, overdueCount = 0;
+
+        // Collect all cards with their computed states for sorting
+        var cardStates = [];
+
+        document.querySelectorAll('.overview-room-card').forEach(function (outerCard) {
+            var card  = outerCard.querySelector('.overview-card');
+            var badge = outerCard.querySelector('.ci-alert-badge');
+            if (!card || !badge) return;
+
+            // ── Atomic reset — remove ALL possible alert classes ──────────────
+            ALL_ALERT_CLASSES.forEach(function (cls) { card.classList.remove(cls); });
+            badge.className   = 'ci-alert-badge';
+            badge.textContent = '';
+            badge.removeAttribute('title');
+
+            // Fail-safe: only occupied rooms
+            if (outerCard.dataset.resStatus !== 'occupied') {
+                outerCard.dataset.alertSortOrder = '99';
+                cardStates.push({ el: outerCard, order: 99 });
+                return;
+            }
+            var checkoutDate = outerCard.dataset.checkoutDate || '';
+            // Guard: skip historically-dated stays (departure before PMS business date)
+            var BIZ_DATE = '{{ today.isoformat() }}';
+            if (checkoutDate && BIZ_DATE && checkoutDate < BIZ_DATE) {
+                outerCard.dataset.alertSortOrder = '99';
+                cardStates.push({ el: outerCard, order: 99 });
+                return;
+            }
+            if (!checkoutDate) {
+                outerCard.dataset.alertSortOrder = '99';
+                cardStates.push({ el: outerCard, order: 99 });
+                return;
+            }
+
+            var result = getCheckoutAlertState(
+                outerCard.dataset.bookingType     || 'Regular',
+                checkoutDate,
+                outerCard.dataset.checkoutTime    || '',
+                outerCard.dataset.checkoutInitiated === 'true'
+            );
+
+            if (result.cardClass) {
+                card.classList.add(result.cardClass);
+                badge.classList.add(result.badgeClass);
+                badge.textContent = result.label;
+                badge.title = result.sortOrder === 0
+                    ? 'CRITICAL: checkout was initiated but not completed'
+                    : result.sortOrder === 1
+                    ? 'Guest overstaying — contact front desk'
+                    : result.sortOrder === 2
+                    ? 'Checkout overdue — verify with guest'
+                    : 'Checkout time approaching';
+                if (result.sortOrder <= 1) overdueCount++;
+                else dueSoon++;
+            }
+
+            outerCard.dataset.alertSortOrder = String(result.sortOrder);
+            cardStates.push({ el: outerCard, order: result.sortOrder });
+        });
+
+        // ── Sort: overdue-critical → overdue-severe → overdue → due-urgent → due-soon → normal
+        var grid = document.getElementById('overviewGrid');
+        if (grid) {
+            cardStates.sort(function (a, b) { return a.order - b.order; });
+            cardStates.forEach(function (item) { grid.appendChild(item.el); });
+        }
+
+        // ── Summary bar ───────────────────────────────────────────────────────
+        var bar = document.getElementById('alertSummaryBar');
+        var txt = document.getElementById('alertSummaryText');
+        if (!bar || !txt) return;
+
+        if (dueSoon + overdueCount > 0) {
+            txt.textContent = 'Overdue: ' + overdueCount + '  \u2502  Due Soon: ' + dueSoon;
+            bar.classList.remove('d-none', 'alert-danger', 'alert-warning');
+            bar.classList.add(overdueCount > 0 ? 'alert-danger' : 'alert-warning');
+        } else {
+            bar.classList.remove('alert-danger', 'alert-warning');
+            bar.classList.add('d-none');
+        }
+    }
+
+    // One immediate run + exactly one 60s interval
+    updateOverviewAlerts();
+    setInterval(updateOverviewAlerts, 60000);
+})();
+
+// ═══════════════════════════════════════════════════════════════════════
+// Planning Board — Drag & Drop Engine
+// ═══════════════════════════════════════════════════════════════════════
+(function () {
+'use strict';
+
+// ── State ──────────────────────────────────────────────────────────────
+var _drag = null;   // current drag payload
+var _pendingAction = null;  // move/resize action waiting for confirmation
+var _lastOver = null;       // last hovered drop-zone td
+
+// ── Utility ────────────────────────────────────────────────────────────
+function daysBetween(a, b) {
+    return Math.round((new Date(b) - new Date(a)) / 86400000);
+}
+function addDays(iso, n) {
+    var d = new Date(iso); d.setDate(d.getDate() + n);
+    return d.toISOString().split('T')[0];
+}
+function fmtDate(iso) {
+    var d = new Date(iso + 'T00:00:00');
+    return d.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+}
+function clearDropStyles() {
+    document.querySelectorAll('.drop-valid,.drop-invalid,.drop-hover').forEach(function(el){
+        el.classList.remove('drop-valid','drop-invalid','drop-hover');
+    });
+    document.querySelectorAll('.drag-source').forEach(function(el){
+        el.classList.remove('drag-source');
+    });
+}
+
+// ── Drag-start ─────────────────────────────────────────────────────────
+document.getElementById('gridTable').addEventListener('dragstart', function(e) {
+    // Resize handle drag
+    var handle = e.target.closest('[data-action="resize"]');
+    if (handle) {
+        _drag = {
+            action:    'resize',
+            resId:     handle.dataset.resId,
+            arrival:   handle.dataset.resArrival,
+            departure: handle.dataset.resDeparture,
+            roomId:    handle.dataset.resRoom,
+            guest:     handle.dataset.resGuest,
+        };
+        e.dataTransfer.setData('text/plain', 'resize:' + _drag.resId);
+        e.dataTransfer.effectAllowed = 'move';
+        return;
+    }
+
+    // Reservation cell drag
+    var td = e.target.closest('td[data-res-id]');
+    if (!td) return;
+
+    var resType = td.dataset.resType;
+
+    // Checked-in: only Admin/Manager can drag (enforced by popover, but also guard here)
+    // We allow the drag to start; server will reject if unauthorised
+
+    _drag = {
+        action:     'move',
+        resId:      td.dataset.resId,
+        resType:    resType,
+        roomId:     td.dataset.resRoom,
+        roomTypeId: td.dataset.resRoomType,
+        arrival:    td.dataset.resArrival,
+        departure:  td.dataset.resDeparture,
+        nights:     parseInt(td.dataset.resNights) || 1,
+        guest:      td.dataset.resGuest,
+        originDate: td.dataset.date,
+        originRoom: td.dataset.roomId,
+    };
+
+    e.dataTransfer.setData('text/plain', 'move:' + _drag.resId);
+    e.dataTransfer.effectAllowed = 'move';
+
+    // Dim all cells belonging to this reservation
+    document.querySelectorAll('td[data-res-id="' + _drag.resId + '"]').forEach(function(c){
+        c.classList.add('drag-source');
+    });
+}, false);
+
+// ── Drag-over ──────────────────────────────────────────────────────────
+document.getElementById('gridTable').addEventListener('dragover', function(e) {
+    if (!_drag) return;
+
+    var td = e.target.closest('td[data-room-id]');
+    if (!td || td === _lastOver) { e.preventDefault(); return; }
+    _lastOver = td;
+
+    // Clear previous
+    document.querySelectorAll('.drop-valid,.drop-invalid,.drop-hover').forEach(function(el){
+        el.classList.remove('drop-valid','drop-invalid','drop-hover');
+    });
+
+    var targetRoomId   = td.dataset.roomId;
+    var targetDate     = td.dataset.date;
+    var targetRoomType = td.dataset.roomType;
+    var existingRes    = td.dataset.resId;
+
+    var valid = false;
+
+    if (_drag.action === 'resize') {
+        // For resize: can drop on any cell in same room, after arrival
+        if (td.dataset.roomId === _drag.roomId && targetDate >= _drag.arrival) {
+            valid = true;
+        }
+    } else {
+        // For move: cannot drop on cell occupied by another reservation
+        if (existingRes && existingRes !== _drag.resId) {
+            valid = false;
+        } else if (!targetRoomType || targetRoomType !== _drag.roomTypeId) {
+            // Room type mismatch — still allow but server will reject; show as warning hover
+            td.classList.add('drop-hover');
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            return;
+        } else {
+            valid = true;
+        }
+    }
+
+    td.classList.add(valid ? 'drop-valid' : 'drop-invalid');
+    e.preventDefault();
+    e.dataTransfer.dropEffect = valid ? 'move' : 'none';
+}, false);
+
+// ── Drag-end ───────────────────────────────────────────────────────────
+document.getElementById('gridTable').addEventListener('dragend', function() {
+    clearDropStyles();
+    _lastOver = null;
+    // Don't clear _drag here — drop event fires before dragend
+}, false);
+
+// ── Drop ───────────────────────────────────────────────────────────────
+document.getElementById('gridTable').addEventListener('drop', function(e) {
+    e.preventDefault();
+    clearDropStyles();
+
+    if (!_drag) return;
+    var td = e.target.closest('td[data-room-id]');
+    if (!td) { _drag = null; return; }
+
+    var newRoomId = td.dataset.roomId;
+    var newDate   = td.dataset.date;
+
+    if (_drag.action === 'resize') {
+        // new departure = day after the dropped cell
+        var newDep = addDays(newDate, 1);
+        if (newDep <= _drag.arrival) { _drag = null; return; }
+        var newNights = daysBetween(_drag.arrival, newDep);
+        _pendingAction = {
+            type:       'resize',
+            resId:      _drag.resId,
+            guest:      _drag.guest,
+            newDep:     newDep,
+            nights:     newNights,
+        };
+        showToast(
+            '\u21D4 Resize Stay',
+            '<b>' + _drag.guest + '</b> — change checkout to <b>' +
+            fmtDate(newDep) + '</b> (' + newNights + ' night' + (newNights !== 1 ? 's' : '') + ')?'
+        );
+    } else {
+        // move
+        var dateShift  = daysBetween(_drag.arrival, newDate);
+        var sameRoom   = (newRoomId === _drag.roomId);
+        var sameDate   = (dateShift === 0);
+        if (sameRoom && sameDate) { _drag = null; return; }  // no change
+
+        var newArr = addDays(_drag.arrival, dateShift);
+        var newDep2 = addDays(_drag.departure, dateShift);
+        _pendingAction = {
+            type:       'move',
+            resId:      _drag.resId,
+            guest:      _drag.guest,
+            newRoomId:  newRoomId,
+            dateShift:  dateShift,
+            newArr:     newArr,
+            newDep:     newDep2,
+            oldRoomId:  _drag.roomId,
+        };
+
+        var desc = '<b>' + _drag.guest + '</b> — move to';
+        if (!sameRoom) desc += ' Room <b>' + (td.closest('tr') ? td.closest('tr').querySelector('td')?.textContent.trim().split('\n')[0] : newRoomId) + '</b>';
+        if (!sameDate) desc += ' from <b>' + fmtDate(newArr) + '</b> to <b>' + fmtDate(newDep2) + '</b>';
+        desc += '?';
+        showToast(dateShift !== 0 ? '\u2194 Move Dates' : '\u21C5 Move Room', desc);
+    }
+
+    _drag = null;
+}, false);
+
+// ── Toast helpers ──────────────────────────────────────────────────────
+function showToast(title, body) {
+    document.getElementById('toastTitle').textContent = title;
+    document.getElementById('toastBody').innerHTML    = body;
+    document.getElementById('toastErr').style.display = 'none';
+    document.getElementById('toastErr').textContent   = '';
+    var t = document.getElementById('planToast');
+    t.style.display = 'block';
+    // Auto-hide after 30s if not acted on
+    clearTimeout(t._timer);
+    t._timer = setTimeout(cancelPlan, 30000);
+}
+
+window.cancelPlan = function() {
+    document.getElementById('planToast').style.display = 'none';
+    _pendingAction = null;
+};
+
+window.confirmPlan = function() {
+    if (!_pendingAction) return;
+    var p = _pendingAction;
+    var errEl = document.getElementById('toastErr');
+    errEl.style.display = 'none';
+
+    var url, body;
+    if (p.type === 'move') {
+        url  = '/api/reservation/move';
+        body = { reservation_id: p.resId, new_room_id: p.newRoomId, date_shift: p.dateShift };
+    } else {
+        url  = '/api/reservation/resize';
+        body = { reservation_id: p.resId, new_departure: p.newDep };
+    }
+
+    fetch(url, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(body),
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.ok) {
+            document.getElementById('planToast').style.display = 'none';
+            _pendingAction = null;
+            // Reload to reflect change
+            window.location.reload();
+        } else {
+            errEl.textContent   = data.error || 'Action failed';
+            errEl.style.display = 'block';
+        }
+    })
+    .catch(function() {
+        errEl.textContent   = 'Network error — please try again';
+        errEl.style.display = 'block';
+    });
+};
+
+// ── Quick-action popover ───────────────────────────────────────────────
+var _popoverOpenFor = null;
+
+window.openResPopover = function(e, resId) {
+    e.stopPropagation();
+    var td   = e.currentTarget.closest('td[data-res-id]') || e.target.closest('td[data-res-id]');
+    if (!td) td = e.target.closest('td');
+    if (!td) return;
+
+    var guest    = td.dataset.resGuest || '—';
+    var resType  = td.dataset.resType  || '';
+    var arr      = td.dataset.resArrival   || '';
+    var dep      = td.dataset.resDeparture || '';
+    var nights   = td.dataset.resNights    || '?';
+
+    var pop = document.getElementById('resPopover');
+
+    if (_popoverOpenFor === resId && pop.style.display === 'block') {
+        closePopover(); return;
+    }
+    _popoverOpenFor = resId;
+
+    document.getElementById('popGuestName').textContent = guest;
+    document.getElementById('popSubLine').textContent   =
+        (arr ? fmtDate(arr) : '') + ' → ' + (dep ? fmtDate(dep) : '') +
+        ' · ' + nights + ' night' + (nights != 1 ? 's' : '') +
+        ' · ' + resType.charAt(0).toUpperCase() + resType.slice(1);
+
+    // Build action buttons
+    var actions = [];
+    if (resType === 'reserved' || resType === 'confirmed') {
+        actions.push({ icon: 'bi-box-arrow-in-right', label: 'Check In',         url: '/reservations/' + resId + '/checkin' });
+    }
+    if (resType === 'checkedin') {
+        actions.push({ icon: 'bi-box-arrow-right',    label: 'Check Out',        url: '/checkout/'  + resId });
+        actions.push({ icon: 'bi-wallet2',             label: 'View Folio',       url: '/folio/'   + resId });
+        actions.push({ icon: 'bi-receipt',             label: 'View Invoice',     url: '/invoice/' + resId });
+    }
+    actions.push(  { icon: 'bi-pencil-square',        label: 'Edit Reservation', url: '/reservation/' + resId + '/edit' });
+    if (resType !== 'checkedin') {
+        actions.push({ icon: 'bi-x-circle',           label: 'Cancel',           url: '/reservation/' + resId + '/cancel', cls: 'text-danger' });
+    }
+
+    var html = '';
+    actions.forEach(function(a, i) {
+        if (i > 0 && (i === actions.length - 1) && actions.length > 2) html += '<div class="pop-divider"></div>';
+        if (a.label === 'Cancel') {
+            // Cancel is POST-only — render a form button
+            html += '<form method="POST" action="' + a.url + '" style="margin:0;" onsubmit="return confirm(\'Cancel this reservation?\')">' +
+                    '<button type="submit" class="pop-btn text-danger w-100">' +
+                    '<i class="bi ' + a.icon + '"></i>' + a.label + '</button></form>';
+        } else {
+            html += '<a href="' + a.url + '" class="pop-btn' + (a.cls ? ' ' + a.cls : '') + '">' +
+                    '<i class="bi ' + a.icon + '"></i>' + a.label + '</a>';
+        }
+    });
+    document.getElementById('popActions').innerHTML = html;
+
+    // Position near click
+    pop.style.display = 'block';
+    var rect = e.currentTarget.getBoundingClientRect ? e.currentTarget.getBoundingClientRect() : {left:e.clientX, bottom:e.clientY, top:e.clientY};
+    var left = (rect.left || e.clientX);
+    var top  = (rect.bottom || e.clientY) + 6;
+    // Keep within viewport
+    if (left + 210 > window.innerWidth)  left = window.innerWidth - 220;
+    if (top  + 260 > window.innerHeight) top  = (rect.top  || e.clientY) - 270;
+    pop.style.left = left + 'px';
+    pop.style.top  = top  + 'px';
+};
+
+function closePopover() {
+    document.getElementById('resPopover').style.display = 'none';
+    _popoverOpenFor = null;
+}
+
+document.addEventListener('click', function(e) {
+    if (!document.getElementById('resPopover').contains(e.target)) {
+        closePopover();
+    }
+});
+
+// ── Auto-scroll near edges while dragging ─────────────────────────────
+var _scrollInterval = null;
+document.getElementById('calendarScroll').addEventListener('dragover', function(e) {
+    var el    = document.getElementById('calendarScroll');
+    var rect  = el.getBoundingClientRect();
+    var edge  = 60;
+    var speed = 8;
+    clearInterval(_scrollInterval);
+    if (e.clientX < rect.left + edge) {
+        _scrollInterval = setInterval(function(){ el.scrollLeft -= speed; }, 30);
+    } else if (e.clientX > rect.right - edge) {
+        _scrollInterval = setInterval(function(){ el.scrollLeft += speed; }, 30);
+    }
+}, false);
+document.getElementById('calendarScroll').addEventListener('dragleave', function() {
+    clearInterval(_scrollInterval);
+}, false);
+document.getElementById('calendarScroll').addEventListener('drop', function() {
+    clearInterval(_scrollInterval);
+}, false);
+
+})(); // end planning board IIFE
+</script>
+{% endblock %}

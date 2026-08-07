@@ -1,0 +1,320 @@
+====================================================================================================
+DSBC FRONTLINE — HISTORICAL REPLAY
+Production Verification Framework, Wave 0 Deliverable 3
+====================================================================================================
+Started           : 2026-08-04T11:29:28
+Duration          : 3.5s
+Application       : v2.2.18
+PVF               : v0.2.0
+Business date     : 2026-05-28
+History replayed  : 2026-05-27 .. 2026-05-28
+
+----------------------------------------------------------------------------------------------------
+CONTROLS (Principle 11 — positive evidence, not silence)
+----------------------------------------------------------------------------------------------------
+Source database   : C:\Users\SIPL Server\Downloads\DSS\SukoonPMS\SukoonPMS\instance\pms.db
+Copy method       : sqlite-backup-api
+SHA-256 before    : f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c
+SHA-256 after     : f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c
+  read-only       : VERIFIED — production byte-identical after run
+  frozen clock    : proven on 28/28 dates (each date re-installs and re-proves the freeze)
+  ledger stable   : VERIFIED — the primary record is byte-identical before and after the application ran
+  order independent: VERIFIED — replaying the dates in reverse produced identical figures
+
+----------------------------------------------------------------------------------------------------
+COVERAGE
+----------------------------------------------------------------------------------------------------
+  Dates replayed        : 28  (2 with primary records, 26 with none — replayed anyway)
+  Closed (night audit)  : 1
+  With frozen snapshot  : 1
+  Reconciliations       : 36 reconciled, 0 UNRECONCILED, 2 not comparable, 494 on days with no activity
+  As-at drift           : 0 figures move when a closed day is asked about today
+  History drift         : 1 figures differ from what was frozen at close
+  Engine probe errors   : 0
+
+  OVERALL VERDICT       : FAIL
+  Blocking findings     : 1
+
+====================================================================================================
+HISTORY DRIFT — today's code disagrees with what was frozen at close
+====================================================================================================
+These dates were closed and the figures reported. Recomputing
+them now gives a different answer. Either the data moved after
+the close, or the code changed what the day means.
+
+2026-05-27 (Warning) — 1 figures
+      nas.folio_control.total_outstanding vs snapshot.folio.total_outstanding
+          frozen at close : 0.16
+          recomputed now  : 200.15
+
+====================================================================================================
+DATES
+====================================================================================================
+DATE        STATE      PAY  CHG  TAX  NGT   LEDGER ENGINE  RECON UNREC DRIFT     ms
+----------------------------------------------------------------------------------------------------
+2026-05-27  CLOSED      16    1   28   14       51    317     17     0     0     68
+2026-05-28  TODAY       19    4   38   16       51    337     19     0     0     82
+
+  26 further dates were replayed and carry no primary record and no finding:
+      2026-05-01 .. 2026-05-26
+  They are present in full in result.json. They are summarised
+  here rather than omitted, because a day that later acquires a
+  back-dated posting must be visible as a change against the
+  stored replay.
+
+====================================================================================================
+NOT REPLAYABLE — engine entry points with no historical form
+====================================================================================================
+These publish a figure for "now" and cannot answer for a past date.
+Any report showing one of them under a historical heading is showing
+today's number.
+  kpi_helpers.get_occupancy
+      takes no date; counts reservations in-house NOW
+  kpi_helpers.get_occupied_count
+      takes no date; counts reservations in-house NOW
+  kpi_helpers.get_adr
+      takes no date; averages the tariffs of CURRENTLY checked-in reservations, so it returns 0.00 for every past date once the guests have left
+  kpi_helpers.get_revpar
+      derived from get_adr and get_occupancy, both present-tense
+  kpi_helpers.get_sellable_room_count
+      reads Room.status, which is present-tense: it says what a room is like now, not what it was like on the replayed date
+  occupancy_engine.occupancy_snapshot
+      reads Room.status; same present-tense limitation
+  night_audit_service.NightAuditService.occupancy_position (room half)
+      the reservation half is date-scoped and IS replayed; the room counts inside it derive from Room.status and are not
+
+====================================================================================================
+AS-AT COMPARISON EXCLUSIONS
+====================================================================================================
+  nas.audit_header.generated_at   (matched on 27 date(s))
+      records when the report was generated, not what happened on the date. It is SUPPOSED to move when the clock moves.
+
+====================================================================================================
+REPLAY WINDOW
+====================================================================================================
+  INCLUDED  2026-05-01..2026-05-26
+      earlier than the first activity, included anyway so month-to-date figures can be checked against the sum of their days
+  EXCLUDED  2026-05-29
+      later than the current business date — a future booking, not history
+
+====================================================================================================
+DATE-INSENSITIVE ENGINE FIGURES (80)
+====================================================================================================
+Held the same value on all 28 replayed dates. A
+date-scoped figure that never moves is either genuinely constant
+or not date-scoped at all — a present-tense number published
+under a historical heading. Informational: the framework states
+the fact, the judgement is an engineering one.
+  kpi.accrual_summary.accrual_discount                             = 0
+  kpi.accrual_summary[len]                                         = 5
+  kpi.cash_discount                                                = 0
+  kpi.cash_summary.cash_discount                                   = 0
+  kpi.cash_summary[len]                                            = 4
+  kpi.dashboard_kpis.accrual_discount                              = 0
+  kpi.dashboard_kpis.adr                                           = 0
+  kpi.dashboard_kpis.cash_discount                                 = 0
+  kpi.dashboard_kpis.occupancy_pct                                 = 0
+  kpi.dashboard_kpis.occupied                                      = 0
+  kpi.dashboard_kpis.revpar                                        = 0
+  kpi.dashboard_kpis.sellable                                      = 39
+  kpi.dashboard_kpis.total_rooms                                   = 39
+  kpi.dashboard_kpis[len]                                          = 15
+  kpi.previous_month_revenue                                       = 0
+  nas.audit_header.blocker_count                                   = 0
+  nas.audit_header.warning_count                                   = 0
+  nas.audit_header[len]                                            = 11
+  nas.final_control.reconciliation_difference                      = 0
+  nas.final_control.warning_count                                  = 0
+  nas.final_control[len]                                           = 10
+  nas.folio_control.company_credit_count                           = 0
+  nas.folio_control.company_credit_outstanding                     = 0
+  nas.folio_control.credit_created_count_today                     = 0
+  nas.folio_control.credit_created_today                           = 0
+  nas.folio_control.credit_overdue_15_count                        = 0
+  nas.folio_control.credit_overdue_15_total                        = 0
+  nas.folio_control.credit_overdue_30_count                        = 0
+  nas.folio_control.credit_overdue_30_total                        = 0
+  nas.folio_control.credit_recovered_today                         = 0
+  nas.folio_control.credit_risky_account_count                     = 0
+  nas.folio_control.forfeit_count_today                            = 0
+  nas.folio_control.forfeit_income_today                           = 0
+  nas.folio_control.in_house_outstanding                           = 0
+  nas.folio_control.individual_credit_count                        = 1
+  nas.folio_control.individual_credit_outstanding                  = 200
+  nas.folio_control.open_folio_list[len]                           = 0
+  nas.folio_control.open_folios_count                              = 0
+  nas.folio_control.total_credit_outstanding                       = 200
+  nas.folio_control[len]                                           = 23
+  nas.occupancy_position.dirty                                     = 3
+  nas.occupancy_position.expected_not_checkedin[len]               = 0
+  nas.occupancy_position.expected_not_checkedout[len]              = 0
+  nas.occupancy_position.out_of_order                              = 0
+  nas.occupancy_position.sellable_rooms                            = 39
+  nas.occupancy_position.stayovers                                 = 0
+  nas.occupancy_position.total_rooms                               = 39
+  nas.occupancy_position.vacant                                    = 36
+  nas.occupancy_position[len]                                      = 14
+  nas.payment_summary.advance_received                             = 0
+  nas.payment_summary.advance_received_total                       = 0
+  nas.payment_summary.credit_recovered_total                       = 0
+  nas.payment_summary.net_advance_today                            = 0
+  nas.payment_summary.ota_outstanding_lifetime                     = 7977.92
+  nas.payment_summary.refund_count                                 = 0
+  nas.payment_summary.refund_issued_total                          = 0
+  nas.payment_summary.total_refunds                                = 0
+  nas.payment_summary[len]                                         = 17
+  nas.reservation_reconciliation.arrivals_by_source.direct         = 0
+  nas.reservation_reconciliation.arrivals_by_source.ota            = 0
+  nas.reservation_reconciliation.arrivals_by_source[len]           = 3
+  nas.reservation_reconciliation.cancellations_today               = 0
+  nas.reservation_reconciliation.missing_room_assignment[len]      = 0
+  nas.reservation_reconciliation.noshow_logs[len]                  = 0
+  nas.reservation_reconciliation.noshows[len]                      = 0
+  nas.reservation_reconciliation.noshows_count                     = 0
+  nas.reservation_reconciliation.occupied_rooms_no_reservation[len] = 0
+  nas.reservation_reconciliation[len]                              = 11
+  nas.revenue_summary.discount_count                               = 0
+  nas.revenue_summary.discount_list[len]                           = 0
+  nas.revenue_summary.discount_total                               = 0
+  nas.revenue_summary.early_checkin_total                          = 0
+  nas.revenue_summary[len]                                         = 21
+  nas.room_charge_audit.audit_ok                                   = True
+  nas.room_charge_audit.incorrect_tariff[len]                      = 0
+  nas.room_charge_audit.missing_count                              = 0
+  nas.room_charge_audit.missing_rent[len]                          = 0
+  nas.room_charge_audit[len]                                       = 6
+  nas.tax_snapshot.exempt_lines                                    = 0
+  nas.tax_snapshot[len]                                            = 6
+
+====================================================================================================
+ENGINE FIGURES NOT COVERED BY A DECLARED RECONCILIATION (201)
+====================================================================================================
+The framework's own coverage gap. These figures are captured and
+compared between runs, but nothing checks them against the primary
+record. Listed in full so the declared mapping cannot quietly stop
+keeping up with the application.
+  kpi.accrual_summary.accrual_discount
+  kpi.accrual_summary.accrual_extras
+  kpi.accrual_summary.accrual_gross
+  kpi.accrual_summary.accrual_room
+  kpi.cash_summary.cash_discount
+  kpi.cash_summary.cash_net
+  kpi.cash_summary.ota_receivable
+  kpi.dashboard_kpis.accrual_discount
+  kpi.dashboard_kpis.accrual_extras
+  kpi.dashboard_kpis.accrual_gross
+  kpi.dashboard_kpis.accrual_net
+  kpi.dashboard_kpis.accrual_room
+  kpi.dashboard_kpis.adr
+  kpi.dashboard_kpis.cash_discount
+  kpi.dashboard_kpis.cash_net
+  kpi.dashboard_kpis.occupancy_pct
+  kpi.dashboard_kpis.occupied
+  kpi.dashboard_kpis.ota_receivable
+  kpi.dashboard_kpis.revpar
+  kpi.dashboard_kpis.sellable
+  kpi.dashboard_kpis.total_rooms
+  kpi.ota_receivable_mtd
+  kpi.payment_by_mode.Cash
+  kpi.payment_by_mode.UPI
+  kpi.previous_month_revenue
+  kpi.revenue_by_source.Walk-in
+  nas.audit_header.blocker_count
+  nas.audit_header.business_date
+  nas.audit_header.completed_at
+  nas.audit_header.generated_at
+  nas.audit_header.log_id
+  nas.audit_header.run_at
+  nas.audit_header.warning_count
+  nas.final_control.blocker_count
+  nas.final_control.can_close
+  nas.final_control.lifetime_outstanding
+  nas.final_control.reconciliation_difference
+  nas.final_control.tax_liability
+  nas.final_control.total_collected
+  nas.final_control.total_outstanding
+  nas.final_control.total_posted_revenue
+  nas.final_control.warning_count
+  nas.folio_control.checkout_outstanding_list[0].balance
+  nas.folio_control.checkout_outstanding_list[0].paid
+  nas.folio_control.checkout_outstanding_list[0].total
+  nas.folio_control.checkout_outstanding_list[1].balance
+  nas.folio_control.checkout_outstanding_list[1].paid
+  nas.folio_control.checkout_outstanding_list[1].total
+  nas.folio_control.checkout_outstanding_list[2].balance
+  nas.folio_control.checkout_outstanding_list[2].paid
+  nas.folio_control.checkout_outstanding_list[2].total
+  nas.folio_control.checkout_outstanding_list[3].balance
+  nas.folio_control.checkout_outstanding_list[3].paid
+  nas.folio_control.checkout_outstanding_list[3].total
+  nas.folio_control.checkout_outstanding_total
+  nas.folio_control.closed_folios_count
+  nas.folio_control.company_credit_count
+  nas.folio_control.company_credit_outstanding
+  nas.folio_control.credit_created_count_today
+  nas.folio_control.credit_created_today
+  nas.folio_control.credit_overdue_15_count
+  nas.folio_control.credit_overdue_15_total
+  nas.folio_control.credit_overdue_30_count
+  nas.folio_control.credit_overdue_30_total
+  nas.folio_control.credit_recovered_today
+  nas.folio_control.credit_risky_account_count
+  nas.folio_control.forfeit_count_today
+  nas.folio_control.forfeit_income_today
+  nas.folio_control.in_house_outstanding
+  nas.folio_control.individual_credit_count
+  nas.folio_control.individual_credit_outstanding
+  nas.folio_control.negative_folios[0].balance
+  nas.folio_control.negative_folios[0].paid
+  nas.folio_control.negative_folios[0].total
+  nas.folio_control.open_folios_count
+  nas.folio_control.total_credit_outstanding
+  nas.folio_control.total_outstanding
+  nas.occupancy_position.checked_out_today_count
+  nas.occupancy_position.dirty
+  nas.occupancy_position.new_arrivals_count
+  nas.occupancy_position.occ_pct
+  nas.occupancy_position.out_of_order
+  nas.occupancy_position.sellable_rooms
+  nas.occupancy_position.stayovers
+  nas.occupancy_position.total_rooms
+  nas.occupancy_position.vacant
+  nas.payment_summary.advance_received
+  nas.payment_summary.advance_received_total
+  nas.payment_summary.by_mode.Cash.amount
+  nas.payment_summary.by_mode.Cash.count
+  nas.payment_summary.by_mode.UPI.amount
+  nas.payment_summary.by_mode.UPI.count
+  nas.payment_summary.credit_recovered_total
+  nas.payment_summary.direct_by_mode.Cash.amount
+  nas.payment_summary.direct_by_mode.Cash.count
+  nas.payment_summary.direct_by_mode.UPI.amount
+  nas.payment_summary.direct_by_mode.UPI.count
+  nas.payment_summary.net_advance_today
+  nas.payment_summary.net_collection
+  nas.payment_summary.ota_by_head.EaseMyTrip Paid.amount
+  nas.payment_summary.ota_by_head.EaseMyTrip Paid.count
+  nas.payment_summary.ota_by_head.Goibibo Paid.amount
+  nas.payment_summary.ota_by_head.Goibibo Paid.count
+  nas.payment_summary.ota_by_head.MMT Paid.amount
+  nas.payment_summary.ota_by_head.MMT Paid.count
+  nas.payment_summary.ota_by_head.Other OTA Paid.amount
+  nas.payment_summary.ota_by_head.Other OTA Paid.count
+  nas.payment_summary.ota_outstanding_lifetime
+  nas.payment_summary.refund_count
+  nas.payment_summary.refund_issued_total
+  nas.payment_summary.settlement_collected_total
+  nas.payment_summary.total_refunds
+  nas.reservation_reconciliation.arrivals_actual
+  nas.reservation_reconciliation.arrivals_by_source.direct
+  nas.reservation_reconciliation.arrivals_by_source.ota
+  nas.reservation_reconciliation.arrivals_by_source.walk_in
+  nas.reservation_reconciliation.by_status.CheckedOut
+  nas.reservation_reconciliation.cancellations_today
+  nas.reservation_reconciliation.noshows_count
+  nas.revenue_summary.accrual_gross
+  ... 81 more (see result.json)
+
+====================================================================================================
+END OF REPORT
+====================================================================================================

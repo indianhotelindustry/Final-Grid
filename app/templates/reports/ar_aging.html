@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}AR Aging Report{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Accounts Receivable Aging</h5>
+        <div>
+            <a href="{{ url_for('reports.ar_aging', format='excel') }}" class="btn btn-success btn-sm">
+                <i class="bi bi-file-earmark-excel me-1"></i>Export Excel
+            </a>
+            <a href="{{ url_for('reports.index') }}" class="btn btn-outline-secondary btn-sm ms-1">
+                <i class="bi bi-arrow-left me-1"></i>All Reports
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-3">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <small class="text-muted">Current (0-30 days)</small>
+                    <h4 class="text-success mb-0">{{ "₹{:,.0f}".format(totals.current) }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <small class="text-muted">31-60 Days</small>
+                    <h4 class="text-warning mb-0">{{ "₹{:,.0f}".format(totals.days_30) }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card border-danger">
+                <div class="card-body text-center">
+                    <small class="text-muted">61-90 Days</small>
+                    <h4 class="text-danger mb-0">{{ "₹{:,.0f}".format(totals.days_60) }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card border-dark">
+                <div class="card-body text-center">
+                    <small class="text-muted">90+ Days</small>
+                    <h4 class="text-dark mb-0">{{ "₹{:,.0f}".format(totals.days_90) }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-light d-flex justify-content-between">
+            <span>Outstanding Receivables — Total: <strong>{{ "₹{:,.0f}".format(totals.total) }}</strong></span>
+            <span class="text-muted">{{ rows|length }} account(s)</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Guest</th>
+                        <th>Company</th>
+                        <th>Invoice #</th>
+                        <th>Room</th>
+                        <th>Checkout</th>
+                        <th class="text-center">Days</th>
+                        <th class="text-end">Balance</th>
+                        <th class="text-center">Bucket</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in rows %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('main.guest_folio', reservation_id=r.reservation_id) }}">
+                                {{ r.guest_name }}
+                            </a>
+                        </td>
+                        <td>{{ r.company or '-' }}</td>
+                        <td>{{ r.invoice_number }}</td>
+                        <td>{{ r.room }}</td>
+                        <td>{{ r.checkout_date.strftime('%d %b %Y') if r.checkout_date else '-' }}</td>
+                        <td class="text-center">{{ r.days_old }}</td>
+                        <td class="text-end fw-bold">{{ "₹{:,.0f}".format(r.balance) }}</td>
+                        <td class="text-center">
+                            {% if r.bucket == 'current' %}
+                                <span class="badge bg-success">Current</span>
+                            {% elif r.bucket == 'days_30' %}
+                                <span class="badge bg-warning text-dark">31-60</span>
+                            {% elif r.bucket == 'days_60' %}
+                                <span class="badge bg-danger">61-90</span>
+                            {% else %}
+                                <span class="badge bg-dark">90+</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if not rows %}
+                    <tr><td colspan="8" class="text-muted text-center py-4">No outstanding receivables.</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

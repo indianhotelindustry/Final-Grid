@@ -1,0 +1,543 @@
+{% extends "base.html" %}
+{% block title %}Predictive Maintenance - {{ config.HOTEL_NAME }}{% endblock %}
+
+{% block styles %}
+<style>
+    .summary-card { border-radius: 12px; text-align: center; padding: 20px 10px; }
+    .summary-card .count { font-size: 2rem; font-weight: 700; line-height: 1; }
+    .health-badge { display: inline-flex; align-items: center; justify-content: center;
+        width: 56px; height: 40px; border-radius: 8px; font-weight: 700; font-size: .85rem;
+        cursor: pointer; transition: transform .15s, box-shadow .15s; color: #fff; }
+    .health-badge:hover { transform: scale(1.1); box-shadow: 0 4px 12px rgba(0,0,0,.2); }
+    .health-critical { background: #dc3545; }
+    .health-high { background: #fd7e14; }
+    .health-medium { background: #ffc107; color: #212529; }
+    .health-good { background: #198754; }
+    .risk-badge { font-size: .75rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+    .risk-Critical { background: #dc3545; color: #fff; }
+    .risk-High { background: #fd7e14; color: #fff; }
+    .risk-Medium { background: #ffc107; color: #212529; }
+    .risk-Low { background: #198754; color: #fff; }
+    .prob-bar { height: 8px; border-radius: 4px; background: #e9ecef; overflow: hidden; }
+    .prob-fill { height: 100%; border-radius: 4px; transition: width .5s; }
+    .trend-up { color: #198754; } .trend-down { color: #dc3545; } .trend-flat { color: #6c757d; }
+    .trend-arrow::before { font-weight: 700; margin-right: 4px; }
+    .trend-increasing::before { content: '\2191'; color: #dc3545; }
+    .trend-decreasing::before { content: '\2193'; color: #198754; }
+    .trend-stable::before { content: '\2194'; color: #6c757d; }
+    .overdue-row { background: #fff5f5 !important; }
+    .cat-bar { height: 22px; border-radius: 4px; min-width: 4px; transition: width .5s; }
+    .lifecycle-bar { height: 10px; border-radius: 5px; background: #e9ecef; overflow: hidden; }
+    .lifecycle-fill { height: 100%; border-radius: 5px; }
+    .gauge { width: 120px; height: 120px; position: relative; display: inline-block; }
+    .gauge-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        font-size: 1.5rem; font-weight: 700; }
+    #loadingSpinner { display: none; }
+    .empty-state { text-align: center; padding: 40px 20px; color: #6c757d; }
+    .canvas-trend { width: 100%; height: 150px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3 py-3">
+
+    <!-- Header -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-3 gap-2">
+        <div>
+            <h4 class="mb-0"><i class="bi bi-tools me-2"></i>Predictive Maintenance</h4>
+            <small class="text-muted">AI-powered failure prediction, health scoring & preventive scheduling</small>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <button id="btnGenerate" class="btn btn-outline-primary btn-sm" onclick="generateSchedules()">
+                <i class="bi bi-calendar-plus me-1"></i>Generate Schedules
+            </button>
+            <button id="btnRefresh" class="btn btn-primary btn-sm" onclick="loadDashboard()">
+                <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loadingSpinner" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <div class="mt-2 text-muted">Analyzing maintenance patterns...</div>
+    </div>
+
+    <div id="dashboardContent" style="display:none;">
+
+    <!-- Summary Cards -->
+    <div class="row g-2 mb-3" id="summaryRow">
+        <div class="col-6 col-md">
+            <div class="summary-card bg-white border shadow-sm">
+                <div class="count text-danger" id="sumRisk">0</div>
+                <div class="small text-muted">Rooms at Risk</div>
+            </div>
+        </div>
+        <div class="col-6 col-md">
+            <div class="summary-card bg-white border shadow-sm">
+                <div class="count text-danger" id="sumCritical">0</div>
+                <div class="small text-muted">Critical</div>
+            </div>
+        </div>
+        <div class="col-6 col-md">
+            <div class="summary-card bg-white border shadow-sm">
+                <div class="count text-warning" id="sumHigh">0</div>
+                <div class="small text-muted">High Risk</div>
+            </div>
+        </div>
+        <div class="col-6 col-md">
+            <div class="summary-card bg-white border shadow-sm">
+                <div class="count text-danger" id="sumOverdue">0</div>
+                <div class="small text-muted">Overdue Tasks</div>
+            </div>
+        </div>
+        <div class="col-6 col-md">
+            <div class="summary-card bg-white border shadow-sm">
+                <div class="count text-primary" id="sumHealth">0</div>
+                <div class="small text-muted">Avg Health</div>
+            </div>
+        </div>
+        <div class="col-6 col-md">
+            <div class="summary-card bg-white border shadow-sm">
+                <div class="count text-success" id="sumSavings">0%</div>
+                <div class="small text-muted">Breakdown Reduction</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 1: Health Grid + Predictions -->
+    <div class="row g-3 mb-3">
+        <!-- Room Health Grid -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0"><i class="bi bi-grid-3x3-gap me-2"></i>Room Health Grid</h6>
+                    <small class="text-muted">Click a room for details</small>
+                </div>
+                <div class="card-body" id="healthGrid">
+                    <div class="d-flex flex-wrap gap-2" id="healthBadges"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Predictions -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Failure Predictions</h6>
+                </div>
+                <div class="card-body p-0" style="max-height:400px; overflow-y:auto;" id="predictionsPanel"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 2: Schedule Table + Category Breakdown -->
+    <div class="row g-3 mb-3">
+        <!-- Schedule Table -->
+        <div class="col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0"><i class="bi bi-calendar-check me-2"></i>Preventive Schedule</h6>
+                    <span class="badge bg-secondary" id="schedCount">0</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th><th>Room</th><th>Category</th>
+                                    <th>Task</th><th>Priority</th><th>Status</th><th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="schedBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="schedEmpty" class="empty-state" style="display:none;">
+                        <i class="bi bi-calendar-check"></i>
+                        <div>No upcoming schedules. Click "Generate Schedules" to create them.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Breakdown -->
+        <div class="col-lg-5">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Issues by Category</h6>
+                </div>
+                <div class="card-body" id="categoryPanel"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 3: Equipment Lifecycle (collapsible) -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#equipCollapse">
+            <h6 class="mb-0">
+                <i class="bi bi-cpu me-2"></i>Equipment Lifecycle
+                <i class="bi bi-chevron-down float-end"></i>
+            </h6>
+        </div>
+        <div class="collapse" id="equipCollapse">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Room</th><th>Equipment</th><th>Category</th>
+                                <th>Age</th><th>Life Remaining</th><th>Last Service</th>
+                                <th>Status</th><th>Issues</th>
+                            </tr>
+                        </thead>
+                        <tbody id="equipBody"></tbody>
+                    </table>
+                </div>
+                <div id="equipEmpty" class="empty-state" style="display:none;">
+                    <i class="bi bi-cpu"></i>
+                    <div>No equipment records yet. Add equipment in the Masters section to enable lifecycle tracking.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div><!-- /dashboardContent -->
+</div>
+
+<!-- Room Detail Modal -->
+<div class="modal fade" id="roomDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="roomDetailTitle">Room Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="roomDetailBody"></div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script nonce="{{ csp_nonce }}">
+let _data = null;
+const CSRF = document.querySelector('meta[name=csrf-token]')?.content || '';
+
+async function loadDashboard() {
+    document.getElementById('loadingSpinner').style.display = 'block';
+    document.getElementById('dashboardContent').style.display = 'none';
+    try {
+        const r = await fetch('/api/ai/predictive-maintenance');
+        _data = await r.json();
+        if (_data.status !== 'ok') throw new Error(_data.error || 'API error');
+        renderSummary(_data.summary);
+        renderHealthGrid(_data.room_health);
+        renderPredictions(_data.predictions);
+        renderSchedules(_data.upcoming_schedules);
+        renderCategories(_data.category_breakdown);
+        loadEquipment();
+    } catch(e) {
+        console.error(e);
+        document.getElementById('dashboardContent').innerHTML =
+            '<div class="alert alert-danger">Failed to load data: '+e.message+'</div>';
+    }
+    document.getElementById('loadingSpinner').style.display = 'none';
+    document.getElementById('dashboardContent').style.display = 'block';
+}
+
+function renderSummary(s) {
+    document.getElementById('sumRisk').textContent = s.rooms_at_risk;
+    document.getElementById('sumCritical').textContent = s.critical_count;
+    document.getElementById('sumHigh').textContent = s.high_count;
+    document.getElementById('sumOverdue').textContent = s.overdue_schedules;
+    document.getElementById('sumHealth').textContent = s.avg_health_score;
+    document.getElementById('sumSavings').textContent = s.predicted_savings_pct + '%';
+}
+
+function _healthClass(score) {
+    if (score < 40) return 'health-critical';
+    if (score < 60) return 'health-high';
+    if (score < 80) return 'health-medium';
+    return 'health-good';
+}
+
+function renderHealthGrid(rooms) {
+    const c = document.getElementById('healthBadges');
+    if (!rooms.length) { c.innerHTML = '<div class="empty-state"><i class="bi bi-grid-3x3-gap"></i><div>No rooms found</div></div>'; return; }
+    c.innerHTML = rooms.map(r =>
+        `<div class="health-badge ${_healthClass(r.health_score)}" onclick="showRoomDetail(${r.room_id})"
+              title="Room ${r.room_number} — ${r.health_score} (${r.risk_level})">
+            ${r.room_number}
+        </div>`
+    ).join('');
+}
+
+function renderPredictions(preds) {
+    const c = document.getElementById('predictionsPanel');
+    if (!preds.length) {
+        c.innerHTML = '<div class="empty-state"><i class="bi bi-check-circle"></i><div>No failure predictions</div></div>';
+        return;
+    }
+    c.innerHTML = preds.slice(0, 15).map(p => {
+        const pct = Math.round(p.probability * 100);
+        const color = p.risk_level === 'Critical' ? '#dc3545' : p.risk_level === 'High' ? '#fd7e14' : '#ffc107';
+        return `<div class="px-3 py-2 border-bottom">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="fw-bold">Room ${p.room_number}</span>
+                <span class="risk-badge risk-${p.risk_level}">${p.risk_level}</span>
+            </div>
+            <div class="small text-muted mb-1">${p.category} &mdash; ${p.predicted_date}</div>
+            <div class="prob-bar">
+                <div class="prob-fill" style="width:${pct}%; background:${color};"></div>
+            </div>
+            <div class="d-flex justify-content-between mt-1">
+                <small class="text-muted">${pct}% probability</small>
+                <small class="text-muted">${p.days_since_last}d since last</small>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function renderSchedules(scheds) {
+    const body = document.getElementById('schedBody');
+    const empty = document.getElementById('schedEmpty');
+    document.getElementById('schedCount').textContent = scheds.length;
+    if (!scheds.length) { body.innerHTML = ''; empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+    body.innerHTML = scheds.map(s => {
+        const cls = s.is_overdue ? 'overdue-row' : '';
+        const statusBadge = s.is_overdue
+            ? '<span class="badge bg-danger">Overdue</span>'
+            : `<span class="badge bg-${s.status==='Completed'?'success':'secondary'}">${s.status}</span>`;
+        const actions = (s.status === 'Pending' || s.status === 'Overdue')
+            ? `<button class="btn btn-success btn-sm py-0 px-1 me-1" onclick="completeSchedule(${s.id})"><i class="bi bi-check"></i></button>
+               <button class="btn btn-outline-secondary btn-sm py-0 px-1" onclick="skipSchedule(${s.id})"><i class="bi bi-skip-forward"></i></button>`
+            : '';
+        return `<tr class="${cls}">
+            <td class="text-nowrap">${s.scheduled_date}</td>
+            <td><strong>${s.room_number}</strong></td>
+            <td>${s.category}</td>
+            <td class="small">${s.task_description.substring(0,60)}${s.task_description.length>60?'...':''}</td>
+            <td><span class="risk-badge risk-${s.risk_level||'Low'}">${s.priority}</span></td>
+            <td>${statusBadge}</td>
+            <td class="text-nowrap">${actions}</td>
+        </tr>`;
+    }).join('');
+}
+
+function renderCategories(cats) {
+    const c = document.getElementById('categoryPanel');
+    const entries = Object.entries(cats);
+    if (!entries.length) { c.innerHTML = '<div class="empty-state">No data</div>'; return; }
+    const maxCount = Math.max(...entries.map(([,v]) => v.total_requests), 1);
+    c.innerHTML = entries.sort((a,b) => b[1].total_requests - a[1].total_requests).map(([cat, d]) => {
+        const pct = Math.round((d.total_requests / maxCount) * 100);
+        const colors = {'AC / Heating':'#dc3545','Plumbing':'#0d6efd','Electrical':'#ffc107',
+            'Internet / TV':'#6f42c1','Furniture':'#fd7e14','Cleaning':'#198754','Other':'#6c757d'};
+        const color = colors[cat] || '#6c757d';
+        return `<div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="fw-semibold">${cat}</span>
+                <span class="d-flex align-items-center gap-2">
+                    <span class="trend-${d.trend}">${d.trend}</span>
+                    <span class="badge bg-light text-dark border">${d.total_requests}</span>
+                </span>
+            </div>
+            <div class="cat-bar" style="width:${pct}%; background:${color};"></div>
+            <div class="d-flex justify-content-between mt-1">
+                <small class="text-muted">${d.open_count} open</small>
+                <small class="text-muted">Avg resolve: ${d.avg_resolution_hours}h</small>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+async function loadEquipment() {
+    try {
+        const r = await fetch('/api/ai/predictive-maintenance/equipment');
+        const d = await r.json();
+        const body = document.getElementById('equipBody');
+        const empty = document.getElementById('equipEmpty');
+        if (!d.equipment || !d.equipment.length) { body.innerHTML=''; empty.style.display='block'; return; }
+        empty.style.display = 'none';
+        body.innerHTML = d.equipment.map(e => {
+            const lifeColor = e.life_remaining_pct > 50 ? '#198754' : e.life_remaining_pct > 20 ? '#ffc107' : '#dc3545';
+            const statusCls = {'Good':'text-success','Aging':'text-warning','End-of-Life':'text-danger','Overdue Service':'text-danger'};
+            return `<tr>
+                <td><strong>${e.room_number}</strong></td>
+                <td>${e.name}</td>
+                <td>${e.category}</td>
+                <td>${e.age_years}y</td>
+                <td style="min-width:120px;">
+                    <div class="lifecycle-bar">
+                        <div class="lifecycle-fill" style="width:${Math.max(e.life_remaining_pct,2)}%; background:${lifeColor};"></div>
+                    </div>
+                    <small>${e.life_remaining_pct}%</small>
+                </td>
+                <td>${e.last_service_date||'Never'} ${e.service_overdue?'<span class="badge bg-danger">Overdue '+e.service_overdue_days+'d</span>':''}</td>
+                <td class="${statusCls[e.status]||''} fw-semibold">${e.status}</td>
+                <td>${e.related_issues_count}</td>
+            </tr>`;
+        }).join('');
+    } catch(e) { console.error('Equipment load failed:', e); }
+}
+
+async function showRoomDetail(roomId) {
+    document.getElementById('roomDetailBody').innerHTML = '<div class="text-center py-4"><div class="spinner-border spinner-border-sm"></div> Loading...</div>';
+    new bootstrap.Modal(document.getElementById('roomDetailModal')).show();
+    try {
+        const r = await fetch(`/api/ai/predictive-maintenance/health/${roomId}`);
+        const d = await r.json();
+        const room = d.room;
+        if (!room) { document.getElementById('roomDetailBody').innerHTML = '<div class="text-muted">No data</div>'; return; }
+        document.getElementById('roomDetailTitle').textContent = `Room ${room.room_number} — Health Details`;
+
+        const gaugeColor = _healthClass(room.health_score).replace('health-','');
+        const colorMap = {critical:'#dc3545', high:'#fd7e14', medium:'#ffc107', good:'#198754'};
+        const gc = colorMap[gaugeColor] || '#6c757d';
+
+        let html = `<div class="row g-3">
+            <div class="col-md-4 text-center">
+                <canvas id="gaugeCanvas" width="140" height="140"></canvas>
+                <div class="mt-2"><span class="risk-badge risk-${room.risk_level} fs-6">${room.risk_level} Risk</span></div>
+                <div class="mt-1 small text-muted">${room.room_type} &mdash; Floor ${room.floor}</div>
+                <div class="small text-muted">Trend: <span class="fw-bold trend-${room.trend==='improving'?'up':room.trend==='declining'?'down':'flat'}">${room.trend}</span></div>
+            </div>
+            <div class="col-md-8">
+                <h6>Risk Factors</h6>`;
+        if (room.risk_factors.length) {
+            html += '<ul class="mb-3">' + room.risk_factors.map(f => `<li class="small">${f}</li>`).join('') + '</ul>';
+        } else {
+            html += '<p class="text-success small mb-3"><i class="bi bi-check-circle me-1"></i>No risk factors detected</p>';
+        }
+
+        if (Object.keys(room.category_scores).length) {
+            html += '<h6>Category Scores</h6><div class="row g-2 mb-3">';
+            for (const [cat, sc] of Object.entries(room.category_scores)) {
+                const c2 = sc > 80 ? 'success' : sc > 60 ? 'warning' : 'danger';
+                html += `<div class="col-6"><div class="d-flex justify-content-between align-items-center">
+                    <span class="small">${cat}</span>
+                    <span class="badge bg-${c2}">${sc}</span>
+                </div></div>`;
+            }
+            html += '</div>';
+        }
+
+        html += `<h6>Health Trend (90 days)</h6>
+            <canvas id="trendCanvas" class="canvas-trend"></canvas>
+        </div></div>`;
+
+        document.getElementById('roomDetailBody').innerHTML = html;
+
+        // Draw gauge
+        const gCtx = document.getElementById('gaugeCanvas').getContext('2d');
+        drawGauge(gCtx, room.health_score, gc);
+
+        // Draw trend
+        if (d.trend && d.trend.length > 1) {
+            const tCtx = document.getElementById('trendCanvas').getContext('2d');
+            drawTrend(tCtx, d.trend, document.getElementById('trendCanvas'));
+        }
+    } catch(e) {
+        document.getElementById('roomDetailBody').innerHTML = '<div class="alert alert-danger">'+e.message+'</div>';
+    }
+}
+
+function drawGauge(ctx, score, color) {
+    const cx = 70, cy = 70, r = 55;
+    ctx.clearRect(0, 0, 140, 140);
+    // Background arc
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0.75*Math.PI, 0.25*Math.PI);
+    ctx.lineWidth = 12; ctx.strokeStyle = '#e9ecef'; ctx.lineCap = 'round'; ctx.stroke();
+    // Score arc
+    const range = 1.5 * Math.PI;
+    const endAngle = 0.75*Math.PI + (score/100)*range;
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0.75*Math.PI, endAngle);
+    ctx.lineWidth = 12; ctx.strokeStyle = color; ctx.lineCap = 'round'; ctx.stroke();
+    // Text
+    ctx.fillStyle = '#212529'; ctx.font = 'bold 28px system-ui'; ctx.textAlign = 'center';
+    ctx.fillText(Math.round(score), cx, cy + 5);
+    ctx.font = '11px system-ui'; ctx.fillStyle = '#6c757d';
+    ctx.fillText('/ 100', cx, cy + 22);
+}
+
+function drawTrend(ctx, data, canvas) {
+    const W = canvas.offsetWidth || 400, H = canvas.offsetHeight || 150;
+    canvas.width = W; canvas.height = H;
+    const pad = 30;
+    const scores = data.map(d => d.score);
+    const minS = Math.max(0, Math.min(...scores) - 10);
+    const maxS = Math.min(100, Math.max(...scores) + 10);
+    const rangeS = maxS - minS || 1;
+    const stepX = (W - 2*pad) / Math.max(scores.length - 1, 1);
+
+    // Grid lines
+    ctx.strokeStyle = '#e9ecef'; ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+        const y = pad + (H - 2*pad) * (i/4);
+        ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W-pad, y); ctx.stroke();
+        ctx.fillStyle = '#adb5bd'; ctx.font = '10px system-ui'; ctx.textAlign = 'right';
+        ctx.fillText(Math.round(maxS - (rangeS*i/4)), pad-5, y+3);
+    }
+
+    // Line
+    ctx.beginPath(); ctx.strokeStyle = '#0d6efd'; ctx.lineWidth = 2;
+    scores.forEach((s, i) => {
+        const x = pad + i*stepX;
+        const y = pad + (H-2*pad) * (1 - (s-minS)/rangeS);
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // Dots
+    scores.forEach((s, i) => {
+        const x = pad + i*stepX;
+        const y = pad + (H-2*pad) * (1 - (s-minS)/rangeS);
+        ctx.beginPath(); ctx.arc(x, y, 3, 0, 2*Math.PI);
+        ctx.fillStyle = '#0d6efd'; ctx.fill();
+    });
+}
+
+async function generateSchedules() {
+    const btn = document.getElementById('btnGenerate');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Generating...';
+    try {
+        const r = await fetch('/api/ai/predictive-maintenance/schedules/generate', {
+            method: 'POST', headers: {'Content-Type':'application/json', 'X-CSRFToken': CSRF}
+        });
+        const d = await r.json();
+        if (d.status === 'ok') {
+            alert(`Created ${d.created} new schedule(s). ${d.existing} already existed.`);
+            loadDashboard();
+        } else {
+            alert('Error: ' + (d.error || 'Unknown'));
+        }
+    } catch(e) { alert('Failed: ' + e.message); }
+    btn.disabled = false; btn.innerHTML = '<i class="bi bi-calendar-plus me-1"></i>Generate Schedules';
+}
+
+async function completeSchedule(id) {
+    if (!confirm('Mark this schedule as completed?')) return;
+    try {
+        await fetch(`/api/ai/predictive-maintenance/schedules/${id}/complete`, {
+            method: 'POST', headers: {'Content-Type':'application/json', 'X-CSRFToken': CSRF}
+        });
+        loadDashboard();
+    } catch(e) { alert('Failed: ' + e.message); }
+}
+
+async function skipSchedule(id) {
+    if (!confirm('Skip this scheduled maintenance?')) return;
+    try {
+        await fetch(`/api/ai/predictive-maintenance/schedules/${id}/skip`, {
+            method: 'POST', headers: {'Content-Type':'application/json', 'X-CSRFToken': CSRF}
+        });
+        loadDashboard();
+    } catch(e) { alert('Failed: ' + e.message); }
+}
+
+// Auto-load on page ready
+document.addEventListener('DOMContentLoaded', loadDashboard);
+</script>
+{% endblock %}

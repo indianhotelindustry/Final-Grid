@@ -1,0 +1,461 @@
+====================================================================================================
+DSBC FRONTLINE — FAULT INJECTION PLATFORM COMMISSIONING
+Wave 0 Deliverable 5 — Principles 6, 9, 11, 13
+====================================================================================================
+Result: 36/37 NOT COMMISSIONED
+
+[PASS] FLT-A01  Walk-in reservation settled through an OTA receivable head
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D1_PARITY, D3_REPLAY, D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-A02  Corporate booking with no company account behind it
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-A03  Duplicate payment posted for the same settlement
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D1_PARITY, D3_REPLAY, D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-A04  A sold room night has no priced rate row
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D3_REPLAY
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-A05  GST applied at the wrong rate
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-A06  Payment posted through a settlement head that does not exist
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D1_PARITY, D3_REPLAY, D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-A07  Guest overpaid with no overpayment record
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D1_PARITY, D3_REPLAY, D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-A08  Room move recorded without releasing the old room
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-A09  Guest checked out with an unexplained balance
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D1_PARITY, D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[FAIL] FLT-A10  Duplicate reservation for the same stay
+    FAIL positive_injection       IntegrityError: NOT NULL constraint failed: reservations.credit_amount
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    FAIL detection                declared layers did not attribute it: 
+    FAIL evidence                 missing: execution_context
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    FAIL isolation                containment was not verified
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-B01  Payment referencing a reservation that does not exist
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-B02  Payment posted with no folio
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D1_PARITY, D3_REPLAY, D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-B03  A ledger row that a closed day counted has been deleted
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D1_PARITY, D3_REPLAY, D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[UNCOVERED] FLT-B04  Two reservations sharing one invoice number
+    FAIL positive_injection       uncovered — see reason
+    FAIL negative_injection       uncovered — see reason
+    FAIL detection                uncovered — see reason
+    FAIL evidence                 uncovered — see reason
+    FAIL repeatability            uncovered — see reason
+    FAIL determinism              uncovered — see reason
+    FAIL order_independence       uncovered — see reason
+    FAIL isolation                uncovered — see reason
+    FAIL cleanup                  uncovered — see reason
+    reason: No invariant asserts invoice-number uniqueness, and no monetary total moves, so every layer is silent by construction. Injecting it would produce a guaranteed MISS that says nothing the declaration does not already say.
+
+[PASS] FLT-B05  Folio referencing a reservation that does not exist
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-B06  Tax line pointing at a room night that never happened
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-B07  Money dated beyond the business date
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D1_PARITY, D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-B08  Priced room night outside the stay it belongs to
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D3_REPLAY, D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-B09  Reversal flagged with no original transaction
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-B10  A second business date row
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-C01  Cash revenue engine double-counts every collection
+    ok   positive_injection       0 row(s) changed by ENGINE_PATCH
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D3_REPLAY, D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-C02  Accrual extras counted twice
+    ok   positive_injection       0 row(s) changed by ENGINE_PATCH
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D3_REPLAY
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-C03  Folio balance drifts by half a rupee
+    ok   positive_injection       0 row(s) changed by ENGINE_PATCH
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D1_PARITY, D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-C04  Cash engine ignores the date it is asked about
+    ok   positive_injection       0 row(s) changed by ENGINE_PATCH
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D3_REPLAY, D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-C05  Night audit occupancy inflated by present-tense leakage
+    ok   positive_injection       0 row(s) changed by ENGINE_PATCH
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D1_PARITY, D3_REPLAY, D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-C06  Canonical room-revenue engine bypassed by a 10% inflation
+    ok   positive_injection       0 row(s) changed by ENGINE_PATCH
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D1_PARITY
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-C07  OTA receivable filter excludes everything
+    ok   positive_injection       0 row(s) changed by ENGINE_PATCH
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D3_REPLAY
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-C08  Accrual room revenue double-counts occupied nights
+    ok   positive_injection       0 row(s) changed by ENGINE_PATCH
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D3_REPLAY
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-C09  Night audit reports tax twice
+    ok   positive_injection       0 row(s) changed by ENGINE_PATCH
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D3_REPLAY, D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-C10  Night audit settlement total diverges from the payments it lists
+    ok   positive_injection       0 row(s) changed by ENGINE_PATCH
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D1_PARITY, D3_REPLAY, D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-D01  Clock drift: a run executes one day out
+    ok   positive_injection       0 row(s) changed by CLOCK_SHIFT
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D2_GOLDEN
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-D02  A frozen night-audit snapshot has been edited
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D3_REPLAY, D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-D03  The stored close total for an audited day has been rewritten
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D1_PARITY, D3_REPLAY
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[UNCOVERED] FLT-D04  A database backup file is corrupt
+    FAIL positive_injection       uncovered — see reason
+    FAIL negative_injection       uncovered — see reason
+    FAIL detection                uncovered — see reason
+    FAIL evidence                 uncovered — see reason
+    FAIL repeatability            uncovered — see reason
+    FAIL determinism              uncovered — see reason
+    FAIL order_independence       uncovered — see reason
+    FAIL isolation                uncovered — see reason
+    FAIL cleanup                  uncovered — see reason
+    reason: No verification layer reads backup artefacts, and backup_logs stores no checksum — the schema records filename, size and status only. There is nothing to compare a restored file against, so corruption is undetectable by construction rather than by omission.
+
+[UNCOVERED] FLT-D05  A restored database does not match what was backed up
+    FAIL positive_injection       uncovered — see reason
+    FAIL negative_injection       uncovered — see reason
+    FAIL detection                uncovered — see reason
+    FAIL evidence                 uncovered — see reason
+    FAIL repeatability            uncovered — see reason
+    FAIL determinism              uncovered — see reason
+    FAIL order_independence       uncovered — see reason
+    FAIL isolation                uncovered — see reason
+    FAIL cleanup                  uncovered — see reason
+    reason: Detecting this requires comparing a restored database against a recorded pre-backup fingerprint. Nothing in the framework holds one, so the deletion is simply the new truth and every layer reconciles against it perfectly.
+
+[PASS] FLT-D06  Hotel state code changed, flipping the GST regime
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D2_GOLDEN
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[UNCOVERED] FLT-D07  A run executes under a different process environment
+    FAIL positive_injection       uncovered — see reason
+    FAIL negative_injection       uncovered — see reason
+    FAIL detection                uncovered — see reason
+    FAIL evidence                 uncovered — see reason
+    FAIL repeatability            uncovered — see reason
+    FAIL determinism              uncovered — see reason
+    FAIL order_independence       uncovered — see reason
+    FAIL isolation                uncovered — see reason
+    FAIL cleanup                  uncovered — see reason
+    reason: No layer fingerprints the process environment, so a run under a different environment is indistinguishable in the evidence. The gap is in the evidence model rather than in any control.
+
+[PASS] FLT-D08  An invoice presentation flag was changed after issue
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D2_GOLDEN
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-D09  The business date has been rolled backwards
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] FLT-D10  A completed night audit has been reopened and left open
+    ok   positive_injection       1 row(s) changed by SQL
+    ok   negative_injection       the clean baseline sweep is the negative case; it is compared against itself and moves nothing (see the platform NULL control)
+    ok   detection                attributed by D3_REPLAY, D4_INVARIANTS
+    ok   evidence                 complete
+    ok   repeatability            two challenges gave the same classification
+    ok   determinism              identical injection and identical detection across runs
+    ok   order_independence       reversing the layer order changed nothing
+    ok   isolation                baseline and production byte-identical after every injection
+    ok   cleanup                  every private copy removed and verified gone
+
+[PASS] PLATFORM  Platform self-verification
+    ok   repeatability            proven per fault by the repeatability and determinism elements of fault commissioning
+    ok   isolation                the pristine baseline and production are byte-identical after every injection in this run
+    ok   registry_validation      6/6 malformed declarations refused
+    ok   injection_validation     an injection that changed no rows was refused
+    ok   evidence_validation      every one of 36 results carries injection, timestamp and root-cause candidates
+    ok   cleanup_validation       no seeded copy survived
+    ok   false_positive_resistance an unmutated copy moved nothing in any layer
+    ok   false_negative_resistance all 35 covered faults were attributed by a declared layer
+    ok   parallel_safety          4 probes run concurrently agreed with the same probes run serially
+

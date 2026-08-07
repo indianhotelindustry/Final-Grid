@@ -1,0 +1,182 @@
+====================================================================================================
+DSBC FRONTLINE — INVARIANT HISTORICAL REPLAY
+Production Verification Framework, Wave 0 Deliverable 4
+====================================================================================================
+Started           : 2026-08-04T17:08:01
+Duration          : 1.9s
+Application       : v2.2.18
+Business date     : 2026-05-28
+Dates replayed    : 28  (2026-05-01 .. 2026-05-28)
+Read-only         : VERIFIED
+Zero writes       : VERIFIED
+
+VERDICT           : FAIL
+
+----------------------------------------------------------------------------------------------------
+WHAT THIS CAN AND CANNOT ANSWER
+----------------------------------------------------------------------------------------------------
+The database holds one state: the present one. There is no archive
+of what it looked like on a past date, so "was this true then"
+cannot mean "restore the database and evaluate". Each date is
+instead evaluated twice against current data — once with the clock
+frozen to that date, once with the clock frozen to today. A
+difference between the two is clock-dependence inside a date-scoped
+rule. Genuine historical state is available only where a night
+audit froze a snapshot, and INV-B03 is the invariant that uses it.
+
+====================================================================================================
+EARLIEST DIVERGENCE
+====================================================================================================
+ID        SEVERITY  EARLIEST FAIL      POP  CLOCK-DEP   TODAY  TITLE
+----------------------------------------------------------------------------------------------------
+INV-A02   HIGH      2026-05-27          17          0      no  Every financial row belongs to a f
+INV-A04   CRITICAL  —                    0          0   holds  Daily collections equal the direct
+INV-A05   CRITICAL  —                    0          0   holds  Every stored tax line equals its t
+INV-B01   CRITICAL  —                    0          0      no  No financial row was created into 
+INV-B02   CRITICAL  —                    0          0      no  Every frozen night-audit snapshot 
+INV-B03   CRITICAL  2026-05-27           8          0      no  Recomputing a closed day reproduce
+INV-B06   MEDIUM    —                    0          0   holds  A payment is never dated outside t
+INV-C01   CRITICAL  2026-05-27           3          0      no  A walk-in reservation is never set
+
+====================================================================================================
+PER-INVARIANT TIMELINES
+====================================================================================================
+
+INV-A02  Every financial row belongs to a folio
+  earliest divergence: 2026-05-27 (population 17)
+  DATE        AS OF DATE      AS OF TODAY       VIOL  CLOSED
+  2026-05-01  VACUOUS         VACUOUS              0        
+  2026-05-02  VACUOUS         VACUOUS              0        
+  2026-05-03  VACUOUS         VACUOUS              0        
+  2026-05-04  VACUOUS         VACUOUS              0        
+  2026-05-05  VACUOUS         VACUOUS              0        
+  2026-05-06  VACUOUS         VACUOUS              0        
+  2026-05-07  VACUOUS         VACUOUS              0        
+  2026-05-08  VACUOUS         VACUOUS              0        
+  2026-05-09  VACUOUS         VACUOUS              0        
+  2026-05-10  VACUOUS         VACUOUS              0        
+  2026-05-11  VACUOUS         VACUOUS              0        
+  2026-05-12  VACUOUS         VACUOUS              0        
+  2026-05-13  VACUOUS         VACUOUS              0        
+  2026-05-14  VACUOUS         VACUOUS              0        
+  2026-05-15  VACUOUS         VACUOUS              0        
+  2026-05-16  VACUOUS         VACUOUS              0        
+  2026-05-17  VACUOUS         VACUOUS              0        
+  2026-05-18  VACUOUS         VACUOUS              0        
+  2026-05-19  VACUOUS         VACUOUS              0        
+  2026-05-20  VACUOUS         VACUOUS              0        
+  2026-05-21  VACUOUS         VACUOUS              0        
+  2026-05-22  VACUOUS         VACUOUS              0        
+  2026-05-23  VACUOUS         VACUOUS              0        
+  2026-05-24  VACUOUS         VACUOUS              0        
+  2026-05-25  VACUOUS         VACUOUS              0        
+  2026-05-26  VACUOUS         VACUOUS              0        
+  2026-05-27  VIOLATED        VIOLATED            17     yes
+  2026-05-28  VIOLATED        VIOLATED            23        
+
+INV-B03  Recomputing a closed day reproduces the figures it reported
+  earliest divergence: 2026-05-27 (population 8)
+  DATE        AS OF DATE      AS OF TODAY       VIOL  CLOSED
+  2026-05-01  VACUOUS         VACUOUS              0        
+  2026-05-02  VACUOUS         VACUOUS              0        
+  2026-05-03  VACUOUS         VACUOUS              0        
+  2026-05-04  VACUOUS         VACUOUS              0        
+  2026-05-05  VACUOUS         VACUOUS              0        
+  2026-05-06  VACUOUS         VACUOUS              0        
+  2026-05-07  VACUOUS         VACUOUS              0        
+  2026-05-08  VACUOUS         VACUOUS              0        
+  2026-05-09  VACUOUS         VACUOUS              0        
+  2026-05-10  VACUOUS         VACUOUS              0        
+  2026-05-11  VACUOUS         VACUOUS              0        
+  2026-05-12  VACUOUS         VACUOUS              0        
+  2026-05-13  VACUOUS         VACUOUS              0        
+  2026-05-14  VACUOUS         VACUOUS              0        
+  2026-05-15  VACUOUS         VACUOUS              0        
+  2026-05-16  VACUOUS         VACUOUS              0        
+  2026-05-17  VACUOUS         VACUOUS              0        
+  2026-05-18  VACUOUS         VACUOUS              0        
+  2026-05-19  VACUOUS         VACUOUS              0        
+  2026-05-20  VACUOUS         VACUOUS              0        
+  2026-05-21  VACUOUS         VACUOUS              0        
+  2026-05-22  VACUOUS         VACUOUS              0        
+  2026-05-23  VACUOUS         VACUOUS              0        
+  2026-05-24  VACUOUS         VACUOUS              0        
+  2026-05-25  VACUOUS         VACUOUS              0        
+  2026-05-26  VACUOUS         VACUOUS              0        
+  2026-05-27  VIOLATED        VIOLATED             1     yes
+  2026-05-28  VACUOUS         VACUOUS              0        
+
+INV-C01  A walk-in reservation is never settled through an OTA receivable
+  earliest divergence: 2026-05-27 (population 3)
+  DATE        AS OF DATE      AS OF TODAY       VIOL  CLOSED
+  2026-05-01  VACUOUS         VACUOUS              0        
+  2026-05-02  VACUOUS         VACUOUS              0        
+  2026-05-03  VACUOUS         VACUOUS              0        
+  2026-05-04  VACUOUS         VACUOUS              0        
+  2026-05-05  VACUOUS         VACUOUS              0        
+  2026-05-06  VACUOUS         VACUOUS              0        
+  2026-05-07  VACUOUS         VACUOUS              0        
+  2026-05-08  VACUOUS         VACUOUS              0        
+  2026-05-09  VACUOUS         VACUOUS              0        
+  2026-05-10  VACUOUS         VACUOUS              0        
+  2026-05-11  VACUOUS         VACUOUS              0        
+  2026-05-12  VACUOUS         VACUOUS              0        
+  2026-05-13  VACUOUS         VACUOUS              0        
+  2026-05-14  VACUOUS         VACUOUS              0        
+  2026-05-15  VACUOUS         VACUOUS              0        
+  2026-05-16  VACUOUS         VACUOUS              0        
+  2026-05-17  VACUOUS         VACUOUS              0        
+  2026-05-18  VACUOUS         VACUOUS              0        
+  2026-05-19  VACUOUS         VACUOUS              0        
+  2026-05-20  VACUOUS         VACUOUS              0        
+  2026-05-21  VACUOUS         VACUOUS              0        
+  2026-05-22  VACUOUS         VACUOUS              0        
+  2026-05-23  VACUOUS         VACUOUS              0        
+  2026-05-24  VACUOUS         VACUOUS              0        
+  2026-05-25  VACUOUS         VACUOUS              0        
+  2026-05-26  VACUOUS         VACUOUS              0        
+  2026-05-27  VIOLATED        VIOLATED             3     yes
+  2026-05-28  VIOLATED        VIOLATED             2        
+
+====================================================================================================
+NOT REPLAYED (16)
+====================================================================================================
+These invariants declare no date-scoped mode, so they have no
+historical form. Listed rather than dropped, so the coverage of
+a historical run is never overstated.
+  INV-A01
+      declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING, SINGLE_RESERVATION; none of them is date-scoped, so it has no historical form and is not replayed
+  INV-A03
+      declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed
+  INV-A06
+      declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING, SINGLE_RESERVATION; none of them is date-scoped, so it has no historical form and is not replayed
+  INV-B04
+      declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed
+  INV-B05
+      declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed
+  INV-C02
+      declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING, SINGLE_RESERVATION; none of them is date-scoped, so it has no historical form and is not replayed
+  INV-C03
+      declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed
+  INV-C04
+      declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed
+  INV-C05
+      declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed
+  INV-C06
+      declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed
+  INV-D01
+      declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed
+  INV-D02
+      declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed
+  INV-D03
+      declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed
+  INV-D04
+      declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed
+  INV-D05
+      declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed
+  INV-D06
+      declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed
+
+====================================================================================================
+END OF REPORT
+====================================================================================================

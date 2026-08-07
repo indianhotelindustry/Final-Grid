@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Night Audit</h2>
+    <form method="post" action="{{ url_for('main.run_night_audit_manual') }}" onsubmit="return confirm('Run night audit now?')">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-play-circle"></i> Run Now
+        </button>
+    </form>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-12 col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Current Business Date</h5>
+            </div>
+            <div class="card-body">
+                <h3>{{ audit_date.strftime('%d %b %Y') if audit_date else (business_date.current_date.strftime('%d %b %Y') if business_date else 'Not Set') }}</h3>
+                <p class="mb-0">
+                    <span class="badge {% if business_date and business_date.is_locked %}bg-danger{% else %}bg-success{% endif %}">
+                        {% if business_date and business_date.is_locked %}Locked{% else %}Active{% endif %}
+                    </span>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">Audit Settings</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-1"><strong>Auto Run:</strong> {{ settings.get('night_audit_enabled', 'false').title() }}</p>
+                <p class="mb-0"><strong>Scheduled Time:</strong> {{ settings.get('night_audit_time', '02:00') }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Audit History</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Run At</th>
+                    <th class="text-end">Revenue</th>
+                    <th class="text-end">Occupancy</th>
+                    <th class="text-end">Pending CO</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ log.audit_date.strftime('%d %b %Y') }}</td>
+                    <td>{{ log.run_at.strftime('%I:%M %p') }}</td>
+                    <td class="text-end">₹{{ "%.2f"|format(log.total_revenue) }}</td>
+                    <td class="text-end">{{ log.occupancy_count }}</td>
+                    <td class="text-end">{{ log.pending_checkouts }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if not logs %}
+<div class="alert alert-info text-center mt-3">
+    <i class="bi bi-info-circle"></i> No audit logs available
+</div>
+{% endif %}
+{% endblock %}

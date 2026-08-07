@@ -1,0 +1,48 @@
+{
+  "anon_location": "/auth/login?next=%2Floyalty%2F",
+  "anon_status": 302,
+  "body_bytes": 26379,
+  "body_sha256": "ed639659449ba29760a9199958374b4495925a56872396d024b106203038f061",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 27,
+  "endpoint": "loyalty.dashboard",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "recent_txns[len]": "0",
+    "stats.enrolled": "0",
+    "stats.gold": "0",
+    "stats.platinum": "0",
+    "stats.points_issued_mtd": "0",
+    "stats.points_redeemed_mtd": "0",
+    "stats.silver": "0",
+    "stats[len]": "6",
+    "tiers[0][type]": "LoyaltyConfig",
+    "tiers[1][type]": "LoyaltyConfig",
+    "tiers[2][type]": "LoyaltyConfig",
+    "tiers[len]": "3",
+    "top_members[len]": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "loyalty.dashboard",
+  "templates": [
+    "loyalty/dashboard.html"
+  ],
+  "truncations": [],
+  "url": "/loyalty/"
+}

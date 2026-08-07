@@ -1,0 +1,37 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Fgstr1-export",
+  "anon_status": 302,
+  "body_bytes": 24743,
+  "body_sha256": "602c52cbee1368e19e20dfcebadc5f197f7b1771e01f564ffb0d9e813c351846",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 10,
+  "endpoint": "reports.gstr1_export",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "from_date": "2026-04-01",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "to_date": "2026-04-30"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.gstr1_export",
+  "templates": [
+    "reports/gstr1_export.html"
+  ],
+  "truncations": [],
+  "url": "/reports/gstr1-export"
+}

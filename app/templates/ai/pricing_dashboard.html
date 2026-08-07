@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+
+{% block title %}AI Dynamic Pricing - {{ config.HOTEL_NAME }}{% endblock %}
+
+{% block styles %}
+<style>
+    .pricing-card {
+        border-radius: 10px;
+        transition: transform 0.15s;
+    }
+    .pricing-card:hover {
+        transform: translateY(-2px);
+    }
+    .factor-badge {
+        font-size: 0.75rem;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-weight: 500;
+    }
+    .factor-up { background: #d1fae5; color: #065f46; }
+    .factor-down { background: #fee2e2; color: #991b1b; }
+    .factor-neutral { background: #f3f4f6; color: #374151; }
+    .confidence-bar {
+        height: 6px;
+        border-radius: 3px;
+        background: #e5e7eb;
+        overflow: hidden;
+    }
+    .confidence-fill {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.3s;
+    }
+    .rate-change-positive { color: #059669; font-weight: 600; }
+    .rate-change-negative { color: #dc2626; font-weight: 600; }
+    .rate-change-neutral  { color: #6b7280; }
+    .table-pricing th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+    .table-pricing td { vertical-align: middle; font-size: 0.875rem; }
+    .chart-container { position: relative; height: 350px; }
+    .settings-panel { background: #f8f9fa; border-radius: 10px; padding: 1.25rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3 py-3">
+
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <div>
+            <h4 class="mb-0"><i class="bi bi-graph-up-arrow text-primary"></i> AI Dynamic Pricing</h4>
+            <small class="text-muted">Rule-based revenue optimization engine</small>
+        </div>
+        <div class="d-flex gap-2 align-items-center">
+            <form method="get" class="d-flex gap-2 align-items-center">
+                <label class="form-label mb-0 small fw-semibold">Horizon:</label>
+                <select name="days" class="form-select form-select-sm" style="width:auto;" onchange="this.form.submit()">
+                    <option value="7"  {% if days == 7  %}selected{% endif %}>7 days</option>
+                    <option value="14" {% if days == 14 %}selected{% endif %}>14 days</option>
+                    <option value="30" {% if days == 30 %}selected{% endif %}>30 days</option>
+                    <option value="60" {% if days == 60 %}selected{% endif %}>60 days</option>
+                    <option value="90" {% if days == 90 %}selected{% endif %}>90 days</option>
+                </select>
+            </form>
+            {% if not data.enabled %}
+            <span class="badge bg-warning text-dark"><i class="bi bi-pause-circle"></i> Pricing Engine Disabled</span>
+            {% else %}
+            <span class="badge bg-success"><i class="bi bi-check-circle"></i> Engine Active</span>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if not data.enabled %}
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle me-1"></i>
+        The AI pricing engine is currently disabled. Enable it in
+        <strong>Settings</strong> (key: <code>pricing_enabled</code>) to see recommendations.
+    </div>
+    {% endif %}
+
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card pricing-card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-muted small mb-1">Avg Rate Change</div>
+                    <h3 class="mb-0 {% if data.summary.avg_change_pct > 0 %}rate-change-positive{% elif data.summary.avg_change_pct < 0 %}rate-change-negative{% else %}rate-change-neutral{% endif %}">
+                        {% if data.summary.avg_change_pct > 0 %}+{% endif %}{{ data.summary.avg_change_pct }}%
+                    </h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card pricing-card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-muted small mb-1">Rate Increases</div>
+                    <h3 class="mb-0 rate-change-positive">
+                        <i class="bi bi-arrow-up-circle"></i> {{ data.summary.rooms_increase }}
+                    </h3>
+                    <small class="text-muted">of {{ data.summary.total_recommendations }}</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card pricing-card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-muted small mb-1">Rate Decreases</div>
+                    <h3 class="mb-0 rate-change-negative">
+                        <i class="bi bi-arrow-down-circle"></i> {{ data.summary.rooms_decrease }}
+                    </h3>
+                    <small class="text-muted">of {{ data.summary.total_recommendations }}</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card pricing-card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-muted small mb-1">No Change</div>
+                    <h3 class="mb-0 rate-change-neutral">
+                        <i class="bi bi-dash-circle"></i> {{ data.summary.rooms_unchanged }}
+                    </h3>
+                    <small class="text-muted">of {{ data.summary.total_recommendations }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-0 pt-3">
+            <h6 class="mb-0"><i class="bi bi-bar-chart-line text-primary"></i> Rate Comparison: Base vs AI Recommended</h6>
+        </div>
+        <div class="card-body">
+            <div class="chart-container">
+                <canvas id="pricingChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommendations Table -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-0 pt-3 d-flex justify-content-between align-items-center">
+            <h6 class="mb-0"><i class="bi bi-table text-primary"></i> Rate Recommendations</h6>
+            <div class="d-flex gap-2">
+                <input type="text" id="tableSearch" class="form-control form-control-sm" placeholder="Filter..." style="width:180px;">
+                <select id="changeFilter" class="form-select form-select-sm" style="width:auto;">
+                    <option value="all">All</option>
+                    <option value="increase">Increases only</option>
+                    <option value="decrease">Decreases only</option>
+                    <option value="unchanged">No change</option>
+                </select>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-pricing mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Room Type</th>
+                            <th class="text-end">Base Rate</th>
+                            <th class="text-end">AI Rate</th>
+                            <th class="text-end">Change</th>
+                            <th class="text-center">Factors</th>
+                            <th class="text-center">Confidence</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recTableBody">
+                        {% for rec in data.recommendations %}
+                        <tr class="rec-row"
+                            data-change-type="{% if rec.change_pct > 0.5 %}increase{% elif rec.change_pct < -0.5 %}decrease{% else %}unchanged{% endif %}"
+                            data-search="{{ rec.date_display|lower }} {{ rec.room_type_name|lower }}">
+                            <td>
+                                <span class="fw-semibold">{{ rec.date_display }}</span>
+                            </td>
+                            <td>{{ rec.room_type_name }}</td>
+                            <td class="text-end">{{ "%.2f"|format(rec.base_rate) }}</td>
+                            <td class="text-end fw-semibold">{{ "%.2f"|format(rec.recommended_rate) }}</td>
+                            <td class="text-end">
+                                {% if rec.change_pct > 0.5 %}
+                                <span class="rate-change-positive">+{{ rec.change_pct }}%</span>
+                                {% elif rec.change_pct < -0.5 %}
+                                <span class="rate-change-negative">{{ rec.change_pct }}%</span>
+                                {% else %}
+                                <span class="rate-change-neutral">--</span>
+                                {% endif %}
+                                {% if rec.capped %}<i class="bi bi-shield-exclamation text-warning ms-1" title="Rate was capped by max increase/decrease limit"></i>{% endif %}
+                            </td>
+                            <td class="text-center">
+                                <span class="factor-badge {% if rec.factors.occupancy > 1.01 %}factor-up{% elif rec.factors.occupancy < 0.99 %}factor-down{% else %}factor-neutral{% endif %}"
+                                      title="Occupancy factor">Occ {{ "%.0f"|format((rec.factors.occupancy - 1) * 100) }}%</span>
+                                <span class="factor-badge {% if rec.factors.dow > 1.01 %}factor-up{% elif rec.factors.dow < 0.99 %}factor-down{% else %}factor-neutral{% endif %}"
+                                      title="Day-of-week factor">DoW {{ "%.0f"|format((rec.factors.dow - 1) * 100) }}%</span>
+                                <span class="factor-badge {% if rec.factors.seasonal > 1.01 %}factor-up{% elif rec.factors.seasonal < 0.99 %}factor-down{% else %}factor-neutral{% endif %}"
+                                      title="Seasonal factor">Ssn {{ "%.0f"|format((rec.factors.seasonal - 1) * 100) }}%</span>
+                                <span class="factor-badge {% if rec.factors.pace > 1.01 %}factor-up{% elif rec.factors.pace < 0.99 %}factor-down{% else %}factor-neutral{% endif %}"
+                                      title="Pace factor">Pace {{ "%.0f"|format((rec.factors.pace - 1) * 100) }}%</span>
+                            </td>
+                            <td class="text-center" style="min-width:90px;">
+                                <div class="d-flex align-items-center gap-1">
+                                    <div class="confidence-bar flex-grow-1">
+                                        <div class="confidence-fill {% if rec.confidence >= 70 %}bg-success{% elif rec.confidence >= 40 %}bg-warning{% else %}bg-danger{% endif %}"
+                                             style="width:{{ rec.confidence }}%"></div>
+                                    </div>
+                                    <small class="text-muted">{{ rec.confidence }}%</small>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if not data.recommendations %}
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-inbox" style="font-size:2rem;"></i>
+                <p class="mt-2 mb-0">No recommendations available. Ensure the pricing engine is enabled and room types exist.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-0 pt-3">
+            <h6 class="mb-0"><i class="bi bi-gear text-primary"></i> Pricing Engine Settings</h6>
+        </div>
+        <div class="card-body">
+            <div class="settings-panel">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold">Engine Status</label>
+                        <div>
+                            {% if data.settings.pricing_enabled %}
+                            <span class="badge bg-success">Enabled</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Disabled</span>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">Setting: <code>pricing_enabled</code></small>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold">Max Increase</label>
+                        <div class="fs-5 fw-bold text-success">+{{ data.settings.pricing_max_increase_pct|int }}%</div>
+                        <small class="text-muted">Setting: <code>pricing_max_increase_pct</code></small>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold">Max Decrease</label>
+                        <div class="fs-5 fw-bold text-danger">-{{ data.settings.pricing_max_decrease_pct|int }}%</div>
+                        <small class="text-muted">Setting: <code>pricing_max_decrease_pct</code></small>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold">Auto-Apply</label>
+                        <div>
+                            {% if data.settings.pricing_auto_apply %}
+                            <span class="badge bg-warning text-dark">Auto-apply ON</span>
+                            {% else %}
+                            <span class="badge bg-info text-dark">Manager Approval</span>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">Setting: <code>pricing_auto_apply</code></small>
+                    </div>
+                </div>
+                <hr class="my-3">
+                <div>
+                    <label class="form-label small fw-semibold">Day-of-Week Multipliers</label>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% set day_names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] %}
+                        {% for i in range(7) %}
+                        {% set mult = data.settings.pricing_dow_multipliers.get(i|string, 1.0) %}
+                        <span class="badge {% if mult > 1.01 %}bg-success{% elif mult < 0.99 %}bg-danger{% else %}bg-secondary{% endif %} fs-6">
+                            {{ day_names[i] }}: {{ "%.2f"|format(mult) }}x
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle"></i>
+                        Configure these settings in the <strong>Settings</strong> table (Admin > Settings) using the keys shown above.
+                        Values are read in real-time by the pricing engine.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/chartjs/chart.umd.min.js') }}"></script>
+<script>
+(function() {
+    // ── Chart.js: Rate Comparison ──
+    const chartData = {{ chart_data_json|safe }};
+    const ctx = document.getElementById('pricingChart');
+    if (ctx && chartData.labels.length > 0) {
+        new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: chartData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { usePointStyle: true, padding: 15, font: { size: 11 } }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        padding: 10,
+                        callbacks: {
+                            label: function(ctx) {
+                                return ctx.dataset.label + ': ' + (ctx.parsed.y != null ? ctx.parsed.y.toFixed(2) : 'N/A');
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { size: 10 }, maxRotation: 45 }
+                    },
+                    y: {
+                        beginAtZero: false,
+                        ticks: { font: { size: 11 } },
+                        grid: { color: 'rgba(0,0,0,0.05)' }
+                    }
+                }
+            }
+        });
+    }
+
+    // ── Table filtering ──
+    const searchInput = document.getElementById('tableSearch');
+    const changeFilter = document.getElementById('changeFilter');
+    const rows = document.querySelectorAll('.rec-row');
+
+    function filterTable() {
+        const query = (searchInput.value || '').toLowerCase();
+        const changeType = changeFilter.value;
+
+        rows.forEach(row => {
+            const searchText = row.getAttribute('data-search') || '';
+            const rowChange = row.getAttribute('data-change-type') || '';
+            const matchText = !query || searchText.includes(query);
+            const matchChange = changeType === 'all' || rowChange === changeType;
+            row.style.display = (matchText && matchChange) ? '' : 'none';
+        });
+    }
+
+    if (searchInput) searchInput.addEventListener('input', filterTable);
+    if (changeFilter) changeFilter.addEventListener('change', filterTable);
+})();
+</script>
+{% endblock %}

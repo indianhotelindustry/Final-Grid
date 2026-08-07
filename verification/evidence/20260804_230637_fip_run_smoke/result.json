@@ -1,0 +1,517 @@
+{
+  "commissioning_evidence_pack": "",
+  "commissioning_gaps": [
+    {
+      "fault_id": "FLT-A01",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-A02",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-A03",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-A04",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-A05",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-A06",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-A07",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-A08",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-A09",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-A10",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-B01",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-B02",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-B03",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-B04",
+      "reason": "No invariant asserts invoice-number uniqueness, and no monetary total moves, so every layer is silent by construction. Injecting it would produce a guaranteed MISS that says nothing the declaration does not already say.",
+      "status": "UNCOVERED"
+    },
+    {
+      "fault_id": "FLT-B05",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-B06",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-B07",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-B08",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-B09",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-B10",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-C01",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-C02",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-C03",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-C04",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-C05",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-C06",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-C07",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-C08",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-C09",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-C10",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-D01",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-D02",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-D03",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-D04",
+      "reason": "No verification layer reads backup artefacts, and backup_logs stores no checksum \u2014 the schema records filename, size and status only. There is nothing to compare a restored file against, so corruption is undetectable by construction rather than by omission.",
+      "status": "UNCOVERED"
+    },
+    {
+      "fault_id": "FLT-D05",
+      "reason": "Detecting this requires comparing a restored database against a recorded pre-backup fingerprint. Nothing in the framework holds one, so the deletion is simply the new truth and every layer reconciles against it perfectly.",
+      "status": "UNCOVERED"
+    },
+    {
+      "fault_id": "FLT-D06",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-D07",
+      "reason": "No layer fingerprints the process environment, so a run under a different environment is indistinguishable in the evidence. The gap is in the evidence model rather than in any control.",
+      "status": "UNCOVERED"
+    },
+    {
+      "fault_id": "FLT-D08",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-D09",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    },
+    {
+      "fault_id": "FLT-D10",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    }
+  ],
+  "counts": {
+    "D1_PARITY": 1,
+    "D2_GOLDEN": 0,
+    "D3_REPLAY": 1,
+    "D4_INVARIANTS": 1,
+    "challenged": 1,
+    "detected": 1,
+    "errors": 0,
+    "missed": 0,
+    "registered": 1,
+    "uncovered": 4
+  },
+  "duration_seconds": 36.45,
+  "finished_at": "2026-08-04T23:07:13",
+  "gaps": [],
+  "isolation": {
+    "baseline_hash": "d630f730a91133916ee3f76878c2cdd2b7930ec9ad745e571f81be78cdd08413",
+    "cleanup": {
+      "baseline_unchanged": true,
+      "copies_left_behind": [],
+      "copies_removed": 1,
+      "production_sha256": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+      "production_unchanged": true
+    },
+    "production_db": "C:\\Users\\SIPL Server\\Downloads\\DSS\\SukoonPMS\\SukoonPMS\\instance\\pms.db",
+    "production_hash_after": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+    "production_hash_before": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+    "verified": true
+  },
+  "layers_swept": [
+    "D1_PARITY",
+    "D2_GOLDEN",
+    "D3_REPLAY",
+    "D4_INVARIANTS"
+  ],
+  "mode": "BATCH",
+  "parallel": true,
+  "pvf_version": "0.4.0",
+  "results": [
+    {
+      "blast_radius": [
+        "D2_GOLDEN"
+      ],
+      "category": "A-BUSINESS",
+      "cleanup_verified": true,
+      "commissioning_status": "NOT_COMMISSIONED",
+      "detected": true,
+      "error": "",
+      "evidence": {
+        "actual_detection": [
+          "D1_PARITY",
+          "D2_GOLDEN",
+          "D3_REPLAY",
+          "D4_INVARIANTS"
+        ],
+        "affected_invariants": [
+          "INV-B03",
+          "INV-C01",
+          "INV-C05"
+        ],
+        "affected_parity_checks": [
+          "P10",
+          "P15",
+          "P16",
+          "P22"
+        ],
+        "affected_replays": [
+          "date:2026-05-01",
+          "date:2026-05-02",
+          "date:2026-05-03",
+          "date:2026-05-04",
+          "date:2026-05-05",
+          "date:2026-05-06",
+          "date:2026-05-07",
+          "date:2026-05-08",
+          "date:2026-05-09",
+          "date:2026-05-10",
+          "date:2026-05-11",
+          "date:2026-05-12",
+          "date:2026-05-13",
+          "date:2026-05-14",
+          "date:2026-05-15",
+          "date:2026-05-16",
+          "date:2026-05-17",
+          "date:2026-05-18",
+          "date:2026-05-19",
+          "date:2026-05-20",
+          "date:2026-05-21",
+          "date:2026-05-22",
+          "date:2026-05-23",
+          "date:2026-05-24",
+          "date:2026-05-25",
+          "date:2026-05-26",
+          "date:2026-05-27",
+          "date:2026-05-28"
+        ],
+        "affected_reports": [
+          "ai.api_ceo_kpi_pack",
+          "grc.preview__any_reservation",
+          "main.dashboard",
+          "main.guest_folio__any_guest",
+          "main.invoice__checked_out_reservation",
+          "main.invoice_detail_api__checked_out_reservation",
+          "main.load_tab__overview",
+          "main.reservation_folio__checked_out_reservation",
+          "reports.daily_profit_snapshot",
+          "reports.flash_report",
+          "reports.flash_report__date_2026_05_28",
+          "reports.ota_receivables",
+          "reports.revenue",
+          "reports.revenue__start_date_2026_05_01_end_date_2026_05_28"
+        ],
+        "business_date": "",
+        "certification_impact": "Certification-blocking: revenue is recognised against a counterparty that does not exist.",
+        "detected_by": [
+          "D1_PARITY",
+          "D3_REPLAY",
+          "D4_INVARIANTS"
+        ],
+        "detection_time_ms": 8051,
+        "evidence_files": [],
+        "execution_context": {
+          "env": {},
+          "layers": [
+            "D1_PARITY",
+            "D2_GOLDEN",
+            "D3_REPLAY",
+            "D4_INVARIANTS"
+          ],
+          "parallel": true,
+          "patch": ""
+        },
+        "expected_detection": [
+          "D4_INVARIANTS",
+          "D3_REPLAY",
+          "D1_PARITY"
+        ],
+        "injection": {
+          "method": "SQL",
+          "rows_changed": 1,
+          "statements": [
+            "UPDATE payments SET payment_mode_id =   (SELECT id FROM payment_modes WHERE category='ota_receivable'     ORDER BY id LIMIT 1) WHERE id = (SELECT MIN(p.id) FROM payments p             JOIN payment_modes m ON m.id = p.payment_mode_id             WHERE m.category = 'direct_payment')"
+          ]
+        },
+        "missed_by": [],
+        "replay_context": {},
+        "root_cause_candidates": [
+          "The desk UI offers every payment mode regardless of booking source",
+          "A booking imported from an OTA whose source was overwritten",
+          "Training: OTA heads used as a catch-all for card settlements"
+        ],
+        "timestamp": "2026-08-04T23:07:13"
+      },
+      "fault_id": "FLT-A01",
+      "gaps": [],
+      "injection_verified": true,
+      "isolation_verified": true,
+      "layers": [
+        {
+          "attributed_targets": [
+            "P10"
+          ],
+          "detection": "ATTRIBUTED",
+          "duration_ms": 8051,
+          "error": "",
+          "expected": true,
+          "layer": "D1_PARITY",
+          "missing_targets": [],
+          "moved_keys": [
+            "P10",
+            "P15",
+            "P16",
+            "P22"
+          ],
+          "ran": true,
+          "signal_moved": true
+        },
+        {
+          "attributed_targets": [
+            "reports.flash"
+          ],
+          "detection": "UNEXPECTED",
+          "duration_ms": 11882,
+          "error": "",
+          "expected": false,
+          "layer": "D2_GOLDEN",
+          "missing_targets": [
+            "reports.ota_reconciliation"
+          ],
+          "moved_keys": [
+            "ai.api_ceo_kpi_pack",
+            "grc.preview__any_reservation",
+            "main.dashboard",
+            "main.guest_folio__any_guest",
+            "main.invoice__checked_out_reservation",
+            "main.invoice_detail_api__checked_out_reservation",
+            "main.load_tab__overview",
+            "main.reservation_folio__checked_out_reservation",
+            "reports.daily_profit_snapshot",
+            "reports.flash_report",
+            "reports.flash_report__date_2026_05_28",
+            "reports.ota_receivables",
+            "reports.revenue",
+            "reports.revenue__start_date_2026_05_01_end_date_2026_05_28"
+          ],
+          "ran": true,
+          "signal_moved": true
+        },
+        {
+          "attributed_targets": [],
+          "detection": "ATTRIBUTED",
+          "duration_ms": 8739,
+          "error": "",
+          "expected": true,
+          "layer": "D3_REPLAY",
+          "missing_targets": [],
+          "moved_keys": [
+            "date:2026-05-01",
+            "date:2026-05-02",
+            "date:2026-05-03",
+            "date:2026-05-04",
+            "date:2026-05-05",
+            "date:2026-05-06",
+            "date:2026-05-07",
+            "date:2026-05-08",
+            "date:2026-05-09",
+            "date:2026-05-10",
+            "date:2026-05-11",
+            "date:2026-05-12",
+            "date:2026-05-13",
+            "date:2026-05-14",
+            "date:2026-05-15",
+            "date:2026-05-16",
+            "date:2026-05-17",
+            "date:2026-05-18",
+            "date:2026-05-19",
+            "date:2026-05-20",
+            "date:2026-05-21",
+            "date:2026-05-22",
+            "date:2026-05-23",
+            "date:2026-05-24",
+            "date:2026-05-25",
+            "date:2026-05-26",
+            "date:2026-05-27",
+            "date:2026-05-28"
+          ],
+          "ran": true,
+          "signal_moved": true
+        },
+        {
+          "attributed_targets": [
+            "INV-C01",
+            "INV-C05"
+          ],
+          "detection": "ATTRIBUTED",
+          "duration_ms": 9520,
+          "error": "",
+          "expected": true,
+          "layer": "D4_INVARIANTS",
+          "missing_targets": [],
+          "moved_keys": [
+            "INV-B03",
+            "INV-C01",
+            "INV-C05"
+          ],
+          "ran": true,
+          "signal_moved": true
+        }
+      ],
+      "metering": {
+        "db_reads": 0,
+        "db_writes": 0,
+        "duration_ms": 11929,
+        "layers_run": 4,
+        "memory_peak_kb": 3817
+      },
+      "method": "SQL",
+      "rows_changed": 1,
+      "severity": "CRITICAL",
+      "title": "Walk-in reservation settled through an OTA receivable head"
+    }
+  ],
+  "started_at": "2026-08-04T23:06:37",
+  "unbacked_claims": [],
+  "uncovered": [
+    {
+      "covered_by": "D4 \u2014 add an invariant asserting invoice_number uniqueness among finalised invoices. Registered here so the gap is tracked.",
+      "fault_id": "FLT-B04",
+      "reason": "No invariant asserts invoice-number uniqueness, and no monetary total moves, so every layer is silent by construction. Injecting it would produce a guaranteed MISS that says nothing the declaration does not already say.",
+      "title": "Two reservations sharing one invoice number"
+    },
+    {
+      "covered_by": "D9 \u2014 Backup Restore Verification. It will need a checksum column, or an out-of-band manifest, before it can detect this at all.",
+      "fault_id": "FLT-D04",
+      "reason": "No verification layer reads backup artefacts, and backup_logs stores no checksum \u2014 the schema records filename, size and status only. There is nothing to compare a restored file against, so corruption is undetectable by construction rather than by omission.",
+      "title": "A database backup file is corrupt"
+    },
+    {
+      "covered_by": "D9 \u2014 Backup Restore Verification, which must fingerprint before backup and re-verify after restore for this to be detectable.",
+      "fault_id": "FLT-D05",
+      "reason": "Detecting this requires comparing a restored database against a recorded pre-backup fingerprint. Nothing in the framework holds one, so the deletion is simply the new truth and every layer reconciles against it perfectly.",
+      "title": "A restored database does not match what was backed up"
+    },
+    {
+      "covered_by": "D7 \u2014 Certification Engine, which must record an environment fingerprint in every certificate for this to be visible.",
+      "fault_id": "FLT-D07",
+      "reason": "No layer fingerprints the process environment, so a run under a different environment is indistinguishable in the evidence. The gap is in the evidence model rather than in any control.",
+      "title": "A run executes under a different process environment"
+    }
+  ],
+  "undetected": [],
+  "verdict": "INCOMPLETE"
+}

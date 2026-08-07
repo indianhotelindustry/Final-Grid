@@ -1,0 +1,41 @@
+{# ============================================================================
+   Reusable accounting cheat-sheet for staff. Drop this on any screen where
+   the user is making a financial decision and may confuse Revenue with
+   Settlement / Receivable.
+
+   Pure markup — no JS, CSP-safe (uses Bootstrap 5 dismissible alert).
+   Dismissed per page-load (no persistence — keep it in front of staff).
+
+   Usage::
+       {% from "_partials/training_glossary.html" import accounting_glossary %}
+       {{ accounting_glossary() }}
+============================================================================ #}
+
+{% macro accounting_glossary() %}
+<div class="alert alert-info alert-dismissible fade show py-2 px-3 mb-3 small"
+     role="alert" style="background:#eff6ff;border:1px solid #93c5fd;color:#1e3a8a;">
+  <div class="d-flex align-items-center gap-2 mb-2">
+    <i class="bi bi-mortarboard-fill"></i>
+    <strong>Quick reference — money words mean different things</strong>
+  </div>
+  <div class="row g-2">
+    <div class="col-md-4">
+      <span class="badge me-1" style="background:#16a34a;color:#fff;">Revenue</span>
+      <span>= money <strong>earned</strong> (rooms + extras booked, regardless of cash received)</span>
+    </div>
+    <div class="col-md-4">
+      <span class="badge me-1" style="background:#2563eb;color:#fff;">Settlement</span>
+      <span>= money <strong>collected</strong> (cash, UPI, card actually in hand)</span>
+    </div>
+    <div class="col-md-4">
+      <span class="badge me-1" style="background:#f59e0b;color:#1f2937;">Receivable</span>
+      <span>= money <strong>to be collected</strong> (credit owed by guest or company)</span>
+    </div>
+  </div>
+  <div class="small mt-2" style="color:#1e40af;">
+    <i class="bi bi-info-circle me-1"></i>
+    Revenue can be high while Settlement is low — that means people booked but haven't paid yet (Receivable).
+  </div>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Dismiss"></button>
+</div>
+{% endmacro %}

@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0d6efd">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>{% block title %}{{ config.HOTEL_NAME }} - PMS{% endblock %}</title>
+
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='icons/icon-192.svg') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192.svg') }}">
+
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap-icons/font/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/design-system.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <style>
+    /* ── Primary navbar: button-style tabs ──────────────────────────── */
+    .nav-btn {
+        display: inline-flex; align-items: center; gap: 4px;
+        padding: 4px 11px; border-radius: 6px;
+        font-size: 0.875rem; font-weight: 500;
+        color: rgba(255,255,255,0.82) !important;
+        text-decoration: none !important;
+        border: 1px solid transparent;
+        transition: background .12s, border-color .12s, color .12s;
+        white-space: nowrap; line-height: 1.5; cursor: pointer;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,0.16); color: #fff !important; border-color: rgba(255,255,255,0.28); }
+    .nav-btn.active { background: #fff !important; color: #0d6efd !important; border-color: rgba(255,255,255,0.5); font-weight: 700; box-shadow: 0 1px 4px rgba(0,0,0,0.18); }
+    .nav-btn:focus-visible { outline: 2px solid rgba(255,255,255,0.8); outline-offset: 1px; }
+    </style>
+    {% block styles %}{% endblock %}
+</head>
+
+<body>
+    <!-- ═══ PRIMARY NAVBAR ═══ -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm" style="z-index:1030;">
+        <div class="container-fluid px-3">
+            <!-- Brand -->
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-semibold" href="{{ url_for('main.dashboard') }}">
+                {% if app_logo_url %}
+                <img src="{{ app_logo_url }}" alt="Logo" style="height:28px;width:auto;object-fit:contain;">
+                {% else %}
+                <i class="bi bi-building-fill"></i>
+                {% endif %}
+                <span class="d-flex flex-column lh-1">
+                    <span>{{ app_display_name }}</span>
+                    {% if property_name %}
+                    <span class="fw-normal" style="font-size:.65em;opacity:.75;">{{ property_name }}</span>
+                    {% endif %}
+                </span>
+            </a>
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#primaryNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="primaryNav">
+                <!-- ── Primary links (6 items only) ── -->
+                <ul class="navbar-nav me-auto gap-1">
+                    {% set _ep = request.endpoint or '' %}
+                    {% set _bp = request.blueprint or '' %}
+                    <li class="nav-item">
+                        <a class="nav-btn {% if _ep == 'main.dashboard' %}active{% endif %}" href="{{ url_for('main.dashboard') }}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+
+                    {% if current_user.is_authenticated and current_user.has_role('Admin','Manager','FrontDesk','Accountant') %}
+                    <li class="nav-item">
+                        <a class="nav-btn {% if _bp == 'main' and 'reservat' in _ep or _ep in ('main.checkin','main.checkout','main.invoice') %}active{% endif %}" href="{{ url_for('main.reservations') }}">
+                            <i class="bi bi-calendar2-check"></i> Front Desk
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {# Housekeeping and Invoice Manager removed from header —
+                       they are accessible from the dashboard tab bar #}
+
+                    {% if current_user.is_authenticated and current_user.has_role('Admin','Manager','FrontDesk') %}
+                    <li class="nav-item">
+                        <a class="nav-btn {% if _bp == 'pos' %}active{% endif %}" href="{{ url_for('pos.index') }}">
+                            <i class="bi bi-receipt"></i> POS
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% if current_user.is_authenticated and current_user.has_role('Admin','Manager','Accountant') %}
+                    <li class="nav-item">
+                        <a class="nav-btn {% if _bp == 'reports' %}active{% endif %}" href="{{ url_for('reports.index') }}">
+                            <i class="bi bi-bar-chart-line"></i> Reports
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% if current_user.is_authenticated and current_user.has_role('Admin') %}
+                    <li class="nav-item">
+                        <a class="nav-btn {% if _ep == 'main.masters' or _bp in ('rates','updater','backup','maintenance','auth') %}active{% endif %}" href="{{ url_for('main.masters') }}">
+                            <i class="bi bi-gear-wide-connected"></i> Masters
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+
+                <!-- ── Right side: business date + shift + user ── -->
+                <ul class="navbar-nav ms-auto align-items-center gap-1">
+                    {% if current_user.is_authenticated %}
+
+                    <!-- Business date -->
+                    {% if g_business_date %}
+                    <li class="nav-item">
+                        <span class="badge bg-light text-dark border fs-6" style="font-size:0.72rem!important;">
+                            <i class="bi bi-calendar-event me-1"></i>{{ g_business_date.strftime('%d %b %Y') }}
+                        </span>
+                    </li>
+                    {% endif %}
+
+                    <!-- Shift widget -->
+                    {% set open_shift = current_user.shifts | selectattr('status','equalto','Open') | list | first %}
+                    {% if open_shift %}
+                    <li class="nav-item">
+                        <span class="badge bg-success border border-white fs-6" style="font-size:0.7rem!important;">
+                            <i class="bi bi-clock"></i> {{ open_shift.shift_type }}
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('auth.close_shift') }}" class="btn btn-sm btn-warning ms-1">
+                            <i class="bi bi-stop-circle"></i> End
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#startShiftModal">
+                            <i class="bi bi-play-circle"></i> Shift
+                        </button>
+                    </li>
+                    {% endif %}
+
+                    <!-- User dropdown -->
+                    <li class="nav-item dropdown ms-1">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-1 py-1" href="#"
+                           role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="badge rounded-pill
+                                {% if current_user.role == 'Admin' %}bg-danger
+                                {% elif current_user.role == 'Manager' %}bg-warning text-dark
+                                {% elif current_user.role == 'FrontDesk' %}bg-light text-primary
+                                {% elif current_user.role == 'Housekeeping' %}bg-success
+                                {% else %}bg-secondary{% endif %}">
+                                {{ current_user.role }}
+                            </span>
+                            <i class="bi bi-person-circle fs-5"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow" style="min-width:220px;">
+                            <li>
+                                <div class="dropdown-header py-2">
+                                    <div class="small text-muted mb-1">Welcome back,</div>
+                                    <div class="fw-bold text-dark lh-sm">{{ current_user.full_name }}</div>
+                                    <small class="text-muted">{{ current_user.username }} · {{ current_user.role }}</small>
+                                </div>
+                            </li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('auth.change_password') }}">
+                                <i class="bi bi-shield-lock me-2"></i>Change Password</a></li>
+                            {% if current_user.is_app_owner %}
+                            <li><a class="dropdown-item" href="{{ url_for('main.ceo_dashboard') }}">
+                                <i class="bi bi-graph-up-arrow me-2"></i>CEO Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.app_branding') }}">
+                                <i class="bi bi-palette me-2"></i>App Branding</a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li>
+                                <form method="POST" action="{{ url_for('auth.logout') }}" class="d-inline w-100">
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                    {% endif %}
+
+                    <li class="nav-item">
+                        <button id="installBtn" class="btn btn-sm btn-light ms-1" style="display:none;">
+                            <i class="bi bi-download"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ═══ SECONDARY NAVBAR ═══ -->
+    {% if current_user.is_authenticated %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-0 sticky-top" style="z-index:1029;top:56px;">
+        <div class="container-fluid px-3">
+            <button class="navbar-toggler border-0 py-1 ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#secondaryNav" style="font-size:0.8rem;">
+                <i class="bi bi-three-dots"></i> More
+            </button>
+            <div class="collapse navbar-collapse" id="secondaryNav">
+                <ul class="navbar-nav flex-row flex-wrap gap-0">
+
+                    {% if current_user.has_role('Admin','Manager','FrontDesk','Accountant') %}
+                    <li class="nav-item">
+                        <a class="nav-link px-2 py-2 text-secondary" style="font-size:0.82rem;" href="{{ url_for('main.guest_database') }}">
+                            <i class="bi bi-people"></i> Guest Database
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% if current_user.has_role('Admin','Manager','Housekeeping') %}
+                    <li class="nav-item">
+                        <a class="nav-link px-2 py-2 text-secondary" style="font-size:0.82rem;" href="{{ url_for('main.hk_mobile') }}">
+                            <i class="bi bi-phone"></i> HK Mobile
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% if current_user.has_role('Admin','Manager','FrontDesk') %}
+                    <li class="nav-item">
+                        <a class="nav-link px-2 py-2 text-secondary" style="font-size:0.82rem;" href="{{ url_for('loyalty.dashboard') }}">
+                            <i class="bi bi-award"></i> Loyalty Program
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% if current_user.has_role('Admin','Manager') %}
+                    <li class="nav-item">
+                        <a class="nav-link px-2 py-2 text-secondary" style="font-size:0.82rem;" href="{{ url_for('rates.index') }}">
+                            <i class="bi bi-tags"></i> Rates Manager
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link px-2 py-2 text-secondary dropdown-toggle" style="font-size:0.82rem;" href="#"
+                           role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-stars"></i> AI Insights
+                        </a>
+                        <ul class="dropdown-menu shadow" style="min-width:180px;">
+                            <li><a class="dropdown-item" href="{{ url_for('ai_pricing.dashboard') }}">
+                                <i class="bi bi-currency-rupee me-2"></i>Dynamic Pricing</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('ai.forecast_dashboard') }}">
+                                <i class="bi bi-graph-up-arrow me-2"></i>Revenue Forecast</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('ai.demand_calendar_page') }}">
+                                <i class="bi bi-calendar-event me-2"></i>Demand Calendar</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('ai.predictive_maintenance_dashboard') }}">
+                                <i class="bi bi-tools me-2"></i>Predictive Maintenance</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+
+                    {% if current_user.has_role('Admin') %}
+                    <li class="nav-item">
+                        <a class="nav-link px-2 py-2 text-secondary" style="font-size:0.82rem;" href="{{ url_for('auth.users') }}">
+                            <i class="bi bi-shield-person"></i> Users
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-2 py-2 text-secondary" style="font-size:0.82rem;" href="{{ url_for('backup.index') }}">
+                            <i class="bi bi-database-down"></i> Backups
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-2 py-2 text-secondary" style="font-size:0.82rem;" href="{{ url_for('updater.index') }}">
+                            <i class="bi bi-cloud-arrow-up"></i> System Update
+                        </a>
+                    </li>
+                    {% endif %}
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- Start Shift Modal -->
+    {% if current_user.is_authenticated %}
+    <div class="modal fade" id="startShiftModal" tabindex="-1">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <form method="POST" action="{{ url_for('auth.start_shift') }}">
+                    <div class="modal-header bg-primary text-white py-2">
+                        <h6 class="modal-title"><i class="bi bi-play-circle me-1"></i>Start Shift</h6>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Shift Type</label>
+                            <select class="form-select" name="shift_type">
+                                <option value="Morning">Morning (6 AM – 2 PM)</option>
+                                <option value="Evening">Evening (2 PM – 10 PM)</option>
+                                <option value="Night">Night (10 PM – 6 AM)</option>
+                            </select>
+                        </div>
+                        <div class="mb-0">
+                            <label class="form-label fw-semibold">Opening Cash (₹)</label>
+                            <input type="number" class="form-control" name="opening_cash" value="0" min="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="modal-footer py-2">
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="bi bi-play-fill me-1"></i>Start
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Close Shift Modal -->
+    {% endif %}
+
+    <!-- Flash Toast Container -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:1090;">
+        {% for category, message in messages %}
+        {% set icon = 'check-circle-fill' if category == 'success' else ('exclamation-circle-fill' if category == 'danger' else ('exclamation-triangle-fill' if category == 'warning' else 'info-circle-fill')) %}
+        {% set bg   = 'var(--warm-accent)' if category == 'success' else ('#DC2626' if category == 'danger' else ('#D97706' if category == 'warning' else '#0284C7')) %}
+        <div class="toast align-items-center border-0 text-white show mb-2 pms-toast"
+             role="alert" aria-live="assertive" aria-atomic="true"
+             style="background:{{ bg }};border-radius:0.625rem;box-shadow:0 6px 20px rgba(63,42,29,0.18);min-width:280px;max-width:360px;">
+            <div class="d-flex">
+                <div class="toast-body d-flex align-items-start gap-2" style="font-size:0.875rem;font-weight:500;">
+                    <i class="bi bi-{{ icon }} flex-shrink-0 mt-1" style="font-size:1rem;"></i>
+                    <span>{{ message }}</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto flex-shrink-0"
+                        data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="container-fluid py-3 mt-1">
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/voice-assistant.js') }}"></script>
+    {% block scripts %}{% endblock %}
+    <script nonce="{{ csp_nonce }}">
+    // Auto-inject CSRF token into every POST form and outgoing fetch/XHR
+    (function () {
+        const token = document.querySelector('meta[name="csrf-token"]').content;
+        // Inject into HTML forms
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('form[method="post"],form[method="POST"]').forEach(function (f) {
+                if (!f.querySelector('input[name="csrf_token"]')) {
+                    const inp = document.createElement('input');
+                    inp.type = 'hidden'; inp.name = 'csrf_token'; inp.value = token;
+                    f.prepend(inp);
+                }
+            });
+        });
+        // Inject into fetch requests
+        const _fetch = window.fetch;
+        window.fetch = function (url, opts) {
+            opts = opts || {};
+            if (opts.method && opts.method.toUpperCase() !== 'GET') {
+                opts.headers = opts.headers || {};
+                opts.headers['X-CSRFToken'] = token;
+            }
+            return _fetch(url, opts);
+        };
+        // Inject into XHR
+        const _open = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function (method) {
+            this._method = method;
+            return _open.apply(this, arguments);
+        };
+        const _send = XMLHttpRequest.prototype.send;
+        XMLHttpRequest.prototype.send = function () {
+            if (this._method && this._method.toUpperCase() !== 'GET') {
+                this.setRequestHeader('X-CSRFToken', token);
+            }
+            return _send.apply(this, arguments);
+        };
+    })();
+    </script>
+    <script nonce="{{ csp_nonce }}">
+    // Auto-close flash toasts after 2 seconds with a smooth slide-out
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.pms-toast').forEach(function (el) {
+            var t = new bootstrap.Toast(el, { delay: 2000, autohide: true });
+            t.show();
+        });
+    });
+    </script>
+
+    <!-- Offline / Online connectivity banner -->
+    <div id="offline-banner" style="display:none; position:fixed; bottom:0; left:0; right:0;
+         z-index:9999; background:#dc3545; color:#fff; text-align:center;
+         padding:8px 16px; font-weight:600; font-size:0.85rem;">
+        <i class="bi bi-wifi-off me-1"></i> You are offline — notifications and OTA sync are paused. Data is saved locally.
+    </div>
+    <div id="online-banner" style="display:none; position:fixed; bottom:0; left:0; right:0;
+         z-index:9999; background:#198754; color:#fff; text-align:center;
+         padding:8px 16px; font-weight:600; font-size:0.85rem;">
+        <i class="bi bi-wifi me-1"></i> Back online — syncing queued notifications...
+    </div>
+    <script nonce="{{ csp_nonce }}">
+    (function(){
+        var offB = document.getElementById('offline-banner');
+        var onB  = document.getElementById('online-banner');
+        var wasOffline = false;
+
+        function update(){
+            if(!navigator.onLine){
+                offB.style.display='block'; onB.style.display='none'; wasOffline=true;
+            } else {
+                offB.style.display='none';
+                if(wasOffline){ onB.style.display='block'; setTimeout(function(){ onB.style.display='none'; }, 4000); wasOffline=false; }
+            }
+        }
+        window.addEventListener('online', update);
+        window.addEventListener('offline', update);
+        update();
+    })();
+    </script>
+
+    {% if current_user.is_authenticated %}
+    <!-- Voice Assistant Button -->
+    <button id="voiceAssistantBtn" class="voice-mic-btn" title="Voice Assistant (Ctrl+Shift+V)"
+            aria-label="Activate voice assistant">
+        <i class="bi bi-mic-fill"></i>
+    </button>
+
+    <!-- Voice Overlay -->
+    <div id="voiceOverlay" class="voice-overlay">
+        <div class="voice-overlay-content">
+            <div class="voice-icon-ring">
+                <i class="bi bi-mic-fill"></i>
+            </div>
+            <div id="voiceStatus" class="voice-status listening">Listening...</div>
+            <div id="voiceTranscript" class="voice-transcript"></div>
+            <div id="voiceResponse" class="voice-response"></div>
+            <small class="text-muted mt-3 d-block">Press <kbd>Esc</kbd> to cancel</small>
+        </div>
+    </div>
+
+    <style>
+    .voice-mic-btn {
+        position: fixed; bottom: 24px; right: 24px; z-index: 9990;
+        width: 56px; height: 56px; border-radius: 50%;
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: #fff; border: none; font-size: 1.4rem;
+        box-shadow: 0 4px 16px rgba(13,110,253,0.4);
+        cursor: pointer; transition: all 0.3s ease;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .voice-mic-btn:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(13,110,253,0.5); }
+    .voice-mic-btn.listening {
+        background: linear-gradient(135deg, #dc3545, #fd7e14);
+        animation: pulse-mic 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse-mic {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(220,53,69,0.5); }
+        50% { box-shadow: 0 0 0 16px rgba(220,53,69,0); }
+    }
+    .voice-overlay {
+        display: none; position: fixed; inset: 0; z-index: 9995;
+        background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+        align-items: center; justify-content: center;
+    }
+    .voice-overlay.active { display: flex; }
+    .voice-overlay-content {
+        background: #fff; border-radius: 20px; padding: 40px 48px;
+        text-align: center; max-width: 480px; width: 90%;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .voice-icon-ring {
+        width: 80px; height: 80px; border-radius: 50%;
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: #fff; font-size: 2rem;
+        display: inline-flex; align-items: center; justify-content: center;
+        margin-bottom: 16px;
+    }
+    .voice-status { font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; }
+    .voice-status.listening { color: #dc3545; }
+    .voice-status.processing { color: #fd7e14; }
+    .voice-status.success { color: #198754; }
+    .voice-status.error { color: #dc3545; }
+    .voice-transcript {
+        font-size: 1.3rem; color: #212529; min-height: 2em;
+        font-weight: 500; margin-bottom: 8px;
+    }
+    .voice-response {
+        font-size: 1rem; color: #495057; min-height: 1.5em;
+        line-height: 1.5;
+    }
+    </style>
+    {% endif %}
+
+    {# ── CSP-safe print trigger (Apr 2026) ───────────────────────────
+       The app's CSP forbids inline event handlers, so the older
+       onclick="window.print()" buttons silently no-op. This delegated
+       listener lets any element opt-in by adding data-action="print"
+       (or the existing data-print attribute). Buttons that still use
+       the inline handler also get caught here as a fallback because we
+       intercept clicks on any [data-print-trigger]/[data-action="print"]/
+       [data-print] element. #}
+    <script nonce="{{ csp_nonce }}">
+    (function(){
+      function shouldPrint(el){
+        if (!el) return false;
+        if (el.hasAttribute('data-action') && el.getAttribute('data-action') === 'print') return true;
+        if (el.hasAttribute('data-print-trigger')) return true;
+        if (el.hasAttribute('data-print')) return true;
+        return false;
+      }
+      document.addEventListener('click', function(e){
+        var t = e.target;
+        // Walk up a few levels — clicks land on inner <i> or <span>
+        for (var i = 0; t && i < 5; i++){
+          if (shouldPrint(t)){
+            e.preventDefault();
+            try { window.print(); } catch (_) { /* swallow */ }
+            return;
+          }
+          t = t.parentElement;
+        }
+      });
+    })();
+    </script>
+</body>
+
+</html>

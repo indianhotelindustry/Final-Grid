@@ -1,0 +1,43 @@
+{
+  "anon_location": "/auth/login?next=%2Fnoshow%2Freport",
+  "anon_status": 302,
+  "body_bytes": 24227,
+  "body_sha256": "2a5b000467054a8d7da2a298c0d6d46a0e1bc22cfc5e93221fa3122ed169a45d",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 66,
+  "endpoint": "noshow.report",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "direct_count": "0",
+    "fee_applied_count": "0",
+    "from_date": "2026-05-01",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "logs[len]": "0",
+    "ota_count": "0",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "to_date": "2026-05-28",
+    "total_count": "0",
+    "total_fees": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "noshow.report",
+  "templates": [
+    "noshow/report.html"
+  ],
+  "truncations": [],
+  "url": "/noshow/report"
+}

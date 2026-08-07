@@ -1,0 +1,32 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/api/alerts/live",
+  "anon_status": 302,
+  "body_bytes": 63,
+  "body_sha256": "9a095d6c1888c7589add67218abb8ca95d409dd9789a3ae699f1d5583132881b",
+  "category": "OPERATIONAL",
+  "content_type": "application/json",
+  "duration_ms": 3,
+  "endpoint": "main.api_alerts_live",
+  "error": "",
+  "figure_source": "json",
+  "figures": {
+    "$.alerts[len]": "0",
+    "$.counts.HIGH": "0",
+    "$.counts.LOW": "0",
+    "$.counts.MEDIUM": "0",
+    "$.counts.total": "0",
+    "$.counts[len]": "4",
+    "$[len]": "2"
+  },
+  "location": "",
+  "normalisation_hits": {},
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "main.api_alerts_live",
+  "templates": [],
+  "truncations": [],
+  "url": "/api/alerts/live"
+}

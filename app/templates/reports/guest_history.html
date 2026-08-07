@@ -1,0 +1,71 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Guest History{% endblock %}
+{% block report_name %}Guest History{% endblock %}
+
+{% block report_content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h5 class="mb-0"><i class="bi bi-people me-2"></i>Guest History</h5>
+    <div class="d-flex gap-2">
+        {% if guests %}
+        <a href="{{ url_for('reports.guest_history', q=q, format='excel') }}"
+           class="btn btn-sm btn-secondary">
+            <i class="bi bi-file-earmark-excel me-1"></i>Excel
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<form class="d-flex gap-2 mb-3" method="GET">
+    <input type="text" name="q" class="form-control" placeholder="Search by name, phone, or email…"
+           value="{{ q }}">
+    <button class="btn btn-primary">Search</button>
+    {% if q %}<a href="{{ url_for('reports.guest_history') }}" class="btn btn-outline-secondary">Clear</a>{% endif %}
+</form>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle mb-0 small">
+            <thead class="table-light">
+                <tr>
+                    <th>Name</th><th>Phone</th><th>Email</th>
+                    <th class="text-center">Total Stays</th>
+                    <th>Last Stay</th><th class="text-end">Total Spent</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for g in guests %}
+                {% set stays = g.reservations | selectattr('status','in',['CheckedOut','CheckedIn']) | list if g.reservations else [] %}
+                {% set ns = namespace(total=0.0) %}
+                {% for r in stays %}
+                  {% set nights = (r.departure_date - r.arrival_date).days %}
+                  {% set extras = r.extra_charges | sum(attribute='amount') | float %}
+                  {% set ns.total = ns.total + (r.rate_per_night | float * nights) + extras %}
+                {% endfor %}
+                <tr>
+                    <td class="fw-semibold">{{ g.name }}</td>
+                    <td>{{ g.phone }}</td>
+                    <td>{{ g.email or '—' }}</td>
+                    <td class="text-center">
+                        <span class="badge bg-primary">{{ stays | length }}</span>
+                    </td>
+                    <td>
+                        {% if stays %}
+                        {{ stays | map(attribute='departure_date') | max | string | truncate(10, true, '') }}
+                        {% else %}—{% endif %}
+                    </td>
+                    <td class="text-end fw-semibold text-success">
+                        {% if stays %}
+                        ₹{{ '{:,.0f}'.format(ns.total) }}
+                        {% else %}—{% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="text-center text-muted py-4">
+                    {% if q %}No guests found for "{{ q }}".{% else %}Search for a guest above.{% endif %}
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

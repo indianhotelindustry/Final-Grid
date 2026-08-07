@@ -1,0 +1,40 @@
+{
+  "anon_location": "/auth/login?next=%2Frates%2F",
+  "anon_status": 302,
+  "body_bytes": 37360,
+  "body_sha256": "c68a4a03e244288e82666c09cd4c8085ab15033089b410d54fc77abbfdc7fa90",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 29,
+  "endpoint": "rates.index",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "plans[len]": "0",
+    "room_types[0][type]": "RoomType",
+    "room_types[1][type]": "RoomType",
+    "room_types[2][type]": "RoomType",
+    "room_types[len]": "3"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 5,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "rates.index",
+  "templates": [
+    "rates/index.html"
+  ],
+  "truncations": [],
+  "url": "/rates/"
+}

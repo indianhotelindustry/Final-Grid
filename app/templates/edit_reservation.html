@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Edit Reservation #{{ reservation.id }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <h6 class="mb-3">Guest Details</h6>
+                        {% set _g = reservation.guest %}
+                        {% if _g.first_name %}
+                          {% set _fn = _g.first_name %}
+                          {% set _ln = _g.last_name or '' %}
+                        {% else %}
+                          {% set _parts = (_g.name or '').split(None, 1) %}
+                          {% set _fn = _parts[0] if _parts else '' %}
+                          {% set _ln = _parts[1] if _parts|length > 1 else '' %}
+                        {% endif %}
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">First Name *</label>
+                                <input type="text" name="guest_first_name" class="form-control" value="{{ _fn }}" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" name="guest_last_name" class="form-control" value="{{ _ln }}">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Phone *</label>
+                                <input type="tel" name="guest_phone" class="form-control" value="{{ _g.phone }}" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="guest_email" class="form-control" value="{{ reservation.guest.email or '' }}">
+                        </div>
+
+                        <h6 class="mb-3 mt-4">Booking Details</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Arrival Date *</label>
+                                <input type="date" name="arrival_date" class="form-control" value="{{ reservation.arrival_date.strftime('%Y-%m-%d') }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Departure Date *</label>
+                                <input type="date" name="departure_date" class="form-control" value="{{ reservation.departure_date.strftime('%Y-%m-%d') }}" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Room Type *</label>
+                            <select name="room_type_id" class="form-select" required>
+                                {% for rt in room_types %}
+                                <option value="{{ rt.id }}" {% if rt.id == reservation.room_type_id %}selected{% endif %}>{{ rt.name }} - ₹{{ rt.base_rate }}/night</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Adults *</label>
+                                <input type="number" name="adults" class="form-control" value="{{ reservation.adults }}" min="1" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Children</label>
+                                <input type="number" name="children" class="form-control" value="{{ reservation.children }}" min="0">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Rate per Night *</label>
+                            <input type="number" name="rate" class="form-control" step="0.01" value="{{ reservation.rate_per_night }}" required>
+                        </div>
+
+                        <div class="mt-4">
+                            <a href="{{ url_for('main.reservations') }}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

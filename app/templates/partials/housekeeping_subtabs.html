@@ -1,0 +1,22 @@
+{#
+  Sub-tab bar for the Housekeeping section.
+  Sets the top-level Housekeeping global-tab as active on both the housekeeping
+  and maintenance pages; switches here between the two operational views.
+  Expected caller-supplied variable: `hk_subtab` in {'housekeeping', 'maintenance'}.
+#}
+<ul class="nav nav-pills mb-3" style="gap:4px;">
+    <li class="nav-item">
+        <a class="nav-link py-1 px-3 {% if hk_subtab == 'housekeeping' %}active{% endif %}"
+           href="{{ url_for('main.housekeeping') }}">
+            <i class="bi bi-brush me-1"></i>Dirty Rooms
+        </a>
+    </li>
+    {% if current_user.has_role('Admin','Manager','FrontDesk','Housekeeping') %}
+    <li class="nav-item">
+        <a class="nav-link py-1 px-3 {% if hk_subtab == 'maintenance' %}active{% endif %}"
+           href="{{ url_for('maintenance.index') }}">
+            <i class="bi bi-wrench me-1"></i>Maintenance
+        </a>
+    </li>
+    {% endif %}
+</ul>

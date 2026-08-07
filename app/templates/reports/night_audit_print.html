@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Night Audit Report — {{ audit_date.strftime('%d %b %Y') }}</title>
+<style>
+/* ── Page Setup ──────────────────────────────────────────────────────────── */
+@page {
+    size: A4 portrait;
+    margin: 14mm 14mm 16mm 14mm;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9pt;
+    color: #1a1a1a;
+    background: #fff;
+    line-height: 1.4;
+}
+
+/* ── Utility ─────────────────────────────────────────────────────────────── */
+.text-right  { text-align: right; }
+.text-center { text-align: center; }
+.fw-bold     { font-weight: 700; }
+.text-muted  { color: #555; }
+.text-danger { color: #c00; }
+.text-success{ color: #1a7a3c; }
+
+/* ── Page-break helpers ──────────────────────────────────────────────────── */
+.no-break { page-break-inside: avoid; }
+.page-break-before { page-break-before: always; }
+
+/* ── Print button (screen only) ──────────────────────────────────────────── */
+@media screen {
+    body { max-width: 210mm; margin: 10mm auto; padding: 14mm; background: #f0f0f0; }
+    .a4-page { background: #fff; padding: 14mm; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+    .print-btn-bar {
+        text-align: center; margin-bottom: 8mm;
+    }
+    .print-btn {
+        background: #1a4fa0; color: #fff; border: none; padding: 8px 28px;
+        font-size: 11pt; border-radius: 4px; cursor: pointer; margin-right: 8px;
+    }
+    .print-btn:hover { background: #153d80; }
+    .close-btn {
+        background: #555; color: #fff; border: none; padding: 8px 20px;
+        font-size: 11pt; border-radius: 4px; cursor: pointer;
+    }
+}
+@media print {
+    body { background: #fff; margin: 0; padding: 0; }
+    .a4-page { padding: 0; box-shadow: none; }
+    .print-btn-bar { display: none; }
+}
+
+/* ── Hotel Header ────────────────────────────────────────────────────────── */
+.hotel-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    border-bottom: 2.5pt solid #1a4fa0;
+    padding-bottom: 6pt;
+    margin-bottom: 8pt;
+}
+.hotel-logo-box {
+    width: 52pt;
+    height: 52pt;
+    border: 1pt solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #aaa;
+    font-size: 7pt;
+    flex-shrink: 0;
+    margin-right: 10pt;
+    border-radius: 3pt;
+}
+.hotel-name-block { flex: 1; }
+.hotel-name-block h1 {
+    font-size: 16pt;
+    font-weight: 700;
+    color: #1a4fa0;
+    letter-spacing: 0.03em;
+}
+.hotel-name-block .sub { font-size: 8pt; color: #444; margin-top: 2pt; }
+.report-meta { text-align: right; font-size: 7.5pt; color: #333; }
+.report-meta .report-title {
+    font-size: 12pt;
+    font-weight: 700;
+    color: #1a1a1a;
+    display: block;
+    margin-bottom: 3pt;
+}
+.report-meta .meta-row { margin-bottom: 1pt; }
+
+/* ── Report Info Bar ─────────────────────────────────────────────────────── */
+.info-bar {
+    display: flex;
+    gap: 0;
+    background: #1a4fa0;
+    color: #fff;
+    border-radius: 3pt;
+    margin-bottom: 10pt;
+    overflow: hidden;
+}
+.info-bar-cell {
+    flex: 1;
+    padding: 5pt 8pt;
+    border-right: 1pt solid rgba(255,255,255,0.2);
+    font-size: 7.5pt;
+}
+.info-bar-cell:last-child { border-right: none; }
+.info-bar-cell .label { opacity: 0.8; font-size: 6.5pt; text-transform: uppercase; letter-spacing: 0.06em; }
+.info-bar-cell .value { font-weight: 700; font-size: 9pt; margin-top: 1pt; }
+
+/* ── Section Heading ─────────────────────────────────────────────────────── */
+.section-heading {
+    font-size: 9pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #fff;
+    background: #2d5fa8;
+    padding: 3pt 7pt;
+    margin-bottom: 4pt;
+    margin-top: 8pt;
+    border-radius: 2pt;
+}
+.section-heading.first { margin-top: 0; }
+
+/* ── Tables ──────────────────────────────────────────────────────────────── */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.5pt;
+    margin-bottom: 4pt;
+}
+th {
+    background: #e8eef7;
+    color: #1a1a1a;
+    font-weight: 700;
+    padding: 3pt 6pt;
+    border: 0.5pt solid #b0bed0;
+    text-align: left;
+    font-size: 8pt;
+}
+td {
+    padding: 3pt 6pt;
+    border: 0.5pt solid #ccd5e0;
+    vertical-align: top;
+}
+tr:nth-child(even) td { background: #f7f9fc; }
+.total-row td {
+    background: #dce6f5 !important;
+    font-weight: 700;
+    border-top: 1pt solid #1a4fa0;
+}
+.grand-total-row td {
+    background: #1a4fa0 !important;
+    color: #fff !important;
+    font-weight: 700;
+    font-size: 9pt;
+    border-top: 1.5pt solid #0d3278;
+}
+
+/* ── KPI Grid ────────────────────────────────────────────────────────────── */
+.kpi-grid {
+    display: flex;
+    gap: 5pt;
+    margin-bottom: 4pt;
+}
+.kpi-box {
+    flex: 1;
+    border: 0.5pt solid #b0bed0;
+    border-radius: 3pt;
+    padding: 5pt 6pt;
+    text-align: center;
+    background: #f7f9fc;
+}
+.kpi-box .kpi-value { font-size: 13pt; font-weight: 700; color: #1a4fa0; }
+.kpi-box .kpi-label { font-size: 7pt; color: #555; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 1pt; }
+
+/* ── Two-column layout ───────────────────────────────────────────────────── */
+.two-col { display: flex; gap: 8pt; }
+.two-col .col { flex: 1; }
+
+/* ── Alert rows ──────────────────────────────────────────────────────────── */
+.alert-row-blocker td { background: #fff0f0 !important; color: #900; }
+.alert-row-warning td { background: #fffbe6 !important; color: #7a5800; }
+
+/* ── Signature block ─────────────────────────────────────────────────────── */
+.sig-block {
+    display: flex;
+    gap: 20pt;
+    margin-top: 10pt;
+    border-top: 0.5pt solid #bbb;
+    padding-top: 8pt;
+}
+.sig-cell { flex: 1; }
+.sig-line {
+    border-bottom: 0.75pt solid #333;
+    height: 20pt;
+    margin-bottom: 3pt;
+}
+.sig-label { font-size: 7.5pt; color: #444; }
+.sig-role  { font-size: 8pt; font-weight: 700; margin-top: 1pt; }
+
+/* ── Notes block ─────────────────────────────────────────────────────────── */
+.notes-lines { margin-top: 4pt; }
+.notes-lines div {
+    border-bottom: 0.5pt solid #ccc;
+    height: 14pt;
+    margin-bottom: 2pt;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+.page-footer {
+    margin-top: 8pt;
+    border-top: 0.5pt solid #ccc;
+    padding-top: 4pt;
+    display: flex;
+    justify-content: space-between;
+    font-size: 7pt;
+    color: #777;
+}
+
+/* ── Reconciliation box ──────────────────────────────────────────────────── */
+.recon-box {
+    border: 1pt solid #1a4fa0;
+    border-radius: 3pt;
+    padding: 6pt 10pt;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f0f5ff;
+}
+.recon-box .recon-label { font-size: 8pt; color: #333; }
+.recon-box .recon-value { font-size: 11pt; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- Screen-only print button bar -->
+<div class="print-btn-bar" id="printBtnBar">
+    <button class="print-btn" id="printBtn">🖨 Print / Save as PDF</button>
+    <button class="close-btn" onclick="window.close()">✕ Close</button>
+</div>
+
+<div class="a4-page">
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- HOTEL HEADER                                                           -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div class="hotel-header">
+    <div class="hotel-logo-box">LOGO</div>
+    <div class="hotel-name-block">
+        <h1>{{ header.hotel_name }}</h1>
+        {% if hotel_address %}
+        <div class="sub">{{ hotel_address }}</div>
+        {% endif %}
+        {% if hotel_gstin %}
+        <div class="sub">GSTIN: {{ hotel_gstin }}</div>
+        {% endif %}
+    </div>
+    <div class="report-meta">
+        <span class="report-title">Night Audit Report</span>
+        <div class="meta-row"><strong>Audit Date:</strong> {{ audit_date.strftime('%d %B %Y') }}{% if audit_is_closed|default(false) %} (Closed){% endif %}</div>
+        <div class="meta-row"><strong>Generated:</strong> {{ header.generated_at.strftime('%d %b %Y %H:%M') }}</div>
+        <div class="meta-row"><strong>Audit Status:</strong>
+            {% if header.audit_status == 'Completed' %}<span style="color:#1a7a3c;font-weight:700;">✔ Completed</span>
+            {% elif header.audit_status == 'InProgress' %}<span style="color:#a06000;font-weight:700;">⟳ In Progress</span>
+            {% else %}<span style="color:#888;">{{ header.audit_status }}</span>{% endif %}
+        </div>
+        {% if header.run_by %}
+        <div class="meta-row"><strong>Prepared By:</strong> {{ header.run_by }}</div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Info Bar -->
+<div class="info-bar">
+    <div class="info-bar-cell">
+        <div class="label">Date of Business</div>
+        <div class="value">{{ audit_date.strftime('%d %b %Y') }}</div>
+    </div>
+    <div class="info-bar-cell">
+        <div class="label">Audit Date</div>
+        <div class="value">{{ header.generated_at.strftime('%d %b %Y') }}</div>
+    </div>
+    <div class="info-bar-cell">
+        <div class="label">Sellable Rooms</div>
+        <div class="value">{{ occupancy.sellable_rooms }}</div>
+    </div>
+    <div class="info-bar-cell">
+        <div class="label">Rooms Occupied (Business Date)</div>
+        <div class="value">{{ occupancy.occupied }}</div>
+    </div>
+    <div class="info-bar-cell">
+        <div class="label">Business-Date Occ %</div>
+        <div class="value">{{ occupancy.occ_pct }}%</div>
+    </div>
+    <div class="info-bar-cell">
+        <div class="label">Total Revenue</div>
+        <div class="value">₹{{ "{:,.0f}".format(revenue.gross_revenue) }}</div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 1 + 2: OCCUPANCY & KPI (two columns)                          -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div class="two-col no-break">
+    <div class="col">
+        <div class="section-heading first">📊 Occupancy Summary</div>
+        <table>
+            <tr><td>Total Rooms Available</td><td class="text-right fw-bold">{{ occupancy.total_rooms }}</td></tr>
+            <tr><td>Sellable Rooms</td><td class="text-right">{{ occupancy.sellable_rooms }}</td></tr>
+            <tr><td>Rooms Occupied (Business Date)</td><td class="text-right fw-bold">{{ occupancy.occupied }}</td></tr>
+            <tr><td>Business-Date Occupancy %</td><td class="text-right fw-bold">{{ occupancy.occ_pct }}%</td></tr>
+            <tr><td>Vacant Rooms</td><td class="text-right">{{ occupancy.vacant }}</td></tr>
+            <tr><td>Dirty / Under Service</td><td class="text-right">{{ occupancy.dirty }}</td></tr>
+            <tr><td>Out of Order</td><td class="text-right {% if occupancy.out_of_order > 0 %}text-danger{% endif %}">{{ occupancy.out_of_order }}</td></tr>
+            <tr><td>New Arrivals Today</td><td class="text-right">{{ occupancy.new_arrivals_count }}</td></tr>
+            <tr><td>Departures Today</td><td class="text-right">{{ occupancy.checked_out_today_count }}</td></tr>
+            <tr><td>Stay-overs</td><td class="text-right">{{ occupancy.stayovers }}</td></tr>
+        </table>
+    </div>
+    <div class="col">
+        <div class="section-heading first">📈 KPI Metrics</div>
+        <div class="kpi-grid">
+            <div class="kpi-box">
+                <div class="kpi-value">₹{{ "{:,.0f}".format(adr) }}</div>
+                <div class="kpi-label">ADR</div>
+            </div>
+            <div class="kpi-box">
+                <div class="kpi-value">₹{{ "{:,.0f}".format(revpar) }}</div>
+                <div class="kpi-label">RevPAR</div>
+            </div>
+            <div class="kpi-box">
+                <div class="kpi-value">₹{{ "{:,.0f}".format(adr) }}</div>
+                <div class="kpi-label">ARR</div>
+            </div>
+        </div>
+        <div class="section-heading" style="margin-top:6pt;">🛎️ Front Office Activity</div>
+        <table>
+            {# v2.2.18 — arrivals split by semantic meaning. Previously the
+               row labelled "Total Arrivals Expected" was the gross booking
+               count (incl. checked-in / cancelled / no-show), and "Walk-ins"
+               was every CheckedIn reservation regardless of source. Both
+               labels are now accurate; numbers derive from the same
+               reservation/occupancy data, no logic change. #}
+            <tr><td>Expected Arrivals (pending)</td><td class="text-right">{{ occupancy.expected_not_checkedin|length }}</td></tr>
+            <tr><td>Actual Arrivals Today</td><td class="text-right fw-bold">{{ reservations.arrivals_actual|default(occupancy.new_arrivals_count) }}</td></tr>
+            {% set _abs = reservations.arrivals_by_source|default({}) %}
+            <tr><td style="padding-left:14pt;">&nbsp;&nbsp;• Walk-in</td><td class="text-right">{{ _abs.get('walk_in', 0) }}</td></tr>
+            <tr><td style="padding-left:14pt;">&nbsp;&nbsp;• OTA</td><td class="text-right">{{ _abs.get('ota', 0) }}</td></tr>
+            <tr><td style="padding-left:14pt;">&nbsp;&nbsp;• Direct / Other</td><td class="text-right">{{ _abs.get('direct', 0) }}</td></tr>
+            <tr><td>Expected Departures</td><td class="text-right">{{ reservations.departures_today }}</td></tr>
+            <tr><td>Departures Checked Out</td><td class="text-right fw-bold">{{ occupancy.checked_out_today_count }}</td></tr>
+            <tr><td>No-Shows</td><td class="text-right {% if reservations.noshows_count > 0 %}text-danger{% endif %}">{{ reservations.noshows_count }}</td></tr>
+            <tr><td>Cancellations Today</td><td class="text-right">{{ reservations.cancellations_today }}</td></tr>
+            <tr><td>Stay-overs</td><td class="text-right">{{ occupancy.stayovers }}</td></tr>
+        </table>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 3: REVENUE SUMMARY                                            -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div class="no-break">
+<div class="section-heading">💰 Revenue Summary</div>
+<table>
+    <thead>
+        <tr>
+            <th>Revenue Head</th>
+            <th class="text-right" style="width:25%;">Amount (₹)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>Room Revenue</td><td class="text-right">{{ "{:,.2f}".format(revenue.room_revenue) }}</td></tr>
+        {% for cat, amt in revenue.extra_by_category.items() %}
+        <tr><td>{{ cat }}</td><td class="text-right">{{ "{:,.2f}".format(amt) }}</td></tr>
+        {% endfor %}
+        {% if not revenue.extra_by_category %}
+        <tr><td>F&B / Other Revenue</td><td class="text-right">0.00</td></tr>
+        {% endif %}
+        <tr class="total-row">
+            <td>Accrual Net Revenue (Pre-Tax)</td>
+            <td class="text-right">{{ "{:,.2f}".format(revenue.accrual_net) }}</td>
+        </tr>
+        <tr><td>Taxes Collected (GST etc.)</td><td class="text-right">{{ "{:,.2f}".format(revenue.tax_amount) }}</td></tr>
+        {% if revenue.discount_total > 0 %}
+        <tr><td>Discounts / Rate Overrides</td><td class="text-right text-danger">({{ "{:,.2f}".format(revenue.discount_total) }})</td></tr>
+        {% endif %}
+        <tr class="grand-total-row">
+            <td>Gross Revenue (incl. Tax)</td>
+            <td class="text-right">{{ "{:,.2f}".format(revenue.gross_revenue) }}</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 4 + 5: PAYMENT & ACCOUNTS (two columns)                       -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div class="two-col no-break">
+    <div class="col">
+        <div class="section-heading">🧾 Payment Summary</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Payment Mode</th>
+                    <th class="text-right">Txns</th>
+                    <th class="text-right">Amount (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mode, info in payments.by_mode.items() %}
+                <tr>
+                    <td>{{ mode }}</td>
+                    <td class="text-right">{{ info.count }}</td>
+                    <td class="text-right">{{ "{:,.2f}".format(info.amount) }}</td>
+                </tr>
+                {% endfor %}
+                {# v2.2.18 — OTA prepaid settlements were absent from this
+                   panel and made the payment totals appear to undercount.
+                   Listed here separately; NOT added to cash subtotal. #}
+                {% if payments.ota_by_head %}
+                <tr><td colspan="3" style="font-style:italic; color:#666; padding-top:4pt;">OTA Prepaid Settlements (separate from cash collected)</td></tr>
+                {% for head, info in payments.ota_by_head.items() %}
+                <tr style="color:#666;">
+                    <td>{{ head }} &nbsp;<span style="font-size:7pt; padding:1pt 4pt; background:#cfe2ff; color:#084298; border-radius:2pt;">OTA</span></td>
+                    <td class="text-right">{{ info.count }}</td>
+                    <td class="text-right">{{ "{:,.2f}".format(info.amount) }}</td>
+                </tr>
+                {% endfor %}
+                <tr style="font-weight:600; color:#444;">
+                    <td>OTA Subtotal</td>
+                    <td class="text-right"></td>
+                    <td class="text-right">{{ "{:,.2f}".format(payments.ota_total|default(0)) }}</td>
+                </tr>
+                {% endif %}
+                {% if not payments.by_mode and not payments.ota_by_head %}
+                <tr><td colspan="3" class="text-center text-muted">No payments recorded</td></tr>
+                {% endif %}
+            </tbody>
+            <tfoot>
+                {% if payments.total_refunds > 0 %}
+                <tr>
+                    <td colspan="2">Voided / Refunds</td>
+                    <td class="text-right text-danger">({{ "{:,.2f}".format(payments.total_refunds) }})</td>
+                </tr>
+                {% endif %}
+                <tr class="grand-total-row">
+                    <td colspan="2">Net Collection</td>
+                    <td class="text-right">{{ "{:,.2f}".format(payments.net_collection) }}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <div class="col">
+        <div class="section-heading">📚 Accounts & Ledger</div>
+        <table>
+            <tr><td>Open Folios (In-house)</td><td class="text-right fw-bold">{{ folio.open_folios_count }}</td></tr>
+            <tr><td>Closed Folios (Departed)</td><td class="text-right">{{ folio.closed_folios_count }}</td></tr>
+            <tr><td>In-house Outstanding</td><td class="text-right {% if folio.in_house_outstanding > 0 %}text-danger{% endif %}">₹{{ "{:,.2f}".format(folio.in_house_outstanding) }}</td></tr>
+            <tr><td>Checkout Outstanding</td><td class="text-right {% if folio.checkout_outstanding_total > 0 %}text-danger{% endif %}">₹{{ "{:,.2f}".format(folio.checkout_outstanding_total) }}</td></tr>
+            <tr class="total-row"><td>Total Outstanding Balance</td><td class="text-right">₹{{ "{:,.2f}".format(folio.total_outstanding) }}</td></tr>
+        </table>
+
+        <div class="section-heading" style="margin-top:6pt;">🧹 Housekeeping Status</div>
+        <table>
+            <tr><td>Vacant Clean</td><td class="text-right">{{ hk.vacant_clean }}</td></tr>
+            <tr><td>Vacant Dirty</td><td class="text-right">{{ hk.vacant_dirty }}</td></tr>
+            <tr><td>Occupied</td><td class="text-right">{{ hk.occupied }}</td></tr>
+            <tr><td>Out of Order / Maintenance</td><td class="text-right {% if hk.out_of_order > 0 %}text-danger{% endif %}">{{ hk.out_of_order }}</td></tr>
+        </table>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 6: TAX SNAPSHOT                                               -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+{% if tax.has_data %}
+<div class="no-break">
+<div class="section-heading">🧮 Tax Snapshot</div>
+<table>
+    <thead>
+        <tr>
+            <th>Tax Type</th>
+            <th class="text-right">Taxable Amount (₹)</th>
+            <th class="text-right">Tax Amount (₹)</th>
+            <th class="text-right">Lines</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for key, t in tax.by_rate.items() %}
+        <tr>
+            <td>{{ key }}</td>
+            <td class="text-right">{{ "{:,.2f}".format(t['taxable']) }}</td>
+            <td class="text-right">{{ "{:,.2f}".format(t['tax']) }}</td>
+            <td class="text-right">{{ t['count'] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr class="grand-total-row">
+            <td>Total</td>
+            <td class="text-right">{{ "{:,.2f}".format(tax.total_taxable) }}</td>
+            <td class="text-right">{{ "{:,.2f}".format(tax.total_tax) }}</td>
+            <td class="text-right">{{ tax.total_lines }}</td>
+        </tr>
+    </tfoot>
+</table>
+</div>
+{% endif %}
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 7: EXCEPTIONS / ALERTS                                        -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div class="no-break">
+<div class="section-heading">⚠️ Exceptions &amp; Alerts</div>
+<table>
+    <thead>
+        <tr>
+            <th style="width:22%;">Type</th>
+            <th>Severity</th>
+            <th>Detail</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for b in exceptions.blockers %}
+        <tr class="alert-row-blocker">
+            <td class="fw-bold">{{ b.type }}</td>
+            <td class="fw-bold text-danger">Blocker</td>
+            <td>{{ b.detail }}</td>
+        </tr>
+        {% endfor %}
+        {% for w in exceptions.warnings %}
+        <tr class="alert-row-warning">
+            <td>{{ w.type }}</td>
+            <td style="color:#7a5800;">Review Note</td>
+            <td>{{ w.detail }}</td>
+        </tr>
+        {% endfor %}
+        {% if exceptions.blocker_count == 0 and exceptions.warning_count == 0 %}
+        <tr><td colspan="3" class="text-center text-success fw-bold">✔ No exceptions — Audit is clean</td></tr>
+        {% endif %}
+    </tbody>
+</table>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 8: RECONCILIATION CONTROL                                     -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div class="no-break" style="margin-top:6pt;">
+<div class="section-heading">⚖️ Audit Reconciliation Control</div>
+<table>
+    <thead>
+        <tr><th>Metric</th><th class="text-right" style="width:30%;">Amount (₹)</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>Total Posted Revenue</td><td class="text-right">{{ "{:,.2f}".format(control.total_posted_revenue) }}</td></tr>
+        <tr><td>Total Collected (Payments)</td><td class="text-right">{{ "{:,.2f}".format(control.total_collected) }}</td></tr>
+        <tr><td>Total Outstanding</td><td class="text-right">{{ "{:,.2f}".format(control.total_outstanding) }}</td></tr>
+        <tr class="total-row">
+            <td>Reconciliation Difference</td>
+            <td class="text-right {% if control.reconciliation_difference > 1 or control.reconciliation_difference < -1 %}text-danger{% else %}text-success{% endif %}">
+                {{ "{:,.2f}".format(control.reconciliation_difference) }}
+            </td>
+        </tr>
+    </tbody>
+</table>
+<div class="recon-box" style="margin-top:4pt;">
+    <div>
+        <span class="recon-label">Audit Can Close: </span>
+        <span class="fw-bold {% if control.can_close %}text-success{% else %}text-danger{% endif %}">
+            {% if control.can_close %}✔ Yes — All checks passed{% else %}✘ No — {{ control.close_reasons | join(', ') }}{% endif %}
+        </span>
+    </div>
+    <div>
+        <span style="font-size:7.5pt; color:#555;">Blockers: {{ control.blocker_count }} &nbsp;|&nbsp; Review Notes: {{ control.warning_count }}</span>
+    </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 9: FORECAST SNAPSHOT                                          -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div class="no-break" style="margin-top:4pt;">
+<div class="section-heading">📅 Forecast — {{ tomorrow.strftime('%d %B %Y') }} (Next Day)</div>
+<div class="kpi-grid">
+    <div class="kpi-box">
+        <div class="kpi-value">{{ tom_arr }}</div>
+        <div class="kpi-label">Expected Arrivals</div>
+    </div>
+    <div class="kpi-box">
+        <div class="kpi-value">{{ tom_dep }}</div>
+        <div class="kpi-label">Expected Departures</div>
+    </div>
+    <div class="kpi-box">
+        <div class="kpi-value">{{ forecast_occ }}</div>
+        <div class="kpi-label">Forecast Occupied</div>
+    </div>
+    <div class="kpi-box">
+        <div class="kpi-value">{{ forecast_pct }}%</div>
+        <div class="kpi-label">Forecast Occupancy</div>
+    </div>
+    <div class="kpi-box">
+        <div class="kpi-value">{{ occupancy.sellable_rooms }}</div>
+        <div class="kpi-label">Sellable Rooms</div>
+    </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 10: NOTES & REMARKS                                           -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div class="no-break">
+<div class="section-heading">📝 Notes &amp; Remarks</div>
+<div class="notes-lines">
+    <div></div><div></div><div></div><div></div><div></div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 11: SIGNATURES                                                -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div class="sig-block no-break">
+    <div class="sig-cell">
+        <div class="sig-line"></div>
+        <div class="sig-role">Night Auditor</div>
+        <div class="sig-label">Name: _____________________________ &nbsp; Time: ________</div>
+    </div>
+    <div class="sig-cell">
+        <div class="sig-line"></div>
+        <div class="sig-role">Duty Manager</div>
+        <div class="sig-label">Name: _____________________________ &nbsp; Time: ________</div>
+    </div>
+    <div class="sig-cell">
+        <div class="sig-line"></div>
+        <div class="sig-role">General Manager</div>
+        <div class="sig-label">Name: _____________________________ &nbsp; Time: ________</div>
+    </div>
+</div>
+
+<!-- Page Footer -->
+<div class="page-footer">
+    <span>{{ header.hotel_name }} — Night Audit Report — {{ audit_date.strftime('%d %B %Y') }}</span>
+    <span>Generated {{ header.generated_at.strftime('%d %b %Y %H:%M') }} UTC</span>
+    <span>CONFIDENTIAL — For Internal Use Only</span>
+</div>
+
+</div><!-- /.a4-page -->
+
+<script nonce="{{ csp_nonce }}">
+document.getElementById('printBtn').addEventListener('click', function() { window.print(); });
+// Auto-print when opened directly
+if (window.opener || window.name === 'nightAuditPrint') {
+    window.addEventListener('load', function() { window.print(); });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,931 @@
+{
+  "app_version": "2.2.18",
+  "asat_exclusions": [
+    {
+      "path": "nas.audit_header.generated_at",
+      "why": "records when the report was generated, not what happened on the date. It is SUPPOSED to move when the clock moves."
+    }
+  ],
+  "business_date": "2026-05-28",
+  "copy_method": "sqlite-backup-api",
+  "counts": {
+    "asat_drift": 0,
+    "closed": 1,
+    "dates": 28,
+    "engine_errors": 0,
+    "history_drift": 1,
+    "no_activity": 494,
+    "not_comparable": 2,
+    "order_mismatch": 0,
+    "reconciled": 36,
+    "traded": 2,
+    "unreconciled": 0,
+    "with_snapshot": 1
+  },
+  "date_index": [
+    {
+      "date": "2026-05-01",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-02",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-03",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-04",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-05",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-06",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-07",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-08",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-09",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-10",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-11",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-12",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-13",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-14",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-15",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-16",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-17",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-18",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-19",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-20",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-21",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-22",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-23",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-24",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-25",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-26",
+      "engine_figures": 164,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 42,
+      "row_counts": {
+        "charges": 0,
+        "night_rates": 0,
+        "payments": 0,
+        "tax_lines": 0
+      }
+    },
+    {
+      "date": "2026-05-27",
+      "engine_figures": 317,
+      "has_snapshot": true,
+      "is_closed": true,
+      "ledger_figures": 51,
+      "row_counts": {
+        "charges": 1,
+        "night_rates": 14,
+        "payments": 16,
+        "tax_lines": 28
+      }
+    },
+    {
+      "date": "2026-05-28",
+      "engine_figures": 337,
+      "has_snapshot": false,
+      "is_closed": false,
+      "ledger_figures": 51,
+      "row_counts": {
+        "charges": 4,
+        "night_rates": 16,
+        "payments": 19,
+        "tax_lines": 38
+      }
+    }
+  ],
+  "date_insensitive": [
+    {
+      "dates": 28,
+      "path": "kpi.accrual_summary.accrual_discount",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "kpi.cash_discount",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "kpi.cash_summary.cash_discount",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "kpi.dashboard_kpis.accrual_discount",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "kpi.dashboard_kpis.adr",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "kpi.dashboard_kpis.cash_discount",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "kpi.dashboard_kpis.occupancy_pct",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "kpi.dashboard_kpis.occupied",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "kpi.dashboard_kpis.revpar",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "kpi.dashboard_kpis.sellable",
+      "value": "39"
+    },
+    {
+      "dates": 28,
+      "path": "kpi.dashboard_kpis.total_rooms",
+      "value": "39"
+    },
+    {
+      "dates": 28,
+      "path": "kpi.previous_month_revenue",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.audit_header.blocker_count",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.audit_header.warning_count",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.final_control.reconciliation_difference",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.final_control.warning_count",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.folio_control.company_credit_count",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.folio_control.company_credit_outstanding",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.folio_control.credit_created_count_today",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.folio_control.credit_created_today",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.folio_control.credit_overdue_15_count",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.folio_control.credit_overdue_15_total",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.folio_control.credit_overdue_30_count",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.folio_control.credit_overdue_30_total",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.folio_control.credit_recovered_today",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.folio_control.credit_risky_account_count",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.folio_control.forfeit_count_today",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.folio_control.forfeit_income_today",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.folio_control.in_house_outstanding",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.folio_control.individual_credit_count",
+      "value": "1"
+    },
+    {
+      "dates": 28,
+      "path": "nas.folio_control.individual_credit_outstanding",
+      "value": "200"
+    },
+    {
+      "dates": 28,
+      "path": "nas.folio_control.open_folios_count",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.folio_control.total_credit_outstanding",
+      "value": "200"
+    },
+    {
+      "dates": 28,
+      "path": "nas.occupancy_position.dirty",
+      "value": "3"
+    },
+    {
+      "dates": 28,
+      "path": "nas.occupancy_position.out_of_order",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.occupancy_position.sellable_rooms",
+      "value": "39"
+    },
+    {
+      "dates": 28,
+      "path": "nas.occupancy_position.stayovers",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.occupancy_position.total_rooms",
+      "value": "39"
+    },
+    {
+      "dates": 28,
+      "path": "nas.occupancy_position.vacant",
+      "value": "36"
+    },
+    {
+      "dates": 28,
+      "path": "nas.payment_summary.advance_received",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.payment_summary.advance_received_total",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.payment_summary.credit_recovered_total",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.payment_summary.net_advance_today",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.payment_summary.ota_outstanding_lifetime",
+      "value": "7977.92"
+    },
+    {
+      "dates": 28,
+      "path": "nas.payment_summary.refund_count",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.payment_summary.refund_issued_total",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.payment_summary.total_refunds",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.reservation_reconciliation.arrivals_by_source.direct",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.reservation_reconciliation.arrivals_by_source.ota",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.reservation_reconciliation.cancellations_today",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.reservation_reconciliation.noshows_count",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.revenue_summary.discount_count",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.revenue_summary.discount_total",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.revenue_summary.early_checkin_total",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.room_charge_audit.audit_ok",
+      "value": "True"
+    },
+    {
+      "dates": 28,
+      "path": "nas.room_charge_audit.missing_count",
+      "value": "0"
+    },
+    {
+      "dates": 28,
+      "path": "nas.tax_snapshot.exempt_lines",
+      "value": "0"
+    }
+  ],
+  "duration_seconds": 7.89,
+  "finished_at": "2026-08-04T11:40:59",
+  "first_activity": "2026-05-27",
+  "gaps_filled": 26,
+  "ledger_instability": [],
+  "ledger_stable": true,
+  "mtd_checks": [
+    {
+      "date": "2026-05-01",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-02",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-03",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-04",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-05",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-06",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-07",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-08",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-09",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-10",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-11",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-12",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-13",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-14",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-15",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-16",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-17",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-18",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-19",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-20",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-21",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-22",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-23",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-24",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-25",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-26",
+      "engine": "0",
+      "ledger": "0.000000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-27",
+      "engine": "16100.5",
+      "ledger": "16100.500000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    },
+    {
+      "date": "2026-05-28",
+      "engine": "31666.37",
+      "ledger": "31666.370000",
+      "note": "month-to-date against the sum of the daily direct collections in the ledger",
+      "status": "RECONCILED"
+    }
+  ],
+  "not_replayable": [
+    {
+      "entry_point": "kpi_helpers.get_occupancy",
+      "reason": "takes no date; counts reservations in-house NOW"
+    },
+    {
+      "entry_point": "kpi_helpers.get_occupied_count",
+      "reason": "takes no date; counts reservations in-house NOW"
+    },
+    {
+      "entry_point": "kpi_helpers.get_adr",
+      "reason": "takes no date; averages the tariffs of CURRENTLY checked-in reservations, so it returns 0.00 for every past date once the guests have left"
+    },
+    {
+      "entry_point": "kpi_helpers.get_revpar",
+      "reason": "derived from get_adr and get_occupancy, both present-tense"
+    },
+    {
+      "entry_point": "kpi_helpers.get_sellable_room_count",
+      "reason": "reads Room.status, which is present-tense: it says what a room is like now, not what it was like on the replayed date"
+    },
+    {
+      "entry_point": "occupancy_engine.occupancy_snapshot",
+      "reason": "reads Room.status; same present-tense limitation"
+    },
+    {
+      "entry_point": "night_audit_service.NightAuditService.occupancy_position (room half)",
+      "reason": "the reservation half is date-scoped and IS replayed; the room counts inside it derive from Room.status and are not"
+    }
+  ],
+  "order_proof_run": true,
+  "pvf_version": "0.3.0",
+  "read_only_verified": true,
+  "source_db": "C:\\Users\\SIPL Server\\Downloads\\DSS\\SukoonPMS\\SukoonPMS\\instance\\pms.db",
+  "source_hash_after": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+  "source_hash_before": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+  "started_at": "2026-08-04T11:40:51",
+  "timeline_excluded": [
+    {
+      "date": "2026-05-29",
+      "reason": "later than the current business date \u2014 a future booking, not history"
+    }
+  ],
+  "timeline_window_notes": [
+    {
+      "date": "2026-05-01..2026-05-26",
+      "reason": "earlier than the first activity, included anyway so month-to-date figures can be checked against the sum of their days"
+    }
+  ]
+}

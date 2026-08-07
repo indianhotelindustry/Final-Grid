@@ -1,0 +1,139 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Refund Report{% endblock %}
+{% block report_name %}Refund Report{% endblock %}
+
+{% block report_content %}
+<style>
+@media print {
+    .d-print-none { display: none !important; }
+    @page { size: A4; margin: 15mm; }
+}
+</style>
+
+<div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+    <div>
+        <h5 class="mb-0">
+            <i class="bi bi-arrow-counterclockwise text-danger me-2"></i>Refund Report
+        </h5>
+        <small class="text-muted">
+            {{ from_date.strftime('%d %b %Y') }} — {{ to_date.strftime('%d %b %Y') }}
+        </small>
+    </div>
+    <div class="d-flex gap-2 d-print-none">
+        <a href="{{ url_for('reports.refund_report', **request.args, format='excel') }}"
+           class="btn btn-sm btn-success">
+            <i class="bi bi-file-earmark-excel me-1"></i>Excel
+        </a>
+        <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i>Print / PDF
+        </button>
+    </div>
+</div>
+
+{# Date filter #}
+<form class="d-flex align-items-center gap-2 mb-4 flex-wrap d-print-none">
+    <label class="fw-semibold small">From</label>
+    <input type="date" name="from" class="form-control form-control-sm" style="width:auto;"
+           value="{{ from_str }}">
+    <label class="fw-semibold small">To</label>
+    <input type="date" name="to" class="form-control form-control-sm" style="width:auto;"
+           value="{{ to_str }}">
+    <button class="btn btn-sm btn-primary">Apply</button>
+</form>
+
+{# Summary card #}
+<div class="row g-3 mb-4">
+    <div class="col-sm-4">
+        <div class="card border-danger shadow-sm text-center py-3">
+            <div class="fs-2 fw-bold text-danger">₹{{ '{:,.2f}'.format(total) }}</div>
+            <div class="text-muted small">Total Refunded</div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card shadow-sm text-center py-3">
+            <div class="fs-2 fw-bold">{{ rows|length }}</div>
+            <div class="text-muted small">Refund Transactions</div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card shadow-sm text-center py-3">
+            <div class="fs-5 fw-bold text-muted">
+                ₹{{ '{:,.2f}'.format(total / rows|length) if rows else '0.00' }}
+            </div>
+            <div class="text-muted small">Average Refund</div>
+        </div>
+    </div>
+</div>
+
+{# Detail table #}
+<div class="card shadow-sm">
+    <div class="card-header bg-white fw-semibold py-2 d-flex align-items-center gap-2">
+        <i class="bi bi-table me-1"></i>Refund Details
+        <span class="badge bg-danger ms-auto">{{ rows|length }} records</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle mb-0 small">
+            <thead class="table-danger">
+                <tr>
+                    <th>Date</th>
+                    <th>Folio</th>
+                    <th>Guest</th>
+                    <th>Room</th>
+                    <th>Amount</th>
+                    <th>Refund Mode</th>
+                    <th>Reason</th>
+                    <th>Remarks</th>
+                    <th>Processed By</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in rows %}
+                {% set res = r.reservation %}
+                <tr>
+                    <td class="text-nowrap">{{ r.created_at.strftime('%d %b %Y') }}</td>
+                    <td>
+                        {% if res %}
+                        <a href="{{ url_for('main.invoice', reservation_id=res.id) }}"
+                           class="text-primary fw-semibold text-decoration-none">
+                            {{ res.booking_reference or res.id }}
+                        </a>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>{{ res.guest.name if res and res.guest else '—' }}</td>
+                    <td>{{ res.room.room_number if res and res.room else '—' }}</td>
+                    <td class="fw-bold text-danger">₹{{ '{:,.2f}'.format(r.overpaid_amount) }}</td>
+                    <td>
+                        <span class="badge bg-secondary">
+                            {{ r.refund_mode.name if r.refund_mode else '—' }}
+                        </span>
+                    </td>
+                    <td class="text-capitalize">{{ r.reason or '—' }}</td>
+                    <td class="text-muted">{{ r.remarks or '—' }}</td>
+                    <td>{{ r.resolved_by.username if r.resolved_by else '—' }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="9" class="text-center text-muted py-4">
+                        No refunds in this period.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% if rows %}
+            <tfoot class="table-danger fw-bold">
+                <tr>
+                    <td colspan="4" class="text-end">Total Refunded:</td>
+                    <td>₹{{ '{:,.2f}'.format(total) }}</td>
+                    <td colspan="4"></td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+</div>
+
+<p class="small text-muted mt-3 d-print-none">
+    <i class="bi bi-info-circle me-1"></i>
+    Refund amounts reduce net collection. They are not included in room revenue.
+</p>
+{% endblock %}

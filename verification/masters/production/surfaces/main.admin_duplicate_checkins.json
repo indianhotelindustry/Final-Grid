@@ -1,0 +1,36 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/admin/duplicate-checkins",
+  "anon_status": 302,
+  "body_bytes": 22915,
+  "body_sha256": "be0c38afb2cab18addce06fc2d01d609e1b7d7bbcb278a7ebc9cbc55d0dc3d94",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 17,
+  "endpoint": "main.admin_duplicate_checkins",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "groups[len]": "0",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "main.admin_duplicate_checkins",
+  "templates": [
+    "admin/duplicate_checkins.html"
+  ],
+  "truncations": [],
+  "url": "/admin/duplicate-checkins"
+}

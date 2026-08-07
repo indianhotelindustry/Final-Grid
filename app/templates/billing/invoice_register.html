@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+{% block title %}Invoice Register{% endblock %}
+
+{% block content %}
+
+{# ── Page header ────────────────────────────────────────────────────────── #}
+<div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+    <h5 class="mb-0 fw-bold">
+        <i class="bi bi-receipt-cutoff text-primary me-2"></i>Invoice Register
+        <span class="badge bg-secondary ms-1 fs-6">{{ rows|length }}</span>
+    </h5>
+    <div class="d-flex gap-2 d-print-none flex-wrap align-items-center">
+        <a href="{{ url_for('billing.invoice_register', tab=quick, from=from_date.isoformat(), to=to_date.isoformat(), search=search, room=room_f, btype=btype_f, format='excel') }}"
+           class="btn btn-sm btn-outline-success" title="Export Excel">
+            <i class="bi bi-file-earmark-excel me-1"></i>Export Excel
+        </a>
+        <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i>Print
+        </button>
+    </div>
+</div>
+
+{# ── Summary cards ───────────────────────────────────────────────────────── #}
+<div class="row g-2 mb-3">
+
+    <div class="col-6 col-sm-4 col-xl-2">
+        <div class="card border-0 shadow-sm h-100 border-start border-4 border-primary">
+            <div class="card-body py-2 px-3">
+                <div class="text-muted small">Invoices</div>
+                <div class="fw-bold fs-5">{{ summary.count }}</div>
+                <div style="font-size:0.68rem;" class="text-muted">
+                    <span class="text-success">{{ summary.settled_count }} settled</span> ·
+                    <span class="text-warning">{{ summary.partial_count }} partial</span> ·
+                    <span class="text-danger">{{ summary.unsettled_count }} unsettled</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-sm-4 col-xl-2">
+        <div class="card border-0 shadow-sm h-100 border-start border-4 border-dark">
+            <div class="card-body py-2 px-3">
+                <div class="text-muted small">Billed Amount</div>
+                <div class="fw-bold fs-5">₹{{ '{:,.0f}'.format(summary.total_billed) }}</div>
+                <div style="font-size:0.68rem;" class="text-muted">excl. GST</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-sm-4 col-xl-2">
+        <div class="card border-0 shadow-sm h-100 border-start border-4 border-success">
+            <div class="card-body py-2 px-3">
+                <div class="text-muted small">Collected</div>
+                <div class="fw-bold fs-5 text-success">₹{{ '{:,.0f}'.format(summary.total_collected) }}</div>
+                <div style="font-size:0.68rem;" class="text-muted">payments received</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-sm-4 col-xl-2">
+        <div class="card border-0 shadow-sm h-100 border-start border-4 {% if summary.total_pending > 0 %}border-danger{% else %}border-secondary{% endif %}">
+            <div class="card-body py-2 px-3">
+                <div class="text-muted small">Pending Recovery</div>
+                <div class="fw-bold fs-5 {% if summary.total_pending > 0 %}text-danger{% else %}text-muted{% endif %}">
+                    ₹{{ '{:,.0f}'.format(summary.total_pending) }}
+                </div>
+                <div style="font-size:0.68rem;" class="text-muted">outstanding</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-sm-4 col-xl-2">
+        <div class="card border-0 shadow-sm h-100 border-start border-4 {% if summary.unsettled_count > 0 %}border-danger{% else %}border-secondary{% endif %}">
+            <div class="card-body py-2 px-3">
+                <div class="text-muted small">Unsettled</div>
+                <div class="fw-bold fs-5 {% if summary.unsettled_count > 0 %}text-danger{% else %}text-muted{% endif %}">
+                    {{ summary.unsettled_count }}
+                </div>
+                <div style="font-size:0.68rem;" class="text-muted">zero payment received</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-sm-4 col-xl-2">
+        <div class="card border-0 shadow-sm h-100 border-start border-4 {% if summary.partial_count > 0 %}border-warning{% else %}border-secondary{% endif %}">
+            <div class="card-body py-2 px-3">
+                <div class="text-muted small">Partial</div>
+                <div class="fw-bold fs-5 {% if summary.partial_count > 0 %}text-warning{% else %}text-muted{% endif %}">
+                    {{ summary.partial_count }}
+                </div>
+                <div style="font-size:0.68rem;" class="text-muted">partially paid</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{# ── Quick-filter tabs ───────────────────────────────────────────────────── #}
+<div class="d-flex gap-2 flex-wrap align-items-start mb-3 d-print-none">
+
+    <div class="btn-group btn-group-sm me-2" role="group">
+        {% for tab_id, tab_label in [('today','Today'), ('unsettled','Unsettled'), ('partial','Partial'), ('settled','Settled'), ('all','All')] %}
+        <a href="{{ url_for('billing.invoice_register', tab=tab_id, search=search, room=room_f, btype=btype_f) }}"
+           class="btn {% if quick == tab_id %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            {{ tab_label }}
+            {% if tab_id == 'unsettled' and summary.unsettled_count > 0 %}
+                <span class="badge bg-danger ms-1">{{ summary.unsettled_count }}</span>
+            {% elif tab_id == 'partial' and summary.partial_count > 0 %}
+                <span class="badge bg-warning text-dark ms-1">{{ summary.partial_count }}</span>
+            {% endif %}
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Search + date form -->
+    <form class="d-flex gap-1 align-items-center flex-wrap" action="{{ url_for('billing.invoice_register') }}" method="get">
+        <input type="hidden" name="tab" value="{{ quick }}">
+        {% if quick != 'today' %}
+        <input type="date" class="form-control form-control-sm" name="from"
+               value="{{ from_date.isoformat() }}" style="width:130px;">
+        <span class="small text-muted">→</span>
+        <input type="date" class="form-control form-control-sm" name="to"
+               value="{{ to_date.isoformat() }}" style="width:130px;">
+        {% endif %}
+        <input type="text" class="form-control form-control-sm" name="search"
+               value="{{ search }}" placeholder="Guest / Phone" style="width:130px;">
+        <input type="text" class="form-control form-control-sm" name="room"
+               value="{{ room_f }}" placeholder="Room no." style="width:80px;">
+        <select name="btype" class="form-select form-select-sm" style="width:100px;">
+            <option value="" {% if not btype_f %}selected{% endif %}>All Types</option>
+            <option value="Regular" {% if btype_f == 'Regular' %}selected{% endif %}>Regular</option>
+            <option value="Hourly"  {% if btype_f == 'Hourly'  %}selected{% endif %}>Hourly</option>
+        </select>
+        <button class="btn btn-sm btn-secondary">Apply</button>
+        {% if search or room_f or btype_f %}
+        <a href="{{ url_for('billing.invoice_register', tab=quick) }}" class="btn btn-sm btn-outline-secondary">Clear</a>
+        {% endif %}
+    </form>
+
+</div>
+
+{% if quick != 'today' %}
+<div class="text-muted small mb-2">
+    Period: {{ from_date.strftime('%d %b %Y') }} — {{ to_date.strftime('%d %b %Y') }}
+    {% if search %} · Guest: <strong>{{ search }}</strong>{% endif %}
+    {% if room_f  %} · Room: <strong>{{ room_f }}</strong>{% endif %}
+    {% if btype_f %} · Type: <strong>{{ btype_f }}</strong>{% endif %}
+</div>
+{% endif %}
+
+{# ── Invoice table ───────────────────────────────────────────────────────── #}
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle mb-0 small" id="invoiceTable">
+            <thead class="table-dark">
+                <tr>
+                    <th>Invoice No.</th>
+                    <th>Date / Time</th>
+                    <th>Guest</th>
+                    <th>Room</th>
+                    <th>Type</th>
+                    <th>Arrival → Departure</th>
+                    <th class="text-end">Bill Total</th>
+                    <th class="text-end">Paid</th>
+                    <th class="text-end">Balance</th>
+                    <th class="text-center">Status</th>
+                    <th>Payment Modes</th>
+                    <th>Checkout By</th>
+                    <th class="d-print-none">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in rows %}
+                {% set res = r.reservation %}
+                {% set b   = r.billing %}
+                <tr>
+                    <td class="fw-semibold text-primary text-nowrap">
+                        {{ res.booking_reference or ('RES-' ~ res.id) }}
+                    </td>
+                    <td class="text-nowrap">
+                        {% if res.checked_out_at %}
+                            <div>{{ res.checked_out_at.strftime('%d %b %Y') }}</div>
+                            <div class="text-muted" style="font-size:0.7rem;">{{ res.checked_out_at.strftime('%H:%M') }}</div>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>
+                        <div>{{ res.guest.name if res.guest else '—' }}</div>
+                        {% if res.guest and res.guest.phone %}
+                        <div class="text-muted" style="font-size:0.7rem;">{{ res.guest.phone }}</div>
+                        {% endif %}
+                    </td>
+                    <td class="fw-semibold">{{ res.room.room_number if res.room else '—' }}</td>
+                    <td>
+                        <span class="badge"
+                              style="background:{% if res.booking_type == 'Hourly' %}#1D6FA4{% else %}#6B7280{% endif %};font-size:0.62rem;">
+                            {{ res.booking_type or 'Regular' }}
+                        </span>
+                    </td>
+                    <td class="text-nowrap small text-muted">
+                        {{ res.arrival_date.strftime('%d %b') if res.arrival_date else '—' }}
+                        →
+                        {{ res.departure_date.strftime('%d %b') if res.departure_date else '—' }}
+                        <span class="ms-1 text-muted" style="font-size:0.68rem;">
+                            ({{ (res.departure_date - res.arrival_date).days if res.departure_date and res.arrival_date else '?' }}N)
+                        </span>
+                    </td>
+                    <td class="text-end fw-semibold">₹{{ '{:,.0f}'.format(b.total) }}</td>
+                    <td class="text-end text-success">₹{{ '{:,.0f}'.format(b.paid) }}</td>
+                    <td class="text-end {% if b.balance > 0.01 %}text-danger fw-semibold{% else %}text-muted{% endif %}">
+                        {% if b.balance > 0.01 %}₹{{ '{:,.0f}'.format(b.balance) }}{% else %}—{% endif %}
+                    </td>
+                    <td class="text-center">
+                        {% if r.status == 'Settled' %}
+                            <span class="badge bg-success">Settled</span>
+                        {% elif r.status == 'Partial' %}
+                            <span class="badge bg-warning text-dark">Partial</span>
+                        {% else %}
+                            <span class="badge bg-danger">Unsettled</span>
+                        {% endif %}
+                    </td>
+                    <td class="small">
+                        {% if r.modes %}
+                            {% for mode, amt in r.modes.items() %}
+                            <span class="badge bg-light text-dark border me-1" style="font-size:0.62rem;">
+                                {{ mode }} ₹{{ '{:,.0f}'.format(amt) }}
+                            </span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td class="small text-nowrap">{{ r.checkout_by }}</td>
+                    <td class="text-nowrap d-print-none">
+                        <a href="{{ url_for('main.invoice', reservation_id=res.id) }}"
+                           class="btn btn-xs btn-outline-primary" style="font-size:0.68rem;padding:2px 6px;"
+                           title="View Invoice">
+                            <i class="bi bi-eye"></i> View
+                        </a>
+                        <a href="{{ url_for('main.invoice', reservation_id=res.id) }}"
+                           class="btn btn-xs btn-outline-secondary" style="font-size:0.68rem;padding:2px 6px;"
+                           onclick="window.open(this.href,'_blank');setTimeout(()=>{window.frames[0]&&window.frames[0].print()},500);return false;"
+                           title="Print Invoice">
+                            <i class="bi bi-printer"></i>
+                        </a>
+                        <a href="{{ url_for('main.guest_folio', guest_id=res.guest_id) }}"
+                           class="btn btn-xs btn-outline-dark" style="font-size:0.68rem;padding:2px 6px;"
+                           title="Open Folio">
+                            <i class="bi bi-folder2-open"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="13" class="text-center text-muted py-5">
+                        <i class="bi bi-inbox fs-4 d-block mb-2"></i>
+                        No invoices found for this filter.
+                        {% if quick == 'today' %}
+                            No check-outs recorded today.
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+            {% if rows %}
+            <tfoot class="table-secondary fw-semibold small">
+                <tr>
+                    <td colspan="6" class="text-end">Totals ({{ rows|length }} invoice{{ 's' if rows|length != 1 else '' }}):</td>
+                    <td class="text-end">₹{{ '{:,.0f}'.format(summary.total_billed) }}</td>
+                    <td class="text-end text-success">₹{{ '{:,.0f}'.format(summary.total_collected) }}</td>
+                    <td class="text-end {% if summary.total_pending > 0 %}text-danger{% endif %}">
+                        {% if summary.total_pending > 0 %}₹{{ '{:,.0f}'.format(summary.total_pending) }}{% else %}—{% endif %}
+                    </td>
+                    <td colspan="4"></td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+</div>
+
+<div class="text-muted mt-2 d-print-none" style="font-size:0.7rem;">
+    <i class="bi bi-info-circle me-1"></i>
+    Settled: balance ≤ ₹0 &nbsp;·&nbsp; Partial: part-paid with outstanding balance &nbsp;·&nbsp;
+    Unsettled: no payment received. All amounts exclude GST.
+</div>
+
+<style>
+.btn-xs { line-height: 1; }
+@media print {
+    .d-print-none { display: none !important; }
+    .table { font-size: 0.7rem; }
+}
+</style>
+
+{% endblock %}

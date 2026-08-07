@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-calendar-plus me-1"></i>Advance Booking
+                  <small class="opacity-75 ms-2">— for a future stay</small>
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <input type="hidden" name="guest_id" id="rf_guest_id" value="">
+
+                    <h6 class="border-bottom pb-2 mb-3">Guest Search</h6>
+                    <div class="mb-2">
+                        <div class="guest-search-wrapper position-relative">
+                            <input type="text" class="form-control form-control-lg" id="rf_search"
+                                placeholder="Search by name, mobile or company…" autocomplete="off">
+                        </div>
+                        <div class="form-text">Search for a returning guest, or fill in the details below for a new guest.</div>
+                    </div>
+
+                    <!-- Selected guest card -->
+                    <div id="rf_selected_card" class="alert alert-success d-flex align-items-start gap-3 py-2 px-3 mb-3" style="display:none; font-size:.85rem;">
+                        <i class="bi bi-person-check-fill fs-5 mt-1 text-success flex-shrink-0"></i>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold" id="rf_sc_name"></div>
+                            <div class="text-muted">
+                                <i class="bi bi-telephone me-1"></i><span id="rf_sc_phone"></span>
+                                &ensp;<i class="bi bi-envelope me-1"></i><span id="rf_sc_email"></span>
+                                &ensp;<i class="bi bi-building me-1"></i><span id="rf_sc_company"></span>
+                            </div>
+                        </div>
+                        <button type="button" id="rf_clear_guest" class="btn btn-sm btn-outline-secondary py-0 px-2">
+                            <i class="bi bi-x"></i> Change
+                        </button>
+                    </div>
+
+                    <div id="rf_new_guest_fields">
+                        <h6 class="border-bottom pb-2 mb-3">Guest Details</h6>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">First Name *</label>
+                                <input type="text" name="first_name" id="rf_first_name" class="form-control form-control-lg" required placeholder="First name">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" name="last_name" id="rf_last_name" class="form-control form-control-lg" placeholder="Last name">
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Mobile *</label>
+                                <input type="tel" name="guest_phone" id="rf_guest_phone" class="form-control form-control-lg" required placeholder="10-digit number">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="guest_email" id="rf_guest_email" class="form-control form-control-lg" placeholder="Optional">
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="border-bottom pb-2 mb-3 mt-4">Booking Details</h6>
+                    <div class="row">
+                        <div class="col-12 col-md-6 mb-3">
+                            <label class="form-label">Arrival Date *</label>
+                            <input type="date" name="arrival_date" class="form-control form-control-lg" required>
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <label class="form-label">Departure Date *</label>
+                            <input type="date" name="departure_date" class="form-control form-control-lg" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Room Type *</label>
+                        <select name="room_type_id" class="form-select form-select-lg" required>
+                            {% for rt in room_types %}
+                            <option value="{{ rt.id }}">{{ rt.name }} - ₹{{ rt.base_rate }}/night</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Adults *</label>
+                            <input type="number" name="adults" class="form-control form-control-lg" value="1" min="1" required>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Children</label>
+                            <input type="number" name="children" class="form-control form-control-lg" value="0" min="0">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rate per Night *</label>
+                        <input type="number" name="rate" class="form-control form-control-lg" step="0.01" value="1000" required>
+                    </div>
+
+                    <h6 class="border-bottom pb-2 mb-3 mt-4">Payment</h6>
+                    <div class="mb-3">
+                        <label class="form-label">Advance Payment</label>
+                        <input type="number" name="advance_payment" class="form-control form-control-lg" step="0.01" value="0">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Payment Mode</label>
+                        <select name="payment_mode_id" class="form-select form-select-lg">
+                            {% for pm in payment_modes %}
+                            <option value="{{ pm.id }}">{{ pm.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="manager_override" value="1" id="managerOverride">
+                            <label class="form-check-label" for="managerOverride">
+                                Manager Override (Allow overbooking)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 sticky-bottom">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-calendar-check"></i> Save Advance Booking
+                        </button>
+                        <a href="{{ url_for('main.reservations') }}" class="btn btn-secondary btn-lg">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/guest-search-form.js') }}"></script>
+<script nonce="{{ csp_nonce }}">
+    window['guestSearchForm_rf'] = new GuestSearchForm('rf_search', 'rf');
+</script>
+{% endblock %}

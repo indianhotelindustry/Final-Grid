@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{# ── CEO Dashboard — Phase B ───────────────────────────────────────────
+   Owner-only. The route renders the empty shell; all data is loaded
+   async via JS from /api/ceo/kpi-pack and /api/ai/insights?mode=ceo.
+─────────────────────────────────────────────────────────────────────── #}
+
+{% block content %}
+<div class="container-fluid mt-3" id="ceoDashboard"
+     data-kpi-endpoint="{{ url_for('ai.api_ceo_kpi_pack') }}"
+     data-insights-endpoint="{{ url_for('ai.api_ai_insights') }}?mode=ceo"
+     data-insights-refresh-endpoint="{{ url_for('ai.api_ai_insights_refresh') }}?mode=ceo">
+
+    {# ── Header ─────────────────────────────────────────────────────── #}
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+            <h4 class="mb-0 d-flex align-items-center gap-2">
+                <i class="bi bi-graph-up-arrow text-primary"></i>
+                CEO Dashboard
+                <span class="badge bg-secondary fw-normal" style="font-size:0.6rem;">OWNER</span>
+            </h4>
+            <div class="text-muted" style="font-size:0.78rem;">
+                Business date: <span id="ceoBusinessDate">…</span>
+                · Last refresh: <span id="ceoLoadedAt">…</span>
+            </div>
+        </div>
+        <button id="ceoRefreshBtn" type="button" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-arrow-clockwise"></i> Refresh
+        </button>
+    </div>
+
+    {# ── Top KPI strip — 6 compact cards ────────────────────────────── #}
+    <style>
+    .ceo-kpi-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
+    @media (min-width: 768px) { .ceo-kpi-row { grid-template-columns: repeat(6, 1fr); } }
+    .ceo-kpi-card {
+        background: #fff; border: 1px solid #e9ecef; border-radius: 8px;
+        padding: 10px 12px; box-shadow: 0 1px 3px rgba(0,0,0,.05); min-height: 78px;
+    }
+    .ceo-kpi-label {
+        font-size: 0.62rem; font-weight: 800; text-transform: uppercase;
+        letter-spacing: 0.06em; color: #6b7280; margin-bottom: 4px;
+        display: flex; align-items: center; gap: 5px;
+    }
+    .ceo-kpi-value { font-size: 1.35rem; font-weight: 800; color: #111827; line-height: 1.2; }
+    .ceo-kpi-sub   { font-size: 0.62rem; color: #9ca3af; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ceo-kpi-card.healthy { border-left: 3px solid #10b981; }
+    .ceo-kpi-card.warn    { border-left: 3px solid #f59e0b; }
+    .ceo-kpi-card.danger  { border-left: 3px solid #ef4444; }
+
+    /* ── Section card ── */
+    .ceo-section { background: #fff; border: 1px solid #e9ecef; border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+    .ceo-section-title { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; color: #6b7280; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+
+    /* ── Funnel ── */
+    .ceo-funnel { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    @media (min-width: 768px) { .ceo-funnel { grid-template-columns: repeat(6, 1fr); } }
+    .ceo-funnel-step { background: #f9fafb; border-radius: 6px; padding: 8px 10px; text-align: center; }
+    .ceo-funnel-step .fnum   { font-size: 1.3rem; font-weight: 800; color: #111827; }
+    .ceo-funnel-step .flabel { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+
+    /* ── Channel mix table ── */
+    .ceo-table { width: 100%; font-size: 0.78rem; }
+    .ceo-table th { font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; padding: 6px 8px; border-bottom: 1px solid #e9ecef; }
+    .ceo-table td { padding: 7px 8px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
+    .ceo-table tr:last-child td { border-bottom: none; }
+    .ceo-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+    /* ── Aging matrix ── */
+    .ceo-aging-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    @media (min-width: 768px) { .ceo-aging-grid { grid-template-columns: repeat(4, 1fr); } }
+    .ceo-aging-card { background: #f9fafb; border-radius: 6px; padding: 10px 12px; }
+    .ceo-aging-card .alabel { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+    .ceo-aging-card .aval   { font-size: 1.1rem; font-weight: 800; color: #111827; margin-top: 2px; }
+    .ceo-aging-card.bucket-30plus { background: #fef2f2; }
+    .ceo-aging-card.bucket-30plus .aval { color: #991b1b; }
+
+    /* ── AI Insights (CEO mode) — share styles with Module 7 ── */
+    .ceo-ai { background: linear-gradient(135deg, #f0f9ff 0%, #ede9fe 100%); border: 1px solid #c7d2fe; border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
+    .ceo-ai-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+    .ceo-ai-title { font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #4338ca; display: flex; align-items: center; gap: 6px; }
+    .ceo-ai-meta { font-size: 0.62rem; color: #6b7280; display: flex; align-items: center; gap: 8px; }
+    .ceo-ai-meta .ai-source-badge { padding: 1px 6px; border-radius: 10px; font-weight: 700; background: #e0e7ff; color: #3730a3; }
+    .ceo-ai-meta .ai-source-badge.heuristic { background: #fef3c7; color: #92400e; }
+    .ceo-ai-summary { font-size: 0.85rem; line-height: 1.45; color: #1f2937; margin-bottom: 10px; }
+    .ceo-ai-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 767px) { .ceo-ai-grid { grid-template-columns: 1fr; } }
+    .ceo-ai-col { background: #fff; border-radius: 8px; padding: 10px 12px; }
+    .ceo-ai-col-title { font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #6b7280; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+    .ceo-ai-item { display: flex; gap: 7px; align-items: flex-start; padding: 5px 0; border-bottom: 1px solid #f3f4f6; font-size: 0.76rem; }
+    .ceo-ai-item:last-child { border-bottom: none; }
+    .ceo-ai-item .bullet { color: #6366f1; flex-shrink: 0; margin-top: 1px; }
+    .ceo-ai-item .issue-title { font-weight: 700; color: #111827; }
+    .ceo-ai-item .issue-reason { color: #6b7280; font-size: 0.72rem; margin-top: 2px; }
+    .ceo-ai-empty { font-size: 0.72rem; color: #9ca3af; font-style: italic; padding: 4px 0; }
+    .ceo-ai-error { font-size: 0.72rem; color: #991b1b; padding: 4px 0; }
+    </style>
+
+    <div class="ceo-kpi-row" id="ceoKpiRow">
+        {# Cards rendered by JS — placeholders shown until data arrives. #}
+        <div class="ceo-kpi-card" data-kpi="bookings">
+            <div class="ceo-kpi-label"><i class="bi bi-bag-plus text-primary"></i>OTA Bookings Today</div>
+            <div class="ceo-kpi-value">…</div>
+            <div class="ceo-kpi-sub">received in last 24h</div>
+        </div>
+        <div class="ceo-kpi-card" data-kpi="arrivals">
+            <div class="ceo-kpi-label"><i class="bi bi-calendar-event text-info"></i>OTA Arrivals Today</div>
+            <div class="ceo-kpi-value">…</div>
+            <div class="ceo-kpi-sub">expected today</div>
+        </div>
+        <div class="ceo-kpi-card" data-kpi="checkins">
+            <div class="ceo-kpi-label"><i class="bi bi-box-arrow-in-down-right text-success"></i>OTA Check-ins Today</div>
+            <div class="ceo-kpi-value">…</div>
+            <div class="ceo-kpi-sub">conversion: <span data-conv>…</span>%</div>
+        </div>
+        <div class="ceo-kpi-card" data-kpi="revenue">
+            <div class="ceo-kpi-label"><i class="bi bi-cash-stack text-success"></i>OTA Revenue Today</div>
+            <div class="ceo-kpi-value">…</div>
+            <div class="ceo-kpi-sub">accrued (rate × nights)</div>
+        </div>
+        <div class="ceo-kpi-card" data-kpi="outstanding">
+            <div class="ceo-kpi-label"><i class="bi bi-hourglass-split text-warning"></i>OTA Outstanding</div>
+            <div class="ceo-kpi-value">…</div>
+            <div class="ceo-kpi-sub">awaiting channel payout</div>
+        </div>
+        <div class="ceo-kpi-card" data-kpi="audit">
+            <div class="ceo-kpi-label"><i class="bi bi-moon-stars text-secondary"></i>Last Night Audit</div>
+            <div class="ceo-kpi-value">…</div>
+            <div class="ceo-kpi-sub" data-audit-date>…</div>
+        </div>
+    </div>
+
+    {# ── AI Insights (CEO mode) ─────────────────────────────────────── #}
+    <div class="ceo-ai" id="ceoAiPanel">
+        <div class="ceo-ai-head">
+            <div class="ceo-ai-title">
+                <i class="bi bi-stars"></i> AI Insights — Owner View
+            </div>
+            <div class="ceo-ai-meta">
+                <span class="ai-source-badge" id="ceoAiSource">loading…</span>
+                <span id="ceoAiTime"></span>
+                <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2"
+                        id="ceoAiRefreshBtn" style="font-size:0.68rem;">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+            </div>
+        </div>
+        <div class="ceo-ai-summary" id="ceoAiSummary">
+            <span class="text-muted">Generating ownership insights…</span>
+        </div>
+        <div class="ceo-ai-grid">
+            <div class="ceo-ai-col">
+                <div class="ceo-ai-col-title">
+                    <i class="bi bi-exclamation-circle text-warning"></i> Why these issues?
+                </div>
+                <div id="ceoAiIssues">
+                    <div class="ceo-ai-empty">Loading…</div>
+                </div>
+            </div>
+            <div class="ceo-ai-col">
+                <div class="ceo-ai-col-title">
+                    <i class="bi bi-lightning-charge text-success"></i> Strategic actions
+                </div>
+                <div id="ceoAiActions">
+                    <div class="ceo-ai-empty">Loading…</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# ── OTA Funnel ─────────────────────────────────────────────────── #}
+    <div class="ceo-section">
+        <div class="ceo-section-title">
+            <i class="bi bi-funnel"></i> OTA Funnel — Today
+        </div>
+        <div class="ceo-funnel" id="ceoFunnel">
+            <div class="ceo-funnel-step"><div class="fnum">…</div><div class="flabel">Bookings</div></div>
+            <div class="ceo-funnel-step"><div class="fnum">…</div><div class="flabel">Arrivals</div></div>
+            <div class="ceo-funnel-step"><div class="fnum">…</div><div class="flabel">Checked In</div></div>
+            <div class="ceo-funnel-step"><div class="fnum">…</div><div class="flabel">Checked Out</div></div>
+            <div class="ceo-funnel-step"><div class="fnum">…</div><div class="flabel">No-shows</div></div>
+            <div class="ceo-funnel-step"><div class="fnum">…</div><div class="flabel">Cancelled</div></div>
+        </div>
+    </div>
+
+    {# ── Channel Mix ────────────────────────────────────────────────── #}
+    <div class="ceo-section">
+        <div class="ceo-section-title">
+            <i class="bi bi-pie-chart"></i> Channel Mix — Today &amp; MTD
+        </div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="text-muted mb-1" style="font-size:0.65rem;font-weight:700;text-transform:uppercase;">Today</div>
+                <table class="ceo-table">
+                    <thead><tr><th>Channel</th><th class="num">Bookings</th><th class="num">Nights</th><th class="num">Revenue</th></tr></thead>
+                    <tbody id="ceoChannelToday"><tr><td colspan="4" class="text-muted small">Loading…</td></tr></tbody>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <div class="text-muted mb-1" style="font-size:0.65rem;font-weight:700;text-transform:uppercase;">Month to date</div>
+                <table class="ceo-table">
+                    <thead><tr><th>Channel</th><th class="num">Bookings</th><th class="num">Nights</th><th class="num">Revenue</th></tr></thead>
+                    <tbody id="ceoChannelMtd"><tr><td colspan="4" class="text-muted small">Loading…</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {# ── Forward Pipeline ───────────────────────────────────────────── #}
+    <div class="ceo-section">
+        <div class="ceo-section-title">
+            <i class="bi bi-calendar-range"></i> Forward Pipeline — Next 30 Days
+        </div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="text-muted small mb-2">Totals</div>
+                <div><strong id="ceoPipeBookings">…</strong> confirmed bookings</div>
+                <div><strong id="ceoPipeNights">…</strong> room nights</div>
+                <div><strong>₹<span id="ceoPipeRevenue">…</span></strong> projected revenue</div>
+            </div>
+            <div class="col-md-8">
+                <div class="text-muted small mb-2">By channel</div>
+                <table class="ceo-table">
+                    <thead><tr><th>Channel</th><th class="num">Bookings</th><th class="num">Nights</th><th class="num">Revenue</th></tr></thead>
+                    <tbody id="ceoPipeBySource"><tr><td colspan="4" class="text-muted small">Loading…</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {# ── OTA Payout Status (Phase 2 — reconciliation layer) ────────── #}
+    <div class="ceo-section">
+        <div class="ceo-section-title d-flex align-items-center justify-content-between">
+            <span><i class="bi bi-arrow-left-right"></i> OTA Payout Status</span>
+            <a href="{{ url_for('reports.ota_reconciliation') }}"
+               class="btn btn-sm btn-outline-primary py-0 px-2"
+               style="font-size:0.65rem;">
+                <i class="bi bi-arrow-up-right-square"></i> Open Reconciliation
+            </a>
+        </div>
+        <div class="text-muted small mb-2" id="ceoPayoutSummary">…</div>
+        <div class="table-responsive">
+            <table class="ceo-table">
+                <thead>
+                    <tr>
+                        <th>Channel</th>
+                        <th class="num">Pending</th>
+                        <th class="num">Last Payout</th>
+                        <th class="num">Cycle</th>
+                        <th class="num">Delay</th>
+                        <th class="num">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="ceoPayoutRows">
+                    <tr><td colspan="6" class="text-muted small">Loading…</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {# ── Receivable Aging ──────────────────────────────────────────── #}
+    <div class="ceo-section">
+        <div class="ceo-section-title">
+            <i class="bi bi-clock-history"></i> OTA Receivable Aging
+        </div>
+        <div class="ceo-aging-grid" id="ceoAging">
+            <div class="ceo-aging-card"><div class="alabel">0-7 days</div><div class="aval">…</div></div>
+            <div class="ceo-aging-card"><div class="alabel">8-15 days</div><div class="aval">…</div></div>
+            <div class="ceo-aging-card"><div class="alabel">16-30 days</div><div class="aval">…</div></div>
+            <div class="ceo-aging-card bucket-30plus"><div class="alabel">30+ days</div><div class="aval">…</div></div>
+        </div>
+        <div class="text-muted small mt-2">
+            Total outstanding: <strong>₹<span id="ceoAgingTotal">…</span></strong>
+            <span class="text-muted">— buckets show payments accrued but not yet reconciled to channel payout files.</span>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/ceo_dashboard.js') }}" defer></script>
+{% endblock %}

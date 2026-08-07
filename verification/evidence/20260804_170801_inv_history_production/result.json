@@ -1,0 +1,2434 @@
+{
+  "app_version": "2.2.18",
+  "business_date": "2026-05-28",
+  "clock_dependent": [],
+  "dates_replayed": 28,
+  "diverged": [
+    "INV-A02",
+    "INV-B03",
+    "INV-C01"
+  ],
+  "duration_seconds": 1.85,
+  "finished_at": "2026-08-04T17:08:03",
+  "first_date": "2026-05-01",
+  "invariants": [
+    {
+      "blocking": "CERTIFICATION_BLOCKING",
+      "clock_dependent_dates": [],
+      "dates": [
+        {
+          "clock_dependent": false,
+          "date": "2026-05-01",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-02",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-03",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-04",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-05",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-06",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-07",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-08",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-09",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-10",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-11",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-12",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-13",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-14",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-15",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-16",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-17",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-18",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-19",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-20",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-21",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-22",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-23",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-24",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-25",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-26",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-27",
+          "is_closed": true,
+          "population_as_of_date": 17,
+          "status_as_of_date": "VIOLATED",
+          "status_as_of_today": "VIOLATED",
+          "violations_as_of_date": 17,
+          "violations_as_of_today": 17
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-28",
+          "is_closed": false,
+          "population_as_of_date": 23,
+          "status_as_of_date": "VIOLATED",
+          "status_as_of_today": "VIOLATED",
+          "violations_as_of_date": 23,
+          "violations_as_of_today": 23
+        }
+      ],
+      "earliest_divergence": "2026-05-27",
+      "earliest_divergence_population": 17,
+      "evaluated_dates": 28,
+      "holds_today": false,
+      "invariant_id": "INV-A02",
+      "severity": "HIGH",
+      "title": "Every financial row belongs to a folio"
+    },
+    {
+      "blocking": "RELEASE_BLOCKING",
+      "clock_dependent_dates": [],
+      "dates": [
+        {
+          "clock_dependent": false,
+          "date": "2026-05-01",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-02",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-03",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-04",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-05",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-06",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-07",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-08",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-09",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-10",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-11",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-12",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-13",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-14",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-15",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-16",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-17",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-18",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-19",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-20",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-21",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-22",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-23",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-24",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-25",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-26",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-27",
+          "is_closed": true,
+          "population_as_of_date": 16,
+          "status_as_of_date": "HOLDS",
+          "status_as_of_today": "HOLDS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-28",
+          "is_closed": false,
+          "population_as_of_date": 19,
+          "status_as_of_date": "HOLDS",
+          "status_as_of_today": "HOLDS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        }
+      ],
+      "earliest_divergence": "",
+      "earliest_divergence_population": 0,
+      "evaluated_dates": 28,
+      "holds_today": true,
+      "invariant_id": "INV-A04",
+      "severity": "CRITICAL",
+      "title": "Daily collections equal the direct payments recorded for the day"
+    },
+    {
+      "blocking": "CERTIFICATION_BLOCKING",
+      "clock_dependent_dates": [],
+      "dates": [
+        {
+          "clock_dependent": false,
+          "date": "2026-05-01",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-02",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-03",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-04",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-05",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-06",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-07",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-08",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-09",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-10",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-11",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-12",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-13",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-14",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-15",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-16",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-17",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-18",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-19",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-20",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-21",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-22",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-23",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-24",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-25",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-26",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-27",
+          "is_closed": true,
+          "population_as_of_date": 28,
+          "status_as_of_date": "HOLDS",
+          "status_as_of_today": "HOLDS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-28",
+          "is_closed": false,
+          "population_as_of_date": 38,
+          "status_as_of_date": "HOLDS",
+          "status_as_of_today": "HOLDS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        }
+      ],
+      "earliest_divergence": "",
+      "earliest_divergence_population": 0,
+      "evaluated_dates": 28,
+      "holds_today": true,
+      "invariant_id": "INV-A05",
+      "severity": "CRITICAL",
+      "title": "Every stored tax line equals its taxable base times its rate"
+    },
+    {
+      "blocking": "RELEASE_BLOCKING",
+      "clock_dependent_dates": [],
+      "dates": [
+        {
+          "clock_dependent": false,
+          "date": "2026-05-01",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-02",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-03",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-04",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-05",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-06",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-07",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-08",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-09",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-10",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-11",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-12",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-13",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-14",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-15",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-16",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-17",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-18",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-19",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-20",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-21",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-22",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-23",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-24",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-25",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-26",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-27",
+          "is_closed": true,
+          "population_as_of_date": 17,
+          "status_as_of_date": "HOLDS",
+          "status_as_of_today": "HOLDS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-28",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        }
+      ],
+      "earliest_divergence": "",
+      "earliest_divergence_population": 0,
+      "evaluated_dates": 28,
+      "holds_today": false,
+      "invariant_id": "INV-B01",
+      "severity": "CRITICAL",
+      "title": "No financial row was created into a business date after that date closed"
+    },
+    {
+      "blocking": "RELEASE_BLOCKING",
+      "clock_dependent_dates": [],
+      "dates": [
+        {
+          "clock_dependent": false,
+          "date": "2026-05-01",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-02",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-03",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-04",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-05",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-06",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-07",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-08",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-09",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-10",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-11",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-12",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-13",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-14",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-15",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-16",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-17",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-18",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-19",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-20",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-21",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-22",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-23",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-24",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-25",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-26",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-27",
+          "is_closed": true,
+          "population_as_of_date": 1,
+          "status_as_of_date": "HOLDS",
+          "status_as_of_today": "HOLDS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-28",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        }
+      ],
+      "earliest_divergence": "",
+      "earliest_divergence_population": 0,
+      "evaluated_dates": 28,
+      "holds_today": false,
+      "invariant_id": "INV-B02",
+      "severity": "CRITICAL",
+      "title": "Every frozen night-audit snapshot matches its stored hash"
+    },
+    {
+      "blocking": "RELEASE_BLOCKING",
+      "clock_dependent_dates": [],
+      "dates": [
+        {
+          "clock_dependent": false,
+          "date": "2026-05-01",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-02",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-03",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-04",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-05",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-06",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-07",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-08",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-09",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-10",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-11",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-12",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-13",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-14",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-15",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-16",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-17",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-18",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-19",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-20",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-21",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-22",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-23",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-24",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-25",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-26",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-27",
+          "is_closed": true,
+          "population_as_of_date": 8,
+          "status_as_of_date": "VIOLATED",
+          "status_as_of_today": "VIOLATED",
+          "violations_as_of_date": 1,
+          "violations_as_of_today": 1
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-28",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        }
+      ],
+      "earliest_divergence": "2026-05-27",
+      "earliest_divergence_population": 8,
+      "evaluated_dates": 28,
+      "holds_today": false,
+      "invariant_id": "INV-B03",
+      "severity": "CRITICAL",
+      "title": "Recomputing a closed day reproduces the figures it reported"
+    },
+    {
+      "blocking": "OPERATIONAL_WARNING",
+      "clock_dependent_dates": [],
+      "dates": [
+        {
+          "clock_dependent": false,
+          "date": "2026-05-01",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-02",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-03",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-04",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-05",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-06",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-07",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-08",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-09",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-10",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-11",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-12",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-13",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-14",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-15",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-16",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-17",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-18",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-19",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-20",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-21",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-22",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-23",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-24",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-25",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-26",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-27",
+          "is_closed": true,
+          "population_as_of_date": 16,
+          "status_as_of_date": "HOLDS",
+          "status_as_of_today": "HOLDS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-28",
+          "is_closed": false,
+          "population_as_of_date": 19,
+          "status_as_of_date": "HOLDS",
+          "status_as_of_today": "HOLDS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        }
+      ],
+      "earliest_divergence": "",
+      "earliest_divergence_population": 0,
+      "evaluated_dates": 28,
+      "holds_today": true,
+      "invariant_id": "INV-B06",
+      "severity": "MEDIUM",
+      "title": "A payment is never dated outside the stay it belongs to"
+    },
+    {
+      "blocking": "CERTIFICATION_BLOCKING",
+      "clock_dependent_dates": [],
+      "dates": [
+        {
+          "clock_dependent": false,
+          "date": "2026-05-01",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-02",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-03",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-04",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-05",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-06",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-07",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-08",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-09",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-10",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-11",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-12",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-13",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-14",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-15",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-16",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-17",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-18",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-19",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-20",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-21",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-22",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-23",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-24",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-25",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-26",
+          "is_closed": false,
+          "population_as_of_date": 0,
+          "status_as_of_date": "VACUOUS",
+          "status_as_of_today": "VACUOUS",
+          "violations_as_of_date": 0,
+          "violations_as_of_today": 0
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-27",
+          "is_closed": true,
+          "population_as_of_date": 3,
+          "status_as_of_date": "VIOLATED",
+          "status_as_of_today": "VIOLATED",
+          "violations_as_of_date": 3,
+          "violations_as_of_today": 3
+        },
+        {
+          "clock_dependent": false,
+          "date": "2026-05-28",
+          "is_closed": false,
+          "population_as_of_date": 2,
+          "status_as_of_date": "VIOLATED",
+          "status_as_of_today": "VIOLATED",
+          "violations_as_of_date": 2,
+          "violations_as_of_today": 2
+        }
+      ],
+      "earliest_divergence": "2026-05-27",
+      "earliest_divergence_population": 3,
+      "evaluated_dates": 28,
+      "holds_today": false,
+      "invariant_id": "INV-C01",
+      "severity": "CRITICAL",
+      "title": "A walk-in reservation is never settled through an OTA receivable"
+    }
+  ],
+  "pvf_version": "0.3.0",
+  "read_only_verified": true,
+  "skipped": [
+    {
+      "invariant_id": "INV-A01",
+      "reason": "declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING, SINGLE_RESERVATION; none of them is date-scoped, so it has no historical form and is not replayed"
+    },
+    {
+      "invariant_id": "INV-A03",
+      "reason": "declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed"
+    },
+    {
+      "invariant_id": "INV-A06",
+      "reason": "declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING, SINGLE_RESERVATION; none of them is date-scoped, so it has no historical form and is not replayed"
+    },
+    {
+      "invariant_id": "INV-B04",
+      "reason": "declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed"
+    },
+    {
+      "invariant_id": "INV-B05",
+      "reason": "declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed"
+    },
+    {
+      "invariant_id": "INV-C02",
+      "reason": "declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING, SINGLE_RESERVATION; none of them is date-scoped, so it has no historical form and is not replayed"
+    },
+    {
+      "invariant_id": "INV-C03",
+      "reason": "declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed"
+    },
+    {
+      "invariant_id": "INV-C04",
+      "reason": "declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed"
+    },
+    {
+      "invariant_id": "INV-C05",
+      "reason": "declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed"
+    },
+    {
+      "invariant_id": "INV-C06",
+      "reason": "declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed"
+    },
+    {
+      "invariant_id": "INV-D01",
+      "reason": "declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed"
+    },
+    {
+      "invariant_id": "INV-D02",
+      "reason": "declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed"
+    },
+    {
+      "invariant_id": "INV-D03",
+      "reason": "declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed"
+    },
+    {
+      "invariant_id": "INV-D04",
+      "reason": "declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed"
+    },
+    {
+      "invariant_id": "INV-D05",
+      "reason": "declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed"
+    },
+    {
+      "invariant_id": "INV-D06",
+      "reason": "declares modes ENTIRE_DATABASE, RELEASE_VERIFICATION, REGRESSION_DATASET, CONTINUOUS_MONITORING; none of them is date-scoped, so it has no historical form and is not replayed"
+    }
+  ],
+  "source_db": "C:\\Users\\SIPL Server\\Downloads\\DSS\\SukoonPMS\\SukoonPMS\\instance\\pms.db",
+  "source_hash_after": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+  "source_hash_before": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+  "started_at": "2026-08-04T17:08:01",
+  "total_writes": 0,
+  "verdict": "FAIL"
+}

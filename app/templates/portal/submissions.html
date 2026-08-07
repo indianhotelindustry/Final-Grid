@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Pre-Check-In Submissions{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h5 class="mb-0">
+        <i class="bi bi-person-check text-success me-2"></i>
+        Pre-Check-In Submissions
+        <span class="badge bg-secondary ms-1">{{ submissions|length }}</span>
+    </h5>
+    <a href="{{ url_for('main.reservations') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Back
+    </a>
+</div>
+
+{% if submissions %}
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle mb-0 small">
+            <thead class="table-light">
+                <tr>
+                    <th>Booking Ref</th>
+                    <th>Guest Name</th>
+                    <th>Nationality</th>
+                    <th>ID Type</th>
+                    <th>Check-in Date</th>
+                    <th>ETA</th>
+                    <th>Submitted</th>
+                    <th>ID Photo</th>
+                    <th>Signature</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sub in submissions %}
+                {% set r = sub.reservation %}
+                <tr>
+                    <td class="fw-semibold text-primary">
+                        {{ r.booking_reference or ('#' ~ r.id) }}
+                    </td>
+                    <td>{{ sub.full_name }}</td>
+                    <td>{{ sub.nationality or '—' }}</td>
+                    <td>
+                        <span class="badge bg-secondary">{{ sub.id_type }}</span>
+                        <span class="text-muted">{{ sub.id_number }}</span>
+                    </td>
+                    <td>{{ r.arrival_date.strftime('%d %b %Y') }}</td>
+                    <td>{{ sub.estimated_arrival_time or '—' }}</td>
+                    <td>
+                        <span title="{{ sub.submitted_at.strftime('%d %b %Y %H:%M') }}">
+                            {{ sub.submitted_at.strftime('%d %b %H:%M') }}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        {% if sub.id_photo_path %}
+                        <i class="bi bi-image text-success" title="Photo uploaded"></i>
+                        {% else %}
+                        <i class="bi bi-x-circle text-muted" title="No photo"></i>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        {% if sub.signature_path %}
+                        <i class="bi bi-pen text-success" title="Signed"></i>
+                        {% else %}
+                        <i class="bi bi-x-circle text-muted" title="No signature"></i>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('portal.view_submission', reservation_id=r.id) }}"
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye"></i> View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card shadow-sm">
+    <div class="card-body text-center text-muted py-5">
+        <i class="bi bi-inbox display-4 d-block mb-2"></i>
+        No pre-check-in submissions yet.
+        <br>
+        <small>Send pre-check-in links from the Front Desk reservations list.</small>
+    </div>
+</div>
+{% endif %}
+
+<style>@media print { .btn, nav, .navbar { display:none !important; } }</style>
+{% endblock %}

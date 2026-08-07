@@ -1,0 +1,71 @@
+{# Shared form partial — included by create and edit modals #}
+<div class="row g-3">
+    <div class="col-sm-8">
+        <label class="form-label fw-semibold">Plan Name <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" name="name" placeholder="e.g. Peak Season 2026, Weekend Special" required>
+    </div>
+    <div class="col-sm-4">
+        <label class="form-label fw-semibold">Type</label>
+        <select class="form-select" name="plan_type">
+            <option value="Seasonal">Seasonal</option>
+            <option value="Weekend">Weekend</option>
+            <option value="Package">Package</option>
+            <option value="Promo">Promo / Discount</option>
+        </select>
+    </div>
+    <div class="col-sm-6">
+        <label class="form-label fw-semibold">Room Type</label>
+        <select class="form-select" name="room_type_id">
+            <option value="">All Room Types</option>
+            {% for rt in room_types %}
+            <option value="{{ rt.id }}">{{ rt.name }} (Base ₹{{ '{:,.0f}'.format(rt.base_rate) }})</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-sm-3">
+        <label class="form-label fw-semibold">Rate Mode <span class="text-danger">*</span></label>
+        <select class="form-select" name="rate_mode">
+            <option value="fixed">Fixed Amount (₹)</option>
+            <option value="percent_up">% Increase on Base</option>
+            <option value="percent_down">% Discount on Base</option>
+        </select>
+    </div>
+    <div class="col-sm-3">
+        <label class="form-label fw-semibold">Amount <span class="text-danger">*</span></label>
+        <div class="input-group">
+            <span class="input-group-text" id="ratePrefix">₹</span>
+            <input type="number" class="form-control" name="rate_amount" min="0" step="0.01" required placeholder="1500">
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <label class="form-label fw-semibold">Valid From</label>
+        <input type="date" class="form-control" name="start_date">
+        <div class="form-text">Leave blank for no start limit</div>
+    </div>
+    <div class="col-sm-6">
+        <label class="form-label fw-semibold">Valid Until</label>
+        <input type="date" class="form-control" name="end_date">
+        <div class="form-text">Leave blank for no end limit</div>
+    </div>
+    <div class="col-12">
+        <label class="form-label fw-semibold">Apply on Days</label>
+        <div class="d-flex gap-2 flex-wrap">
+            {% for val, label in [('0','Mon'),('1','Tue'),('2','Wed'),('3','Thu'),('4','Fri'),('5','Sat'),('6','Sun')] %}
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="days_of_week" value="{{ val }}" id="day{{ val }}">
+                <label class="form-check-label" for="day{{ val }}">{{ label }}</label>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="form-text">Leave all unchecked to apply every day</div>
+    </div>
+    <div class="col-sm-4">
+        <label class="form-label fw-semibold">Priority</label>
+        <input type="number" class="form-control" name="priority" value="10" min="1" max="100">
+        <div class="form-text">Higher number = takes precedence</div>
+    </div>
+    <div class="col-sm-8">
+        <label class="form-label fw-semibold">Notes</label>
+        <input type="text" class="form-control" name="notes" placeholder="Internal notes...">
+    </div>
+</div>

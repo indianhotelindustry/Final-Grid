@@ -1,0 +1,23 @@
+====================================================================================================
+DSBC FRONTLINE — HISTORICAL REPLAY VERIFICATION
+Production Verification Framework, Wave 0 Deliverable 3
+====================================================================================================
+Stored replay     : production
+Stored captured   : 2026-08-04T11:40:51 (app v2.2.18)
+Current run       : 2026-08-04T11:41:08 (app v2.2.18)
+Business date     : 2026-05-28 -> 2026-05-28
+Read-only         : VERIFIED
+
+Dates compared    : 28
+Dates clean       : 28
+Differences       : 0
+Blocking          : 0
+
+VERDICT           : PASS
+
+  No differences. Every replayed date reconstructs exactly as it
+  did when the stored replay was taken.
+
+====================================================================================================
+END OF REPORT
+====================================================================================================

@@ -1,0 +1,27 @@
+{
+  "anon_location": "/auth/login?next=%2Fapi%2Fai%2Fpredictive-maintenance%2Fcategories",
+  "anon_status": 302,
+  "body_bytes": 32,
+  "body_sha256": "8bab0247f542619d4c200a201d16456756eb23daa88824fc66a5d49326103090",
+  "category": "ADVISORY",
+  "content_type": "application/json",
+  "duration_ms": 5,
+  "endpoint": "ai.api_pm_categories",
+  "error": "",
+  "figure_source": "json",
+  "figures": {
+    "$.categories[len]": "0",
+    "$[len]": "2"
+  },
+  "location": "",
+  "normalisation_hits": {},
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "INFO",
+  "status": 200,
+  "surface_id": "ai.api_pm_categories",
+  "templates": [],
+  "truncations": [],
+  "url": "/api/ai/predictive-maintenance/categories"
+}

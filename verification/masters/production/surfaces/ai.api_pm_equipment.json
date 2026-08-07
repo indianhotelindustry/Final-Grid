@@ -1,0 +1,27 @@
+{
+  "anon_location": "/auth/login?next=%2Fapi%2Fai%2Fpredictive-maintenance%2Fequipment",
+  "anon_status": 302,
+  "body_bytes": 31,
+  "body_sha256": "496e8063b165d6a7cc06b317edaf137f32f24b0d4f2ac34ee630acfd31d59208",
+  "category": "ADVISORY",
+  "content_type": "application/json",
+  "duration_ms": 3,
+  "endpoint": "ai.api_pm_equipment",
+  "error": "",
+  "figure_source": "json",
+  "figures": {
+    "$.equipment[len]": "0",
+    "$[len]": "2"
+  },
+  "location": "",
+  "normalisation_hits": {},
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "INFO",
+  "status": 200,
+  "surface_id": "ai.api_pm_equipment",
+  "templates": [],
+  "truncations": [],
+  "url": "/api/ai/predictive-maintenance/equipment"
+}

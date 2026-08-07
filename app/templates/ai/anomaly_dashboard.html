@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+{% block title %}Payment Anomaly Detection - {{ config.HOTEL_NAME }}{% endblock %}
+
+{% block styles %}
+<style>
+    .anomaly-card { border-left: 4px solid #6c757d; transition: box-shadow .15s; }
+    .anomaly-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.12); }
+    .anomaly-card.severity-CRITICAL { border-left-color: #dc3545; background: #fff5f5; }
+    .anomaly-card.severity-HIGH { border-left-color: #fd7e14; background: #fff8f0; }
+    .anomaly-card.severity-MEDIUM { border-left-color: #ffc107; background: #fffef0; }
+    .anomaly-card.severity-LOW { border-left-color: #0dcaf0; background: #f0fcff; }
+    .severity-badge { font-size: .75rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+    .severity-CRITICAL { background: #dc3545; color: #fff; }
+    .severity-HIGH { background: #fd7e14; color: #fff; }
+    .severity-MEDIUM { background: #ffc107; color: #212529; }
+    .severity-LOW { background: #0dcaf0; color: #212529; }
+    .category-icon { width: 32px; height: 32px; display: inline-flex; align-items: center;
+                     justify-content: center; border-radius: 8px; font-size: 1rem; }
+    .cat-discount { background: #e8f5e9; color: #2e7d32; }
+    .cat-void { background: #fce4ec; color: #c62828; }
+    .cat-cash { background: #fff3e0; color: #e65100; }
+    .cat-off_hours { background: #e8eaf6; color: #283593; }
+    .cat-rate { background: #f3e5f5; color: #6a1b9a; }
+    .summary-card { border-radius: 12px; text-align: center; padding: 20px 10px; }
+    .summary-card .count { font-size: 2rem; font-weight: 700; line-height: 1; }
+    .risk-meter { height: 8px; border-radius: 4px; background: #e9ecef; overflow: hidden; }
+    .risk-fill { height: 100%; border-radius: 4px; transition: width .5s; }
+    .filter-btn.active { font-weight: 600; box-shadow: inset 0 -2px 0 currentColor; }
+    #loadingSpinner { display: none; }
+    .empty-state { text-align: center; padding: 60px 20px; color: #6c757d; }
+    .empty-state i { font-size: 3rem; margin-bottom: 12px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3 py-3">
+    <!-- Header -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-3 gap-2">
+        <div>
+            <h4 class="mb-0"><i class="bi bi-shield-exclamation me-2"></i>Payment Anomaly Detection</h4>
+            <small class="text-muted">AI-powered scan of payment, void, cash, and rate patterns</small>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <select id="lookbackDays" class="form-select form-select-sm" style="width:auto;">
+                <option value="7">Last 7 days</option>
+                <option value="14">Last 14 days</option>
+                <option value="30" selected>Last 30 days</option>
+                <option value="60">Last 60 days</option>
+                <option value="90">Last 90 days</option>
+            </select>
+            <button id="btnScan" class="btn btn-primary btn-sm" onclick="runScan()">
+                <i class="bi bi-arrow-clockwise me-1"></i>Scan Now
+            </button>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-2 mb-3" id="summaryRow">
+        <div class="col-6 col-md">
+            <div class="summary-card bg-white border shadow-sm">
+                <div class="count text-dark" id="totalCount">--</div>
+                <small class="text-muted">Total Findings</small>
+            </div>
+        </div>
+        <div class="col-6 col-md">
+            <div class="summary-card bg-white border shadow-sm">
+                <div class="count text-danger" id="criticalCount">--</div>
+                <small class="text-muted">Critical</small>
+            </div>
+        </div>
+        <div class="col-6 col-md">
+            <div class="summary-card bg-white border shadow-sm">
+                <div class="count" style="color:#fd7e14;" id="highCount">--</div>
+                <small class="text-muted">High</small>
+            </div>
+        </div>
+        <div class="col-6 col-md">
+            <div class="summary-card bg-white border shadow-sm">
+                <div class="count text-warning" id="mediumCount">--</div>
+                <small class="text-muted">Medium</small>
+            </div>
+        </div>
+        <div class="col-6 col-md">
+            <div class="summary-card bg-white border shadow-sm">
+                <div class="count text-info" id="lowCount">--</div>
+                <small class="text-muted">Low</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Filters -->
+    <div class="d-flex flex-wrap gap-2 mb-3">
+        <button class="btn btn-sm btn-outline-secondary filter-btn active" data-cat="all" onclick="filterCategory('all', this)">
+            <i class="bi bi-grid-3x3-gap me-1"></i>All
+        </button>
+        <button class="btn btn-sm btn-outline-success filter-btn" data-cat="discount" onclick="filterCategory('discount', this)">
+            <i class="bi bi-percent me-1"></i>Discounts
+        </button>
+        <button class="btn btn-sm btn-outline-danger filter-btn" data-cat="void" onclick="filterCategory('void', this)">
+            <i class="bi bi-x-circle me-1"></i>Voids
+        </button>
+        <button class="btn btn-sm btn-outline-warning filter-btn" data-cat="cash" onclick="filterCategory('cash', this)">
+            <i class="bi bi-cash-stack me-1"></i>Cash
+        </button>
+        <button class="btn btn-sm btn-outline-primary filter-btn" data-cat="off_hours" onclick="filterCategory('off_hours', this)">
+            <i class="bi bi-moon-stars me-1"></i>Off-Hours
+        </button>
+        <button class="btn btn-sm btn-outline-purple filter-btn" data-cat="rate" onclick="filterCategory('rate', this)" style="border-color:#6a1b9a;color:#6a1b9a;">
+            <i class="bi bi-graph-down me-1"></i>Rates
+        </button>
+    </div>
+
+    <!-- Loading spinner -->
+    <div id="loadingSpinner" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-2 text-muted">Scanning for anomalies...</p>
+    </div>
+
+    <!-- Empty state -->
+    <div id="emptyState" class="empty-state" style="display:none;">
+        <i class="bi bi-shield-check d-block"></i>
+        <h5>No anomalies detected</h5>
+        <p>All payment patterns look normal for the selected period.</p>
+    </div>
+
+    <!-- Findings list -->
+    <div id="findingsList"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let allFindings = [];
+
+function getCategoryIcon(cat) {
+    const icons = {
+        discount: '<div class="category-icon cat-discount"><i class="bi bi-percent"></i></div>',
+        void: '<div class="category-icon cat-void"><i class="bi bi-x-circle"></i></div>',
+        cash: '<div class="category-icon cat-cash"><i class="bi bi-cash-stack"></i></div>',
+        off_hours: '<div class="category-icon cat-off_hours"><i class="bi bi-moon-stars"></i></div>',
+        rate: '<div class="category-icon cat-rate"><i class="bi bi-graph-down"></i></div>',
+    };
+    return icons[cat] || '<div class="category-icon bg-light"><i class="bi bi-exclamation-triangle"></i></div>';
+}
+
+function getCategoryLabel(cat) {
+    const labels = {
+        discount: 'Discount Pattern', void: 'Void Activity', cash: 'Cash Handling',
+        off_hours: 'Off-Hours Activity', rate: 'Rate Manipulation'
+    };
+    return labels[cat] || cat;
+}
+
+function renderFindings(findings) {
+    const container = document.getElementById('findingsList');
+    const emptyState = document.getElementById('emptyState');
+
+    if (!findings.length) {
+        container.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+    }
+    emptyState.style.display = 'none';
+
+    let html = '';
+    findings.forEach((f, i) => {
+        html += `
+        <div class="card anomaly-card severity-${f.severity} mb-2">
+            <div class="card-body py-2 px-3">
+                <div class="d-flex align-items-start gap-2">
+                    ${getCategoryIcon(f.category)}
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="severity-badge severity-${f.severity}">${f.severity}</span>
+                            <small class="text-muted">${getCategoryLabel(f.category)}</small>
+                            <small class="text-muted ms-auto"><i class="bi bi-clock me-1"></i>${f.detected_at || ''}</small>
+                        </div>
+                        <p class="mb-1" style="font-size:.9rem;">${f.description}</p>
+                        <div class="d-flex flex-wrap gap-3" style="font-size:.8rem;">
+                            <span class="text-muted"><strong>Staff:</strong> ${f.user || '-'}</span>
+                            <span class="text-muted"><strong>Metric:</strong> ${f.metric || '-'}</span>
+                            <span class="text-muted"><strong>Value:</strong> ${f.value != null ? f.value : '-'}</span>
+                            <span class="text-muted"><strong>Threshold:</strong> ${f.threshold != null ? f.threshold : '-'}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    });
+    container.innerHTML = html;
+}
+
+function filterCategory(cat, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    if (cat === 'all') {
+        renderFindings(allFindings);
+    } else {
+        renderFindings(allFindings.filter(f => f.category === cat));
+    }
+}
+
+function runScan() {
+    const days = document.getElementById('lookbackDays').value;
+    const spinner = document.getElementById('loadingSpinner');
+    const list = document.getElementById('findingsList');
+    const emptyState = document.getElementById('emptyState');
+
+    spinner.style.display = 'block';
+    list.innerHTML = '';
+    emptyState.style.display = 'none';
+
+    fetch(`/api/ai/anomalies?days=${days}`)
+        .then(r => r.json())
+        .then(data => {
+            spinner.style.display = 'none';
+            if (data.status === 'ok') {
+                allFindings = data.findings || [];
+                // Update summary
+                const s = data.summary || {};
+                document.getElementById('totalCount').textContent = s.total || 0;
+                document.getElementById('criticalCount').textContent = s.critical || 0;
+                document.getElementById('highCount').textContent = s.high || 0;
+                document.getElementById('mediumCount').textContent = s.medium || 0;
+                document.getElementById('lowCount').textContent = s.low || 0;
+                // Reset filter to all
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                document.querySelector('.filter-btn[data-cat="all"]').classList.add('active');
+                renderFindings(allFindings);
+            } else {
+                list.innerHTML = `<div class="alert alert-danger">Scan failed: ${data.error || 'Unknown error'}</div>`;
+            }
+        })
+        .catch(err => {
+            spinner.style.display = 'none';
+            list.innerHTML = `<div class="alert alert-danger">Network error: ${err.message}</div>`;
+        });
+}
+
+// Auto-scan on load
+document.addEventListener('DOMContentLoaded', runScan);
+</script>
+{% endblock %}

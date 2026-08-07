@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% block title %}Pending Void Requests{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">
+    <i class="bi bi-slash-circle text-danger me-2"></i>Pending Void Requests
+    {% if pending %}
+      <span class="badge bg-danger ms-1">{{ pending | length }}</span>
+    {% endif %}
+  </h4>
+  <a href="{{ url_for('billing.gst_report') }}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-percent me-1"></i>GST Report
+  </a>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for cat, msg in messages %}
+    <div class="alert alert-{{ cat }} alert-dismissible fade show">
+      {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  {% endfor %}
+{% endwith %}
+
+{% if not pending %}
+  <div class="alert alert-success">
+    <i class="bi bi-check-circle me-1"></i>No pending void requests.
+  </div>
+{% else %}
+  <div class="alert alert-warning d-flex align-items-center">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <div><strong>{{ pending | length }}</strong> payment void request{{ 's' if pending|length != 1 }} awaiting your decision.
+    Review carefully — voided payments reduce net collection figures.</div>
+  </div>
+
+  {% for vr in pending %}
+  {% set pmt = vr.payment %}
+  <div class="card mb-3 border-warning shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center bg-warning bg-opacity-10">
+      <div>
+        <span class="fw-semibold">Void Request #{{ vr.id }}</span>
+        <span class="badge bg-warning text-dark ms-2">Pending</span>
+        {% if pmt.payment_mode.name in ('Cash',) %}
+          <span class="badge bg-secondary ms-1">{{ pmt.payment_mode.name }}</span>
+        {% else %}
+          <span class="badge bg-info text-dark ms-1">{{ pmt.payment_mode.name }}</span>
+        {% endif %}
+      </div>
+      <small class="text-muted">Requested {{ vr.requested_at.strftime('%d %b %Y %H:%M') }}</small>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <table class="table table-sm table-borderless mb-0">
+            <tr>
+              <td class="text-muted ps-0">Payment ID</td>
+              <td><strong>#{{ pmt.id }}</strong></td>
+            </tr>
+            <tr>
+              <td class="text-muted ps-0">Reservation</td>
+              <td>
+                <a href="{{ url_for('main.invoice', reservation_id=pmt.reservation_id) }}"
+                   class="text-decoration-none" target="_blank">
+                  {{ pmt.reservation.booking_reference or ('RES-' ~ pmt.reservation_id) }}
+                </a>
+                &nbsp;|&nbsp;{{ pmt.reservation.guest.name }}
+              </td>
+            </tr>
+            <tr>
+              <td class="text-muted ps-0">Amount</td>
+              <td class="fs-5 fw-bold text-danger">&#8377;{{ '%.2f'|format(pmt.amount) }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted ps-0">Payment Date</td>
+              <td>{{ pmt.payment_date.strftime('%d %b %Y') }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted ps-0">Posted At</td>
+              <td>{{ pmt.created_at.strftime('%d %b %Y %H:%M') }}</td>
+            </tr>
+          </table>
+        </div>
+        <div class="col-md-6">
+          <p class="mb-1 text-muted small">Requested by:</p>
+          <p class="mb-2 fw-semibold">{{ vr.requested_by.full_name }} ({{ vr.requested_by.role }})</p>
+          <p class="mb-1 text-muted small">Void Reason:</p>
+          <div class="alert alert-secondary py-2 mb-0">{{ vr.reason }}</div>
+        </div>
+      </div>
+
+      <!-- Age warning -->
+      {% set age_hours = ((now() - pmt.created_at).total_seconds() / 3600) if now is defined else 0 %}
+      <div class="mt-2 d-flex gap-2 align-items-center">
+        <!-- Approve -->
+        <form method="POST" action="{{ url_for('billing.approve_void', void_request_id=vr.id) }}"
+              onsubmit="return confirm('Approve void of ₹{{ '%.2f'|format(pmt.amount) }}? This cannot be undone.');">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-success btn-sm">
+            <i class="bi bi-check-circle me-1"></i>Approve Void
+          </button>
+        </form>
+
+        <!-- Reject (modal) -->
+        <button type="button" class="btn btn-outline-danger btn-sm"
+                data-bs-toggle="modal" data-bs-target="#rejectModal{{ vr.id }}">
+          <i class="bi bi-x-circle me-1"></i>Reject
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reject modal -->
+  <div class="modal fade" id="rejectModal{{ vr.id }}" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form method="POST" action="{{ url_for('billing.reject_void', void_request_id=vr.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="modal-header">
+            <h5 class="modal-title text-danger"><i class="bi bi-x-circle me-2"></i>Reject Void Request</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p>Rejecting void for payment <strong>₹{{ '%.2f'|format(pmt.amount) }}</strong>
+               from <strong>{{ pmt.reservation.guest.name }}</strong>.</p>
+            <div class="mb-3">
+              <label class="form-label">Reason for Rejection <span class="text-danger">*</span></label>
+              <input type="text" name="rejection_reason" class="form-control" required
+                     placeholder="e.g. Payment was correct, no error found">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-danger">Confirm Rejection</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+{% endif %}
+{% endblock %}

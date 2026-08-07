@@ -1,0 +1,83 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Maintenance Work Order Report{% endblock %}
+{% block report_name %}Maintenance Report{% endblock %}
+
+{% block report_content %}
+<div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+  <h5 class="mb-0">
+    <i class="bi bi-tools text-secondary me-2"></i>
+    Maintenance Work Orders
+    <span class="badge bg-secondary ms-1">{{ records|length }}</span>
+  </h5>
+  <div class="d-flex gap-2 align-items-center d-print-none">
+    <form class="d-flex gap-1 align-items-center" action="{{ url_for('reports.maintenance_report') }}">
+      <select class="form-select form-select-sm" name="status" style="width:130px;">
+        <option value="" {% if not status_filter %}selected{% endif %}>All Statuses</option>
+        {% for st in ['Pending', 'InProgress', 'Resolved', 'Cancelled'] %}
+        <option value="{{ st }}" {% if status_filter == st %}selected{% endif %}>{{ st }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-sm btn-secondary">Filter</button>
+      <button class="btn btn-sm btn-outline-success" name="format" value="excel"
+              title="Export Excel"><i class="bi bi-file-earmark-excel"></i></button>
+    </form>
+    <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+      <i class="bi bi-printer me-1"></i>Print
+    </button>
+  </div>
+</div>
+
+{# Status summary #}
+<div class="row g-2 mb-3">
+  {% set st_colors = {'Pending':'warning','InProgress':'primary','Resolved':'success','Cancelled':'secondary'} %}
+  {% for st, items in by_status.items() %}
+  <div class="col-auto">
+    <span class="badge bg-{{ st_colors.get(st,'secondary') }} fs-6 px-3 py-2">
+      {{ st }}: {{ items|length }}
+    </span>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover table-sm align-middle mb-0 small">
+      <thead class="table-dark">
+        <tr>
+          <th>Room</th>
+          <th>Category</th>
+          <th>Description</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th>Reported By</th>
+          <th>Assigned To</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in records %}
+        <tr class="{{ 'table-danger' if r.priority == 'High' else '' }}">
+          <td class="fw-semibold">{{ r.room.room_number if r.room else '—' }}</td>
+          <td>{{ r.category or '—' }}</td>
+          <td class="text-wrap" style="max-width:220px;">{{ r.description or '—' }}</td>
+          <td>
+            {% set pc = {'High':'danger','Medium':'warning','Low':'secondary'} %}
+            <span class="badge bg-{{ pc.get(r.priority,'secondary') }}">{{ r.priority or '—' }}</span>
+          </td>
+          <td>
+            <span class="badge bg-{{ st_colors.get(r.status,'secondary') }}">{{ r.status or '—' }}</span>
+          </td>
+          <td>{{ r.reported_by or '—' }}</td>
+          <td>{{ r.assigned_to or '—' }}</td>
+          <td>{{ r.created_at.strftime('%d %b %Y') if r.created_at else '—' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="text-center text-muted py-4">No maintenance requests found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>@media print { .d-print-none { display:none !important; } }</style>
+{% endblock %}

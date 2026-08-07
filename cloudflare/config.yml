@@ -1,0 +1,26 @@
+# Cloudflare Tunnel Configuration
+# ---------------------------------
+# 1. Replace TUNNEL_ID below with your actual tunnel ID from Cloudflare dashboard
+# 2. Place your tunnel credentials JSON file at the path shown in credentials-file
+# 3. Run: cloudflared tunnel run sukoon-pms
+
+tunnel: TUNNEL_ID
+credentials-file: C:\Users\dell\.cloudflared\TUNNEL_ID.json
+
+ingress:
+  # Main PMS application (staff login required)
+  - hostname: pms.yourdomain.com
+    service: http://localhost:5000
+
+  # Public booking engine (no login)
+  - hostname: book.yourdomain.com
+    service: http://localhost:5000
+    path: /book
+
+  # OTA webhook endpoint
+  - hostname: pms.yourdomain.com
+    path: /webhook
+    service: http://localhost:5000
+
+  # Catch-all — return 404 for anything else
+  - service: http_status:404

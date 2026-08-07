@@ -1,0 +1,28 @@
+{
+  "anon_location": "/auth/login?next=%2Fportal%2Fsubmissions%2F1",
+  "anon_status": 302,
+  "body_bytes": 225,
+  "body_sha256": "fa439f5075a32f212627606afc0025ad98eeffa48e90ed0c97611565dd425e75",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 6,
+  "endpoint": "portal.view_submission",
+  "error": "",
+  "figure_source": "none",
+  "figures": {},
+  "location": "/portal/submissions",
+  "normalisation_hits": {},
+  "note": "Pre-check-in submission for a stay.",
+  "origin": "declared",
+  "params": {
+    "id": 1,
+    "resolver": "any_reservation",
+    "rule": "lowest reservation id"
+  },
+  "severity": "WARN",
+  "status": 302,
+  "surface_id": "portal.view_submission__any_reservation",
+  "templates": [],
+  "truncations": [],
+  "url": "/portal/submissions/1"
+}

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}LAN Access — Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-3 pb-5" style="max-width:780px;">
+
+  <div class="d-flex align-items-center gap-2 mb-3">
+    <i class="bi bi-router-fill text-primary fs-4"></i>
+    <h4 class="mb-0">LAN Access</h4>
+    <a href="{{ url_for('main.masters') }}" class="btn btn-sm btn-outline-secondary ms-auto">
+      <i class="bi bi-arrow-left me-1"></i>Back to Masters
+    </a>
+  </div>
+
+  <div class="card shadow-sm mb-3">
+    <div class="card-body">
+      <p class="mb-2">
+        By default the PMS is reachable only on <code>http://localhost:{{ port }}</code>
+        from this machine. Enable LAN access to make it reachable from other
+        machines on the hotel network — front desk, housekeeping, and manager
+        can then all connect to one install.
+      </p>
+      <ul class="small text-muted mb-0">
+        <li>Requires a restart of the PMS server for the binding to change.</li>
+        <li>Also requires an inbound Windows Firewall rule on TCP port {{ port }}.
+            Run <code>enable_lan.bat</code> (as admin) — it writes the rule for you.</li>
+        <li>SQLite serialises writes at the DB level; small hotels (≤ 5 concurrent
+            users) work fine. For heavier concurrent write load, move to PostgreSQL.</li>
+      </ul>
+    </div>
+  </div>
+
+  {# ── Current state ─────────────────────────────────────────── #}
+  <div class="card mb-3">
+    <div class="card-header"><strong>Current State</strong></div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="text-muted small">Saved in .env (next boot)</div>
+          <div class="fs-5 fw-bold
+              {% if allow_lan_on_disk %}text-success{% else %}text-secondary{% endif %}">
+            {% if allow_lan_on_disk %}
+              <i class="bi bi-check-circle-fill me-1"></i>LAN access ENABLED
+            {% else %}
+              <i class="bi bi-slash-circle me-1"></i>LAN access DISABLED
+            {% endif %}
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="text-muted small">Running server</div>
+          <div class="fs-5 fw-bold
+              {% if allow_lan_running %}text-success{% else %}text-secondary{% endif %}">
+            {% if allow_lan_running %}
+              <i class="bi bi-broadcast me-1"></i>0.0.0.0:{{ port }}
+            {% else %}
+              <i class="bi bi-house-door me-1"></i>127.0.0.1:{{ port }}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% if restart_required %}
+      <div class="alert alert-warning mt-3 mb-0 d-flex gap-2 align-items-start">
+        <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
+        <div>
+          <strong>Restart required.</strong>
+          The saved setting differs from what the server is currently using.
+          Run <code>stop.bat</code> and then <code>start.bat</code> (or reboot)
+          for the new binding to apply.
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {# ── Toggle form ───────────────────────────────────────────── #}
+  <div class="card">
+    <div class="card-header"><strong>Change Setting</strong></div>
+    <div class="card-body">
+      <form method="post" class="d-flex align-items-center gap-3 flex-wrap">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="allow_lan_chk"
+                 name="allow_lan" value="1"
+                 {% if allow_lan_on_disk %}checked{% endif %}>
+          <label class="form-check-label" for="allow_lan_chk">
+            Allow LAN access on next server start
+          </label>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm ms-auto">
+          <i class="bi bi-save me-1"></i>Save
+        </button>
+      </form>
+      <div class="small text-muted mt-2">
+        After saving, also run <code>enable_lan.bat</code> as administrator
+        from the install folder so the Windows Firewall allows inbound
+        connections on port {{ port }}.
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

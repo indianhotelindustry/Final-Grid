@@ -1,0 +1,53 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Fcredit-ledger",
+  "anon_status": 302,
+  "body_bytes": 27530,
+  "body_sha256": "96ddd1e86baaca60676553d160d069c228c8a77c12617d7b56fdb330392b8e5c",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 36,
+  "endpoint": "reports.credit_ledger",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "count_open": "1",
+    "count_overdue": "0",
+    "count_partial": "0",
+    "count_settled": "0",
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "grand_open": "200",
+    "grand_recovered": "0",
+    "include_settled": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "records[0].approved_at": "2026-05-29T07:45:44.305789",
+    "records[0].days_open": "-1",
+    "records[0].days_outstanding": "-1",
+    "records[0].departure_date": "2026-05-29",
+    "records[0].original": "200",
+    "records[0].recovered": "0",
+    "records[0].remaining": "200",
+    "records[0].reservation[type]": "Reservation",
+    "records[0][len]": "17",
+    "records[len]": "1",
+    "today": "2026-05-28"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.credit_ledger",
+  "templates": [
+    "reports/credit_ledger.html"
+  ],
+  "truncations": [],
+  "url": "/reports/credit-ledger"
+}

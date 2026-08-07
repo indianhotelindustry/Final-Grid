@@ -1,0 +1,978 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Money at Risk — {{ config.HOTEL_NAME }}{% endblock %}
+{% block report_name %}Money at Risk{% endblock %}
+
+{% block styles %}
+<style>
+.risk-card {
+    cursor: pointer;
+    transition: transform .12s, box-shadow .12s;
+    user-select: none;
+}
+.risk-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.14) !important; }
+.risk-card:active { transform: none; }
+.section-title {
+    font-size: .78rem; font-weight: 700; letter-spacing: .07em;
+    text-transform: uppercase; color: #6c757d;
+    border-left: 3px solid #dc3545; padding-left: 8px;
+    margin-bottom: .75rem;
+}
+.table-xs { font-size: .8rem; }
+.badge-delay { font-size: .7rem; }
+@media print {
+    .d-print-none { display: none !important; }
+    @page { size: A4; margin: 12mm; }
+    .risk-card { cursor: default; }
+}
+</style>
+{% endblock %}
+
+{% block report_content %}
+
+{# ── Page header ─────────────────────────────────────────────────────────── #}
+<div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+    <div>
+        <h5 class="mb-0">
+            <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Money at Risk Dashboard
+        </h5>
+        <small class="text-muted">Live snapshot as of {{ today.strftime('%d %B %Y') }}</small>
+    </div>
+    <div class="d-flex gap-2 d-print-none">
+        <a href="{{ url_for('reports.money_at_risk', format='excel') }}"
+           class="btn btn-sm btn-success">
+            <i class="bi bi-file-earmark-excel me-1"></i>Excel
+        </a>
+        <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i>Print / PDF
+        </button>
+    </div>
+</div>
+
+{# ── Top summary cards (each opens a detail modal) ───────────────────────── #}
+<div class="row g-3 mb-4">
+
+    <div class="col-6 col-lg">
+        <div class="card shadow risk-card border-0 text-white bg-danger h-100"
+             data-bs-toggle="modal" data-bs-target="#modalTotalRisk">
+            <div class="card-body text-center py-3">
+                <div class="fs-5 fw-bold">₹{{ '{:,.0f}'.format(total_at_risk) }}</div>
+                <div class="small opacity-75 mt-1">Total Money at Risk</div>
+                <i class="bi bi-chevron-down opacity-50 mt-1 d-block"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-lg">
+        <div class="card shadow risk-card border-0 bg-white border-start border-4 border-danger h-100"
+             data-bs-toggle="modal" data-bs-target="#modalPendingDues">
+            <div class="card-body text-center py-3">
+                <div class="fs-5 fw-bold text-danger">₹{{ '{:,.0f}'.format(pending_dues_total) }}</div>
+                <div class="small text-muted mt-1">Pending Dues</div>
+                <i class="bi bi-chevron-down text-muted opacity-50 mt-1 d-block"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-lg">
+        <div class="card shadow risk-card border-0 bg-white border-start border-4 border-warning h-100"
+             data-bs-toggle="modal" data-bs-target="#modalUnposted">
+            <div class="card-body text-center py-3">
+                <div class="fs-5 fw-bold text-warning">₹{{ '{:,.0f}'.format(unposted_total) }}</div>
+                <div class="small text-muted mt-1">Unposted Charges</div>
+                <i class="bi bi-chevron-down text-muted opacity-50 mt-1 d-block"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-lg">
+        <div class="card shadow risk-card border-0 bg-white border-start border-4 border-orange h-100"
+             style="border-color:#fd7e14!important;"
+             data-bs-toggle="modal" data-bs-target="#modalLeakage">
+            <div class="card-body text-center py-3">
+                <div class="fs-5 fw-bold" style="color:#fd7e14;">₹{{ '{:,.0f}'.format(leakage_total) }}</div>
+                <div class="small text-muted mt-1">Revenue Leakage</div>
+                <i class="bi bi-chevron-down text-muted opacity-50 mt-1 d-block"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-lg">
+        <div class="card shadow risk-card border-0 bg-white border-start border-4 border-secondary h-100"
+             data-bs-toggle="modal" data-bs-target="#modalBlocked">
+            <div class="card-body text-center py-3">
+                <div class="fs-5 fw-bold text-secondary">₹{{ '{:,.0f}'.format(blocked_revenue) }}</div>
+                <div class="small text-muted mt-1">Blocked Room Revenue</div>
+                <i class="bi bi-chevron-down text-muted opacity-50 mt-1 d-block"></i>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{# ══════════════════════════════════════════════════════════════════════════ #}
+{# SECTION 1 — Outstanding Guest Dues                                        #}
+{# ══════════════════════════════════════════════════════════════════════════ #}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white py-2 d-flex align-items-center justify-content-between">
+        <span class="fw-semibold">
+            <i class="bi bi-cash-stack text-danger me-2"></i>Outstanding Guest Dues
+        </span>
+        <span class="badge bg-danger rounded-pill">
+            ₹{{ '{:,.0f}'.format(pending_dues_total) }}
+        </span>
+    </div>
+    <div class="card-body p-0">
+
+        {# Tabs: In-House / Checked-Out / Company #}
+        <ul class="nav nav-tabs nav-fill border-0 px-3 pt-2" id="duesTabs">
+            <li class="nav-item">
+                <button class="nav-link active small py-1" data-bs-toggle="tab" data-bs-target="#duesInhouse">
+                    In-House
+                    <span class="badge bg-danger ms-1">{{ inhouse_dues|length }}</span>
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link small py-1" data-bs-toggle="tab" data-bs-target="#duesCheckedOut">
+                    Checked-Out
+                    <span class="badge bg-secondary ms-1">{{ checkedout_dues|length }}</span>
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link small py-1" data-bs-toggle="tab" data-bs-target="#duesCompany">
+                    Company Credit
+                    <span class="badge bg-secondary ms-1">{{ company_dues|length }}</span>
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            {# In-House #}
+            <div class="tab-pane fade show active" id="duesInhouse">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover table-xs align-middle mb-0">
+                        <thead class="table-danger">
+                            <tr>
+                                <th>Folio</th><th>Guest</th><th>Room</th>
+                                <th>Check-In</th><th>Due Out</th>
+                                <th class="text-end">Balance (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for d in inhouse_dues | sort(attribute='balance', reverse=true) %}
+                            {% set r = d.res %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('main.invoice', reservation_id=r.id) }}"
+                                       class="fw-semibold text-primary text-decoration-none">
+                                        {{ r.booking_reference or r.id }}
+                                    </a>
+                                </td>
+                                <td>{{ r.guest.name if r.guest else '—' }}</td>
+                                <td>{{ r.room.room_number if r.room else '—' }}</td>
+                                <td class="text-nowrap">{{ r.arrival_date.strftime('%d %b') }}</td>
+                                <td class="text-nowrap">{{ r.departure_date.strftime('%d %b') }}</td>
+                                <td class="text-end fw-bold text-danger">₹{{ '{:,.0f}'.format(d.balance) }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="6" class="text-center text-muted py-3">No in-house pending dues.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                        {% if inhouse_dues %}
+                        <tfoot class="table-danger fw-bold">
+                            <tr>
+                                <td colspan="5" class="text-end">In-House Total:</td>
+                                <td class="text-end">₹{{ '{:,.0f}'.format(inhouse_total) }}</td>
+                            </tr>
+                        </tfoot>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+
+            {# Checked-Out #}
+            <div class="tab-pane fade" id="duesCheckedOut">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover table-xs align-middle mb-0">
+                        <thead class="table-secondary">
+                            <tr>
+                                <th>Folio</th><th>Guest</th><th>Room</th>
+                                <th>Checked Out</th><th class="text-end">Balance (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for d in checkedout_dues | sort(attribute='balance', reverse=true) %}
+                            {% set r = d.res %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('main.invoice', reservation_id=r.id) }}"
+                                       class="fw-semibold text-primary text-decoration-none">
+                                        {{ r.booking_reference or r.id }}
+                                    </a>
+                                </td>
+                                <td>{{ r.guest.name if r.guest else '—' }}</td>
+                                <td>{{ r.room.room_number if r.room else '—' }}</td>
+                                <td class="text-nowrap">{{ r.departure_date.strftime('%d %b %Y') }}</td>
+                                <td class="text-end fw-bold text-danger">₹{{ '{:,.0f}'.format(d.balance) }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="5" class="text-center text-muted py-3">No checked-out pending dues in last 60 days.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                        {% if checkedout_dues %}
+                        <tfoot class="table-secondary fw-bold">
+                            <tr>
+                                <td colspan="4" class="text-end">Checked-Out Total:</td>
+                                <td class="text-end">₹{{ '{:,.0f}'.format(checkedout_total) }}</td>
+                            </tr>
+                        </tfoot>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+
+            {# Company Credit #}
+            <div class="tab-pane fade" id="duesCompany">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover table-xs align-middle mb-0">
+                        <thead class="table-secondary">
+                            <tr>
+                                <th>Company</th><th>Open Folios</th>
+                                <th class="text-end">Outstanding (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for d in company_dues | sort(attribute='total', reverse=true) %}
+                            <tr>
+                                <td>{{ d.company.name if d.company else '—' }}</td>
+                                <td>{{ d.count }}</td>
+                                <td class="text-end fw-bold text-danger">₹{{ '{:,.0f}'.format(d.total) }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="3" class="text-center text-muted py-3">No company credit pending.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                        {% if company_dues %}
+                        <tfoot class="table-secondary fw-bold">
+                            <tr>
+                                <td colspan="2" class="text-end">Company Total:</td>
+                                <td class="text-end">₹{{ '{:,.0f}'.format(company_total) }}</td>
+                            </tr>
+                        </tfoot>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+        </div>{# /tab-content #}
+
+    </div>
+    <div class="card-footer bg-white d-print-none py-2">
+        <a href="{{ url_for('reports.pending_payments_report') }}" class="btn btn-sm btn-outline-danger">
+            <i class="bi bi-box-arrow-up-right me-1"></i>Go to Pending Payments Report
+        </a>
+    </div>
+</div>
+
+{# ══════════════════════════════════════════════════════════════════════════ #}
+{# SECTION 2 — Pending Check-outs (Overdue)                                  #}
+{# ══════════════════════════════════════════════════════════════════════════ #}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white py-2 d-flex align-items-center justify-content-between">
+        <span class="fw-semibold">
+            <i class="bi bi-clock-history text-warning me-2"></i>Pending Check-outs — Overdue
+        </span>
+        <span class="badge bg-warning text-dark rounded-pill">{{ overdue|length }} rooms</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-sm table-hover table-xs align-middle mb-0">
+            <thead class="table-warning">
+                <tr>
+                    <th>Room</th><th>Folio</th><th>Guest</th>
+                    <th>Due Date</th><th>Delay</th>
+                    <th class="text-end">Balance (₹)</th>
+                    <th class="d-print-none"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in overdue %}
+                {% set r = d.res %}
+                <tr>
+                    <td class="fw-bold">{{ r.room.room_number if r.room else '—' }}</td>
+                    <td>
+                        <a href="{{ url_for('main.invoice', reservation_id=r.id) }}"
+                           class="text-primary text-decoration-none fw-semibold">
+                            {{ r.booking_reference or r.id }}
+                        </a>
+                    </td>
+                    <td>{{ r.guest.name if r.guest else '—' }}</td>
+                    <td class="text-nowrap">{{ r.departure_date.strftime('%d %b %Y') }}</td>
+                    <td>
+                        <span class="badge badge-delay
+                            {% if d.delay_days == 0 %}bg-warning text-dark
+                            {% elif d.delay_days == 1 %}bg-orange
+                            {% else %}bg-danger{% endif %}"
+                            style="{% if d.delay_days == 1 %}background:#fd7e14{% endif %}">
+                            {% if d.delay_days == 0 %}Due today{% else %}{{ d.delay_days }}d late{% endif %}
+                        </span>
+                    </td>
+                    <td class="text-end fw-bold {% if d.balance > 0 %}text-danger{% else %}text-success{% endif %}">
+                        ₹{{ '{:,.0f}'.format(d.balance) }}
+                    </td>
+                    <td class="d-print-none">
+                        <a href="{{ url_for('main.checkout', reservation_id=r.id) }}"
+                           class="btn btn-xs btn-outline-primary py-0 px-2"
+                           style="font-size:.75rem;">
+                            Checkout
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7" class="text-center text-muted py-3">No overdue check-outs.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{# ══════════════════════════════════════════════════════════════════════════ #}
+{# SECTION 3 — Unposted Charges Risk                                         #}
+{# ══════════════════════════════════════════════════════════════════════════ #}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white py-2 d-flex align-items-center justify-content-between">
+        <span class="fw-semibold">
+            <i class="bi bi-receipt text-warning me-2"></i>Service Charges — In-House Guests
+        </span>
+        <span class="badge bg-warning text-dark rounded-pill">₹{{ '{:,.0f}'.format(unposted_total) }}</span>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            {% set cats = [
+                ('restaurant',   'Restaurant / Food & Beverage', 'bi-cup-hot',      'text-danger'),
+                ('laundry',      'Laundry',                      'bi-wind',         'text-info'),
+                ('extra_bed',    'Extra Bed',                    'bi-person-lines-fill', 'text-secondary'),
+                ('late_checkout','Late Checkout',                'bi-clock',        'text-warning'),
+                ('other',        'Other Charges',                'bi-three-dots',   'text-dark'),
+            ] %}
+            {% for key, label, icon, color in cats %}
+            <div class="col-sm-6 col-lg">
+                <div class="border rounded p-3 text-center h-100">
+                    <i class="bi {{ icon }} {{ color }} fs-4 d-block mb-1"></i>
+                    <div class="fw-bold">₹{{ '{:,.0f}'.format(unposted[key]) }}</div>
+                    <div class="text-muted" style="font-size:.75rem;">{{ label }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <p class="small text-muted mt-3 mb-0">
+            <i class="bi bi-info-circle me-1"></i>
+            Shows posted extra charges for currently in-house guests, categorised by description keyword.
+            Verify these are correctly added to the folio before checkout.
+        </p>
+    </div>
+</div>
+
+{# ══════════════════════════════════════════════════════════════════════════ #}
+{# SECTION 4 — Revenue Leakage Alerts                                        #}
+{# ══════════════════════════════════════════════════════════════════════════ #}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white py-2 d-flex align-items-center justify-content-between">
+        <span class="fw-semibold">
+            <i class="bi bi-shield-exclamation me-2" style="color:#fd7e14;"></i>Revenue Leakage Alerts
+        </span>
+        <span class="badge rounded-pill" style="background:#fd7e14;">₹{{ '{:,.0f}'.format(leakage_total) }}</span>
+    </div>
+    <div class="card-body p-0">
+
+        {# Sub-tabs #}
+        <ul class="nav nav-tabs nav-fill border-0 px-3 pt-2" id="leakageTabs">
+            <li class="nav-item">
+                <button class="nav-link active small py-1" data-bs-toggle="tab" data-bs-target="#lkUnauth">
+                    Unauthorized Discounts
+                    {% if unauth_discounts %}<span class="badge bg-danger ms-1">{{ unauth_discounts|length }}</span>{% endif %}
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link small py-1" data-bs-toggle="tab" data-bs-target="#lkTariff">
+                    Tariff Overrides
+                    {% if tariff_overrides %}<span class="badge bg-warning text-dark ms-1">{{ tariff_overrides|length }}</span>{% endif %}
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link small py-1" data-bs-toggle="tab" data-bs-target="#lkLowRate">
+                    Low-Rate Rooms
+                    {% if low_rate %}<span class="badge bg-warning text-dark ms-1">{{ low_rate|length }}</span>{% endif %}
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link small py-1" data-bs-toggle="tab" data-bs-target="#lkVoided">
+                    Voided Payments Today
+                    {% if voided_today %}<span class="badge bg-secondary ms-1">{{ voided_today|length }}</span>{% endif %}
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link small py-1" data-bs-toggle="tab" data-bs-target="#lkOverpay">
+                    Unresolved Overpayments
+                    {% if unresolved_overpay %}<span class="badge bg-success ms-1">{{ unresolved_overpay|length }}</span>{% endif %}
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+
+            {# Unauthorized Discounts #}
+            <div class="tab-pane fade show active" id="lkUnauth">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover table-xs align-middle mb-0">
+                        <thead class="table-danger">
+                            <tr>
+                                <th>Folio</th><th>Guest</th><th>Room</th>
+                                <th>Discount Reason</th><th>Given By</th>
+                                <th class="text-end">Amount (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in unauth_discounts %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('main.invoice', reservation_id=r.id) }}"
+                                       class="text-primary fw-semibold text-decoration-none">
+                                        {{ r.booking_reference or r.id }}
+                                    </a>
+                                </td>
+                                <td>{{ r.guest.name if r.guest else '—' }}</td>
+                                <td>{{ r.room.room_number if r.room else '—' }}</td>
+                                <td class="text-capitalize">{{ r.discount_reason or '—' }}</td>
+                                <td>{{ r.discount_given_by or '—' }}</td>
+                                <td class="text-end fw-bold text-danger">₹{{ '{:,.0f}'.format(r.discount_amount) }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="6" class="text-center text-muted py-3">No unauthorized discounts.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {# Tariff Overrides #}
+            <div class="tab-pane fade" id="lkTariff">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover table-xs align-middle mb-0">
+                        <thead class="table-warning">
+                            <tr>
+                                <th>Folio</th><th>Guest</th><th>Room</th>
+                                <th>Override Type</th>
+                                <th class="text-end">Standard (₹)</th>
+                                <th class="text-end">Actual (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in tariff_overrides %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('main.invoice', reservation_id=r.id) }}"
+                                       class="text-primary fw-semibold text-decoration-none">
+                                        {{ r.booking_reference or r.id }}
+                                    </a>
+                                </td>
+                                <td>{{ r.guest.name if r.guest else '—' }}</td>
+                                <td>{{ r.room.room_number if r.room else '—' }}</td>
+                                <td>
+                                    <span class="badge
+                                        {% if r.adjustment_type == 'LEAKAGE' %}bg-danger
+                                        {% else %}bg-success{% endif %}">
+                                        {{ r.adjustment_type or '—' }}
+                                    </span>
+                                </td>
+                                <td class="text-end">₹{{ '{:,.0f}'.format(r.standard_tariff or 0) }}</td>
+                                <td class="text-end fw-bold
+                                    {% if r.adjustment_type == 'LEAKAGE' %}text-danger{% else %}text-success{% endif %}">
+                                    ₹{{ '{:,.0f}'.format(r.rate_per_night or 0) }}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="6" class="text-center text-muted py-3">No tariff overrides.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {# Low Rate Rooms #}
+            <div class="tab-pane fade" id="lkLowRate">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover table-xs align-middle mb-0">
+                        <thead class="table-warning">
+                            <tr>
+                                <th>Folio</th><th>Guest</th><th>Room</th><th>Room Type</th>
+                                <th class="text-end">Base Rate (₹)</th>
+                                <th class="text-end">Actual Rate (₹)</th>
+                                <th class="text-end">Gap / Night (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for d in low_rate | sort(attribute='gap', reverse=true) %}
+                            {% set r = d.res %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('main.invoice', reservation_id=r.id) }}"
+                                       class="text-primary fw-semibold text-decoration-none">
+                                        {{ r.booking_reference or r.id }}
+                                    </a>
+                                </td>
+                                <td>{{ r.guest.name if r.guest else '—' }}</td>
+                                <td>{{ r.room.room_number if r.room else '—' }}</td>
+                                <td>{{ r.room_type.name if r.room_type else '—' }}</td>
+                                <td class="text-end">₹{{ '{:,.0f}'.format(d.base_rate) }}</td>
+                                <td class="text-end text-danger">₹{{ '{:,.0f}'.format(d.actual_rate) }}</td>
+                                <td class="text-end fw-bold text-danger">₹{{ '{:,.0f}'.format(d.gap) }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="7" class="text-center text-muted py-3">No low-rate rooms.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {# Voided Payments Today #}
+            <div class="tab-pane fade" id="lkVoided">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover table-xs align-middle mb-0">
+                        <thead class="table-secondary">
+                            <tr>
+                                <th>Folio</th><th>Guest</th><th>Mode</th>
+                                <th>Void Reason</th><th>Voided By</th>
+                                <th class="text-end">Amount (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in voided_today %}
+                            {% set r = p.reservation %}
+                            <tr>
+                                <td>
+                                    {% if r %}
+                                    <a href="{{ url_for('main.invoice', reservation_id=r.id) }}"
+                                       class="text-primary fw-semibold text-decoration-none">
+                                        {{ r.booking_reference or r.id }}
+                                    </a>
+                                    {% else %}—{% endif %}
+                                </td>
+                                <td>{{ r.guest.name if r and r.guest else '—' }}</td>
+                                <td>{{ p.payment_mode.name if p.payment_mode else '—' }}</td>
+                                <td class="text-muted">{{ p.void_reason or '—' }}</td>
+                                <td>{{ p.voided_by.username if p.voided_by else '—' }}</td>
+                                <td class="text-end fw-bold text-secondary">₹{{ '{:,.0f}'.format(p.amount) }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="6" class="text-center text-muted py-3">No voided payments today.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {# Unresolved Overpayments #}
+            <div class="tab-pane fade" id="lkOverpay">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover table-xs align-middle mb-0">
+                        <thead class="table-success">
+                            <tr>
+                                <th>Folio</th><th>Guest</th><th>Room</th>
+                                <th class="text-end">Overpaid (₹)</th>
+                                <th class="d-print-none"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for d in unresolved_overpay | sort(attribute='overpaid', reverse=true) %}
+                            {% set r = d.res %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('main.invoice', reservation_id=r.id) }}"
+                                       class="text-primary fw-semibold text-decoration-none">
+                                        {{ r.booking_reference or r.id }}
+                                    </a>
+                                </td>
+                                <td>{{ r.guest.name if r.guest else '—' }}</td>
+                                <td>{{ r.room.room_number if r.room else '—' }}</td>
+                                <td class="text-end fw-bold text-success">₹{{ '{:,.0f}'.format(d.overpaid) }}</td>
+                                <td class="d-print-none">
+                                    <a href="{{ url_for('main.checkout', reservation_id=r.id) }}"
+                                       class="btn btn-xs btn-outline-success py-0 px-2"
+                                       style="font-size:.75rem;">
+                                        Resolve at Checkout
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="5" class="text-center text-muted py-3">No unresolved overpayments.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>{# /leakage tab-content #}
+    </div>
+    <div class="card-footer bg-white d-print-none py-2">
+        <a href="{{ url_for('reports.room_revenue') }}" class="btn btn-sm btn-outline-warning me-2">
+            <i class="bi bi-box-arrow-up-right me-1"></i>Go to Room Revenue Report
+        </a>
+        <a href="{{ url_for('reports.void_adjustments_report') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-box-arrow-up-right me-1"></i>Void Adjustments Report
+        </a>
+    </div>
+</div>
+
+{# ══════════════════════════════════════════════════════════════════════════ #}
+{# SECTION 5 — Dirty Rooms Blocking Revenue                                  #}
+{# ══════════════════════════════════════════════════════════════════════════ #}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white py-2 d-flex align-items-center justify-content-between">
+        <span class="fw-semibold">
+            <i class="bi bi-brush text-secondary me-2"></i>Dirty Rooms Blocking Revenue
+        </span>
+        <span class="badge bg-secondary rounded-pill">{{ dirty_count }} rooms</span>
+    </div>
+    <div class="card-body">
+        {% if dirty_count %}
+        <div class="row g-3 mb-3">
+            <div class="col-sm-4 text-center">
+                <div class="fs-3 fw-bold text-secondary">{{ dirty_count }}</div>
+                <div class="small text-muted">Dirty Rooms</div>
+            </div>
+            <div class="col-sm-4 text-center">
+                <div class="fs-3 fw-bold text-secondary">₹{{ '{:,.0f}'.format(avg_lost_rate) }}</div>
+                <div class="small text-muted">Average Lost Rate / Night</div>
+            </div>
+            <div class="col-sm-4 text-center">
+                <div class="fs-3 fw-bold text-danger">₹{{ '{:,.0f}'.format(blocked_revenue) }}</div>
+                <div class="small text-muted">Estimated Blocked Revenue</div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover table-xs align-middle mb-0">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>Room</th><th>Floor</th><th>Room Type</th>
+                        <th class="text-end">Base Rate / Night (₹)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for room in dirty_rooms %}
+                    <tr>
+                        <td class="fw-bold">{{ room.room_number }}</td>
+                        <td>{{ room.floor or '—' }}</td>
+                        <td>{{ room.room_type.name if room.room_type else '—' }}</td>
+                        <td class="text-end">₹{{ '{:,.0f}'.format(room.room_type.base_rate if room.room_type and room.room_type.base_rate else 0) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-center text-success py-3 mb-0">
+            <i class="bi bi-check-circle-fill me-2"></i>All rooms are clean. No revenue blocked.
+        </p>
+        {% endif %}
+    </div>
+    <div class="card-footer bg-white d-print-none py-2">
+        <a href="{{ url_for('main.housekeeping') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-box-arrow-up-right me-1"></i>Go to Housekeeping
+        </a>
+    </div>
+</div>
+
+{# ══════════════════════════════════════════════════════════════════════════ #}
+{# SECTION 6 — Overpayment Pending Resolution (summary)                      #}
+{# ══════════════════════════════════════════════════════════════════════════ #}
+{% if unresolved_overpay %}
+<div class="card shadow-sm border-success mb-4">
+    <div class="card-header bg-white py-2 fw-semibold">
+        <i class="bi bi-arrow-repeat text-success me-2"></i>
+        Overpayments Pending Resolution
+        <span class="badge bg-success ms-2">{{ unresolved_overpay|length }}</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm table-xs align-middle mb-0">
+                <thead class="table-success">
+                    <tr><th>Folio</th><th>Guest</th><th>Room</th>
+                        <th class="text-end">Overpaid (₹)</th>
+                        <th>Resolution Required</th>
+                        <th class="d-print-none"></th></tr>
+                </thead>
+                <tbody>
+                    {% for d in unresolved_overpay %}
+                    {% set r = d.res %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('main.invoice', reservation_id=r.id) }}"
+                               class="text-primary fw-semibold text-decoration-none">
+                                {{ r.booking_reference or r.id }}
+                            </a>
+                        </td>
+                        <td>{{ r.guest.name if r.guest else '—' }}</td>
+                        <td>{{ r.room.room_number if r.room else '—' }}</td>
+                        <td class="text-end fw-bold text-success">₹{{ '{:,.0f}'.format(d.overpaid) }}</td>
+                        <td><span class="badge bg-warning text-dark">Refund / Tip / Other Income</span></td>
+                        <td class="d-print-none">
+                            <a href="{{ url_for('main.checkout', reservation_id=r.id) }}"
+                               class="btn btn-xs btn-success py-0 px-2" style="font-size:.75rem;">
+                                Resolve
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════════════ #}
+{# SECTION 7 — Waived CICO Charges — Management Review (last 30 days)        #}
+{# ══════════════════════════════════════════════════════════════════════════ #}
+{% if waived_cico %}
+<div class="card shadow-sm border-warning mb-4">
+    <div class="card-header bg-white py-2 fw-semibold d-flex align-items-center gap-2">
+        <i class="bi bi-shield-exclamation text-warning fs-5"></i>
+        Waived CICO Charges — Management Review
+        <span class="badge bg-warning text-dark ms-1">{{ waived_cico|length }}</span>
+        <span class="ms-auto text-muted small">Last 30 days &nbsp;|&nbsp; Total waived: ₹{{ '{:,.0f}'.format(waived_cico_total) }}</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm table-xs align-middle mb-0">
+                <thead class="table-warning">
+                    <tr>
+                        <th>Date / Time</th>
+                        <th>Type</th>
+                        <th>Reservation</th>
+                        <th>Slab</th>
+                        <th class="text-end">Amount Waived</th>
+                        <th>Waived By</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lg in waived_cico %}
+                    {% set res = lg.reservation %}
+                    <tr>
+                        <td class="text-nowrap">{{ lg.timestamp.strftime('%d %b %H:%M') if lg.timestamp else '—' }}</td>
+                        <td>
+                            {% if lg.charge_type == 'early_checkin' %}
+                            <span class="badge bg-info text-dark">Early CI</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">Late CO</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if res %}
+                            <a href="{{ url_for('main.invoice', reservation_id=res.id) }}"
+                               class="text-primary fw-semibold text-decoration-none">
+                                {{ res.booking_reference or ('#' ~ res.id) }}
+                            </a>
+                            <span class="text-muted small ms-1">{{ res.guest.name if res.guest else '' }}</span>
+                            {% else %}
+                            <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="small">{{ lg.slab_label or '—' }}</td>
+                        <td class="text-end fw-semibold text-danger">₹{{ '{:,.0f}'.format(lg.amount_calculated|float) }}</td>
+                        <td class="small">
+                            {% if lg.waived_by %}{{ lg.waived_by.username }}{% elif lg.staff_user %}{{ lg.staff_user.username }}{% else %}—{% endif %}
+                        </td>
+                        <td class="small text-muted">{{ lg.waive_reason or '—' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="table-warning">
+                    <tr>
+                        <td colspan="4" class="text-end fw-semibold">Total Waived:</td>
+                        <td class="text-end fw-bold text-danger">₹{{ '{:,.0f}'.format(waived_cico_total) }}</td>
+                        <td colspan="2"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════════════ #}
+{# MODALS                                                                     #}
+{# ══════════════════════════════════════════════════════════════════════════ #}
+
+{# Modal — Total at Risk breakdown #}
+<div class="modal fade" id="modalTotalRisk" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white py-2">
+                <h6 class="modal-title"><i class="bi bi-exclamation-triangle-fill me-2"></i>Total Money at Risk</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <table class="table table-sm mb-0">
+                    <tbody>
+                        <tr><td>Pending Guest Dues</td><td class="text-end fw-bold">₹{{ '{:,.0f}'.format(pending_dues_total) }}</td></tr>
+                        <tr><td>Unposted / Service Charges</td><td class="text-end fw-bold">₹{{ '{:,.0f}'.format(unposted_total) }}</td></tr>
+                        <tr><td>Revenue Leakage (Discounts + Low Rate)</td><td class="text-end fw-bold">₹{{ '{:,.0f}'.format(leakage_total) }}</td></tr>
+                        <tr><td>Dirty Rooms Blocking Revenue</td><td class="text-end fw-bold">₹{{ '{:,.0f}'.format(blocked_revenue) }}</td></tr>
+                        <tr class="table-danger fw-bold">
+                            <td>Total Money at Risk</td>
+                            <td class="text-end">₹{{ '{:,.0f}'.format(total_at_risk) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer py-2">
+                <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal — Pending Dues compact #}
+<div class="modal fade" id="modalPendingDues" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header py-2">
+                <h6 class="modal-title text-danger">
+                    <i class="bi bi-cash-stack me-2"></i>Pending Dues Summary
+                </h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <table class="table table-sm mb-0">
+                    <tbody>
+                        <tr><td>In-House ({{ inhouse_dues|length }} guests)</td>
+                            <td class="text-end fw-bold text-danger">₹{{ '{:,.0f}'.format(inhouse_total) }}</td></tr>
+                        <tr><td>Checked-Out — last 60 days ({{ checkedout_dues|length }} folios)</td>
+                            <td class="text-end fw-bold text-secondary">₹{{ '{:,.0f}'.format(checkedout_total) }}</td></tr>
+                        <tr><td>Company Credit ({{ company_dues|length }} companies)</td>
+                            <td class="text-end fw-bold text-dark">₹{{ '{:,.0f}'.format(company_total) }}</td></tr>
+                        <tr class="table-danger fw-bold">
+                            <td>Total Pending Dues</td>
+                            <td class="text-end">₹{{ '{:,.0f}'.format(pending_dues_total) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer py-2">
+                <a href="{{ url_for('reports.pending_payments_report') }}" class="btn btn-sm btn-danger">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>Full Pending Payments Report
+                </a>
+                <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal — Unposted Charges #}
+<div class="modal fade" id="modalUnposted" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header py-2">
+                <h6 class="modal-title text-warning">
+                    <i class="bi bi-receipt me-2"></i>Service Charges by Category
+                </h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <table class="table table-sm mb-0">
+                    <tbody>
+                        <tr><td>Restaurant / Food & Beverage</td><td class="text-end fw-bold">₹{{ '{:,.0f}'.format(unposted.restaurant) }}</td></tr>
+                        <tr><td>Laundry</td><td class="text-end fw-bold">₹{{ '{:,.0f}'.format(unposted.laundry) }}</td></tr>
+                        <tr><td>Extra Bed</td><td class="text-end fw-bold">₹{{ '{:,.0f}'.format(unposted.extra_bed) }}</td></tr>
+                        <tr><td>Late Checkout</td><td class="text-end fw-bold">₹{{ '{:,.0f}'.format(unposted.late_checkout) }}</td></tr>
+                        <tr><td>Other</td><td class="text-end fw-bold">₹{{ '{:,.0f}'.format(unposted.other) }}</td></tr>
+                        <tr class="table-warning fw-bold">
+                            <td>Total Service Charges</td>
+                            <td class="text-end">₹{{ '{:,.0f}'.format(unposted_total) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer py-2">
+                <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal — Revenue Leakage #}
+<div class="modal fade" id="modalLeakage" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header py-2">
+                <h6 class="modal-title" style="color:#fd7e14;">
+                    <i class="bi bi-shield-exclamation me-2"></i>Revenue Leakage Summary
+                </h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <table class="table table-sm mb-0">
+                    <tbody>
+                        <tr><td>Unauthorized Discounts ({{ unauth_discounts|length }})</td>
+                            <td class="text-end fw-bold text-danger">₹{{ '{:,.0f}'.format(unauth_total) }}</td></tr>
+                        <tr><td>Tariff Leakage Overrides ({{ leakage_overrides|length }})</td>
+                            <td class="text-end fw-bold text-danger">₹{{ '{:,.0f}'.format(leakage_overrides|sum(attribute='adjustment_amount')) }}</td></tr>
+                        <tr><td>Low-Rate Rooms ({{ low_rate|length }}) — gap / night</td>
+                            <td class="text-end fw-bold text-danger">₹{{ '{:,.0f}'.format(low_rate|sum(attribute='gap')) }}</td></tr>
+                        <tr class="fw-bold" style="background:#fff3cd;">
+                            <td>Total Leakage Impact</td>
+                            <td class="text-end" style="color:#fd7e14;">₹{{ '{:,.0f}'.format(leakage_total) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer py-2">
+                <a href="{{ url_for('reports.room_revenue') }}" class="btn btn-sm btn-warning text-dark">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>Room Revenue Report
+                </a>
+                <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal — Blocked Revenue #}
+<div class="modal fade" id="modalBlocked" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header py-2">
+                <h6 class="modal-title text-secondary">
+                    <i class="bi bi-brush me-2"></i>Dirty Rooms — Blocked Revenue
+                </h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3 text-center mb-3">
+                    <div class="col-4">
+                        <div class="fs-4 fw-bold text-secondary">{{ dirty_count }}</div>
+                        <div class="small text-muted">Dirty Rooms</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fs-4 fw-bold text-secondary">₹{{ '{:,.0f}'.format(avg_lost_rate) }}</div>
+                        <div class="small text-muted">Avg Rate / Night</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fs-4 fw-bold text-danger">₹{{ '{:,.0f}'.format(blocked_revenue) }}</div>
+                        <div class="small text-muted">Blocked Revenue</div>
+                    </div>
+                </div>
+                <p class="small text-muted mb-0">
+                    Estimated based on room-type base rates. Mark rooms clean in Housekeeping to release revenue.
+                </p>
+            </div>
+            <div class="modal-footer py-2">
+                <a href="{{ url_for('main.housekeeping') }}" class="btn btn-sm btn-secondary">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>Go to Housekeeping
+                </a>
+                <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

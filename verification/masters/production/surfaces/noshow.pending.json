@@ -1,0 +1,37 @@
+{
+  "anon_location": "/auth/login?next=%2Fnoshow%2Fpending",
+  "anon_status": 302,
+  "body_bytes": 22424,
+  "body_sha256": "26aa5c65bff3426b6faffcdafc377d704a986630d7f32c60a72b335e4248b2f5",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 28,
+  "endpoint": "noshow.pending",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "business_date": "2026-05-28",
+    "candidates[len]": "0",
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "noshow.pending",
+  "templates": [
+    "noshow/pending.html"
+  ],
+  "truncations": [],
+  "url": "/noshow/pending"
+}

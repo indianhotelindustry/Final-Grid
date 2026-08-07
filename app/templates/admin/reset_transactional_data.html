@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}Reset Transactional Data - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3 px-md-4" style="max-width:960px;">
+
+  <h4 class="mb-3 mt-2">
+    <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>
+    Reset Transactional Data
+  </h4>
+
+  {# ─── Result block (after execute) ─────────────────────────────── #}
+  {% if result and result.ok %}
+    <div class="alert alert-success border-start border-success border-4 mb-4">
+      <h6 class="alert-heading mb-2">
+        <i class="bi bi-check-circle-fill me-1"></i>Reset completed successfully
+      </h6>
+      <ul class="mb-0 small">
+        <li><strong>Backup created:</strong> <code>{{ result.backup_filename }}</code></li>
+        <li><strong>Tables cleared:</strong> {{ result.tables_cleared }}</li>
+        <li><strong>Rows deleted:</strong> {{ result.rows_deleted }}</li>
+        <li><strong>Guests preserved:</strong> {{ result.guests_preserved_count }} profile(s)</li>
+        <li><strong>App status:</strong> still operational — masters, users, settings intact</li>
+      </ul>
+      <hr class="my-2">
+      <p class="mb-0 small text-muted">
+        Recommended next steps: refresh the dashboard to confirm 0 active reservations,
+        verify masters (rooms, payment modes, users) are intact, and check
+        <code>backups/</code> for the pre-reset backup file.
+      </p>
+    </div>
+  {% endif %}
+
+  {# ─── Strong red warning ───────────────────────────────────────── #}
+  <div class="alert alert-danger border-2 border-danger">
+    <h6 class="alert-heading fw-bold mb-2">
+      <i class="bi bi-exclamation-octagon-fill me-1"></i>DESTRUCTIVE OPERATION
+    </h6>
+    <p class="mb-2 small">
+      This tool permanently deletes ALL transactional data in the PMS so you can
+      start fresh. A mandatory full backup is taken first, but the deleted rows
+      cannot be recovered without restoring that backup.
+    </p>
+    <p class="mb-0 small"><strong>What is deleted:</strong>
+      reservations, check-in records, folios, invoices, payments, extra charges,
+      tax lines, nightly rate rows, night audit logs, audit logs, notifications,
+      webhook logs, maintenance requests, equipment health logs, shift data,
+      loyalty transactions, and related transactional rows.</p>
+  </div>
+
+  <div class="alert alert-light border">
+    <h6 class="mb-2"><i class="bi bi-shield-check text-success me-1"></i>What is preserved</h6>
+    <p class="mb-1 small">
+      <strong>Masters &amp; configuration:</strong>
+      users &amp; roles, settings, room types, rooms, payment modes, companies,
+      rate plans, POS items, equipment masters, loyalty config &amp; milestones,
+      schema migrations, business date.
+    </p>
+    <p class="mb-0 small">
+      <strong>Guests:</strong> preserved by default (profiles, phone, KYC) so
+      loyalty and CRM history survives the reset.
+    </p>
+  </div>
+
+  {# ─── Dry-run preview tables ───────────────────────────────────── #}
+  <div class="row g-3 mb-4">
+    <div class="col-md-6">
+      <div class="card border-success shadow-sm h-100">
+        <div class="card-header bg-success bg-opacity-10 border-success py-2">
+          <strong class="text-success">
+            <i class="bi bi-shield-check me-1"></i>Preserved ({{ preserved_total }} rows)
+          </strong>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-sm mb-0" style="font-size:0.82rem;">
+            <tbody>
+              {% for t, cls, rows, exists in preserved %}
+              <tr>
+                <td class="ps-3">{{ t }}</td>
+                <td class="text-end pe-3 text-muted">{{ rows }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card border-danger shadow-sm h-100">
+        <div class="card-header bg-danger bg-opacity-10 border-danger py-2">
+          <strong class="text-danger">
+            <i class="bi bi-trash me-1"></i>To delete ({{ tables_to_clear }} tables · {{ clear_total }} rows)
+          </strong>
+        </div>
+        <div class="card-body p-0" style="max-height:420px;overflow-y:auto;">
+          <table class="table table-sm mb-0" style="font-size:0.82rem;">
+            <tbody>
+              {% for t, cls, rows, exists in clear %}
+              <tr{% if rows > 0 %} class="table-warning"{% endif %}>
+                <td class="ps-3">{{ t }}</td>
+                <td class="text-end pe-3{% if rows > 0 %} fw-semibold{% else %} text-muted{% endif %}">{{ rows }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ─── Confirmation form ────────────────────────────────────────── #}
+  <div class="card border-danger shadow-sm mb-5">
+    <div class="card-header bg-danger text-white py-2">
+      <strong><i class="bi bi-key me-1"></i>Confirmation Required</strong>
+    </div>
+    <div class="card-body">
+      <form method="post" action="{{ url_for('admin_reset.execute') }}"
+            onsubmit="return confirm('Absolutely sure? A backup will be taken, then all transactional data will be deleted.');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <p class="small mb-2">
+          To proceed, type exactly the following phrase:
+        </p>
+        <p class="mb-2"><code class="bg-light px-2 py-1 border rounded">{{ confirmation_phrase }}</code></p>
+        <div class="mb-3">
+          <input type="text" name="confirmation_phrase" class="form-control form-control-lg"
+                 placeholder="Type the phrase exactly..." autocomplete="off" required>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+          <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-x-lg me-1"></i>Cancel
+          </a>
+          <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash-fill me-1"></i>Take Backup &amp; Reset Transactional Data
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

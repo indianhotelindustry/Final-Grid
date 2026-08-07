@@ -1,0 +1,61 @@
+{
+  "anon_location": "/auth/login?next=%2Fgrc%2F1%2Fpreview",
+  "anon_status": 302,
+  "body_bytes": 34432,
+  "body_sha256": "bf0d5ac1bd90d4580d4d358121e5f8cdf605c8f6df7a9125c24aaf75677aa839",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 54,
+  "endpoint": "grc.preview",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "checkin[type]": "CheckInRecord",
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "generated_at": "2026-05-28T12:00:00",
+    "guest[type]": "Guest",
+    "hotel[len]": "8",
+    "is_foreign": "False",
+    "nights": "2",
+    "passengers[len]": "0",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "reservation[type]": "Reservation",
+    "stay_amount.balance": "200",
+    "stay_amount.company_credit": "0",
+    "stay_amount.discount": "0",
+    "stay_amount.extra_charges": "190.48",
+    "stay_amount.grand_total": "2200",
+    "stay_amount.gst_amount": "104.76",
+    "stay_amount.nights": "2",
+    "stay_amount.paid": "2000",
+    "stay_amount.room_charges": "1904.76",
+    "stay_amount.round_off": "0",
+    "stay_amount.rounded_grand_total": "2200",
+    "stay_amount.settlement_balance": "200",
+    "stay_amount.total": "2095.24",
+    "stay_amount[len]": "13"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 5,
+    "csrf_meta": 1
+  },
+  "note": "Guest registration card.",
+  "origin": "declared",
+  "params": {
+    "id": 1,
+    "resolver": "any_reservation",
+    "rule": "lowest reservation id"
+  },
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "grc.preview__any_reservation",
+  "templates": [
+    "grc_preview.html"
+  ],
+  "truncations": [],
+  "url": "/grc/1/preview"
+}

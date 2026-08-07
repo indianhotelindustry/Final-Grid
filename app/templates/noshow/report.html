@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% block title %}No-Show Report{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0"><i class="bi bi-bar-chart-fill text-danger me-2"></i>No-Show Report</h4>
+  <a href="{{ url_for('noshow.pending') }}" class="btn btn-outline-warning btn-sm">
+    <i class="bi bi-person-x me-1"></i>Pending No-Shows
+  </a>
+</div>
+
+<!-- Date filter -->
+<form method="GET" class="row g-2 align-items-end mb-4">
+  <div class="col-auto">
+    <label class="form-label mb-1">From</label>
+    <input type="date" name="from_date" class="form-control form-control-sm"
+           value="{{ from_date.isoformat() }}">
+  </div>
+  <div class="col-auto">
+    <label class="form-label mb-1">To</label>
+    <input type="date" name="to_date" class="form-control form-control-sm"
+           value="{{ to_date.isoformat() }}">
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-primary btn-sm">
+      <i class="bi bi-search me-1"></i>Filter
+    </button>
+  </div>
+  <div class="col-auto">
+    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">
+      <i class="bi bi-printer me-1"></i>Print
+    </button>
+  </div>
+</form>
+
+<!-- Summary cards -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-lg-3">
+    <div class="card border-0 shadow-sm text-center">
+      <div class="card-body py-3">
+        <div class="fs-3 fw-bold text-danger">{{ total_count }}</div>
+        <div class="text-muted small">Total No-Shows</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card border-0 shadow-sm text-center">
+      <div class="card-body py-3">
+        <div class="fs-3 fw-bold text-primary">{{ direct_count }}</div>
+        <div class="text-muted small">Direct Bookings</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card border-0 shadow-sm text-center">
+      <div class="card-body py-3">
+        <div class="fs-3 fw-bold text-info">{{ ota_count }}</div>
+        <div class="text-muted small">OTA Bookings</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card border-0 shadow-sm text-center">
+      <div class="card-body py-3">
+        <div class="fs-3 fw-bold text-success">&#8377;{{ '%.0f' | format(total_fees) }}</div>
+        <div class="text-muted small">Fee Revenue ({{ fee_applied_count }} charged)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if not logs %}
+  <div class="alert alert-info">
+    No no-show records found for
+    {{ from_date.strftime('%d %b %Y') }} – {{ to_date.strftime('%d %b %Y') }}.
+  </div>
+{% else %}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle table-sm">
+      <thead class="table-dark">
+        <tr>
+          <th>Audit Date</th>
+          <th>Ref #</th>
+          <th>Guest</th>
+          <th>Room Type</th>
+          <th>Arrival</th>
+          <th>Source</th>
+          <th>OTA Ref</th>
+          <th class="text-end">Fee</th>
+          <th>Posted By</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in logs %}
+        <tr>
+          <td>{{ log.audit_date.strftime('%d %b %Y') }}</td>
+          <td>
+            <code>{{ log.reservation.booking_reference or ('RES-' ~ log.reservation_id) }}</code>
+          </td>
+          <td>
+            <strong>{{ log.reservation.guest.name }}</strong><br>
+            <small class="text-muted">{{ log.reservation.guest.phone }}</small>
+          </td>
+          <td>{{ log.reservation.room_type.name }}</td>
+          <td>{{ log.reservation.arrival_date.strftime('%d %b %Y') }}</td>
+          <td>
+            {% if log.is_ota %}
+              <span class="badge bg-info text-dark">OTA</span>
+            {% else %}
+              <span class="badge bg-secondary">{{ log.reservation.source }}</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if log.ota_booking_id %}
+              <code class="small">{{ log.ota_booking_id }}</code>
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+          <td class="text-end">
+            {% if log.fee_applied %}
+              <span class="text-success fw-semibold">&#8377;{{ '%.0f' | format(log.fee_amount) }}</span>
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if log.posted_by %}
+              <small>{{ log.posted_by.full_name }}</small>
+            {% else %}
+              <small class="text-muted"><i class="bi bi-clock me-1"></i>Night Audit</small>
+            {% endif %}
+            {% if log.override_by %}
+              <br><small class="text-warning">Override: {{ log.override_by.full_name }}</small>
+            {% endif %}
+          </td>
+          <td><small class="text-muted">{{ log.notes or '—' }}</small></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot class="table-secondary fw-semibold">
+        <tr>
+          <td colspan="7" class="text-end">Total fee revenue:</td>
+          <td class="text-end text-success">&#8377;{{ '%.0f' | format(total_fees) }}</td>
+          <td colspan="2"></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+{% endif %}
+
+<style>
+@media print {
+  .btn, form, .navbar, .sidebar { display: none !important; }
+  .table { font-size: 11px; }
+}
+</style>
+{% endblock %}

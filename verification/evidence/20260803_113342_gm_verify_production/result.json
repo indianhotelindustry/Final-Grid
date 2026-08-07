@@ -1,0 +1,16 @@
+{
+  "blocking_count": 0,
+  "by_kind": {},
+  "current_app_version": "2.2.18",
+  "current_frozen_at": "2026-05-28T12:00:00",
+  "difference_count": 0,
+  "differences": [],
+  "master_app_version": "2.2.18",
+  "master_captured_at": "2026-08-03T11:19:29",
+  "master_frozen_at": "2026-05-28T12:00:00",
+  "read_only_verified": true,
+  "surfaces_clean": 149,
+  "surfaces_compared": 149,
+  "tag": "production",
+  "verdict": "PASS"
+}

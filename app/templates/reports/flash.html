@@ -1,0 +1,243 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Flash Report — {{ report_date.strftime('%d %b %Y') }}{% endblock %}
+{% block report_name %}Manager Flash Report{% endblock %}
+
+{% block report_content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h5 class="mb-0">
+        <i class="bi bi-lightning-charge-fill text-danger me-2"></i>
+        Manager Flash Report — {{ report_date.strftime('%d %B %Y') }}
+    </h5>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('reports.flash_report', date=report_date.isoformat(), format='excel') }}"
+           class="btn btn-sm btn-success d-print-none">
+            <i class="bi bi-file-earmark-excel me-1"></i>Excel
+        </a>
+        <button class="btn btn-sm btn-outline-secondary d-print-none" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i>Print
+        </button>
+    </div>
+</div>
+
+<!-- Date nav -->
+<div class="d-flex gap-2 align-items-center mb-4 d-print-none">
+    <a href="{{ url_for('reports.flash_report', date=(report_date - timedelta(days=1)).isoformat()) }}"
+       class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-left"></i></a>
+    <form class="d-inline" method="GET">
+        <input type="date" name="date" class="form-control form-control-sm d-inline-block" style="width:auto;"
+               value="{{ report_date.isoformat() }}" onchange="this.form.submit()">
+    </form>
+    <a href="{{ url_for('reports.flash_report', date=(report_date + timedelta(days=1)).isoformat()) }}"
+       class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-right"></i></a>
+    <a href="{{ url_for('reports.flash_report', date=today.isoformat()) }}"
+       class="btn btn-sm btn-outline-primary">Today</a>
+</div>
+
+<!-- ── Section 1: Occupancy ── -->
+<h6 class="fw-semibold text-uppercase text-muted mb-2" style="font-size:11px;">Live Occupancy</h6>
+<div class="row g-2 mb-4">
+    {% for label, val, cls in [
+        ('Total Rooms',     total_rooms, 'bg-secondary'),
+        ('In-House (Live)', occupied,    'bg-danger'),
+        ('Vacant',          vacant,      'bg-success'),
+        ('Dirty',           dirty,       'bg-warning text-dark'),
+        ('Maintenance',     maint,       'bg-info text-dark'),
+        ('Live Occupancy %', occ_pct|string + '%', 'bg-primary'),
+        ('ADR (₹)',         arr,         'bg-dark'),
+        ('RevPAR (₹)',      revpar,      'bg-dark'),
+    ] %}
+    <div class="col-6 col-sm-4 col-md-3 col-lg-auto">
+        <div class="card border-0 {{ cls }} text-white px-3 py-2 shadow-sm text-center" style="min-width:110px;">
+            <div class="fw-bold fs-5">{{ val }}</div>
+            <div class="small">{{ label }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- ── Section 2: Movement ── -->
+<h6 class="fw-semibold text-uppercase text-muted mb-2" style="font-size:11px;">Guest Movement</h6>
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+        <div class="card shadow-sm text-center py-3">
+            <div class="fs-3 fw-bold text-success">{{ arrivals_done }} / {{ arrivals_due }}</div>
+            <div class="small text-muted">Arrivals (Done / Due)</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card shadow-sm text-center py-3">
+            <div class="fs-3 fw-bold text-warning">{{ departures_done }} / {{ departures_due }}</div>
+            <div class="small text-muted">Departures (Done / Due)</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card shadow-sm text-center py-3">
+            <div class="fs-3 fw-bold text-primary">{{ inhouse }}</div>
+            <div class="small text-muted">In-House ({{ stayovers }} stayovers)</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card shadow-sm text-center py-3">
+            <div class="fs-3 fw-bold text-danger">{{ no_shows }}</div>
+            <div class="small text-muted">No-Shows ({{ cancellations }} cancelled)</div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Section 3: Revenue ── -->
+<h6 class="fw-semibold text-uppercase text-muted mb-2" style="font-size:11px;">Revenue</h6>
+<div class="row g-3 mb-4">
+    <div class="col-lg-5">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white fw-semibold py-2">
+                <i class="bi bi-cash-stack me-1"></i> Cash Revenue <span class="text-muted fw-normal small">(Collected)</span>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <tbody>
+                        <tr>
+                            <td class="fw-semibold">Cash Collected Today</td>
+                            <td class="text-end fw-bold fs-5 text-success">₹{{ '{:,.0f}'.format(day_revenue) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">MTD Cash Revenue</td>
+                            <td class="text-end fw-semibold">₹{{ '{:,.0f}'.format(mtd_revenue) }}</td>
+                        </tr>
+                        <tr class="table-light">
+                            <td class="text-muted small">Yesterday ({{ prev_date.strftime('%d %b') }})</td>
+                            <td class="text-end text-muted small">₹{{ '{:,.0f}'.format(prev_revenue) }}
+                                {% if day_revenue > prev_revenue %}
+                                <span class="text-success ms-1"><i class="bi bi-arrow-up"></i></span>
+                                {% elif day_revenue < prev_revenue %}
+                                <span class="text-danger ms-1"><i class="bi bi-arrow-down"></i></span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr class="table-light">
+                            <td class="text-muted small">Same Day Last Year ({{ ly_date.strftime('%d %b %Y') }})</td>
+                            <td class="text-end text-muted small">₹{{ '{:,.0f}'.format(ly_revenue) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white fw-semibold py-2">Payment Mode Breakdown</div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <tbody>
+                        {% for mode, amt in by_mode.items() %}
+                        <tr>
+                            <td>{{ mode }}</td>
+                            <td class="text-end fw-semibold">₹{{ '{:,.0f}'.format(amt) }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="2" class="text-muted text-center py-3">No payments today.</td></tr>
+                        {% endfor %}
+                        {% if by_mode %}
+                        <tr class="table-success fw-bold">
+                            <td>Total</td>
+                            <td class="text-end">₹{{ '{:,.0f}'.format(day_revenue) }}</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white fw-semibold py-2">Comparison</div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <div class="small text-muted">Occupancy vs Yesterday</div>
+                    <div class="fw-bold">{{ occ_pct }}% <span class="text-muted small">vs {{ prev_occ_pct }}%</span></div>
+                </div>
+                <div class="mb-2">
+                    <div class="small text-muted">Occupancy vs Last Year</div>
+                    <div class="fw-bold">{{ occ_pct }}% <span class="text-muted small">vs {{ ly_occ_pct }}%</span></div>
+                </div>
+                <div>
+                    <div class="small text-muted">Cash Revenue vs Yesterday</div>
+                    {% set rev_diff = day_revenue - prev_revenue %}
+                    <div class="fw-bold {{ 'text-success' if rev_diff >= 0 else 'text-danger' }}">
+                        {% if rev_diff >= 0 %}+{% endif %}₹{{ '{:,.0f}'.format(rev_diff) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if accrual %}
+<!-- ── Section 3b: Accrual Revenue ── -->
+<h6 class="fw-semibold text-uppercase text-muted mb-2" style="font-size:11px;">Accrual Revenue <span class="fw-normal">(Earned)</span></h6>
+<div class="row g-3 mb-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body py-2">
+                <table class="table table-sm mb-0">
+                    <tbody>
+                        <tr>
+                            <td>Room Revenue <span class="text-muted small">(rate x occupied rooms)</span></td>
+                            <td class="text-end fw-semibold">₹{{ '{:,.0f}'.format(accrual.accrual_room) }}</td>
+                        </tr>
+                        <tr>
+                            <td>Extra Charges <span class="text-muted small">(POS / services)</span></td>
+                            <td class="text-end fw-semibold">₹{{ '{:,.0f}'.format(accrual.accrual_extras) }}</td>
+                        </tr>
+                        <tr class="table-light">
+                            <td class="fw-semibold">Gross Accrual Revenue</td>
+                            <td class="text-end fw-bold">₹{{ '{:,.0f}'.format(accrual.accrual_gross) }}</td>
+                        </tr>
+                        {% if accrual.accrual_discount > 0 %}
+                        <tr>
+                            <td class="text-danger">Less: Discounts</td>
+                            <td class="text-end text-danger">-₹{{ '{:,.0f}'.format(accrual.accrual_discount) }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr class="table-success fw-bold">
+                            <td>Net Accrual Revenue</td>
+                            <td class="text-end">₹{{ '{:,.0f}'.format(accrual.accrual_net) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white fw-semibold py-2">Cash vs Accrual</div>
+            <div class="card-body">
+                {% set diff = day_revenue - accrual.accrual_net %}
+                <div class="mb-2">
+                    <div class="small text-muted">Cash Collected</div>
+                    <div class="fw-bold">₹{{ '{:,.0f}'.format(day_revenue) }}</div>
+                </div>
+                <div class="mb-2">
+                    <div class="small text-muted">Net Accrual Earned</div>
+                    <div class="fw-bold">₹{{ '{:,.0f}'.format(accrual.accrual_net) }}</div>
+                </div>
+                <div>
+                    <div class="small text-muted">Variance</div>
+                    <div class="fw-bold {{ 'text-success' if diff >= 0 else 'text-warning' }}">
+                        {% if diff >= 0 %}+{% endif %}₹{{ '{:,.0f}'.format(diff) }}
+                        <span class="small text-muted">{{ 'over-collected' if diff > 0 else ('under-collected' if diff < 0 else 'balanced') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<p class="text-muted small d-print-none">
+    <i class="bi bi-info-circle me-1"></i>
+    <strong>Cash Revenue</strong> = non-voided payments received on this date.
+    <strong>Accrual Revenue</strong> = room tariff x occupied nights + extra charges posted today.
+    ARR/RevPAR based on rates of currently checked-in reservations.
+</p>
+<style>@media print { .d-print-none { display:none !important; } }</style>
+{% endblock %}

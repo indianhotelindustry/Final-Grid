@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0d6efd">
+    <title>Pre-Check-In — {{ hotel_name }}</title>
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap-icons/font/bootstrap-icons.css') }}">
+    <style>
+        body { background: #f0f4f8; }
+        .hero { background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); color: #fff; padding: 2.5rem 1rem 4.5rem; text-align: center; }
+        .hero h2 { font-weight: 800; }
+        .form-card { max-width: 680px; margin: -3rem auto 2rem; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.12); padding: 2rem; }
+        .step-badge { font-size: .7rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+        .progress { height: 6px; border-radius: 4px; }
+        .step-panel { display: none; }
+        .step-panel.active { display: block; }
+        #signaturePad { border: 2px dashed #dee2e6; border-radius: 8px; cursor: crosshair; background: #f8f9fa; }
+        .camera-preview { border-radius: 8px; overflow: hidden; }
+        footer { text-align: center; color: #adb5bd; font-size: .8rem; padding: 2rem 0; }
+    </style>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body>
+
+<div class="hero">
+    <i class="bi bi-person-check" style="font-size:2.5rem;"></i>
+    <h2 class="mt-1">Online Pre-Check-In</h2>
+    <p class="mb-0 opacity-75">{{ hotel_name }}</p>
+</div>
+
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div style="max-width:680px;margin:1rem auto 0;">
+        {% for cat, msg in messages %}
+        <div class="alert alert-{{ cat }} py-2">{{ msg }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="form-card">
+        <!-- Booking summary -->
+        <div class="alert alert-primary py-2 mb-3">
+            <div class="row g-1">
+                <div class="col-6">
+                    <small class="text-muted">Ref</small><br>
+                    <strong>{{ reservation.booking_reference or reservation.id }}</strong>
+                </div>
+                <div class="col-6">
+                    <small class="text-muted">Room Type</small><br>
+                    <strong>{{ reservation.room_type.name if reservation.room_type else '—' }}</strong>
+                </div>
+                <div class="col-6">
+                    <small class="text-muted">Check-in</small><br>
+                    <strong>{{ reservation.arrival_date.strftime('%d %b %Y') }}</strong>
+                </div>
+                <div class="col-6">
+                    <small class="text-muted">Check-out</small><br>
+                    <strong>{{ reservation.departure_date.strftime('%d %b %Y') }}
+                    <span class="badge bg-secondary">{{ nights }}N</span></strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step progress -->
+        <div class="d-flex justify-content-between mb-1">
+            <span class="step-badge text-primary" id="stepLabel">Step 1 of 3 — Personal Details</span>
+            <span class="step-badge text-muted" id="stepCount">33%</span>
+        </div>
+        <div class="progress mb-4">
+            <div class="progress-bar bg-primary" id="progressBar" style="width:33%;"></div>
+        </div>
+
+        <form method="POST" action="{{ url_for('portal.submit', token_str=token) }}"
+              enctype="multipart/form-data" id="preCheckinForm">
+
+            <!-- Hidden fields populated by JS -->
+            <input type="hidden" name="id_photo_data" id="id_photo_data">
+            <input type="hidden" name="signature_data" id="signature_data">
+
+            <!-- ===== STEP 1: Personal Details ===== -->
+            <div class="step-panel active" id="step1">
+                <h6 class="fw-bold mb-3"><i class="bi bi-person me-1 text-primary"></i>Personal Information</h6>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Full Name (as on ID) <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="full_name"
+                               value="{{ reservation.guest.name if reservation.guest else '' }}" required>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label fw-semibold">Date of Birth</label>
+                        <input type="date" class="form-control" name="date_of_birth">
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label fw-semibold">Nationality</label>
+                        <select class="form-select" name="nationality">
+                            <option value="Indian" selected>Indian</option>
+                            <option value="American">American</option>
+                            <option value="British">British</option>
+                            <option value="Canadian">Canadian</option>
+                            <option value="Australian">Australian</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Home Address</label>
+                        <textarea class="form-control" name="address" rows="2"
+                                  placeholder="Door No., Street, Area…">{{ reservation.guest.address if reservation.guest and reservation.guest.address else '' }}</textarea>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label fw-semibold">City</label>
+                        <input type="text" class="form-control" name="city" placeholder="Mumbai">
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label fw-semibold">Estimated Arrival Time</label>
+                        <input type="time" class="form-control" name="estimated_arrival_time" value="14:00">
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="button" class="btn btn-primary px-4" onclick="goStep(2)">
+                        Next <i class="bi bi-arrow-right ms-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ===== STEP 2: ID Document ===== -->
+            <div class="step-panel" id="step2">
+                <h6 class="fw-bold mb-3"><i class="bi bi-card-text me-1 text-primary"></i>ID Document</h6>
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <label class="form-label fw-semibold">Document Type <span class="text-danger">*</span></label>
+                        <select class="form-select" name="id_type" required>
+                            <option value="">Select…</option>
+                            <option value="Aadhaar Card">Aadhaar Card</option>
+                            <option value="Passport">Passport</option>
+                            <option value="Driving License">Driving License</option>
+                            <option value="Voter ID">Voter ID</option>
+                            <option value="PAN Card">PAN Card</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label fw-semibold">Document Number <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="id_number" required
+                               placeholder="Enter number">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Upload ID Photo</label>
+                        <div class="row g-2">
+                            <div class="col-sm-6">
+                                <div class="card p-2 text-center camera-preview" style="cursor:pointer;" onclick="openCamera()">
+                                    <i class="bi bi-camera fs-2 text-primary mb-1"></i>
+                                    <div class="small fw-semibold">Take Photo</div>
+                                    <div class="text-muted" style="font-size:.75rem;">Use camera</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="card p-2 text-center camera-preview d-block" style="cursor:pointer;">
+                                    <i class="bi bi-image fs-2 text-secondary mb-1"></i>
+                                    <div class="small fw-semibold">Upload File</div>
+                                    <div class="text-muted" style="font-size:.75rem;">Gallery / File</div>
+                                    <input type="file" name="id_photo_file" accept="image/*"
+                                           class="d-none" id="fileInput" onchange="previewFile(this)">
+                                </label>
+                            </div>
+                        </div>
+                        <!-- Camera preview -->
+                        <div id="cameraSection" class="mt-2" style="display:none;">
+                            <video id="cameraVideo" width="100%" style="border-radius:8px;" autoplay playsinline></video>
+                            <button type="button" class="btn btn-sm btn-success mt-1 w-100" onclick="capturePhoto()">
+                                <i class="bi bi-camera me-1"></i>Capture
+                            </button>
+                        </div>
+                        <!-- Photo preview -->
+                        <div id="photoPreview" class="mt-2" style="display:none;">
+                            <div class="alert alert-success py-1 d-flex align-items-center">
+                                <i class="bi bi-check-circle me-2"></i>
+                                <span id="photoStatus">Photo captured</span>
+                                <button type="button" class="btn btn-sm btn-outline-danger ms-auto py-0"
+                                        onclick="clearPhoto()">Retake</button>
+                            </div>
+                            <img id="photoImg" class="img-fluid rounded" style="max-height:200px;" src="">
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-outline-secondary" onclick="goStep(1)">
+                        <i class="bi bi-arrow-left me-1"></i>Back
+                    </button>
+                    <button type="button" class="btn btn-primary px-4" onclick="goStep(3)">
+                        Next <i class="bi bi-arrow-right ms-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ===== STEP 3: Confirm & Sign ===== -->
+            <div class="step-panel" id="step3">
+                <h6 class="fw-bold mb-3"><i class="bi bi-pen me-1 text-primary"></i>Confirm &amp; Sign</h6>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Special Requests for This Stay</label>
+                    <textarea class="form-control" name="special_requests" rows="2"
+                              placeholder="Early check-in, extra pillows, ground floor…">{{ reservation.special_requests or '' }}</textarea>
+                </div>
+
+                <!-- Digital signature pad -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Digital Signature <span class="text-danger">*</span></label>
+                    <div style="position:relative;">
+                        <canvas id="signaturePad" width="600" height="160"
+                                style="width:100%;height:130px;touch-action:none;"></canvas>
+                    </div>
+                    <div class="d-flex justify-content-end mt-1">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearSig()">
+                            <i class="bi bi-eraser me-1"></i>Clear
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Terms -->
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="terms_accepted"
+                           id="termsCheck" required>
+                    <label class="form-check-label" for="termsCheck">
+                        I confirm that all information provided is accurate and I agree to the
+                        <strong>hotel's check-in policy</strong>. Payment is due at check-out unless
+                        an advance has been paid.
+                    </label>
+                </div>
+
+                <div class="alert alert-info py-2 mb-3">
+                    <i class="bi bi-shield-check me-1"></i>
+                    Your data is stored securely and used only for your hotel registration.
+                    Check-in at the front desk from <strong>12:00 PM</strong>.
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary" onclick="goStep(2)">
+                        <i class="bi bi-arrow-left me-1"></i>Back
+                    </button>
+                    <button type="submit" class="btn btn-success px-4" onclick="return captureSignature()">
+                        <i class="bi bi-check-circle me-1"></i>Submit Pre-Check-In
+                    </button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<footer>{{ hotel_name }} &bull; Secure Guest Portal</footer>
+
+<script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script>
+// ---- Step navigation ----
+const stepLabels = ['', 'Step 1 of 3 — Personal Details', 'Step 2 of 3 — ID Document', 'Step 3 of 3 — Confirm & Sign'];
+const stepPcts   = ['', '33%', '66%', '100%'];
+
+function goStep(n) {
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('step' + n).classList.add('active');
+    document.getElementById('stepLabel').textContent = stepLabels[n];
+    document.getElementById('stepCount').textContent = stepPcts[n];
+    document.getElementById('progressBar').style.width = stepPcts[n];
+    window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// ---- Camera / photo capture ----
+let stream = null;
+
+async function openCamera() {
+    document.getElementById('cameraSection').style.display = 'block';
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        document.getElementById('cameraVideo').srcObject = stream;
+    } catch (e) {
+        alert('Camera not available. Please use the Upload File option.');
+        document.getElementById('cameraSection').style.display = 'none';
+    }
+}
+
+function capturePhoto() {
+    const video = document.getElementById('cameraVideo');
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+    document.getElementById('id_photo_data').value = dataUrl;
+    document.getElementById('photoImg').src = dataUrl;
+    document.getElementById('photoStatus').textContent = 'Photo captured ✓';
+    document.getElementById('photoPreview').style.display = 'block';
+    document.getElementById('cameraSection').style.display = 'none';
+    if (stream) stream.getTracks().forEach(t => t.stop());
+}
+
+function previewFile(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            document.getElementById('id_photo_data').value = e.target.result;
+            document.getElementById('photoImg').src = e.target.result;
+            document.getElementById('photoStatus').textContent = 'File selected ✓';
+            document.getElementById('photoPreview').style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function clearPhoto() {
+    document.getElementById('id_photo_data').value = '';
+    document.getElementById('photoPreview').style.display = 'none';
+    document.getElementById('cameraSection').style.display = 'none';
+    document.getElementById('fileInput').value = '';
+    if (stream) stream.getTracks().forEach(t => t.stop());
+}
+
+// ---- Signature pad ----
+const canvas = document.getElementById('signaturePad');
+const ctx = canvas.getContext('2d');
+let drawing = false, hasSig = false;
+
+function scaledCoords(e) {
+    const r = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / r.width;
+    const scaleY = canvas.height / r.height;
+    const src = e.touches ? e.touches[0] : e;
+    return [(src.clientX - r.left) * scaleX, (src.clientY - r.top) * scaleY];
+}
+
+canvas.addEventListener('mousedown', e => { drawing = true; ctx.beginPath(); const [x,y] = scaledCoords(e); ctx.moveTo(x,y); });
+canvas.addEventListener('mousemove', e => { if (!drawing) return; const [x,y] = scaledCoords(e); ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.strokeStyle = '#1a1a2e'; ctx.lineTo(x,y); ctx.stroke(); hasSig = true; });
+canvas.addEventListener('mouseup', () => drawing = false);
+canvas.addEventListener('mouseleave', () => drawing = false);
+canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; ctx.beginPath(); const [x,y] = scaledCoords(e); ctx.moveTo(x,y); }, {passive:false});
+canvas.addEventListener('touchmove', e => { e.preventDefault(); if (!drawing) return; const [x,y] = scaledCoords(e); ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.strokeStyle = '#1a1a2e'; ctx.lineTo(x,y); ctx.stroke(); hasSig = true; }, {passive:false});
+canvas.addEventListener('touchend', () => drawing = false);
+
+function clearSig() { ctx.clearRect(0, 0, canvas.width, canvas.height); hasSig = false; }
+
+function captureSignature() {
+    if (!hasSig) { alert('Please sign before submitting.'); return false; }
+    document.getElementById('signature_data').value = canvas.toDataURL('image/png');
+    return true;
+}
+// CSRF auto-inject for portal form
+(function () {
+    const token = document.querySelector('meta[name="csrf-token"]').content;
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('form[method="post"],form[method="POST"]').forEach(function (f) {
+            if (!f.querySelector('input[name="csrf_token"]')) {
+                const inp = document.createElement('input');
+                inp.type = 'hidden'; inp.name = 'csrf_token'; inp.value = token;
+                f.prepend(inp);
+            }
+        });
+    });
+})();
+</script>
+</body>
+</html>

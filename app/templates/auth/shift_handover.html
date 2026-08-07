@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% block title %}Shift Handover — {{ shift.shift_type }} | {{ shift.user.full_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 d-print-none">
+  <h5 class="mb-0"><i class="bi bi-file-earmark-check me-2 text-success"></i>Shift Handover Report</h5>
+  <div class="btn-group">
+    <button onclick="window.print()" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-printer me-1"></i>Print
+    </button>
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary btn-sm">
+      <i class="bi bi-house me-1"></i>Dashboard
+    </a>
+  </div>
+</div>
+
+<div class="card shadow-sm" id="handover-card">
+  <div class="card-body p-4">
+
+    <!-- Header -->
+    <div class="row mb-3">
+      <div class="col-8">
+        <h5 class="fw-bold mb-1">{{ config.HOTEL_NAME }}</h5>
+        <p class="mb-0 text-muted">Shift Handover Report</p>
+      </div>
+      <div class="col-4 text-end">
+        <span class="badge fs-6
+          {% if shift.approval_status == 'auto_approved' %}bg-success
+          {% elif shift.approval_status == 'approved' %}bg-primary
+          {% elif shift.approval_status == 'pending_approval' %}bg-warning text-dark
+          {% else %}bg-secondary{% endif %}">
+          {{ shift.approval_status | replace('_', ' ') | title if shift.approval_status else shift.status }}
+        </span>
+      </div>
+    </div>
+    <hr>
+
+    <!-- Shift Info -->
+    <div class="row mb-4">
+      <div class="col-sm-6">
+        <table class="table table-sm table-borderless mb-0">
+          <tr>
+            <td class="text-muted">Staff</td>
+            <td class="fw-semibold">{{ shift.user.full_name }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Role</td>
+            <td>{{ shift.user.role }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Shift Type</td>
+            <td>{{ shift.shift_type }}</td>
+          </tr>
+        </table>
+      </div>
+      <div class="col-sm-6">
+        <table class="table table-sm table-borderless mb-0">
+          <tr>
+            <td class="text-muted">Start Time</td>
+            <td>{{ shift.start_time.strftime('%d %b %Y %H:%M') }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">End Time</td>
+            <td>{{ shift.end_time.strftime('%d %b %Y %H:%M') if shift.end_time else '—' }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Closed By</td>
+            <td>{{ shift.closed_by.full_name if shift.closed_by else shift.user.full_name }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Payment Mode Summary -->
+    <h6 class="mt-3 mb-2">Payment Mode Summary</h6>
+    <table class="table table-bordered table-sm mb-4">
+      <thead class="table-dark">
+        <tr>
+          <th>Payment Mode</th>
+          <th class="text-end">Amount Collected (₹)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if shift.payment_summary %}
+          {% for mode, total in shift.payment_summary.items() %}
+          <tr>
+            <td>{{ mode }}</td>
+            <td class="text-end">{{ '%.2f'|format(total) }}</td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="2" class="text-muted small text-center">No payments in this shift.</td></tr>
+        {% endif %}
+      </tbody>
+      {% if shift.payment_summary %}
+      <tfoot class="table-secondary fw-semibold">
+        <tr>
+          <td>Total Collections</td>
+          <td class="text-end">₹{{ '%.2f'|format(shift.payment_summary.values()|sum) }}</td>
+        </tr>
+      </tfoot>
+      {% endif %}
+    </table>
+
+    <!-- Cash Reconciliation -->
+    <h6 class="mt-3 mb-2">Cash Reconciliation</h6>
+    <table class="table table-bordered table-sm mb-4">
+      <tbody>
+        <tr>
+          <td class="text-muted">Opening Cash</td>
+          <td class="text-end">₹{{ '%.2f'|format(shift.opening_cash or 0) }}</td>
+        </tr>
+        {% if adjustments %}
+        <tr>
+          <td colspan="2" class="table-light fw-semibold">Cash Adjustments</td>
+        </tr>
+        {% for adj in adjustments %}
+        <tr>
+          <td class="ps-4 small text-muted">
+            {{ adj.adjustment_type | replace('_', ' ') | title }} — {{ adj.description }}
+          </td>
+          <td class="text-end small
+            {{ 'text-success' if adj.adjustment_type == 'float_add' else 'text-danger' }}">
+            {{ '+' if adj.adjustment_type == 'float_add' else '−' }}₹{{ '%.2f'|format(adj.amount) }}
+          </td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+        <tr class="table-light">
+          <td class="fw-semibold">Expected Cash in Drawer</td>
+          <td class="text-end fw-semibold">₹{{ '%.2f'|format(shift.expected_cash or 0) }}</td>
+        </tr>
+        <tr>
+          <td class="fw-semibold">Declared Closing Cash</td>
+          <td class="text-end fw-bold fs-6">₹{{ '%.2f'|format(shift.declared_closing_cash or 0) }}</td>
+        </tr>
+        <tr class="{{ 'table-danger' if (shift.variance or 0) < -0.01 else 'table-success' if (shift.variance or 0) > 0.01 else 'table-light' }}">
+          <td class="fw-bold">Variance (Declared − Expected)</td>
+          <td class="text-end fw-bold">
+            {% set v = shift.variance | float %}
+            {% if v > 0 %}+{% elif v < 0 %}−{% endif %}
+            ₹{{ '%.2f'|format(v | abs) }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Approval -->
+    {% if shift.approval_status == 'approved' and shift.approved_by %}
+    <div class="alert alert-primary">
+      <i class="bi bi-person-check me-1"></i>
+      Approved by <strong>{{ shift.approved_by.full_name }}</strong>
+      on {{ shift.approved_at.strftime('%d %b %Y %H:%M') }}.
+    </div>
+    {% endif %}
+
+    <!-- Notes -->
+    {% if shift.close_notes %}
+    <h6 class="mt-3 mb-1">Handover Notes</h6>
+    <div class="alert alert-secondary">{{ shift.close_notes }}</div>
+    {% endif %}
+
+    <!-- Signature line -->
+    <div class="row mt-4">
+      <div class="col-6">
+        <p class="text-muted small mb-4">Shift Closed By</p>
+        <p class="border-top pt-1 text-muted small">{{ shift.user.full_name }}</p>
+      </div>
+      <div class="col-6 text-end">
+        <p class="text-muted small mb-4">Received By (Next Shift)</p>
+        <p class="border-top pt-1 text-muted small">Name / Signature</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+@media print {
+  .d-print-none { display: none !important; }
+  #handover-card { box-shadow: none !important; }
+  body { font-size: 12px; }
+  .table { font-size: 11px; }
+}
+</style>
+{% endblock %}

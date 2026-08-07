@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Database Backups — {{ config.HOTEL_NAME }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0"><i class="bi bi-database-down me-2 text-primary"></i>Database Backups</h4>
+    <form method="POST" action="{{ url_for('backup.run_now') }}" class="d-inline">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-play-circle me-1"></i>Run Backup Now
+        </button>
+    </form>
+</div>
+
+<div class="row g-3">
+    <!-- Backup Files -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-archive me-1"></i>Backup Files
+                <small class="text-muted ms-2">(30-day retention, auto-purged)</small>
+            </div>
+            <div class="card-body p-0">
+                {% if files %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Filename</th>
+                                <th>Size</th>
+                                <th>Created</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for f in files %}
+                            <tr>
+                                <td class="font-monospace small">{{ f.filename }}</td>
+                                <td>{{ f.size_kb }} KB</td>
+                                <td>{{ f.created_at.strftime('%d %b %Y %H:%M') }}</td>
+                                <td class="text-end">
+                                    <a href="{{ url_for('backup.download', filename=f.filename) }}"
+                                       class="btn btn-sm btn-outline-primary me-1">
+                                        <i class="bi bi-download"></i>
+                                    </a>
+                                    <form method="POST" action="{{ url_for('backup.delete', filename=f.filename) }}"
+                                          class="d-inline"
+                                          onsubmit="return confirm('Delete this backup?')">
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-database-x fs-1 d-block mb-2"></i>
+                    No backups yet. Click "Run Backup Now" to create the first one.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Backup Log -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-journal-text me-1"></i>Recent Activity
+            </div>
+            <div class="list-group list-group-flush">
+                {% for log in logs %}
+                <div class="list-group-item py-2">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <span class="badge {% if log.status == 'success' %}bg-success{% else %}bg-danger{% endif %} me-1">
+                                {{ log.status }}
+                            </span>
+                            <small class="text-muted">{{ log.backup_type }}</small>
+                        </div>
+                        <small class="text-muted">{{ log.created_at.strftime('%d %b %H:%M') }}</small>
+                    </div>
+                    {% if log.status == 'success' %}
+                    <div class="small text-truncate mt-1 font-monospace">{{ log.filename }}</div>
+                    <div class="small text-muted">{{ (log.size_bytes or 0) // 1024 }} KB</div>
+                    {% else %}
+                    <div class="small text-danger mt-1">{{ log.error_message }}</div>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="list-group-item text-muted text-center py-3">No activity yet.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="card shadow-sm mt-3">
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-info-circle me-1"></i>Schedule
+            </div>
+            <div class="card-body small text-muted">
+                <p class="mb-1"><i class="bi bi-clock me-1"></i>Daily automatic backup at <strong>03:00 AM</strong></p>
+                <p class="mb-1"><i class="bi bi-trash me-1"></i>Files older than 30 days are auto-deleted</p>
+                <p class="mb-0"><i class="bi bi-folder me-1"></i>Stored in <code>backups/</code> folder next to the app</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+{% block title %}System Update — {{ config.HOTEL_NAME }}{% endblock %}
+
+{% block content %}
+<div class="row">
+<div class="col-12 col-lg-7 mx-auto">
+
+  <div class="d-flex align-items-center mb-4 gap-2">
+    <i class="bi bi-cloud-arrow-up fs-3 text-primary"></i>
+    <div>
+      <h4 class="mb-0">System Update</h4>
+      <small class="text-muted">Install updates and manage server</small>
+    </div>
+  </div>
+
+  {# ── Status cards ─────────────────────────────────────────── #}
+  <div class="row g-3 mb-4">
+    <div class="col-4">
+      <div class="card text-center h-100">
+        <div class="card-body py-3">
+          <div class="text-muted small">Installed Version</div>
+          <div class="fw-bold fs-5 text-primary">v{{ app_version }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="card text-center h-100">
+        <div class="card-body py-3">
+          <div class="text-muted small">DB Migrations</div>
+          <div class="fw-bold fs-5">{{ applied_migrations }} applied</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="card text-center h-100">
+        <div class="card-body py-3">
+          <div class="text-muted small">Last Backup</div>
+          {% if last_backup %}
+          <div class="fw-bold text-success" style="font-size:0.8rem;">
+            {{ last_backup.taken_at }}<br>
+            <span class="text-muted fw-normal">
+              ({{ last_backup.size_kb }} KB{% if last_backup.encrypted %}, encrypted{% endif %})
+            </span>
+          </div>
+          {% else %}
+          <div class="fw-bold text-warning" style="font-size:0.85rem;">No backups yet</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ── Step 1: Backup ───────────────────────────────────────── #}
+  <div class="card mb-3 border-start border-primary border-3">
+    <div class="card-body">
+      <h6 class="card-title mb-1">
+        <span class="badge bg-primary rounded-pill me-2">1</span>
+        Take a Backup First
+      </h6>
+      <p class="text-muted small mb-3">
+        A snapshot of your entire database is saved to the <code>backups/</code>
+        folder. A backup is also taken automatically when you apply an update,
+        but it is good practice to take one manually before major changes.
+      </p>
+      <form method="POST" action="{{ url_for('updater.trigger_backup') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-outline-primary btn-sm">
+          <i class="bi bi-database-down me-1"></i> Take Backup Now
+        </button>
+      </form>
+    </div>
+  </div>
+
+  {# ── Step 2: Apply update ─────────────────────────────────── #}
+  <div class="card mb-3 border-start border-success border-3">
+    <div class="card-body">
+      <h6 class="card-title mb-1">
+        <span class="badge bg-success rounded-pill me-2">2</span>
+        Upload Update Package
+      </h6>
+      <p class="text-muted small mb-2">
+        Upload the <code>.zip</code> file sent by your developer.
+        The system will automatically:
+      </p>
+      <ul class="text-muted small mb-3">
+        <li>Take a <strong>backup</strong> of your database</li>
+        <li>Extract new code (<code>.env</code>, uploads, and backups are <strong>never</strong> touched)</li>
+        <li>Apply any new database changes</li>
+        <li>Bump the browser cache so staff see the new version immediately</li>
+        <li>Restart the server — staff are reconnected in ~10 seconds</li>
+      </ul>
+
+      <div class="alert alert-warning py-2 small mb-3">
+        <i class="bi bi-exclamation-triangle me-1"></i>
+        <strong>All staff will be briefly disconnected (~10 seconds)</strong>
+        while the server restarts. Do this during a quiet period.
+      </div>
+
+      <form method="POST" action="{{ url_for('updater.apply_update') }}"
+            enctype="multipart/form-data" id="updateForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Select Update File</label>
+          <input type="file" name="update_zip" class="form-control" accept=".zip" required
+                 id="zipInput">
+          <div class="form-text">Only .zip files from your developer are accepted.</div>
+        </div>
+
+        {# Package preview — populated via AJAX after file selection #}
+        <div id="packagePreview" style="display:none" class="mb-3"></div>
+        <button type="submit" class="btn btn-success" id="applyBtn">
+          <i class="bi bi-cloud-arrow-up me-1"></i> Apply Update &amp; Restart
+        </button>
+      </form>
+    </div>
+  </div>
+
+  {# ── Restart only ─────────────────────────────────────────── #}
+  <div class="card mb-3 border-start border-secondary border-3">
+    <div class="card-body">
+      <h6 class="card-title mb-1">
+        <span class="badge bg-secondary rounded-pill me-2">+</span>
+        Restart Server
+      </h6>
+      <p class="text-muted small mb-3">
+        Restart the server without applying any update — useful after
+        manually editing settings or configuration files.
+      </p>
+      <form method="POST" action="{{ url_for('updater.restart_server') }}"
+            onsubmit="return confirm('Restart the server now? All staff will be disconnected for ~10 seconds.')">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-arrow-clockwise me-1"></i> Restart Server
+        </button>
+      </form>
+    </div>
+  </div>
+
+  {# ── Install path (for reference) ─────────────────────────── #}
+  <div class="card bg-light border-0">
+    <div class="card-body py-2">
+      <small class="text-muted">
+        <i class="bi bi-folder me-1"></i>
+        <strong>Install path:</strong>
+        <code>{{ project_root }}</code>
+      </small>
+    </div>
+  </div>
+
+</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script nonce="{{ csp_nonce }}">
+(function () {
+  var form = document.getElementById('updateForm');
+  var btn = document.getElementById('applyBtn');
+  var zipInput = document.getElementById('zipInput');
+
+  // ── Show chosen filename + inspect package metadata ─────────────
+  zipInput.addEventListener('change', function () {
+    var hint = this.nextElementSibling;
+    var preview = document.getElementById('packagePreview');
+    if (!this.files.length) {
+      preview.style.display = 'none';
+      return;
+    }
+    hint.textContent = 'Selected: ' + this.files[0].name +
+      ' (' + Math.round(this.files[0].size / 1024) + ' KB)';
+
+    // AJAX inspect
+    var fd = new FormData();
+    fd.append('update_zip', this.files[0]);
+    fd.append('csrf_token', document.querySelector('input[name=csrf_token]').value);
+    preview.style.display = '';
+    preview.innerHTML = '<div class="text-muted small"><span class="spinner-border spinner-border-sm me-1"></span>Inspecting package...</div>';
+
+    fetch('{{ url_for("updater.inspect_package") }}', {
+      method: 'POST', body: fd,
+      headers: {'X-CSRFToken': document.querySelector('input[name=csrf_token]').value}
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (!d.ok) { preview.innerHTML = '<div class="alert alert-danger py-2 small mb-0">Invalid package: ' + (d.error || 'unknown') + '</div>'; return; }
+      renderPreview(d);
+    })
+    .catch(function(){ preview.innerHTML = '<div class="alert alert-warning py-2 small mb-0">Could not inspect package.</div>'; });
+  });
+
+  function renderPreview(d) {
+    var preview = document.getElementById('packagePreview');
+    var typeColors = {major:'danger', minor:'info', patch:'secondary'};
+    var typeLabels = {major:'MAJOR UPGRADE', minor:'Minor Update', patch:'Patch'};
+    var color = typeColors[d.release_type] || 'secondary';
+    var label = typeLabels[d.release_type] || 'Update';
+    var html = '';
+
+    // Major upgrade warning banner
+    if (d.release_type === 'major') {
+      html += '<div class="alert alert-danger py-2 mb-2">' +
+        '<i class="bi bi-exclamation-octagon-fill me-1"></i>' +
+        '<strong>Major Version Upgrade</strong> — This update includes structural changes. ' +
+        'Backup is mandatory and strongly recommended before proceeding.' +
+        '</div>';
+    }
+
+    // Downgrade warning
+    if (d.is_downgrade) {
+      html += '<div class="alert alert-danger py-2 mb-2">' +
+        '<i class="bi bi-arrow-down-circle-fill me-1"></i>' +
+        '<strong>Downgrade detected:</strong> v' + d.target_version + ' is older than current v' + d.current_version + '. ';
+      if (d.allow_downgrade) {
+        html += 'Package explicitly allows downgrade.';
+      } else {
+        html += 'Downgrade will be <strong>blocked</strong>.';
+      }
+      html += '</div>';
+    }
+
+    // Same version warning
+    if (d.is_same_version) {
+      html += '<div class="alert alert-warning py-2 mb-2 small">' +
+        '<i class="bi bi-info-circle me-1"></i>Same version as currently installed (v' + d.current_version + ').</div>';
+    }
+
+    // Version card
+    html += '<div class="card border-' + color + '"><div class="card-body py-2 px-3">' +
+      '<div class="d-flex align-items-center gap-2 flex-wrap">' +
+      '<span class="badge bg-' + color + '">' + label + '</span>' +
+      '<span class="fw-semibold">v' + d.current_version + '</span>' +
+      '<i class="bi bi-arrow-right text-muted"></i>' +
+      '<span class="fw-bold text-' + color + '">v' + d.target_version + '</span>' +
+      '</div>';
+
+    if (d.description) {
+      html += '<div class="text-muted small mt-1" style="white-space:pre-wrap">' + escapeHtml(d.description) + '</div>';
+    }
+    html += '</div></div>';
+
+    preview.innerHTML = html;
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  // ── Confirm before applying ────────────────────────────────────
+  form.addEventListener('submit', function (e) {
+    if (!zipInput.files.length) return;
+
+    var fname = zipInput.files[0].name;
+    var ok = confirm(
+      'Apply update "' + fname + '"?\n\n' +
+      'This will:\n' +
+      '  1. Backup your database\n' +
+      '  2. Update system files\n' +
+      '  3. Apply database changes\n' +
+      '  4. Restart the server (~15 seconds)\n\n' +
+      'All staff will be briefly disconnected.\n' +
+      'Continue?'
+    );
+    if (!ok) { e.preventDefault(); return; }
+
+    // Disable button, show spinner
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Uploading & applying...';
+
+    // After form submits, show restart overlay
+    setTimeout(function () {
+      var overlay = document.createElement('div');
+      overlay.id = 'restartOverlay';
+      overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;';
+      overlay.innerHTML =
+        '<div style="text-align:center;color:#fff;max-width:400px;padding:2rem;">' +
+          '<div class="spinner-border text-light mb-3" style="width:3rem;height:3rem;"></div>' +
+          '<h4>Update Applied</h4>' +
+          '<p class="mb-1">Server is restarting...</p>' +
+          '<p id="restartStatus" class="text-light opacity-75">Waiting for server to come back online</p>' +
+          '<div class="progress mt-3" style="height:6px;">' +
+            '<div id="restartBar" class="progress-bar bg-success" style="width:0%;transition:width 0.5s;"></div>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(overlay);
+
+      var bar = document.getElementById('restartBar');
+      var status = document.getElementById('restartStatus');
+      var progress = 0;
+      var maxWait = 30; // seconds
+
+      // Progress bar animation
+      var tick = setInterval(function () {
+        progress += (100 / maxWait);
+        if (progress > 95) progress = 95;
+        bar.style.width = progress + '%';
+      }, 1000);
+
+      // Poll /api/health every 2 seconds until server is back
+      var pollStart = Date.now();
+      var poll = setInterval(function () {
+        var elapsed = Math.round((Date.now() - pollStart) / 1000);
+        status.textContent = 'Waiting for server... (' + elapsed + 's)';
+
+        fetch('/api/health', { cache: 'no-store' })
+          .then(function (r) {
+            if (r.ok) {
+              clearInterval(poll);
+              clearInterval(tick);
+              bar.style.width = '100%';
+              status.innerHTML = '<span class="text-success">Server is back online! Reloading...</span>';
+              setTimeout(function () { location.reload(true); }, 1000);
+            }
+          })
+          .catch(function () { /* server still down, keep polling */ });
+
+        // Give up after 60 seconds
+        if (elapsed > 60) {
+          clearInterval(poll);
+          clearInterval(tick);
+          status.innerHTML = '<span class="text-warning">Server is taking longer than expected.<br>Try refreshing the page manually.</span>';
+        }
+      }, 2000);
+    }, 2000);
+  });
+})();
+</script>
+{% endblock %}

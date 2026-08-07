@@ -1,0 +1,39 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/auth/users",
+  "anon_status": 302,
+  "body_bytes": 31431,
+  "body_sha256": "2c1c1308096e3b8c57c43763b22cacb02f7f0a9c2ab9b7194ca9b2652f0968ef",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 22,
+  "endpoint": "auth.users",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "role_labels[len]": "5",
+    "roles[len]": "5",
+    "users[0][type]": "User",
+    "users[len]": "1"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "auth.users",
+  "templates": [
+    "auth/users.html"
+  ],
+  "truncations": [],
+  "url": "/auth/users"
+}

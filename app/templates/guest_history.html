@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<style>
+.gh-page { max-width: 1000px; margin: 0 auto; }
+
+/* ── Guest strip ──────────────────────────────────────────────── */
+.gh-guest-strip {
+    background: #0d1b2a;
+    color: #fff;
+    border-radius: 10px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.gh-guest-name  { font-size: 1.1rem; font-weight: 700; }
+.gh-guest-meta  { font-size: .78rem; color: rgba(255,255,255,.7); margin-top: 2px; }
+.gh-nav-links   { display: flex; gap: 8px; flex-wrap: wrap; }
+.gh-nav-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 12px; border-radius: 6px; font-size: .75rem; font-weight: 600;
+    text-decoration: none; border: 1px solid rgba(255,255,255,.25);
+    color: rgba(255,255,255,.9); background: rgba(255,255,255,.1);
+    transition: background .12s;
+}
+.gh-nav-btn:hover { background: rgba(255,255,255,.22); color: #fff; }
+
+/* ── Summary ribbon ───────────────────────────────────────────── */
+.gh-summary {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+.gh-sum-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #fff; border: 1px solid #e9ecef; border-radius: 8px;
+    padding: 8px 14px; font-size: .8rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+.gh-sum-chip strong { color: #0d1b2a; }
+.gh-sum-chip.outstanding strong { color: #d93025; }
+.gh-sum-chip.settled strong { color: #188038; }
+
+/* ── History table ────────────────────────────────────────────── */
+.gh-table thead th {
+    font-size: .72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .05em; color: #fff; background: #1a202c;
+    border-color: #2d3748; padding: 10px 12px; white-space: nowrap;
+}
+.gh-table tbody td {
+    padding: 10px 12px; vertical-align: middle;
+    font-size: .84rem; border-bottom: 1px solid #f3f4f6;
+}
+.gh-table tbody tr:hover { background: #f8faff; }
+
+/* ── Status badges ────────────────────────────────────────────── */
+.st-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 20px;
+    font-size: .68rem; font-weight: 700; white-space: nowrap;
+}
+.st-badge.ci  { background: #e6f4ea; color: #188038; }
+.st-badge.co  { background: #e8f0fe; color: #1967d2; }
+.st-badge.res { background: #fff8e1; color: #b45309; }
+.st-badge.ns  { background: #fce8e6; color: #d93025; }
+.st-badge.can { background: #f1f3f4; color: #6c757d; }
+
+/* ── Balance badge ────────────────────────────────────────────── */
+.bal-chip {
+    display: inline-block; padding: 2px 8px; border-radius: 4px;
+    font-size: .72rem; font-weight: 700; white-space: nowrap;
+}
+.bal-chip.due      { background: #fee2e2; color: #991b1b; }
+.bal-chip.settled  { background: #d1fae5; color: #065f46; }
+.bal-chip.partial  { background: #fef3c7; color: #92400e; }
+
+/* ── Row actions ──────────────────────────────────────────────── */
+.row-action {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 9px; border-radius: 5px; font-size: .72rem; font-weight: 600;
+    text-decoration: none; border: 1px solid transparent; transition: all .12s;
+    white-space: nowrap;
+}
+.row-action.folio   { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+.row-action.folio:hover { background: #1d4ed8; color: #fff; }
+.row-action.invoice { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
+.row-action.invoice:hover { background: #166534; color: #fff; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid pb-5">
+<div class="gh-page">
+
+    {# ── Guest strip + nav ─────────────────────────────────────── #}
+    <div class="gh-guest-strip">
+        <div>
+            <div class="gh-guest-name"><i class="bi bi-person-fill me-2 opacity-75"></i>{{ guest.name }}</div>
+            <div class="gh-guest-meta">
+                Folio F{{ '%04d' % guest.id }}
+                {% if guest.phone %} &bull; {{ guest.phone }}{% endif %}
+                {% if guest.company %} &bull; {{ guest.company }}{% endif %}
+            </div>
+        </div>
+        <div class="gh-nav-links">
+            <a href="{{ url_for('main.guest_folio', guest_id=guest.id) }}" class="gh-nav-btn">
+                <i class="bi bi-person-circle"></i> Guest Profile
+            </a>
+            <a href="{{ url_for('billing.invoice_register', search=guest.name, tab='all') }}" class="gh-nav-btn">
+                <i class="bi bi-list-ul"></i> All Invoices
+            </a>
+            <a href="{{ url_for('main.guest_database') }}" class="gh-nav-btn">
+                <i class="bi bi-people"></i> Database
+            </a>
+        </div>
+    </div>
+
+    {# ── Summary ribbon ────────────────────────────────────────── #}
+    {% set total_stays  = rows | length %}
+    {% set total_billed = rows | map(attribute='billing') | map(attribute='total') | sum %}
+    {% set total_paid   = rows | map(attribute='billing') | map(attribute='paid')  | sum %}
+    {% set total_bal    = rows | selectattr('billing.balance', 'gt', 0.01) | map(attribute='billing') | map(attribute='balance') | sum %}
+
+    <div class="gh-summary">
+        <div class="gh-sum-chip">
+            <i class="bi bi-calendar-check text-primary"></i>
+            <span>Total Stays: <strong>{{ total_stays }}</strong></span>
+        </div>
+        <div class="gh-sum-chip">
+            <i class="bi bi-currency-rupee text-secondary"></i>
+            <span>Total Billed: <strong>₹{{ '{:,.0f}'.format(total_billed) }}</strong></span>
+        </div>
+        <div class="gh-sum-chip settled">
+            <i class="bi bi-check-circle text-success"></i>
+            <span>Total Paid: <strong>₹{{ '{:,.0f}'.format(total_paid) }}</strong></span>
+        </div>
+        {% if total_bal > 0.01 %}
+        <div class="gh-sum-chip outstanding">
+            <i class="bi bi-exclamation-circle text-danger"></i>
+            <span>Outstanding: <strong>₹{{ '{:,.0f}'.format(total_bal) }}</strong></span>
+        </div>
+        {% endif %}
+    </div>
+
+    {# ── History table ─────────────────────────────────────────── #}
+    {% if rows %}
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table gh-table mb-0">
+                <thead>
+                    <tr>
+                        <th>Dates</th>
+                        <th>Duration</th>
+                        <th>Room</th>
+                        <th>Room Type</th>
+                        <th>Status</th>
+                        <th class="text-end">Charged</th>
+                        <th class="text-end">Paid</th>
+                        <th class="text-end">Balance</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                    {% set res = row.reservation %}
+                    {% set b   = row.billing %}
+                    {% set s   = res.status %}
+                    {% set nights = (res.departure_date - res.arrival_date).days %}
+                    <tr>
+                        <td>
+                            <div class="fw-semibold" style="white-space:nowrap">
+                                {{ res.arrival_date.strftime('%d %b %Y') }}
+                            </div>
+                            <div class="text-muted" style="font-size:.75rem;white-space:nowrap">
+                                → {{ res.departure_date.strftime('%d %b %Y') }}
+                            </div>
+                        </td>
+                        <td class="text-muted">
+                            {{ nights }}&nbsp;{% if res.booking_type == 'Hourly' %}hr{% else %}N{% endif %}
+                        </td>
+                        <td>
+                            {% if res.room %}
+                            <span class="fw-semibold">{{ res.room.room_number }}</span>
+                            {% else %}<span class="text-muted">—</span>{% endif %}
+                        </td>
+                        <td>{{ res.room_type.name }}</td>
+                        <td>
+                            {% if s == 'CheckedIn' %}
+                                <span class="st-badge ci">Checked-in</span>
+                            {% elif s == 'CheckedOut' %}
+                                <span class="st-badge co">Checked-out</span>
+                            {% elif s in ('Reserved','Confirmed') %}
+                                <span class="st-badge res">{{ s }}</span>
+                            {% elif s == 'NoShow' %}
+                                <span class="st-badge ns">No-show</span>
+                            {% else %}
+                                <span class="st-badge can">{{ s }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end fw-semibold">₹{{ '{:,.0f}'.format(b.total) }}</td>
+                        <td class="text-end text-success fw-semibold">₹{{ '{:,.0f}'.format(b.paid) }}</td>
+                        <td class="text-end">
+                            {% if b.balance > 0.01 %}
+                                <span class="bal-chip due">₹{{ '{:,.0f}'.format(b.balance) }}</span>
+                            {% elif b.balance < -0.01 %}
+                                <span class="bal-chip partial">Overpaid</span>
+                            {% else %}
+                                <span class="bal-chip settled">Settled</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex gap-1 justify-content-center flex-wrap">
+                                <a href="{{ url_for('main.reservation_folio', reservation_id=res.id) }}"
+                                   class="row-action folio">
+                                    <i class="bi bi-wallet2"></i> Folio
+                                </a>
+                                <a href="{{ url_for('main.invoice', reservation_id=res.id) }}"
+                                   class="row-action invoice">
+                                    <i class="bi bi-receipt"></i> Invoice
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5 text-muted">
+        <i class="bi bi-calendar-x" style="font-size:2.5rem;"></i>
+        <p class="mt-2 mb-0">No stays recorded yet.</p>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

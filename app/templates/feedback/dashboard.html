@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}Guest Feedback — {{ config.HOTEL_NAME }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0"><i class="bi bi-star-half me-2 text-warning"></i>Guest Feedback</h4>
+</div>
+
+<!-- KPI row -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm text-center py-3">
+            <div class="fs-2 fw-bold text-warning">{{ avg_rating }}</div>
+            <div class="small text-muted">Avg Rating</div>
+            <div class="text-warning">
+                {% for i in range(1,6) %}
+                <i class="bi bi-star{% if i <= avg_rating|int %}-fill{% elif (avg_rating - avg_rating|int) >= 0.5 and i == avg_rating|int + 1 %}-half{% endif %}"></i>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm text-center py-3">
+            <div class="fs-2 fw-bold text-primary">{{ total }}</div>
+            <div class="small text-muted">Total Reviews</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm text-center py-3">
+            <div class="fs-2 fw-bold text-success">{{ nps }}</div>
+            <div class="small text-muted">NPS Score</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm text-center py-3">
+            <div class="fs-2 fw-bold text-danger">{{ negative }}</div>
+            <div class="small text-muted">Negative (≤2★)</div>
+        </div>
+    </div>
+</div>
+
+<!-- Rating distribution -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h6 class="fw-semibold mb-3">Rating Distribution</h6>
+        {% for i in range(5,0,-1) %}
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="text-warning" style="width:60px;">{{ i }} ★</span>
+            <div class="progress flex-grow-1" style="height:14px;">
+                <div class="progress-bar bg-warning"
+                     style="width:{{ (dist[i] / total * 100)|round if total else 0 }}%"></div>
+            </div>
+            <span class="text-muted small" style="width:30px;">{{ dist[i] }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Feedback list -->
+<div class="card shadow-sm">
+    <div class="card-header bg-white fw-semibold">Recent Feedback</div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Guest</th>
+                    <th>Room</th>
+                    <th>Stay</th>
+                    <th>Rating</th>
+                    <th>Comment</th>
+                    <th>Recommend</th>
+                    <th>Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fb in feedbacks %}
+                <tr class="{% if fb.negative_flag %}table-danger{% endif %}">
+                    <td>{{ fb.reservation.guest.name }}</td>
+                    <td>{{ fb.reservation.room.room_number if fb.reservation.room else '—' }}</td>
+                    <td class="small text-muted">
+                        {{ fb.reservation.arrival_date.strftime('%d %b') }} –
+                        {{ fb.reservation.departure_date.strftime('%d %b') }}
+                    </td>
+                    <td>
+                        <span class="text-warning">
+                            {% for i in range(fb.rating) %}<i class="bi bi-star-fill"></i>{% endfor %}
+                        </span>
+                        {% if fb.negative_flag %}
+                        <span class="badge bg-danger ms-1">Alert</span>
+                        {% endif %}
+                    </td>
+                    <td class="small" style="max-width:200px;">
+                        <span class="text-truncate d-inline-block" style="max-width:180px;"
+                              title="{{ fb.comment }}">{{ fb.comment or '—' }}</span>
+                    </td>
+                    <td>
+                        {% if fb.would_recommend is not none %}
+                            {% if fb.would_recommend %}👍{% else %}👎{% endif %}
+                        {% else %}—{% endif %}
+                    </td>
+                    <td class="small text-muted">{{ fb.submitted_at.strftime('%d %b %Y') }}</td>
+                    <td>
+                        {% if not fb.google_review_pushed and fb.rating >= 4 %}
+                        <form method="POST" action="{{ url_for('feedback.send_link', reservation_id=fb.reservation_id) }}">
+                            <button class="btn btn-xs btn-outline-success btn-sm" title="Re-send Google review link">
+                                <i class="bi bi-google"></i>
+                            </button>
+                        </form>
+                        {% elif fb.google_review_pushed %}
+                        <span class="text-success small"><i class="bi bi-check-circle"></i></span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="8" class="text-center text-muted py-4">No feedback collected yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

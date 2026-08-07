@@ -1,0 +1,41 @@
+{
+  "anon_location": "/auth/login?next=%2Floyalty%2Fmembers",
+  "anon_status": 302,
+  "body_bytes": 23682,
+  "body_sha256": "6500f96ece50607774ab4f6051859656347a04c8964ccb4e5eb8b20690cde8d2",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 17,
+  "endpoint": "loyalty.members",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "balances[len]": "0",
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "guests[len]": "0",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "tiers[0][type]": "LoyaltyConfig",
+    "tiers[1][type]": "LoyaltyConfig",
+    "tiers[2][type]": "LoyaltyConfig",
+    "tiers[len]": "3"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "loyalty.members",
+  "templates": [
+    "loyalty/members.html"
+  ],
+  "truncations": [],
+  "url": "/loyalty/members"
+}

@@ -1,0 +1,1213 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   WARM & WELCOMING DESIGN SYSTEM
+   Primary:   #C2410C  Terracotta
+   Secondary: #FFF7ED  Cream
+   Accent:    #6B8E23  Olive Green
+   Text:      #3F2A1D  Dark Brown
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Bootstrap 5 CSS Variable Overrides ─────────────────────────────── */
+:root {
+    /* Warm palette tokens */
+    --warm-primary:       #C2410C;
+    --warm-primary-dark:  #9A3412;
+    --warm-primary-light: #FED7AA;
+    --warm-primary-pale:  #FFF1E8;
+    --warm-cream:         #FFF7ED;
+    --warm-accent:        #6B8E23;
+    --warm-accent-dark:   #4A6117;
+    --warm-accent-light:  #ECFCCB;
+    --warm-text:          #3F2A1D;
+    --warm-text-muted:    #7C5240;
+    --warm-border:        #E8D5C4;
+    --warm-shadow:        rgba(63, 42, 29, 0.08);
+    --warm-shadow-md:     rgba(63, 42, 29, 0.14);
+
+    /* Bootstrap overrides */
+    --bs-primary:             #C2410C;
+    --bs-primary-rgb:         194, 65, 12;
+    --bs-secondary:           #6B8E23;
+    --bs-secondary-rgb:       107, 142, 35;
+    --bs-success:             #6B8E23;
+    --bs-success-rgb:         107, 142, 35;
+    --bs-danger:              #DC2626;
+    --bs-danger-rgb:          220, 38, 38;
+    --bs-warning:             #D97706;
+    --bs-warning-rgb:         217, 119, 6;
+    --bs-info:                #0284C7;
+    --bs-info-rgb:            2, 132, 199;
+    --bs-light:               #FFF7ED;
+    --bs-light-rgb:           255, 247, 237;
+    --bs-dark:                #3F2A1D;
+    --bs-dark-rgb:            63, 42, 29;
+    --bs-body-bg:             #FFF7ED;
+    --bs-body-color:          #3F2A1D;
+    --bs-body-font-size:      0.9375rem;
+    --bs-link-color:          #C2410C;
+    --bs-link-hover-color:    #9A3412;
+    --bs-border-color:        #E8D5C4;
+    --bs-border-radius:       0.5rem;
+    --bs-border-radius-sm:    0.375rem;
+    --bs-border-radius-lg:    0.75rem;
+    --bs-border-radius-xl:    1rem;
+    --bs-card-border-radius:  0.625rem;
+    --bs-card-bg:             #ffffff;
+    --bs-card-border-color:   #F0E0D0;
+
+    /* Legacy vars for existing code */
+    --primary-color:  #C2410C;
+    --neutral-color:  #FFF1E8;
+    --hover-bg:       #FED7AA;
+    --success-color:  #6B8E23;
+    --danger-color:   #DC2626;
+    --warning-color:  #D97706;
+}
+
+/* ── 2. Base ──────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    font-size: 0.9375rem;
+    color: var(--warm-text);
+    background-color: var(--warm-cream);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.6;
+}
+
+a {
+    color: var(--warm-primary);
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+a:hover { color: var(--warm-primary-dark); }
+
+h1, h2, h3, h4, h5, h6 { color: var(--warm-text); font-weight: 600; }
+
+.text-muted { color: var(--warm-text-muted) !important; }
+
+/* ── 3. Primary Navbar ────────────────────────────────────────────────────── */
+.navbar-warm-primary {
+    background: linear-gradient(135deg, var(--warm-primary) 0%, #B83008 100%) !important;
+    box-shadow: 0 2px 12px rgba(63, 42, 29, 0.18);
+}
+
+/* Keep Bootstrap's bg-primary override for the primary nav */
+.navbar.bg-primary {
+    background: linear-gradient(135deg, var(--warm-primary) 0%, #B83008 100%) !important;
+    box-shadow: 0 2px 12px rgba(63, 42, 29, 0.18);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.01em;
+    color: #fff !important;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.88) !important;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 6px;
+    padding: 0.4rem 0.6rem !important;
+    transition: background 0.15s, color 0.15s;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link:focus {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #fff !important;
+}
+
+.navbar-dark .navbar-nav .nav-link.active,
+.navbar-dark .navbar-nav .show > .nav-link {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: #fff !important;
+    font-weight: 600;
+}
+
+.navbar-dark .dropdown-menu {
+    border: none;
+    border-radius: 0.625rem;
+    box-shadow: 0 8px 24px var(--warm-shadow-md);
+    padding: 0.5rem 0;
+    background: #fff;
+}
+
+.navbar-dark .dropdown-item {
+    color: var(--warm-text);
+    font-size: 0.875rem;
+    padding: 0.45rem 1rem;
+    border-radius: 4px;
+    margin: 0 0.25rem;
+    transition: background 0.15s;
+}
+
+.navbar-dark .dropdown-item:hover,
+.navbar-dark .dropdown-item:focus {
+    background: var(--warm-primary-pale);
+    color: var(--warm-primary);
+}
+
+.navbar-dark .dropdown-header {
+    color: var(--warm-text-muted);
+    font-size: 0.75rem;
+    padding: 0.5rem 1rem 0.25rem;
+}
+
+.navbar-toggler {
+    border: none;
+    color: rgba(255,255,255,0.88);
+}
+.navbar-toggler:focus { box-shadow: 0 0 0 0.2rem rgba(255,255,255,0.25); }
+
+/* ── 4. Secondary Navbar ─────────────────────────────────────────────────── */
+.navbar.bg-white {
+    background: #fff !important;
+    border-bottom: 1px solid var(--warm-border) !important;
+}
+
+.navbar.bg-white .navbar-nav .nav-link {
+    color: var(--warm-text-muted) !important;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.45rem 0.65rem !important;
+    border-radius: 6px;
+    transition: background 0.15s, color 0.15s;
+}
+
+.navbar.bg-white .navbar-nav .nav-link:hover {
+    background: var(--warm-primary-pale);
+    color: var(--warm-primary) !important;
+}
+
+.navbar.bg-white .navbar-nav .nav-link.active {
+    color: var(--warm-primary) !important;
+    font-weight: 600;
+    background: var(--warm-primary-pale);
+}
+
+/* ── 5. Buttons ──────────────────────────────────────────────────────────── */
+.btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.18s ease;
+    min-height: 40px;
+    padding: 0.5rem 1.1rem;
+    letter-spacing: 0.01em;
+}
+
+/* Primary — Terracotta */
+.btn-primary {
+    background: var(--warm-primary);
+    border-color: var(--warm-primary);
+    color: #fff;
+}
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary.active {
+    background: var(--warm-primary-dark) !important;
+    border-color: var(--warm-primary-dark) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 12px rgba(194, 65, 12, 0.3) !important;
+}
+
+/* Outline-primary */
+.btn-outline-primary {
+    color: var(--warm-primary);
+    border-color: var(--warm-primary);
+}
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+    background: var(--warm-primary);
+    border-color: var(--warm-primary);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(194, 65, 12, 0.2);
+}
+
+/* Secondary — Olive */
+.btn-secondary {
+    background: var(--warm-accent);
+    border-color: var(--warm-accent);
+    color: #fff;
+}
+.btn-secondary:hover,
+.btn-secondary:focus {
+    background: var(--warm-accent-dark) !important;
+    border-color: var(--warm-accent-dark) !important;
+    color: #fff !important;
+}
+
+/* Outline-secondary */
+.btn-outline-secondary {
+    color: var(--warm-accent);
+    border-color: var(--warm-accent);
+}
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus {
+    background: var(--warm-accent);
+    color: #fff;
+    border-color: var(--warm-accent);
+}
+
+/* Success */
+.btn-success {
+    background: var(--warm-accent);
+    border-color: var(--warm-accent);
+    color: #fff;
+}
+.btn-success:hover,
+.btn-success:focus {
+    background: var(--warm-accent-dark) !important;
+    border-color: var(--warm-accent-dark) !important;
+    color: #fff !important;
+}
+.btn-outline-success {
+    color: var(--warm-accent);
+    border-color: var(--warm-accent);
+}
+.btn-outline-success:hover {
+    background: var(--warm-accent);
+    color: #fff;
+    border-color: var(--warm-accent);
+}
+
+/* Warning */
+.btn-warning {
+    background: #D97706;
+    border-color: #D97706;
+    color: #fff;
+}
+.btn-warning:hover, .btn-warning:focus {
+    background: #B45309 !important;
+    border-color: #B45309 !important;
+    color: #fff !important;
+}
+
+/* Danger */
+.btn-danger {
+    background: #DC2626;
+    border-color: #DC2626;
+    color: #fff;
+}
+.btn-danger:hover, .btn-danger:focus {
+    background: #B91C1C !important;
+    border-color: #B91C1C !important;
+    color: #fff !important;
+}
+
+/* Light / Ghost */
+.btn-light {
+    background: var(--warm-cream);
+    border-color: var(--warm-border);
+    color: var(--warm-text);
+}
+.btn-light:hover {
+    background: var(--warm-primary-pale);
+    border-color: var(--warm-primary-light);
+    color: var(--warm-primary);
+}
+
+/* Outline-light (used on dark navbar) */
+.btn-outline-light {
+    color: rgba(255,255,255,0.9);
+    border-color: rgba(255,255,255,0.5);
+}
+.btn-outline-light:hover {
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.75);
+    color: #fff;
+}
+
+/* Sizes */
+.btn-sm {
+    min-height: 32px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.8125rem;
+    border-radius: 0.375rem;
+}
+.btn-lg {
+    min-height: 52px;
+    padding: 0.7rem 1.6rem;
+    font-size: 1rem;
+    border-radius: 0.625rem;
+}
+
+/* Special named buttons — theme colours */
+/* Use .btn.btn-express (specificity 0,2,0) to beat .control-btn (0,1,0) */
+.btn-express,
+.btn.btn-express {
+    background: #0D9488;
+    color: #fff;
+    border: 2px solid #0D9488;
+}
+.btn-express:hover,
+.btn.btn-express:hover {
+    background: #0B7A73;
+    border-color: #0B7A73;
+    color: #fff;
+}
+
+.btn-full {
+    background: var(--warm-accent);
+    color: #fff;
+    border: 2px solid var(--warm-accent);
+}
+.btn-full:hover {
+    background: var(--warm-accent-dark);
+    border-color: var(--warm-accent-dark);
+    color: #fff;
+}
+
+.btn-roomgrid {
+    background: var(--warm-text);
+    color: var(--warm-cream);
+    border: 2px solid var(--warm-text);
+}
+.btn-roomgrid:hover {
+    background: #2a1c12;
+    border-color: #2a1c12;
+    color: var(--warm-cream);
+}
+
+/* ── 6. Cards ────────────────────────────────────────────────────────────── */
+.card {
+    background: #fff;
+    border: 1px solid var(--warm-border);
+    border-radius: 0.625rem;
+    box-shadow: 0 1px 4px var(--warm-shadow);
+    margin-bottom: 0.875rem;
+    transition: box-shadow 0.2s;
+}
+
+.card:hover { box-shadow: 0 4px 16px var(--warm-shadow-md); }
+
+.card-header {
+    background: var(--warm-cream);
+    border-bottom: 1px solid var(--warm-border);
+    font-weight: 600;
+    padding: 0.6rem 1rem;
+    color: var(--warm-text);
+    border-radius: calc(0.625rem - 1px) calc(0.625rem - 1px) 0 0 !important;
+}
+
+.card-body { padding: 1rem; }
+.card-footer {
+    background: var(--warm-cream);
+    border-top: 1px solid var(--warm-border);
+    border-radius: 0 0 calc(0.625rem - 1px) calc(0.625rem - 1px) !important;
+}
+
+/* KPI stat cards */
+.card.border-0.shadow-sm {
+    border: 1px solid var(--warm-border) !important;
+    box-shadow: 0 2px 8px var(--warm-shadow) !important;
+}
+
+.card.border-0.bg-light {
+    background: var(--warm-cream) !important;
+    border: 1px solid var(--warm-border) !important;
+}
+
+.card.border-0.bg-light h3,
+.card.border-0.bg-light h4 {
+    font-weight: 700;
+    line-height: 1;
+    margin-top: 0.25rem;
+    color: var(--warm-text);
+}
+
+.card.border-0.bg-light h3 { font-size: 1.75rem; }
+.card.border-0.bg-light h4 { font-size: 1.5rem; }
+
+.card.border-0.bg-light .small {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+    color: var(--warm-text-muted);
+}
+
+/* ── 7. Forms ────────────────────────────────────────────────────────────── */
+.form-label {
+    font-weight: 500;
+    color: var(--warm-text);
+    font-size: 0.875rem;
+    margin-bottom: 0.3rem;
+}
+
+.form-control,
+.form-select {
+    background: #fff;
+    border: 1.5px solid var(--warm-border);
+    border-radius: 0.5rem;
+    color: var(--warm-text);
+    font-size: 0.9375rem;
+    min-height: 44px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-control::placeholder { color: #B8987A; }
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--warm-primary);
+    box-shadow: 0 0 0 0.2rem rgba(194, 65, 12, 0.15);
+    background: #fff;
+    color: var(--warm-text);
+}
+
+.form-control-lg,
+.form-select-lg {
+    min-height: 52px;
+    font-size: 1rem;
+    border-radius: 0.625rem;
+}
+
+.form-control:disabled,
+.form-control[readonly],
+.form-select:disabled {
+    background: var(--warm-cream);
+    color: var(--warm-text-muted);
+    border-color: var(--warm-border);
+}
+
+.input-group-text {
+    background: var(--warm-cream);
+    border: 1.5px solid var(--warm-border);
+    color: var(--warm-text-muted);
+    border-radius: 0.5rem;
+}
+
+.form-check-input:checked {
+    background-color: var(--warm-primary);
+    border-color: var(--warm-primary);
+}
+
+.form-check-input:focus {
+    border-color: var(--warm-primary-light);
+    box-shadow: 0 0 0 0.2rem rgba(194, 65, 12, 0.15);
+}
+
+.form-text { color: var(--warm-text-muted); font-size: 0.8rem; }
+
+/* ── 8. Tables ───────────────────────────────────────────────────────────── */
+.table {
+    color: var(--warm-text);
+    font-size: 0.875rem;
+    --bs-table-bg: transparent;
+    --bs-table-striped-bg: #FFF1E8;
+    --bs-table-hover-bg: var(--warm-primary-pale);
+}
+
+.table thead th {
+    background: var(--warm-cream);
+    color: var(--warm-text);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--warm-border);
+    padding: 0.6rem 0.75rem;
+    white-space: nowrap;
+}
+
+.table tbody tr {
+    border-color: var(--warm-border);
+    transition: background 0.15s;
+}
+
+.table tbody td {
+    padding: 0.6rem 0.75rem;
+    vertical-align: middle;
+    border-color: var(--warm-border);
+}
+
+.table-hover tbody tr:hover {
+    background: var(--warm-primary-pale);
+    cursor: pointer;
+}
+
+.table-responsive { -webkit-overflow-scrolling: touch; }
+
+/* ── 9. Badges ───────────────────────────────────────────────────────────── */
+.badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.35em 0.6em;
+    border-radius: 0.4rem;
+    letter-spacing: 0.02em;
+}
+
+.bg-primary   { background-color: var(--warm-primary) !important; }
+.bg-secondary { background-color: var(--warm-accent)  !important; }
+.bg-success   { background-color: var(--warm-accent)  !important; }
+.bg-danger    { background-color: #DC2626             !important; }
+.bg-warning   { background-color: #D97706             !important; }
+.bg-info      { background-color: #0284C7             !important; }
+.bg-light     { background-color: var(--warm-cream)   !important; color: var(--warm-text) !important; }
+.bg-dark      { background-color: var(--warm-text)    !important; }
+.bg-purple    { background-color: #7C3AED             !important; }
+.bg-orange    { background-color: var(--warm-primary) !important; }
+
+.text-primary { color: var(--warm-primary) !important; }
+.text-success { color: var(--warm-accent)  !important; }
+.text-danger  { color: #DC2626             !important; }
+.text-warning { color: #D97706             !important; }
+.text-dark    { color: var(--warm-text)    !important; }
+
+/* ── 10. Alerts ──────────────────────────────────────────────────────────── */
+.alert {
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    border-width: 1px;
+    border-left-width: 4px;
+    margin-bottom: 0.75rem;
+}
+
+.alert-success {
+    background: var(--warm-accent-light);
+    border-color: var(--warm-accent);
+    color: var(--warm-accent-dark);
+}
+
+.alert-danger {
+    background: #FEF2F2;
+    border-color: #DC2626;
+    color: #991B1B;
+}
+
+.alert-warning {
+    background: #FFFBEB;
+    border-color: #D97706;
+    color: #92400E;
+}
+
+.alert-info {
+    background: #EFF6FF;
+    border-color: #0284C7;
+    color: #1E40AF;
+}
+
+.alert-primary {
+    background: var(--warm-primary-pale);
+    border-color: var(--warm-primary);
+    color: var(--warm-primary-dark);
+}
+
+/* ── 11. Navigation Tabs & Pills ─────────────────────────────────────────── */
+.nav-tabs {
+    border-bottom: 2px solid var(--warm-border);
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.nav-tabs .nav-link {
+    color: var(--warm-text-muted);
+    border: none;
+    border-bottom: 3px solid transparent;
+    padding: 0.7rem 1rem;
+    white-space: nowrap;
+    font-size: 0.875rem;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    transition: color 0.15s, border-color 0.15s;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--warm-primary);
+    border-color: transparent transparent var(--warm-primary-light);
+    background: transparent;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--warm-primary);
+    background: transparent;
+    border-color: transparent transparent var(--warm-primary);
+    font-weight: 600;
+}
+
+/* Global page tab bar (Dashboard / Front Desk / Housekeeping) — fixed height
+   so the header area is pixel-identical on every page */
+#globalTabs {
+    height: 48px;
+    min-height: 48px;
+    align-items: stretch;
+    margin-bottom: 0 !important;
+    border-bottom: 2px solid var(--warm-border);
+}
+#globalTabs .nav-link {
+    height: 48px;
+    min-height: 48px;
+    padding: 0 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+/* The filter-row / sub-header sits directly below globalTabs with a hairline separation */
+#globalTabs + .filter-row,
+#globalTabs + * {
+    margin-top: 0.75rem;
+}
+
+.nav-pills .nav-link {
+    color: var(--warm-text-muted);
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.4rem 0.85rem;
+    transition: background 0.15s, color 0.15s;
+}
+
+.nav-pills .nav-link:hover { background: var(--warm-primary-pale); color: var(--warm-primary); }
+.nav-pills .nav-link.active {
+    background: var(--warm-primary);
+    color: #fff;
+}
+
+/* ── 12. Modals ──────────────────────────────────────────────────────────── */
+.modal-content {
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 20px 60px rgba(63, 42, 29, 0.18);
+    overflow: hidden;
+}
+
+.modal-header {
+    background: var(--warm-cream);
+    border-bottom: 1px solid var(--warm-border);
+    padding: 0.875rem 1.25rem;
+}
+
+.modal-header .modal-title {
+    font-weight: 600;
+    color: var(--warm-text);
+    font-size: 1rem;
+}
+
+/* Terracotta modal headers (bg-primary) */
+.modal-header.bg-primary {
+    background: linear-gradient(135deg, var(--warm-primary) 0%, #B83008 100%) !important;
+    color: #fff;
+    border-bottom: none;
+}
+.modal-header.bg-primary .modal-title { color: #fff; }
+.modal-header.bg-primary .btn-close-white { filter: brightness(0) invert(1); }
+
+.modal-footer {
+    background: var(--warm-cream);
+    border-top: 1px solid var(--warm-border);
+    padding: 0.75rem 1.25rem;
+}
+
+.modal-body { padding: 1.25rem; }
+
+.modal-dialog { margin: 0.75rem auto; }
+@media (min-width: 576px) { .modal-dialog { margin: 1.75rem auto; } }
+
+/* ── 13. Dropdowns ───────────────────────────────────────────────────────── */
+.dropdown-menu {
+    border: 1px solid var(--warm-border);
+    border-radius: 0.625rem;
+    box-shadow: 0 8px 24px var(--warm-shadow-md);
+    padding: 0.4rem 0;
+    background: #fff;
+}
+
+.dropdown-item {
+    color: var(--warm-text);
+    font-size: 0.875rem;
+    padding: 0.45rem 1rem;
+    border-radius: 4px;
+    margin: 0 0.25rem;
+    transition: background 0.15s, color 0.15s;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background: var(--warm-primary-pale);
+    color: var(--warm-primary);
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+    background: var(--warm-primary);
+    color: #fff;
+}
+
+.dropdown-header {
+    color: var(--warm-text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.4rem 1rem 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.dropdown-divider { border-color: var(--warm-border); margin: 0.35rem 0; }
+
+/* ── 14. Accordion ───────────────────────────────────────────────────────── */
+.accordion-item {
+    border: 1px solid var(--warm-border);
+    border-radius: 0.625rem !important;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.accordion-button {
+    background: var(--warm-cream);
+    color: var(--warm-text);
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.875rem 1.25rem;
+    border-radius: 0 !important;
+}
+
+.accordion-button:not(.collapsed) {
+    background: var(--warm-primary-pale);
+    color: var(--warm-primary);
+    box-shadow: none;
+}
+
+.accordion-button::after {
+    filter: none;
+}
+
+.accordion-button:not(.collapsed)::after {
+    filter: none;
+    opacity: 0.7;
+}
+
+.accordion-button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(194, 65, 12, 0.15);
+    border-color: var(--warm-primary-light);
+}
+
+.accordion-body {
+    background: #fff;
+    padding: 1.25rem;
+    border-top: 1px solid var(--warm-border);
+}
+
+/* ── 15. List Groups ─────────────────────────────────────────────────────── */
+.list-group-item {
+    border-color: var(--warm-border);
+    color: var(--warm-text);
+    font-size: 0.875rem;
+    background: #fff;
+}
+
+.list-group-item.active {
+    background: var(--warm-primary);
+    border-color: var(--warm-primary);
+}
+
+.list-group-item-action:hover,
+.list-group-item-action:focus {
+    background: var(--warm-primary-pale);
+    color: var(--warm-primary);
+}
+
+.list-group-item-action {
+    padding: 0.875rem 1rem;
+    transition: background 0.15s, color 0.15s;
+}
+
+/* ── 16. Progress Bars ───────────────────────────────────────────────────── */
+.progress {
+    background: var(--warm-primary-light);
+    border-radius: 0.5rem;
+    height: 8px;
+}
+
+.progress-bar {
+    background: var(--warm-primary);
+    border-radius: 0.5rem;
+}
+
+.progress-bar.bg-success   { background: var(--warm-accent) !important; }
+.progress-bar.bg-warning   { background: #D97706 !important; }
+.progress-bar.bg-danger    { background: #DC2626 !important; }
+
+/* ── 17. Pagination ──────────────────────────────────────────────────────── */
+.page-link {
+    color: var(--warm-primary);
+    border-color: var(--warm-border);
+    background: #fff;
+    border-radius: 0.375rem;
+    margin: 0 1px;
+    transition: background 0.15s;
+}
+
+.page-link:hover { background: var(--warm-primary-pale); border-color: var(--warm-primary-light); }
+.page-item.active .page-link {
+    background: var(--warm-primary);
+    border-color: var(--warm-primary);
+    color: #fff;
+}
+
+/* ── 18. Breadcrumbs ─────────────────────────────────────────────────────── */
+.breadcrumb-item a { color: var(--warm-primary); }
+.breadcrumb-item.active { color: var(--warm-text-muted); }
+.breadcrumb-item + .breadcrumb-item::before { color: var(--warm-text-muted); }
+
+/* ── 19. Reservation Status Row Colors ───────────────────────────────────── */
+.reservation-row {
+    cursor: pointer;
+    transition: background 0.15s;
+    border-left: 4px solid transparent;
+}
+
+.reservation-row:hover { background: var(--warm-primary-pale) !important; }
+
+.reservation-row.status-reserved  { border-left-color: var(--warm-primary); }
+.reservation-row.status-confirmed { border-left-color: var(--warm-accent); }
+.reservation-row.status-checkedin { border-left-color: #7C3AED; }
+.reservation-row.status-cancelled { border-left-color: #9CA3AF; }
+.reservation-row.status-overbooked{ border-left-color: #DC2626; }
+.reservation-row.status-blocked   { border-left-color: var(--warm-text); }
+
+/* ── 20. Control Bar / Filter Tabs ───────────────────────────────────────── */
+.control-bar { gap: 0.5rem; }
+
+.btn-control {
+    background: #fff;
+    border: 1.5px solid var(--warm-border);
+    color: var(--warm-text);
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    min-height: 40px;
+    padding: 0.4rem 0.875rem;
+    transition: all 0.15s;
+}
+.btn-control:hover, .btn-control:focus {
+    background: var(--warm-primary-pale);
+    color: var(--warm-primary);
+    border-color: var(--warm-primary-light);
+}
+.btn-control.active {
+    background: var(--warm-primary);
+    color: #fff;
+    border-color: var(--warm-primary);
+}
+
+.control-tab {
+    min-width: 140px;
+    height: 40px;
+    padding: 0 1rem;
+    border-radius: 0.5rem;
+    border: 1.5px solid var(--warm-border);
+    background: #fff;
+    color: var(--warm-text);
+    font-size: 0.875rem;
+    line-height: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+}
+.control-tab:hover { background: var(--warm-primary-pale); color: var(--warm-primary); border-color: var(--warm-primary-light); }
+.control-tab.active {
+    background: var(--warm-primary);
+    color: #fff;
+    border-color: var(--warm-primary);
+    font-weight: 600;
+}
+
+.filter-btn {
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 0.5rem;
+    border: 1.5px solid var(--warm-primary);
+    background: var(--warm-primary);
+    color: #fff;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+    padding: 0 0.55rem;
+    white-space: nowrap;
+    text-decoration: none;
+    line-height: 1;
+}
+.filter-btn:hover { background: var(--warm-primary-dark); border-color: var(--warm-primary-dark); }
+.filter-btn.active { background: var(--warm-accent); border-color: var(--warm-accent); font-weight: 600; }
+
+.control-btn, .control-btn-default {
+    background: var(--warm-primary);
+    color: #fff;
+    border: 2px solid var(--warm-primary);
+    border-radius: 0.5rem;
+    min-height: 36px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    transition: all 0.15s;
+}
+.control-btn-default:hover { background: var(--warm-primary-dark); border-color: var(--warm-primary-dark); color: #fff; }
+.control-btn-default.active { background: var(--warm-accent); border-color: var(--warm-accent); color: #fff; }
+
+.divider { width: 1px; height: 36px; background: var(--warm-border); margin: 0 0.35rem; }
+
+/* ── 21. Guest Search Autocomplete ───────────────────────────────────────── */
+.guest-search-wrapper { position: relative; width: 100%; }
+
+.guest-search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0; right: 0;
+    z-index: 2000;
+    background: #fff;
+    border: 1.5px solid var(--warm-border);
+    border-radius: 0.625rem;
+    box-shadow: 0 8px 24px var(--warm-shadow-md);
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+}
+.guest-search-dropdown.show { display: block; }
+
+.guest-search-item {
+    padding: 0.7rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid var(--warm-cream);
+    transition: background 0.15s;
+}
+.guest-search-item:last-child { border-bottom: none; }
+.guest-search-item:hover, .guest-search-item.active { background: var(--warm-primary-pale); }
+
+.guest-search-name { font-weight: 600; color: var(--warm-text); }
+.guest-search-details { font-size: 0.8rem; color: var(--warm-text-muted); }
+.guest-search-no-results { padding: 1rem; text-align: center; color: var(--warm-text-muted); font-style: italic; }
+
+/* ── 22. Slide Panel ─────────────────────────────────────────────────────── */
+.slide-panel {
+    position: fixed;
+    right: -100%;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    background: #fff;
+    box-shadow: -4px 0 24px var(--warm-shadow-md);
+    z-index: 1050;
+    transition: right 0.3s ease;
+    overflow-y: auto;
+}
+.slide-panel.show { right: 0; }
+
+.slide-panel-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--warm-border);
+    background: var(--warm-cream);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.slide-panel-body { padding: 1.25rem; }
+.slide-panel-section { margin-bottom: 1.5rem; }
+.slide-panel-section h6 {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    border-bottom: 2px solid var(--warm-border);
+    padding-bottom: 0.5rem;
+    color: var(--warm-text);
+}
+
+.slide-panel-footer {
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--warm-border);
+    background: var(--warm-cream);
+    display: flex;
+    gap: 0.5rem;
+}
+
+.slide-panel-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(63, 42, 29, 0.45);
+    z-index: 1040;
+    display: none;
+}
+.slide-panel-overlay.show { display: block; }
+
+@media (min-width: 768px) { .slide-panel { width: 40%; } }
+
+/* ── 23. Room Cards ──────────────────────────────────────────────────────── */
+.room-card {
+    transition: all 0.2s ease;
+    border-width: 2px;
+    border-color: var(--warm-border);
+    cursor: pointer;
+}
+.room-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px var(--warm-shadow-md);
+    border-color: var(--warm-primary-light);
+}
+.room-card:active { transform: scale(0.97); }
+
+/* ── 24. Check-In Module ─────────────────────────────────────────────────── */
+#webcam { max-width: 100%; height: auto; background: #1a0a00; }
+
+#signaturePad {
+    background: #fff;
+    cursor: crosshair;
+    border-radius: 0.5rem;
+    border: 2px dashed var(--warm-border);
+}
+
+.checkin-section { margin-bottom: 1.5rem; }
+.checkin-section h6 {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid var(--warm-border);
+    padding-bottom: 0.5rem;
+    color: var(--warm-text);
+}
+
+/* ── 25. Sticky Bottom Bar ───────────────────────────────────────────────── */
+.sticky-bottom {
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    padding: 0.875rem 0;
+    margin: 0 -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    box-shadow: 0 -2px 12px rgba(63, 42, 29, 0.12);
+    z-index: 100;
+    border-top: 1px solid var(--warm-border);
+}
+
+/* ── 26. Page Title Area ─────────────────────────────────────────────────── */
+.page-title {
+    color: var(--warm-text);
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+}
+.page-subtitle { color: var(--warm-text-muted); font-size: 0.875rem; }
+
+/* ── 27. Misc Utility ────────────────────────────────────────────────────── */
+.guest-folio-link {
+    color: var(--warm-primary);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--warm-primary);
+    cursor: pointer;
+    transition: color 0.15s;
+}
+.guest-folio-link:hover { color: var(--warm-primary-dark); border-bottom-color: var(--warm-primary-dark); }
+
+.cursor-pointer { cursor: pointer; }
+
+.divider-warm { border-color: var(--warm-border); }
+
+.filter-row {
+    display: flex;
+    gap: 0.28rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 0.875rem;
+}
+.filter-tabs { display: flex; gap: 0.28rem; flex-wrap: wrap; align-items: center; }
+.search-container { margin-left: auto; }
+.search-container input { min-width: 220px; }
+
+/* ── 28. Guest & Folio table ─────────────────────────────────────────────── */
+.guest-database-table { font-size: 0.875rem; }
+.guest-database-table tbody tr { transition: background 0.15s; }
+.guest-database-table tbody tr:hover { background: var(--warm-primary-pale); }
+.guest-folio-badge { font-weight: 600; letter-spacing: 0.5px; }
+.guest-actions-group { display: flex; gap: 0.25rem; }
+
+/* ── 29. Donut chart ─────────────────────────────────────────────────────── */
+.donut { transform: rotate(-90deg); }
+.chart-container { height: 200px; position: relative; overflow: hidden; }
+
+/* ── 30. Scrollbar ───────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--warm-cream); }
+::-webkit-scrollbar-thumb { background: var(--warm-primary-light); border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: var(--warm-primary); }
+
+/* ── 31. Focus Rings ─────────────────────────────────────────────────────── */
+.btn:focus,
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(194, 65, 12, 0.2) !important;
+}
+
+/* ── 32. Page Entry Animation ────────────────────────────────────────────── */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.card, .alert { animation: fadeInUp 0.25s ease-out both; }
+
+/* ── 33. Responsive ──────────────────────────────────────────────────────── */
+@media (min-width: 768px) {
+    body { font-size: 0.9rem; }
+
+    .col-md-1-5 { flex: 0 0 auto; width: 12.5%; }
+
+    .nav-tabs .nav-link { font-size: 0.85rem; padding: 0.6rem 1.1rem; min-height: 40px; }
+
+    .btn { min-height: 40px; padding: 0.45rem 1rem; font-size: 0.9rem; }
+    .btn-lg { min-height: 48px; font-size: 0.9375rem; }
+    .btn-sm { min-height: 32px; padding: 0.3rem 0.65rem; font-size: 0.8rem; }
+
+    .form-control, .form-select { min-height: 40px; font-size: 0.9rem; }
+    .form-control-lg, .form-select-lg { min-height: 48px; font-size: 0.9375rem; }
+
+    .sticky-bottom { position: static; box-shadow: none; border-top: none; margin: 0; padding: 0.875rem 0; }
+    .modal-dialog { margin: 1.75rem auto; }
+    .table { font-size: 0.85rem; }
+
+    .card.border-0.bg-light h3 { font-size: 1.5rem; }
+    .card.border-0.bg-light h4 { font-size: 1.25rem; }
+}
+
+@media (max-width: 991px) {
+    .sticky-bottom {
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        background: #fff;
+        padding: 0.875rem 1rem;
+        box-shadow: 0 -2px 12px rgba(63,42,29,0.12);
+        z-index: 1000;
+        border-top: 1px solid var(--warm-border);
+    }
+    .container-fluid { padding-bottom: 80px; }
+}
+
+@media (min-width: 1200px) {
+    .container-fluid { max-width: 1440px; margin: 0 auto; }
+}
+
+/* ── 34. Print ───────────────────────────────────────────────────────────── */
+@media print {
+    .navbar, .btn, .d-print-none, .nav-tabs { display: none !important; }
+    body { background: #fff !important; color: #000 !important; }
+    .card { box-shadow: none !important; border: 1px solid #ccc !important; }
+}
+
+/* ── 35. Loading Spinner ─────────────────────────────────────────────────── */
+.spinner-border-sm { width: 1rem; height: 1rem; border-width: 0.15em; }
+.spinner-border { color: var(--warm-primary); }
+
+/* ── 36. Secondary navbar sticky offset fix ──────────────────────────────── */
+body > nav:first-of-type + nav { top: 56px; }

@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block title %}OTA Webhook Logs — {{ config.HOTEL_NAME }}{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="mb-0"><i class="bi bi-plug me-2"></i>OTA Webhook Logs</h4>
+    <a href="{{ url_for('ota.dashboard') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Dashboard
+    </a>
+</div>
+
+<!-- Filters -->
+<form class="row g-2 mb-3" method="GET">
+    <div class="col-sm-4 col-md-2">
+        <select class="form-select form-select-sm" name="status">
+            <option value="">All Statuses</option>
+            {% for s in ['received','processed','failed','skipped'] %}
+            <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-sm-4 col-md-2">
+        <input type="text" class="form-control form-control-sm" name="source"
+               value="{{ source_filter }}" placeholder="Source (e.g. staah)">
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-sm btn-primary">Filter</button>
+        <a href="{{ url_for('ota.webhook_logs') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+    </div>
+</form>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle mb-0 small">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th><th>Source</th><th>Event</th><th>Status</th>
+                    <th>Reservation</th><th>IP</th><th>Received</th><th>Error</th><th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs.items %}
+                <tr>
+                    <td class="text-muted">{{ log.id }}</td>
+                    <td><span class="badge bg-secondary">{{ log.source }}</span></td>
+                    <td>{{ log.event_type }}</td>
+                    <td>
+                        <span class="badge
+                            {% if log.status == 'processed' %}bg-success
+                            {% elif log.status == 'failed' %}bg-danger
+                            {% elif log.status == 'skipped' %}bg-warning text-dark
+                            {% else %}bg-secondary{% endif %}">
+                            {{ log.status }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if log.reservation %}
+                        <a href="{{ url_for('main.invoice', reservation_id=log.reservation_id) }}" class="text-decoration-none">
+                            {{ log.reservation.booking_reference or log.reservation_id }}
+                        </a>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td><small class="text-muted">{{ log.ip_address }}</small></td>
+                    <td><small>{{ log.received_at.strftime('%d %b %Y %H:%M:%S') }}</small></td>
+                    <td>
+                        {% if log.error_message %}
+                        <span class="text-danger" title="{{ log.error_message }}">
+                            <i class="bi bi-exclamation-circle"></i> {{ log.error_message[:50] }}
+                        </span>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>
+                        {% if log.status == 'failed' and current_user.has_role('Admin','Manager') %}
+                        <button class="btn btn-xs btn-outline-warning btn-sm py-0 px-1"
+                                onclick="retryLog({{ log.id }}, this)">
+                            <i class="bi bi-arrow-clockwise"></i> Retry
+                        </button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="9" class="text-center text-muted py-4">No webhook logs found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if logs.pages > 1 %}
+    <div class="card-footer bg-white py-2">
+        <nav>
+            <ul class="pagination pagination-sm mb-0 justify-content-center">
+                {% if logs.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('ota.webhook_logs', page=logs.prev_num, status=status_filter, source=source_filter) }}">
+                        &laquo; Prev
+                    </a>
+                </li>
+                {% endif %}
+                <li class="page-item disabled">
+                    <span class="page-link">Page {{ logs.page }} of {{ logs.pages }}</span>
+                </li>
+                {% if logs.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('ota.webhook_logs', page=logs.next_num, status=status_filter, source=source_filter) }}">
+                        Next &raquo;
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script nonce="{{ csp_nonce }}">
+function retryLog(logId, btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+    fetch('{{ url_for("ota.retry_webhook", log_id=0) }}'.replace('/0', '/' + logId), {method: 'POST'})
+        .then(r => r.json())
+        .then(d => {
+            btn.innerHTML = d.ok
+                ? '<i class="bi bi-check-circle text-success"></i>'
+                : '<i class="bi bi-x-circle text-danger"></i>';
+            btn.title = d.message;
+        })
+        .catch(() => { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Retry'; });
+}
+</script>
+{% endblock %}

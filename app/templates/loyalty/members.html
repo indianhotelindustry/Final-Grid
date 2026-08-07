@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Loyalty Members — {{ config.HOTEL_NAME }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0"><i class="bi bi-people me-2"></i>Loyalty Members</h5>
+    <a href="{{ url_for('loyalty.dashboard') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+</div>
+
+<!-- Search + Filter -->
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body py-2">
+        <form method="GET" class="row g-2 align-items-end">
+            <div class="col-md-5">
+                <input type="text" class="form-control form-control-sm" name="q" value="{{ q }}" placeholder="Search name, phone, or loyalty number...">
+            </div>
+            <div class="col-md-3">
+                <select class="form-select form-select-sm" name="tier">
+                    <option value="">All Tiers</option>
+                    {% for t in tiers %}
+                    <option value="{{ t.tier_name }}" {{ 'selected' if tier_filter == t.tier_name }}>{{ t.tier_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-sm btn-primary w-100"><i class="bi bi-search me-1"></i>Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Members Table -->
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-sm table-hover mb-0">
+            <thead class="table-light">
+                <tr><th>Loyalty #</th><th>Guest</th><th>Phone</th><th>Tier</th><th class="text-end">Balance</th><th>Stays</th><th></th></tr>
+            </thead>
+            <tbody>
+            {% for guest in guests %}
+            <tr>
+                <td class="text-muted small">{{ guest.loyalty_number }}</td>
+                <td class="fw-semibold"><a href="{{ url_for('loyalty.member_detail', guest_id=guest.id) }}">{{ guest.name }}</a></td>
+                <td>{{ guest.phone }}</td>
+                <td>
+                    {% for t in tiers if t.tier_name == guest.loyalty_tier %}
+                    <span class="badge" style="background:{{ t.color_hex }}">{{ t.tier_name }}</span>
+                    {% endfor %}
+                </td>
+                <td class="text-end fw-semibold">{{ "{:,}".format(balances.get(guest.id, 0)) }}</td>
+                <td>{{ guest.total_stays or 0 }}</td>
+                <td><a href="{{ url_for('loyalty.member_detail', guest_id=guest.id) }}" class="btn btn-sm btn-outline-primary btn-xs">View</a></td>
+            </tr>
+            {% endfor %}
+            {% if not guests %}
+            <tr><td colspan="7" class="text-center text-muted py-3">No members found</td></tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="text-muted small mt-2">{{ guests|length }} member(s) found</div>
+{% endblock %}

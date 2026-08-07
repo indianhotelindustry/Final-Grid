@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% block title %}Pre-Check-In — {{ sub.full_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h5 class="mb-0">
+        <i class="bi bi-person-vcard text-primary me-2"></i>
+        Pre-Check-In Details
+    </h5>
+    <div class="d-flex gap-2">
+        <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i>Print
+        </button>
+        <a href="{{ url_for('portal.submissions') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> All Submissions
+        </a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <!-- Booking summary -->
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white py-2">
+                <i class="bi bi-bookmark me-1"></i> Booking Details
+            </div>
+            <div class="card-body small">
+                <dl class="row mb-0">
+                    <dt class="col-5 text-muted">Ref</dt>
+                    <dd class="col-7 fw-semibold">{{ reservation.booking_reference or ('#' ~ reservation.id) }}</dd>
+
+                    <dt class="col-5 text-muted">Room Type</dt>
+                    <dd class="col-7">{{ reservation.room_type.name if reservation.room_type else '—' }}</dd>
+
+                    <dt class="col-5 text-muted">Room</dt>
+                    <dd class="col-7">{{ reservation.room.room_number if reservation.room else 'Unassigned' }}</dd>
+
+                    <dt class="col-5 text-muted">Check-in</dt>
+                    <dd class="col-7">{{ reservation.arrival_date.strftime('%d %b %Y') }}</dd>
+
+                    <dt class="col-5 text-muted">Check-out</dt>
+                    <dd class="col-7">{{ reservation.departure_date.strftime('%d %b %Y') }}</dd>
+
+                    <dt class="col-5 text-muted">Nights</dt>
+                    <dd class="col-7">{{ (reservation.departure_date - reservation.arrival_date).days }}</dd>
+
+                    <dt class="col-5 text-muted">Adults</dt>
+                    <dd class="col-7">{{ reservation.adults }}</dd>
+
+                    <dt class="col-5 text-muted">Children</dt>
+                    <dd class="col-7">{{ reservation.children }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <!-- Guest details -->
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white py-2">
+                <i class="bi bi-person me-1"></i> Guest Information
+                <span class="badge bg-white text-success ms-2" style="font-size:0.7rem;">
+                    Submitted {{ sub.submitted_at.strftime('%d %b %Y at %H:%M') }}
+                </span>
+            </div>
+            <div class="card-body small">
+                <div class="row g-2">
+                    <div class="col-sm-6">
+                        <label class="text-muted d-block">Full Name</label>
+                        <strong>{{ sub.full_name }}</strong>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted d-block">Date of Birth</label>
+                        <strong>{{ sub.date_of_birth.strftime('%d %b %Y') if sub.date_of_birth else '—' }}</strong>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted d-block">Nationality</label>
+                        <strong>{{ sub.nationality or '—' }}</strong>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted d-block">City</label>
+                        <strong>{{ sub.city or '—' }}</strong>
+                    </div>
+                    <div class="col-12">
+                        <label class="text-muted d-block">Address</label>
+                        <strong>{{ sub.address or '—' }}</strong>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted d-block">ID Type</label>
+                        <span class="badge bg-secondary">{{ sub.id_type }}</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted d-block">ID Number</label>
+                        <strong class="font-monospace">{{ sub.id_number }}</strong>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted d-block">Estimated Arrival Time</label>
+                        <strong>{{ sub.estimated_arrival_time or '—' }}</strong>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted d-block">IP Address</label>
+                        <span class="text-muted font-monospace">{{ sub.ip_address or '—' }}</span>
+                    </div>
+                    {% if sub.special_requests %}
+                    <div class="col-12">
+                        <label class="text-muted d-block">Special Requests</label>
+                        <div class="alert alert-info py-2 mb-0 small">{{ sub.special_requests }}</div>
+                    </div>
+                    {% endif %}
+                    <div class="col-sm-6">
+                        <label class="text-muted d-block">Terms Accepted</label>
+                        {% if sub.terms_accepted %}
+                        <span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Yes</span>
+                        {% else %}
+                        <span class="text-danger"><i class="bi bi-x-circle me-1"></i>No</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ID Photo -->
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header py-2">
+                <i class="bi bi-image me-1"></i> ID Document Photo
+            </div>
+            <div class="card-body text-center">
+                {% if sub.id_photo_path %}
+                <img src="{{ url_for('main.serve_private_upload', filepath=sub.id_photo_path) }}"
+                     alt="ID Photo"
+                     class="img-fluid rounded"
+                     style="max-height: 260px; object-fit: contain; border: 1px solid #dee2e6;">
+                {% else %}
+                <div class="text-muted py-4">
+                    <i class="bi bi-image display-5 d-block mb-2"></i>
+                    No ID photo uploaded
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Signature -->
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header py-2">
+                <i class="bi bi-pen me-1"></i> Digital Signature
+            </div>
+            <div class="card-body text-center">
+                {% if sub.signature_path %}
+                <img src="{{ url_for('main.serve_private_upload', filepath=sub.signature_path) }}"
+                     alt="Signature"
+                     class="img-fluid rounded"
+                     style="max-height: 160px; background: #fff; border: 1px solid #dee2e6; padding: 8px;">
+                {% else %}
+                <div class="text-muted py-4">
+                    <i class="bi bi-pen display-5 d-block mb-2"></i>
+                    No signature captured
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@media print {
+    .btn, nav, .navbar { display:none !important; }
+    .card { box-shadow: none !important; border: 1px solid #ddd !important; }
+}
+</style>
+{% endblock %}

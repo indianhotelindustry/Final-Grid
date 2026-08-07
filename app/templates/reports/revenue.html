@@ -1,0 +1,198 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Revenue Report{% endblock %}
+{% block report_name %}Revenue Report{% endblock %}
+
+{% block report_content %}
+<div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+    <h5 class="mb-0"><i class="bi bi-currency-rupee text-success me-2"></i>Revenue Report</h5>
+    <div class="d-flex gap-2 d-print-none">
+        <a href="{{ url_for('reports.revenue', format='excel') }}"
+           class="btn btn-sm btn-success">
+            <i class="bi bi-file-earmark-excel me-1"></i>Excel
+        </a>
+        <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i>Print
+        </button>
+    </div>
+</div>
+
+<!-- Date range selector -->
+<form class="d-flex align-items-center gap-2 mb-3 d-print-none">
+    <label class="fw-semibold small">From</label>
+    <input type="date" name="from" class="form-control form-control-sm" style="width:auto;"
+           value="{{ from_date.isoformat() }}">
+    <label class="fw-semibold small">To</label>
+    <input type="date" name="to" class="form-control form-control-sm" style="width:auto;"
+           value="{{ to_date.isoformat() }}">
+    <button class="btn btn-sm btn-primary">Apply</button>
+</form>
+
+<!-- KPI row -->
+<div class="row g-2 mb-3">
+    {% set total_rev = total_room_revenue + total_extra_revenue %}
+    {% set balance_due = total_rev - total_payments %}
+    {% for label, val, cls in [
+        ('Check-outs',      checked_out|length,                    'bg-primary'),
+        ('Room Revenue',    '₹' ~ '{:,.0f}'.format(total_room_revenue),  'bg-success'),
+        ('POS / Extras',    '₹' ~ '{:,.0f}'.format(total_extra_revenue), 'bg-info text-dark'),
+        ('Total Revenue',   '₹' ~ '{:,.0f}'.format(total_rev),           'bg-warning text-dark'),
+        ('Collected',       '₹' ~ '{:,.0f}'.format(total_payments),      'bg-secondary'),
+        ('Balance Due',     '₹' ~ '{:,.0f}'.format(balance_due),         'bg-danger' if balance_due > 0 else 'bg-success'),
+    ] %}
+    <div class="col-auto">
+        <div class="card border-0 {{ cls }} text-white px-3 py-2 shadow-sm">
+            <div class="fw-bold fs-5">{{ val }}</div>
+            <div class="small">{{ label }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Charts + breakdowns row -->
+<div class="row g-3 mb-3">
+    <!-- Daily trend chart -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white fw-semibold py-2">Daily Revenue Trend</div>
+            <div class="card-body">
+                <canvas id="trendChart" height="160"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Breakdowns -->
+    <div class="col-lg-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white fw-semibold py-2">By Room Type</div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <tbody>
+                        {% for rt, rev in by_type.items() %}
+                        <tr>
+                            <td>{{ rt }}</td>
+                            <td class="text-end fw-semibold">₹{{ '{:,.0f}'.format(rev) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-semibold py-2">By Source</div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <tbody>
+                        {% for src, rev in by_source.items() %}
+                        <tr>
+                            <td>{{ src }}</td>
+                            <td class="text-end fw-semibold">₹{{ '{:,.0f}'.format(rev) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card shadow-sm mt-3">
+            <div class="card-header bg-white fw-semibold py-2">By Payment Mode</div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <tbody>
+                        {% for mode, amt in by_mode.items() %}
+                        <tr>
+                            <td>{{ mode }}</td>
+                            <td class="text-end fw-semibold">₹{{ '{:,.0f}'.format(amt) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detail table -->
+<div class="card shadow-sm">
+    <div class="card-header bg-white fw-semibold py-2">Detail</div>
+    <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle mb-0 small">
+            <thead class="table-light">
+                <tr>
+                    <th>Ref</th><th>Guest</th><th>Room Type</th><th>Room</th>
+                    <th>Check-in</th><th>Check-out</th><th>Nights</th>
+                    <th class="text-end">Room Rev.</th><th class="text-end">Extras</th>
+                    <th class="text-end">Total</th><th class="text-end">Paid</th>
+                    <th class="text-end">Bal.</th><th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in checked_out %}
+                {% set nights = (r.departure_date - r.arrival_date).days %}
+                {% set room_rev = r.rate_per_night | float * nights %}
+                {% set extras = r.extra_charges | sum(attribute='amount') | float %}
+                {% set total = room_rev + extras %}
+                {# Only count non-voided payments #}
+                {% set ns = namespace(paid=0.0) %}
+                {% for p in r.payments %}{% if not p.is_voided %}{% set ns.paid = ns.paid + p.amount | float %}{% endif %}{% endfor %}
+                {% set bal = total - ns.paid %}
+                <tr>
+                    <td class="fw-semibold text-primary">{{ r.booking_reference or r.id }}</td>
+                    <td>{{ r.guest.name[:18] if r.guest else '—' }}</td>
+                    <td>{{ r.room_type.name if r.room_type else '—' }}</td>
+                    <td>{{ r.room.room_number if r.room else '—' }}</td>
+                    <td>{{ r.arrival_date.strftime('%d %b') }}</td>
+                    <td>{{ r.departure_date.strftime('%d %b') }}</td>
+                    <td class="text-center">{{ nights }}</td>
+                    <td class="text-end">₹{{ '{:,.0f}'.format(room_rev) }}</td>
+                    <td class="text-end">₹{{ '{:,.0f}'.format(extras) }}</td>
+                    <td class="text-end fw-semibold">₹{{ '{:,.0f}'.format(total) }}</td>
+                    <td class="text-end text-success">₹{{ '{:,.0f}'.format(ns.paid) }}</td>
+                    <td class="text-end {{ 'text-danger fw-bold' if bal > 0 else 'text-success' }}">
+                        ₹{{ '{:,.0f}'.format(bal) }}
+                    </td>
+                    <td><span class="badge bg-secondary">{{ r.source or 'Walk-in' }}</span></td>
+                </tr>
+                {% else %}
+                <tr><td colspan="13" class="text-center text-muted py-4">No check-outs in this period.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>@media print { .d-print-none { display:none !important; } }</style>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/chartjs/chart.umd.min.js') }}"></script>
+<script nonce="{{ csp_nonce }}">
+const trendData = {{ daily_trend | tojson }};
+const labels = Object.keys(trendData).map(d => {
+    const dt = new Date(d);
+    return dt.toLocaleDateString('en-IN', {day:'2-digit', month:'short'});
+});
+const values = Object.values(trendData);
+new Chart(document.getElementById('trendChart'), {
+    type: 'bar',
+    data: {
+        labels,
+        datasets: [{
+            label: 'Revenue (₹)',
+            data: values,
+            backgroundColor: 'rgba(25,135,84,0.65)',
+            borderColor: 'rgba(25,135,84,1)',
+            borderWidth: 1,
+            borderRadius: 4,
+        }]
+    },
+    options: {
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { ticks: { callback: v => '₹' + v.toLocaleString('en-IN') } }
+        }
+    }
+});
+</script>
+{% endblock %}

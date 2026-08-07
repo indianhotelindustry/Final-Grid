@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel PMS — First Time Setup</title>
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap-icons/font/bootstrap-icons.css') }}">
+    <style>
+        body { background: linear-gradient(135deg, #0d1b2a 0%, #1b2838 50%, #2d3748 100%); min-height: 100vh; }
+        .setup-card { max-width: 640px; margin: 40px auto; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .setup-header { background: linear-gradient(135deg, #0d6efd, #6610f2); color: #fff; border-radius: 16px 16px 0 0; padding: 32px; text-align: center; }
+        .setup-header h1 { font-size: 1.8rem; margin: 0; }
+        .setup-header p { opacity: 0.85; margin: 8px 0 0; }
+        .step-badge { display: inline-block; width: 28px; height: 28px; line-height: 28px; border-radius: 50%; background: #0d6efd; color: #fff; text-align: center; font-weight: 700; font-size: 0.85rem; margin-right: 8px; }
+    </style>
+</head>
+<body>
+<div class="container py-4">
+    <div class="setup-card bg-white">
+        <div class="setup-header">
+            <h1><i class="bi bi-building-fill me-2"></i>Hotel PMS Setup</h1>
+            <p>Configure your property to get started</p>
+        </div>
+        <div class="card-body p-4">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} py-2">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <!-- Step 1: Hotel Details -->
+                <h6 class="mb-3"><span class="step-badge">1</span>Hotel Details</h6>
+                <div class="row g-3 mb-4">
+                    <div class="col-12">
+                        <label class="form-label">Hotel / Property Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="hotel_name" required placeholder="e.g. Sukoon City View">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Address</label>
+                        <textarea class="form-control" name="hotel_address" rows="2" placeholder="Full address with city, state, PIN"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Contact Number</label>
+                        <input type="text" class="form-control" name="hotel_contact" placeholder="+91 ...">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="hotel_email" placeholder="front.desk@hotel.com">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">GSTIN</label>
+                        <input type="text" class="form-control" name="hotel_gstin" maxlength="15" placeholder="22AAAAA0000A1Z5">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">State Code</label>
+                        <input type="text" class="form-control" name="hotel_state_code" maxlength="2" placeholder="27">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Contact Person</label>
+                        <input type="text" class="form-control" name="hotel_contact_person" placeholder="Manager name">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Hotel Logo <span class="text-muted small">(optional)</span></label>
+                        <input type="file" class="form-control" name="hotel_logo" accept=".png,.jpg,.jpeg,.svg,.webp">
+                    </div>
+                </div>
+
+                <!-- Step 2: Admin Account -->
+                <h6 class="mb-3"><span class="step-badge">2</span>Admin Account</h6>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label">Username <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="admin_username" value="admin" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-control" name="admin_fullname" value="Administrator">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Password <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" name="admin_password" required minlength="6" placeholder="Min 6 characters">
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-check-circle me-2"></i>Complete Setup
+                    </button>
+                </div>
+
+            </form>
+        </div>
+        <div class="card-footer text-center text-muted py-3" style="border-radius:0 0 16px 16px;">
+            <small>Sukoon PMS v{{ config.get('APP_VERSION', '1.0') }} &mdash; Powered by Sukoon Hospitality</small>
+        </div>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+</body>
+</html>

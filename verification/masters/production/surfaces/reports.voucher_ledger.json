@@ -1,0 +1,45 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Fvoucher-ledger",
+  "anon_status": 302,
+  "body_bytes": 26042,
+  "body_sha256": "c29ad7e5a4e70c5b9cf38554a58a00ffce73f6ccf2cd42383a4c54119f2c8821",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 33,
+  "endpoint": "reports.voucher_ledger",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "counts.active": "0",
+    "counts.cancelled": "0",
+    "counts.expired": "0",
+    "counts.fully_redeemed": "0",
+    "counts[len]": "4",
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "records[len]": "0",
+    "today": "2026-05-28",
+    "total_issued": "0",
+    "total_outstanding": "0",
+    "total_redeemed": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.voucher_ledger",
+  "templates": [
+    "reports/voucher_ledger.html"
+  ],
+  "truncations": [],
+  "url": "/reports/voucher-ledger"
+}

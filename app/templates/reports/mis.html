@@ -1,0 +1,882 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Front Office MIS — {{ from_date.strftime('%d %b') }}{% if from_date != to_date %} – {{ to_date.strftime('%d %b %Y') }}{% else %} {{ from_date.strftime('%Y') }}{% endif %}{% endblock %}
+{% block report_name %}Front Office MIS{% endblock %}
+
+{% block report_content %}
+
+{# ── Macros ──────────────────────────────────────────────────────────────── #}
+{% macro kpi(label, value, cls='bg-secondary', tip='') %}
+<div class="col-6 col-sm-4 col-md-3 col-lg-auto">
+  <div class="card border-0 shadow-sm {{ cls }} text-white text-center px-3 py-2 h-100"
+       style="min-width:110px;"
+       {% if tip %}title="{{ tip }}" data-bs-toggle="tooltip"{% endif %}>
+    <div class="fw-bold fs-5">{{ value }}</div>
+    <div class="small opacity-90">{{ label }}</div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro section_head(title) %}
+<h6 class="fw-semibold text-uppercase text-muted mb-2 mt-3" style="font-size:11px; letter-spacing:.08em;">{{ title }}</h6>
+{% endmacro %}
+
+{# ─────────────────────────────────────────────────────────────────────────── #}
+{# Page header                                                                  #}
+{# ─────────────────────────────────────────────────────────────────────────── #}
+<div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+  <div>
+    <h5 class="mb-0"><i class="bi bi-bar-chart-steps me-2 text-primary"></i>Front Office MIS Report</h5>
+    <small class="text-muted">
+      {{ from_date.strftime('%d %B %Y') }}{% if from_date != to_date %} – {{ to_date.strftime('%d %B %Y') }}{% endif %}
+      &nbsp;·&nbsp; {{ meta.days }} day{% if meta.days != 1 %}s{% endif %}
+      &nbsp;·&nbsp; Generated {{ meta.generated_at.strftime('%d %b %Y %H:%M') }} UTC
+    </small>
+  </div>
+  <div class="d-flex gap-2 flex-wrap d-print-none">
+    <a href="{{ url_for('reports.front_office_mis', **{'from': from_date.isoformat(), 'to': to_date.isoformat(), 'format': 'excel'}) }}"
+       class="btn btn-sm btn-success">
+      <i class="bi bi-file-earmark-excel me-1"></i>Excel
+    </a>
+    <button class="btn btn-sm btn-outline-secondary" id="misPrintBtn">
+      <i class="bi bi-printer me-1"></i>Print / PDF
+    </button>
+  </div>
+</div>
+
+{# ─────────────────────────────────────────────────────────────────────────── #}
+{# Filter form                                                                   #}
+{# ─────────────────────────────────────────────────────────────────────────── #}
+<div class="card border-0 shadow-sm mb-3 d-print-none">
+  <div class="card-body py-2">
+    <form method="GET" class="d-flex flex-wrap gap-2 align-items-end">
+      <div>
+        <label class="form-label form-label-sm mb-1 fw-semibold">From</label>
+        <input type="date" name="from" class="form-control form-control-sm" value="{{ from_date.isoformat() }}">
+      </div>
+      <div>
+        <label class="form-label form-label-sm mb-1 fw-semibold">To</label>
+        <input type="date" name="to" class="form-control form-control-sm" value="{{ to_date.isoformat() }}">
+      </div>
+      <div class="d-flex gap-1 mt-auto">
+        <button type="submit" class="btn btn-sm btn-primary">
+          <i class="bi bi-funnel me-1"></i>Apply
+        </button>
+        <a href="{{ url_for('reports.front_office_mis', **{'from': today.isoformat(), 'to': today.isoformat()}) }}"
+           class="btn btn-sm btn-outline-secondary">Today</a>
+        <a href="{{ url_for('reports.front_office_mis', **{'from': (today - timedelta(days=6)).isoformat(), 'to': today.isoformat()}) }}"
+           class="btn btn-sm btn-outline-secondary">Last 7d</a>
+        <a href="{{ url_for('reports.front_office_mis', **{'from': today.replace(day=1).isoformat(), 'to': today.isoformat()}) }}"
+           class="btn btn-sm btn-outline-secondary">MTD</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{# ─────────────────────────────────────────────────────────────────────────── #}
+{# Alert badges                                                                  #}
+{# ─────────────────────────────────────────────────────────────────────────── #}
+{% set _alerts = [] %}
+{% if business.occupancy_pct < 50 %}{% set _ = _alerts.append(('warning', 'Low Occupancy (' ~ business.occupancy_pct ~ '%)')) %}{% endif %}
+{% if billing.pending_amount > billing.total_billed * 0.3 and billing.total_billed > 0 %}{% set _ = _alerts.append(('danger', 'High Outstanding')) %}{% endif %}
+{% if discounts.total > 0 %}{% set _ = _alerts.append(('warning', 'Discounts ₹' ~ '{:,.0f}'.format(discounts.total))) %}{% endif %}
+{% if audit.variance|abs > 500 %}{% set _ = _alerts.append(('danger', 'Audit Mismatch ₹' ~ '{:,.0f}'.format(audit.variance|abs))) %}{% endif %}
+{% if audit.unclosed_folios > 0 %}{% set _ = _alerts.append(('warning', audit.unclosed_folios ~ ' Unclosed Folio(s)')) %}{% endif %}
+{% if movement.no_shows > 0 %}{% set _ = _alerts.append(('secondary', movement.no_shows ~ ' No-Show(s)')) %}{% endif %}
+
+{% if _alerts %}
+<div class="d-flex flex-wrap gap-2 mb-3">
+  {% for cls, msg in _alerts %}
+  <span class="badge bg-{{ cls }} fs-6 px-3 py-2">
+    <i class="bi bi-exclamation-triangle-fill me-1"></i>{{ msg }}
+  </span>
+  {% endfor %}
+</div>
+{% endif %}
+
+{# ─────────────────────────────────────────────────────────────────────────── #}
+{# Tab navigation                                                                #}
+{# ─────────────────────────────────────────────────────────────────────────── #}
+<ul class="nav nav-tabs mb-3 d-print-none" id="misTabs" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#mis-summary"
+            type="button" role="tab"><i class="bi bi-speedometer2"></i> Summary</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#mis-movement"
+            type="button" role="tab"><i class="bi bi-arrow-left-right"></i> Movement</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#mis-sources"
+            type="button" role="tab"><i class="bi bi-pie-chart"></i> Sources</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#mis-rooms"
+            type="button" role="tab"><i class="bi bi-door-closed"></i> Rooms</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#mis-billing"
+            type="button" role="tab">
+      <i class="bi bi-cash-stack"></i> Billing
+      {% if billing.pending_amount > 0 %}<span class="badge bg-danger ms-1">!</span>{% endif %}
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#mis-ledger"
+            type="button" role="tab">
+      <i class="bi bi-journal-text"></i> Ledger
+      {% if ledger.grand_outstanding > 0 %}<span class="badge bg-danger ms-1">{{ ledger.inhouse|length + ledger.checkout|length }}</span>{% endif %}
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#mis-operations"
+            type="button" role="tab">
+      <i class="bi bi-tools"></i> Operations
+      {% if audit.variance|abs > 500 %}<span class="badge bg-danger ms-1">!</span>{% endif %}
+    </button>
+  </li>
+</ul>
+
+{# ─────────────────────────────────────────────────────────────────────────── #}
+{# Tab content                                                                   #}
+{# ─────────────────────────────────────────────────────────────────────────── #}
+<div class="tab-content">
+
+{# ====== TAB 1: SUMMARY ====== #}
+<div class="tab-pane fade show active" id="mis-summary" role="tabpanel">
+
+  {# Print header — only visible when printing #}
+  <div class="d-none d-print-block mb-3 pb-2 border-bottom">
+    <h4 class="mb-0">Front Office MIS Report</h4>
+    <small>
+      {{ from_date.strftime('%d %B %Y') }}{% if from_date != to_date %} – {{ to_date.strftime('%d %B %Y') }}{% endif %}
+      &nbsp;·&nbsp; {{ meta.days }} day{% if meta.days != 1 %}s{% endif %}
+      &nbsp;·&nbsp; Generated {{ meta.generated_at.strftime('%d %b %Y %H:%M') }} UTC
+    </small>
+  </div>
+
+  {{ section_head('1 · Daily Business Summary') }}
+  <div class="row g-2 mb-4">
+    {{ kpi('Total Rooms',    business.total_rooms,  'bg-secondary') }}
+    {{ kpi('Sellable',       business.sellable_rooms, 'bg-secondary',
+           'Total minus Out-of-Order rooms') }}
+    {{ kpi('Occupied',       business.occupied_rooms,  'bg-danger') }}
+    {{ kpi('Vacant Clean',   business.vacant_rooms,    'bg-success') }}
+    {{ kpi('Dirty',          business.dirty_rooms,     'bg-warning text-dark') }}
+    {{ kpi('Out of Order',   business.oor_rooms,       'bg-dark') }}
+    {{ kpi('Occupancy %',    business.occupancy_pct ~ '%', 'bg-primary',
+           'Occupied room-nights ÷ Sellable room-nights × 100') }}
+    {{ kpi('ARR ₹',          '{:,.0f}'.format(business.arr), 'bg-dark',
+           'Average Room Rate = Room Revenue ÷ Occupied Room-Nights') }}
+    {{ kpi('RevPAR ₹',       '{:,.0f}'.format(business.revpar), 'bg-dark',
+           'Revenue Per Available Room = Room Revenue ÷ Sellable Room-Nights') }}
+  </div>
+
+  {{ section_head('Revenue Breakdown') }}
+  <div class="row g-3 mb-4">
+    <div class="col-sm-4">
+      <div class="card border-start border-4 border-success shadow-sm">
+        <div class="card-body text-center">
+          <div class="fs-4 fw-bold text-success">₹{{ '{:,.0f}'.format(business.room_revenue) }}</div>
+          <div class="small text-muted">Room Revenue</div>
+          <div class="small text-muted">{{ business.occ_room_nights }} room-nights</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="card border-start border-4 border-info shadow-sm">
+        <div class="card-body text-center">
+          <div class="fs-4 fw-bold text-info">₹{{ '{:,.0f}'.format(business.extra_revenue) }}</div>
+          <div class="small text-muted">Other Revenue</div>
+          <div class="small text-muted">Extra charges &amp; services</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="card border-start border-4 border-primary shadow-sm">
+        <div class="card-body text-center">
+          <div class="fs-4 fw-bold text-primary">₹{{ '{:,.0f}'.format(business.total_revenue) }}</div>
+          <div class="small text-muted">Total Revenue</div>
+          <div class="small text-muted">Room + Other</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{ section_head('2 · Check-in / Check-out Snapshot') }}
+  <div class="row g-2 mb-4">
+    {{ kpi('Arrivals Due',      movement.arrivals_expected,   'bg-success') }}
+    {{ kpi('Arrived',           movement.arrivals_done,        'bg-success') }}
+    {{ kpi('Departures Due',    movement.departures_expected,  'bg-warning text-dark') }}
+    {{ kpi('Departed',          movement.departures_done,      'bg-warning text-dark') }}
+    {{ kpi('In-House',          movement.inhouse,              'bg-primary') }}
+    {{ kpi('Stayovers',         movement.stayovers,            'bg-info text-dark') }}
+    {{ kpi('No-Shows',          movement.no_shows,             'bg-danger') }}
+    {{ kpi('Cancellations',     movement.cancellations,        'bg-secondary') }}
+    {{ kpi('Walk-ins',          movement.walk_ins,             'bg-secondary') }}
+  </div>
+
+  {{ section_head('3 · Booking Source Mix') }}
+  {% if sources %}
+  <div class="table-responsive mb-4">
+    <table class="table table-sm table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Source</th>
+          <th class="text-end">Bookings</th>
+          <th class="text-end">Room Nights</th>
+          <th class="text-end">Revenue</th>
+          <th class="text-end">ADR</th>
+          <th>Share</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set total_rev = business.room_revenue if business.room_revenue > 0 else 1 %}
+        {% for s in sources %}
+        <tr>
+          <td><span class="badge bg-secondary">{{ s.source }}</span></td>
+          <td class="text-end">{{ s.bookings }}</td>
+          <td class="text-end">{{ s.room_nights }}</td>
+          <td class="text-end fw-semibold">₹{{ '{:,.0f}'.format(s.revenue) }}</td>
+          <td class="text-end">₹{{ '{:,.0f}'.format(s.adr) }}</td>
+          <td style="min-width:120px;">
+            {% set pct = (s.revenue / total_rev * 100) | round(1) %}
+            <div class="progress" style="height:8px;" title="{{ pct }}%">
+              <div class="progress-bar bg-primary" style="width:{{ pct }}%"></div>
+            </div>
+            <small class="text-muted">{{ pct }}%</small>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="text-muted small">No revenue reservations in this period.</p>
+  {% endif %}
+
+</div>{# /mis-summary #}
+
+
+{# ====== TAB 2: MOVEMENT ====== #}
+<div class="tab-pane fade" id="mis-movement" role="tabpanel">
+
+  {{ section_head('2 · Check-in / Check-out Summary') }}
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+      <div class="card shadow-sm text-center py-3 h-100 border-start border-4 border-success">
+        <div class="fs-3 fw-bold text-success">{{ movement.arrivals_done }} / {{ movement.arrivals_expected }}</div>
+        <div class="small text-muted">Arrivals (Done / Expected)</div>
+        {% if movement.arrivals_expected > 0 %}
+        <div class="small text-muted">{{ (movement.arrivals_done / movement.arrivals_expected * 100) | round(0) | int }}% complete</div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card shadow-sm text-center py-3 h-100 border-start border-4 border-warning">
+        <div class="fs-3 fw-bold text-warning">{{ movement.departures_done }} / {{ movement.departures_expected }}</div>
+        <div class="small text-muted">Departures (Done / Expected)</div>
+        {% if movement.departures_expected > 0 %}
+        <div class="small text-muted">{{ (movement.departures_done / movement.departures_expected * 100) | round(0) | int }}% complete</div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card shadow-sm text-center py-3 h-100 border-start border-4 border-primary">
+        <div class="fs-3 fw-bold text-primary">{{ movement.inhouse }}</div>
+        <div class="small text-muted">In-House Guests</div>
+        <div class="small text-muted">{{ movement.stayovers }} stayovers</div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card shadow-sm text-center py-3 h-100 border-start border-4 border-danger">
+        <div class="fs-3 fw-bold text-danger">{{ movement.no_shows }}</div>
+        <div class="small text-muted">No-Shows</div>
+        <div class="small text-muted">{{ movement.cancellations }} cancellations</div>
+      </div>
+    </div>
+  </div>
+
+  {{ section_head('Detailed Breakdown') }}
+  <div class="row g-2 mb-3">
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-light py-2 fw-semibold small">Arrivals</div>
+        <div class="card-body p-0">
+          <table class="table table-sm mb-0">
+            <tr><td>Expected</td><td class="text-end fw-bold">{{ movement.arrivals_expected }}</td></tr>
+            <tr><td>Checked In</td><td class="text-end fw-bold text-success">{{ movement.arrivals_done }}</td></tr>
+            <tr><td>Pending</td><td class="text-end fw-bold text-warning">{{ movement.arrivals_expected - movement.arrivals_done }}</td></tr>
+            <tr><td>Walk-ins</td><td class="text-end">{{ movement.walk_ins }}</td></tr>
+            <tr><td>Early Check-ins</td><td class="text-end">{{ movement.early_checkins }}</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-light py-2 fw-semibold small">Departures</div>
+        <div class="card-body p-0">
+          <table class="table table-sm mb-0">
+            <tr><td>Expected</td><td class="text-end fw-bold">{{ movement.departures_expected }}</td></tr>
+            <tr><td>Checked Out</td><td class="text-end fw-bold text-success">{{ movement.departures_done }}</td></tr>
+            <tr><td>Pending</td><td class="text-end fw-bold text-warning">{{ movement.departures_expected - movement.departures_done }}</td></tr>
+            <tr><td>Late Check-outs</td><td class="text-end">{{ movement.late_checkouts }}</td></tr>
+            <tr><td>No-Shows</td><td class="text-end {% if movement.no_shows > 0 %}text-danger fw-bold{% endif %}">{{ movement.no_shows }}</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>{# /mis-movement #}
+
+
+{# ====== TAB 3: SOURCES ====== #}
+<div class="tab-pane fade" id="mis-sources" role="tabpanel">
+
+  {{ section_head('3 · Booking Source Analysis') }}
+  {% if sources %}
+  <div class="table-responsive">
+    <table class="table table-hover mb-4">
+      <thead class="table-light">
+        <tr>
+          <th>Source</th>
+          <th class="text-end">Bookings</th>
+          <th class="text-end">Room Nights</th>
+          <th class="text-end">Revenue (₹)</th>
+          <th class="text-end">ADR (₹)</th>
+          <th style="min-width:150px;">Revenue Share</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set total_rev = business.room_revenue if business.room_revenue > 0 else 1 %}
+        {% set total_bk = sources | sum(attribute='bookings') %}
+        {% for s in sources %}
+        {% set pct = (s.revenue / total_rev * 100) | round(1) %}
+        <tr>
+          <td><strong>{{ s.source }}</strong></td>
+          <td class="text-end">
+            {{ s.bookings }}
+            {% if total_bk > 0 %}
+            <small class="text-muted">({{ (s.bookings / total_bk * 100) | round(0) | int }}%)</small>
+            {% endif %}
+          </td>
+          <td class="text-end">{{ s.room_nights }}</td>
+          <td class="text-end fw-semibold">₹{{ '{:,.0f}'.format(s.revenue) }}</td>
+          <td class="text-end">₹{{ '{:,.0f}'.format(s.adr) }}</td>
+          <td>
+            <div class="progress mb-1" style="height:10px;">
+              <div class="progress-bar" style="width:{{ pct }}%"></div>
+            </div>
+            <small class="text-muted">{{ pct }}%</small>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot class="table-light fw-bold">
+        <tr>
+          <td>Total</td>
+          <td class="text-end">{{ sources | sum(attribute='bookings') }}</td>
+          <td class="text-end">{{ sources | sum(attribute='room_nights') }}</td>
+          <td class="text-end">₹{{ '{:,.0f}'.format(business.room_revenue) }}</td>
+          <td class="text-end">—</td>
+          <td>100%</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  {% else %}
+  <div class="alert alert-light">No revenue reservations found for this period.</div>
+  {% endif %}
+
+</div>{# /mis-sources #}
+
+
+{# ====== TAB 4: ROOMS ====== #}
+<div class="tab-pane fade" id="mis-rooms" role="tabpanel">
+
+  {{ section_head('4 · Room Status Snapshot') }}
+  <div class="row g-2 mb-4">
+    {{ kpi('Vacant Clean', rooms.vacant_clean, 'bg-success') }}
+    {{ kpi('Vacant Dirty', rooms.vacant_dirty, 'bg-warning text-dark') }}
+    {{ kpi('Occupied',     rooms.occupied,     'bg-danger') }}
+    {{ kpi('Out of Order', rooms.out_of_order, 'bg-dark') }}
+    {{ kpi('Total Rooms',  business.total_rooms, 'bg-secondary') }}
+  </div>
+
+  {{ section_head('By Room Type') }}
+  {% if rooms.by_type %}
+  <div class="table-responsive mb-4">
+    <table class="table table-sm table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Room Type</th>
+          <th class="text-end">Total</th>
+          <th class="text-end">Occupied</th>
+          <th class="text-end">Vacant</th>
+          <th class="text-end">Dirty</th>
+          <th class="text-end">Out of Order</th>
+          <th class="text-end">Base Rate (₹)</th>
+          <th>Occupancy</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rt, v in rooms.by_type.items() %}
+        {% set occ_p = (v.occupied / v.total * 100) | round(0) | int if v.total > 0 else 0 %}
+        <tr>
+          <td><strong>{{ rt }}</strong></td>
+          <td class="text-end">{{ v.total }}</td>
+          <td class="text-end fw-bold text-danger">{{ v.occupied }}</td>
+          <td class="text-end text-success">{{ v.vacant }}</td>
+          <td class="text-end text-warning">{{ v.dirty }}</td>
+          <td class="text-end text-secondary">{{ v.oor }}</td>
+          <td class="text-end">₹{{ '{:,.0f}'.format(v.base_rate) }}</td>
+          <td style="min-width:120px;">
+            <div class="progress" style="height:8px;">
+              <div class="progress-bar bg-danger" style="width:{{ occ_p }}%"></div>
+            </div>
+            <small class="text-muted">{{ occ_p }}%</small>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="text-muted small">No room type data available.</p>
+  {% endif %}
+
+</div>{# /mis-rooms #}
+
+
+{# ====== TAB 5: BILLING ====== #}
+<div class="tab-pane fade" id="mis-billing" role="tabpanel">
+
+  {{ section_head('5 · Cash & Billing Summary') }}
+  <div class="row g-3 mb-4">
+    <div class="col-sm-4">
+      <div class="card border-start border-4 border-success shadow-sm h-100">
+        <div class="card-body text-center">
+          <div class="fs-4 fw-bold text-success">₹{{ '{:,.0f}'.format(billing.total_collected) }}</div>
+          <div class="small text-muted">Total Collected</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="card border-start border-4 border-primary shadow-sm h-100">
+        <div class="card-body text-center">
+          <div class="fs-4 fw-bold text-primary">₹{{ '{:,.0f}'.format(billing.total_billed) }}</div>
+          <div class="small text-muted">Total Billed</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="card border-start border-4 {% if billing.pending_amount > 0 %}border-danger{% else %}border-success{% endif %} shadow-sm h-100">
+        <div class="card-body text-center">
+          <div class="fs-4 fw-bold {% if billing.pending_amount > 0 %}text-danger{% else %}text-success{% endif %}">
+            ₹{{ '{:,.0f}'.format(billing.pending_amount) }}
+          </div>
+          <div class="small text-muted">Pending / Outstanding</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-6">
+      {{ section_head('Collection by Payment Mode') }}
+      <div class="table-responsive">
+        <table class="table table-sm table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Mode</th>
+              <th class="text-end">Amount (₹)</th>
+              <th style="min-width:120px;">Share</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% set total_coll = billing.total_collected if billing.total_collected > 0 else 1 %}
+            {% for mode, amt in billing.by_mode.items() %}
+            {% set pct = (amt / total_coll * 100) | round(1) %}
+            <tr>
+              <td>{{ mode }}</td>
+              <td class="text-end fw-semibold">₹{{ '{:,.0f}'.format(amt) }}</td>
+              <td>
+                <div class="progress" style="height:8px;">
+                  <div class="progress-bar bg-success" style="width:{{ pct }}%"></div>
+                </div>
+                <small class="text-muted">{{ pct }}%</small>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot class="table-light fw-bold">
+            <tr>
+              <td>Total</td>
+              <td class="text-end">₹{{ '{:,.0f}'.format(billing.total_collected) }}</td>
+              <td>100%</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+    <div class="col-md-6">
+      {{ section_head('Billing Metrics') }}
+      <div class="card shadow-sm">
+        <div class="card-body p-0">
+          <table class="table table-sm mb-0">
+            <tr>
+              <td>Collection Efficiency</td>
+              <td class="text-end fw-bold {% if billing.collection_eff >= 90 %}text-success{% elif billing.collection_eff >= 70 %}text-warning{% else %}text-danger{% endif %}">
+                {{ billing.collection_eff }}%
+              </td>
+            </tr>
+            <tr><td>Total Billed (₹)</td><td class="text-end">₹{{ '{:,.0f}'.format(billing.total_billed) }}</td></tr>
+            <tr><td>Total Collected (₹)</td><td class="text-end">₹{{ '{:,.0f}'.format(billing.total_collected) }}</td></tr>
+            <tr><td>Deposits Received (₹)</td><td class="text-end">₹{{ '{:,.0f}'.format(billing.deposits) }}</td></tr>
+            <tr><td>Refunds Issued (₹)</td><td class="text-end text-danger">₹{{ '{:,.0f}'.format(billing.refunds) }}</td></tr>
+            <tr class="table-warning fw-bold">
+              <td>Pending / Outstanding (₹)</td>
+              <td class="text-end">₹{{ '{:,.0f}'.format(billing.pending_amount) }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>{# /mis-billing #}
+
+
+{# ====== TAB 6: LEDGER ====== #}
+<div class="tab-pane fade" id="mis-ledger" role="tabpanel">
+
+  {{ section_head('6 · Guest Ledger & Outstanding') }}
+  <div class="row g-2 mb-3">
+    {{ kpi('In-House Outstanding',   '₹{:,.0f}'.format(ledger.total_inhouse),   'bg-danger') }}
+    {{ kpi('Checkout Outstanding',   '₹{:,.0f}'.format(ledger.total_checkout),  'bg-warning text-dark') }}
+    {{ kpi('Grand Total Outstanding','₹{:,.0f}'.format(ledger.grand_outstanding),'bg-dark') }}
+  </div>
+
+  {% if ledger.inhouse %}
+  {{ section_head('In-House Outstanding') }}
+  <div class="table-responsive mb-4">
+    <table class="table table-sm table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Guest</th><th>Phone</th><th>Room</th>
+          <th class="text-end">Check-in</th><th class="text-end">Check-out</th>
+          <th class="text-end">Billed (₹)</th><th class="text-end">Paid (₹)</th>
+          <th class="text-end text-danger">Balance (₹)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in ledger.inhouse %}
+        <tr>
+          <td><strong>{{ e.guest }}</strong></td>
+          <td>{{ e.phone }}</td>
+          <td>{{ e.room }}</td>
+          <td class="text-end">{{ e.checkin.strftime('%d %b') }}</td>
+          <td class="text-end">{{ e.checkout.strftime('%d %b') }}</td>
+          <td class="text-end">₹{{ '{:,.0f}'.format(e.total) }}</td>
+          <td class="text-end">₹{{ '{:,.0f}'.format(e.paid) }}</td>
+          <td class="text-end fw-bold text-danger">₹{{ '{:,.0f}'.format(e.balance) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot class="table-light fw-bold">
+        <tr>
+          <td colspan="7">Total In-House Outstanding</td>
+          <td class="text-end text-danger">₹{{ '{:,.0f}'.format(ledger.total_inhouse) }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if ledger.checkout %}
+  {{ section_head('Checked-Out Outstanding') }}
+  <div class="table-responsive mb-4">
+    <table class="table table-sm table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Guest</th><th>Phone</th><th>Room</th>
+          <th class="text-end">Check-in</th><th class="text-end">Check-out</th>
+          <th class="text-end">Billed (₹)</th><th class="text-end">Paid (₹)</th>
+          <th class="text-end text-warning">Balance (₹)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in ledger.checkout %}
+        <tr>
+          <td><strong>{{ e.guest }}</strong></td>
+          <td>{{ e.phone }}</td>
+          <td>{{ e.room }}</td>
+          <td class="text-end">{{ e.checkin.strftime('%d %b') }}</td>
+          <td class="text-end">{{ e.checkout.strftime('%d %b') }}</td>
+          <td class="text-end">₹{{ '{:,.0f}'.format(e.total) }}</td>
+          <td class="text-end">₹{{ '{:,.0f}'.format(e.paid) }}</td>
+          <td class="text-end fw-bold text-warning">₹{{ '{:,.0f}'.format(e.balance) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot class="table-light fw-bold">
+        <tr>
+          <td colspan="7">Total Checked-Out Outstanding</td>
+          <td class="text-end text-warning">₹{{ '{:,.0f}'.format(ledger.total_checkout) }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if not ledger.inhouse and not ledger.checkout %}
+  <div class="alert alert-success"><i class="bi bi-check-circle me-2"></i>No outstanding balances in this period.</div>
+  {% endif %}
+
+</div>{# /mis-ledger #}
+
+
+{# ====== TAB 7: OPERATIONS ====== #}
+<div class="tab-pane fade" id="mis-operations" role="tabpanel">
+
+  {# Section 7: Discounts #}
+  {{ section_head('7 · Discount & Rate Variance') }}
+  {% if discounts.count > 0 %}
+  <div class="row g-2 mb-3">
+    {{ kpi('Below Rack Rate', discounts.count, 'bg-warning text-dark') }}
+    {{ kpi('Total Discount ₹', '{:,.0f}'.format(discounts.total), 'bg-danger',
+           'Sum of (Rack Rate − Sold Rate) × Nights for all discounted bookings') }}
+  </div>
+  <div class="table-responsive mb-4">
+    <table class="table table-sm table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Res.</th><th>Guest</th><th>Room</th><th>Type</th>
+          <th class="text-end">Rack (₹)</th><th class="text-end">Sold (₹)</th>
+          <th class="text-end">Disc %</th><th class="text-end">Nights</th>
+          <th class="text-end text-danger">Disc Amt (₹)</th><th>Source</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in discounts.rows %}
+        <tr>
+          <td><small>#{{ r.reservation_id }}</small></td>
+          <td>{{ r.guest }}</td>
+          <td>{{ r.room }}</td>
+          <td>{{ r.room_type }}</td>
+          <td class="text-end">₹{{ '{:,.0f}'.format(r.rack_rate) }}</td>
+          <td class="text-end">₹{{ '{:,.0f}'.format(r.sold_at) }}</td>
+          <td class="text-end {% if r.disc_pct > 20 %}text-danger fw-bold{% else %}text-warning{% endif %}">
+            {{ r.disc_pct }}%
+          </td>
+          <td class="text-end">{{ r.nights }}</td>
+          <td class="text-end fw-bold text-danger">₹{{ '{:,.0f}'.format(r.disc_amt) }}</td>
+          <td><small>{{ r.source }}</small></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot class="table-light fw-bold">
+        <tr>
+          <td colspan="8">Total Discount Given</td>
+          <td class="text-end text-danger">₹{{ '{:,.0f}'.format(discounts.total) }}</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  {% else %}
+  <div class="alert alert-success mb-4"><i class="bi bi-check-circle me-2"></i>No bookings sold below rack rate in this period.</div>
+  {% endif %}
+
+  {# Section 8: Night Audit #}
+  {{ section_head('8 · Night Audit / Revenue Reconciliation') }}
+  <div class="row g-2 mb-3">
+    {{ kpi('Dates Audited',  audit.dates_audited,  'bg-success' if audit.dates_missing == 0 else 'bg-warning text-dark') }}
+    {{ kpi('Missing Audit',  audit.dates_missing,  'bg-danger' if audit.dates_missing > 0 else 'bg-success') }}
+    {{ kpi('Audit Revenue ₹','{:,.0f}'.format(audit.audit_revenue),  'bg-secondary') }}
+    {{ kpi('System Revenue ₹','{:,.0f}'.format(audit.system_revenue),'bg-secondary') }}
+    {{ kpi('Variance ₹',     '{:,.0f}'.format(audit.variance|abs),
+           'bg-danger' if audit.variance|abs > 500 else 'bg-success',
+           'Audit Revenue − System Payments. Non-zero may indicate timing differences.') }}
+    {{ kpi('Unclosed Folios',audit.unclosed_folios,'bg-warning text-dark' if audit.unclosed_folios > 0 else 'bg-success') }}
+  </div>
+
+  {% if audit.logs %}
+  <div class="table-responsive mb-4">
+    <table class="table table-sm table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Audit Date</th>
+          <th class="text-end">Revenue (₹)</th>
+          <th class="text-end">Occupancy</th>
+          <th class="text-end">Pending CO</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for l in audit.logs %}
+        <tr>
+          <td>{{ l.audit_date.strftime('%d %b %Y') }}</td>
+          <td class="text-end">₹{{ '{:,.0f}'.format(l.total_revenue) }}</td>
+          <td class="text-end">{{ l.occupancy_count }}</td>
+          <td class="text-end {% if l.pending_checkouts > 0 %}text-warning{% endif %}">{{ l.pending_checkouts }}</td>
+          <td><small class="text-muted">{{ l.notes or '—' }}</small></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% elif audit.dates_missing > 0 %}
+  <div class="alert alert-warning">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    Night audit has not been run for {{ audit.dates_missing }} date(s) in this period.
+  </div>
+  {% endif %}
+
+  {# Section 9: Feedback #}
+  {{ section_head('9 · Guest Feedback Snapshot') }}
+  {% if feedback.available %}
+  <div class="row g-2 mb-4">
+    {{ kpi('Responses',         feedback.total,       'bg-primary') }}
+    {{ kpi('Avg Rating',        feedback.avg_rating ~ '★', 'bg-warning text-dark') }}
+    {{ kpi('Negative',          feedback.negative ~ ' (' ~ feedback.neg_pct ~ '%)', 'bg-danger' if feedback.negative > 0 else 'bg-success') }}
+    {{ kpi('Would Recommend',   feedback.rec_count ~ ' (' ~ feedback.rec_pct ~ '%)', 'bg-success') }}
+  </div>
+  {% else %}
+  <div class="alert alert-light mb-4">
+    <i class="bi bi-chat-text me-2"></i>No guest feedback recorded for departures in this period.
+  </div>
+  {% endif %}
+
+  {# Section 10: Staff Performance #}
+  {{ section_head('10 · Staff Performance') }}
+  {% if staff.available %}
+  <div class="table-responsive mb-3">
+    <table class="table table-sm table-hover mb-0" style="max-width:500px;">
+      <thead class="table-light">
+        <tr>
+          <th>Staff Member</th>
+          <th>Role</th>
+          <th class="text-end">Check-ins Handled</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in staff.staff %}
+        <tr>
+          <td><strong>{{ s.name }}</strong></td>
+          <td><small class="badge bg-secondary">{{ s.role }}</small></td>
+          <td class="text-end">{{ s.checkins }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="alert alert-light">
+    <i class="bi bi-person-badge me-2"></i>No staff check-in data found for this period.
+  </div>
+  {% endif %}
+
+</div>{# /mis-operations #}
+
+</div>{# /tab-content #}
+
+{# ─────────────────────────────────────────────────────────────────────────── #}
+{# Print-only: show ALL sections sequentially                                   #}
+{# ─────────────────────────────────────────────────────────────────────────── #}
+<div class="d-none d-print-block">
+
+  <h6 class="fw-semibold text-uppercase text-muted mb-2 mt-4" style="font-size:11px;">DAILY BUSINESS SUMMARY</h6>
+  <table class="table table-sm table-bordered mb-3">
+    <tr><td>Total Rooms</td><td class="fw-bold">{{ business.total_rooms }}</td>
+        <td>Sellable</td><td class="fw-bold">{{ business.sellable_rooms }}</td>
+        <td>Out of Order</td><td class="fw-bold">{{ business.oor_rooms }}</td></tr>
+    <tr><td>Occupied (snapshot)</td><td class="fw-bold">{{ business.occupied_rooms }}</td>
+        <td>Vacant</td><td class="fw-bold">{{ business.vacant_rooms }}</td>
+        <td>Dirty</td><td class="fw-bold">{{ business.dirty_rooms }}</td></tr>
+    <tr><td>Occupancy %</td><td class="fw-bold">{{ business.occupancy_pct }}%</td>
+        <td>ARR (₹)</td><td class="fw-bold">{{ '{:,.0f}'.format(business.arr) }}</td>
+        <td>RevPAR (₹)</td><td class="fw-bold">{{ '{:,.0f}'.format(business.revpar) }}</td></tr>
+    <tr><td>Room Revenue (₹)</td><td class="fw-bold">{{ '{:,.0f}'.format(business.room_revenue) }}</td>
+        <td>Other Revenue (₹)</td><td class="fw-bold">{{ '{:,.0f}'.format(business.extra_revenue) }}</td>
+        <td>Total Revenue (₹)</td><td class="fw-bold">{{ '{:,.0f}'.format(business.total_revenue) }}</td></tr>
+  </table>
+
+  <h6 class="fw-semibold text-uppercase text-muted mb-2 mt-3" style="font-size:11px;">GUEST MOVEMENT</h6>
+  <table class="table table-sm table-bordered mb-3">
+    <tr><td>Arrivals Expected</td><td>{{ movement.arrivals_expected }}</td>
+        <td>Arrived</td><td>{{ movement.arrivals_done }}</td>
+        <td>In-House</td><td>{{ movement.inhouse }}</td></tr>
+    <tr><td>Departures Expected</td><td>{{ movement.departures_expected }}</td>
+        <td>Departed</td><td>{{ movement.departures_done }}</td>
+        <td>Stayovers</td><td>{{ movement.stayovers }}</td></tr>
+    <tr><td>No-Shows</td><td>{{ movement.no_shows }}</td>
+        <td>Cancellations</td><td>{{ movement.cancellations }}</td>
+        <td>Walk-ins</td><td>{{ movement.walk_ins }}</td></tr>
+  </table>
+
+  {% if sources %}
+  <h6 class="fw-semibold text-uppercase text-muted mb-2 mt-3" style="font-size:11px;">BOOKING SOURCES</h6>
+  <table class="table table-sm table-bordered mb-3">
+    <thead><tr><th>Source</th><th>Bookings</th><th>Room Nights</th><th>Revenue (₹)</th><th>ADR (₹)</th></tr></thead>
+    <tbody>
+      {% for s in sources %}
+      <tr><td>{{ s.source }}</td><td>{{ s.bookings }}</td><td>{{ s.room_nights }}</td>
+          <td>₹{{ '{:,.0f}'.format(s.revenue) }}</td><td>₹{{ '{:,.0f}'.format(s.adr) }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  <h6 class="fw-semibold text-uppercase text-muted mb-2 mt-3" style="font-size:11px;">CASH & BILLING</h6>
+  <table class="table table-sm table-bordered mb-3">
+    <tr><td>Total Collected (₹)</td><td class="fw-bold">₹{{ '{:,.0f}'.format(billing.total_collected) }}</td>
+        <td>Total Billed (₹)</td><td class="fw-bold">₹{{ '{:,.0f}'.format(billing.total_billed) }}</td></tr>
+    <tr><td>Deposits Received (₹)</td><td>₹{{ '{:,.0f}'.format(billing.deposits) }}</td>
+        <td>Refunds (₹)</td><td>₹{{ '{:,.0f}'.format(billing.refunds) }}</td></tr>
+    <tr><td>Pending Outstanding (₹)</td><td class="fw-bold text-danger">₹{{ '{:,.0f}'.format(billing.pending_amount) }}</td>
+        <td>Collection Efficiency</td><td class="fw-bold">{{ billing.collection_eff }}%</td></tr>
+  </table>
+
+</div>
+
+<style>
+/* ── Print styles ────────────────────────────────────────────────────────── */
+@media print {
+  .d-print-none  { display: none !important; }
+  .d-print-block { display: block !important; }
+  .tab-pane      { display: none !important; }   /* hide screen tabs */
+  body           { font-size: 11px; }
+  .card          { border: 1px solid #dee2e6 !important; box-shadow: none !important; }
+  h5, h6         { break-after: avoid; }
+  table          { font-size: 10px; }
+  @page          { margin: 15mm; size: A4 portrait; }
+}
+</style>
+
+{% endblock %}
+
+{% block scripts %}
+<script nonce="{{ csp_nonce }}">
+// Print / PDF
+document.getElementById('misPrintBtn').addEventListener('click', function() { window.print(); });
+
+// Initialise tooltips
+document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+    new bootstrap.Tooltip(el, { trigger: 'hover' });
+});
+
+// Persist active tab across refresh
+document.getElementById('misTabs').addEventListener('shown.bs.tab', function (e) {
+    sessionStorage.setItem('misTab', e.target.dataset.bsTarget);
+});
+(function () {
+    const saved = sessionStorage.getItem('misTab');
+    if (saved && saved !== '#mis-summary') {
+        const btn = document.querySelector(`#misTabs [data-bs-target="${saved}"]`);
+        if (btn) bootstrap.Tab.getOrCreateInstance(btn).show();
+    }
+})();
+</script>
+{% endblock %}

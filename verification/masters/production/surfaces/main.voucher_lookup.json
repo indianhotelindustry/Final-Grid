@@ -1,0 +1,26 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/api/voucher/lookup",
+  "anon_status": 302,
+  "body_bytes": 37,
+  "body_sha256": "5413f61813dcee10cf27960071457af9c562f59baca445cbf9741ee2af385876",
+  "category": "FINANCIAL",
+  "content_type": "application/json",
+  "duration_ms": 2,
+  "endpoint": "main.voucher_lookup",
+  "error": "",
+  "figure_source": "json",
+  "figures": {
+    "$[len]": "1"
+  },
+  "location": "",
+  "normalisation_hits": {},
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 400,
+  "surface_id": "main.voucher_lookup",
+  "templates": [],
+  "truncations": [],
+  "url": "/api/voucher/lookup"
+}

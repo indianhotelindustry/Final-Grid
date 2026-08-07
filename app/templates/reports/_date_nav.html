@@ -1,0 +1,13 @@
+{# Shared date navigation bar for daily reports #}
+<div class="d-flex gap-2 align-items-center mb-3">
+    <a href="?date={{ (report_date - timedelta(days=1)).isoformat() }}"
+       class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-left"></i></a>
+    <form class="d-inline" method="GET">
+        <input type="date" name="date" class="form-control form-control-sm d-inline-block" style="width:auto;"
+               value="{{ report_date.isoformat() }}"
+               onchange="this.form.submit()">
+    </form>
+    <a href="?date={{ (report_date + timedelta(days=1)).isoformat() }}"
+       class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-right"></i></a>
+    <a href="?date={{ today.isoformat() }}" class="btn btn-sm btn-outline-primary">Today</a>
+</div>

@@ -1,0 +1,1730 @@
+<style>
+/* ── KPI Grid ─────────────────────────────────────────────────────────── */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 96px;
+    gap: 8px;
+    margin-bottom: 0;
+}
+@media (min-width: 768px) {
+    .kpi-grid { grid-template-columns: repeat(7, 1fr); }
+}
+
+/* ── Scope tag (Apr 2026) — every dashboard tile that displays a date-
+       scoped number labels its scope so we never mix silently:
+         "DD MMM (Closed)" — settled NightAuditLog snapshot
+         "DD MMM (Live)"   — realtime, in-progress, may shift
+       Tag sits inside .kpi-subtitle so we don't change tile heights. */
+.scope-tag {
+    display: inline-block;
+    font-size: 0.62rem; font-weight: 700;
+    padding: 1px 6px; border-radius: 8px;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    margin-left: 4px; vertical-align: 1px;
+}
+.scope-tag.closed { background: #dcfce7; color: #166534; }
+.scope-tag.live   { background: #fef3c7; color: #92400e; }
+.scope-tag.none   { background: #f3f4f6; color: #6b7280; }
+.kpi-secondary-line {
+    font-size: 0.7rem; color: #6b7280;
+    margin-top: 2px; line-height: 1.2;
+}
+.kpi-secondary-line .scope-tag { vertical-align: 0; }
+
+/* ── Info-icon tooltips — accounting clarity, native title attribute
+       so it works without JS and stays CSP-safe. The cursor cue tells
+       the operator the icon is interactive. */
+.kpi-info {
+    color: #9ca3af;
+    font-size: 0.75rem;
+    margin-left: 4px;
+    cursor: help;
+    vertical-align: 1px;
+}
+.kpi-info:hover { color: #4b5563; }
+
+/* ── Accounting-basis explainer banner — sits above the cashier-
+       settlement row so staff understand why a ₹3 test payment moves
+       Cash In but does not move Direct Revenue. */
+.acct-basis-note {
+    grid-column: 1 / -1;
+    background: #f0f9ff;
+    border: 1px dashed #bae6fd;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    color: #075985;
+    line-height: 1.45;
+}
+.acct-basis-note strong { color: #0369a1; }
+.acct-basis-note .lbl {
+    display: inline-block;
+    font-weight: 700; font-size: 0.66rem; text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: #0369a1; color: #fff;
+    padding: 1px 6px; border-radius: 8px;
+    margin-right: 6px; vertical-align: 1px;
+}
+
+/* ── Card base ───────────────────────────────────────────────────────── */
+.kpi-card {
+    height: 100%;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,.07);
+    display: block;
+    text-decoration: none !important;
+    color: inherit;
+}
+a.kpi-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,.13); transform: translateY(-1px); transition: all .12s; }
+.kpi-card .card-body {
+    padding: 8px 10px !important;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+/* ── Label row ───────────────────────────────────────────────────────── */
+.kpi-label-row { display: flex; justify-content: space-between; align-items: center; line-height: 1; flex-shrink: 0; }
+.kpi-label { font-size: 0.9rem; font-weight: 600; color: #5a6370; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 4px; }
+.kpi-icon { font-size: 0.85rem; flex-shrink: 0; }
+.kpi-subtitle { font-size: 0.62rem; color: #9ca3af; line-height: 1.2; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
+
+/* ── Value ───────────────────────────────────────────────────────────── */
+.kpi-val { font-size: 1.3rem; font-weight: 700; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
+
+/* ── Trend pill ──────────────────────────────────────────────────────── */
+.kpi-trend {
+    display: inline-flex; align-items: center; gap: 1px;
+    font-size: 0.6rem; font-weight: 700; padding: 1px 4px;
+    border-radius: 10px; vertical-align: middle; margin-left: 3px;
+    white-space: nowrap; flex-shrink: 0;
+}
+.kpi-trend.up   { background: #d1fae5; color: #065f46; }
+.kpi-trend.down { background: #fee2e2; color: #991b1b; }
+.kpi-trend.flat { background: #f3f4f6; color: #6b7280; }
+
+/* ── Target card ─────────────────────────────────────────────────────── */
+.kpi-target-vals { font-size: 0.8rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.1; flex-shrink: 0; }
+.kpi-target-bottom { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.kpi-target-pct { font-size: 0.65rem; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+
+/* ── Locked card (FrontDesk restricted) ──────────────────────────────── */
+.kpi-locked { opacity: 0.45; cursor: not-allowed; }
+.kpi-lock-icon { font-size: 1rem; color: #9ca3af; }
+
+/* ── Layer header ────────────────────────────────────────────────────── */
+.layer-header {
+    display: flex; align-items: center; gap: 8px;
+    margin: 8px 0 4px;
+    font-size: 0.58rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; color: #9ca3af;
+}
+.layer-header::after { content: ''; flex: 1; height: 1px; background: #e9ecef; }
+
+
+/* ── Intelligence Panel ──────────────────────────────────────────────── */
+.intel-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin: 8px 0;
+}
+@media (max-width: 767px) { .intel-panel { grid-template-columns: 1fr; } }
+.intel-card {
+    background: #fff; border: 1px solid #e9ecef; border-radius: 8px;
+    padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+.intel-title {
+    font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.09em; color: #9ca3af; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 5px;
+}
+
+/* ── Forecast bars ───────────────────────────────────────────────────── */
+.fc-wrap { display: flex; gap: 4px; align-items: flex-end; height: 56px; }
+.fc-col  { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 2px; height: 100%; justify-content: flex-end; }
+.fc-bar-track { width: 100%; background: #f3f4f6; border-radius: 3px 3px 0 0; flex: 1; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; }
+.fc-bar-fill  { width: 100%; border-radius: 3px 3px 0 0; min-height: 2px; transition: height .3s; }
+.fc-day  { font-size: 0.55rem; color: #9ca3af; font-weight: 600; white-space: nowrap; }
+.fc-pct  { font-size: 0.58rem; font-weight: 700; }
+
+/* ── Risk / Suggestion rows ─────────────────────────────────────────── */
+.intel-row {
+    display: flex; align-items: flex-start; gap: 7px;
+    padding: 5px 0; border-bottom: 1px solid #f3f4f6; font-size: 0.74rem;
+}
+.intel-row:last-child { border-bottom: none; }
+.intel-row-icon { font-size: 0.85rem; flex-shrink: 0; margin-top: 1px; }
+
+/* ── AI Insights panel (Module 7 — Gemini) ───────────────────────── */
+.ai-insights {
+    margin: 10px 0;
+    background: linear-gradient(135deg, #f0f9ff 0%, #ede9fe 100%);
+    border: 1px solid #c7d2fe;
+    border-radius: 10px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+.ai-insights-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; margin-bottom: 8px;
+}
+.ai-insights-title {
+    font-size: 0.78rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.06em; color: #4338ca;
+    display: flex; align-items: center; gap: 6px;
+}
+.ai-insights-meta {
+    font-size: 0.62rem; color: #6b7280;
+    display: flex; align-items: center; gap: 8px;
+}
+.ai-insights-meta .ai-source-badge {
+    padding: 1px 6px; border-radius: 10px; font-weight: 700;
+    background: #e0e7ff; color: #3730a3;
+}
+.ai-insights-meta .ai-source-badge.heuristic {
+    background: #fef3c7; color: #92400e;
+}
+.ai-insights-refresh {
+    background: transparent; border: 1px solid #c7d2fe; color: #4338ca;
+    border-radius: 6px; padding: 2px 8px; font-size: 0.68rem; font-weight: 700;
+    cursor: pointer; transition: all .12s;
+}
+.ai-insights-refresh:hover { background: #4338ca; color: #fff; }
+.ai-insights-refresh:disabled { opacity: 0.5; cursor: wait; }
+.ai-insights-summary {
+    font-size: 0.85rem; line-height: 1.45; color: #1f2937; margin-bottom: 10px;
+}
+.ai-insights-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+@media (max-width: 767px) { .ai-insights-grid { grid-template-columns: 1fr; } }
+.ai-insights-col { background: #fff; border-radius: 8px; padding: 10px 12px; }
+.ai-insights-col-title {
+    font-size: 0.62rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.08em; color: #6b7280; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 5px;
+}
+.ai-insights-item {
+    display: flex; gap: 7px; align-items: flex-start;
+    padding: 5px 0; border-bottom: 1px solid #f3f4f6; font-size: 0.76rem;
+}
+.ai-insights-item:last-child { border-bottom: none; }
+.ai-insights-item .bullet { color: #6366f1; flex-shrink: 0; margin-top: 1px; }
+.ai-insights-item .issue-title { font-weight: 700; color: #111827; }
+.ai-insights-item .issue-reason { color: #6b7280; font-size: 0.72rem; margin-top: 2px; }
+.ai-insights-empty { font-size: 0.72rem; color: #9ca3af; font-style: italic; padding: 4px 0; }
+.ai-insights-error { font-size: 0.72rem; color: #991b1b; padding: 4px 0; }
+
+/* ── Card modal trigger ──────────────────────────────────────────── */
+.kpi-card[data-card-modal] { cursor: pointer; position: relative; }
+.kpi-card[data-card-modal]:hover { box-shadow: 0 4px 12px rgba(0,0,0,.14); transform: translateY(-2px); transition: all .13s; }
+.kpi-card-eye {
+    position: absolute; top: 5px; right: 5px;
+    font-size: 0.6rem; color: #6c757d; opacity: 0;
+    transition: opacity .15s; pointer-events: none;
+    background: rgba(255,255,255,0.92); border-radius: 3px;
+    padding: 1px 4px; line-height: 1.4;
+}
+.kpi-card[data-card-modal]:hover .kpi-card-eye { opacity: 1; }
+</style>
+
+{# ── Training: vocabulary cheat-sheet (dismissable, no persistence) ──── #}
+{% from "_partials/training_glossary.html" import accounting_glossary %}
+{{ accounting_glossary() }}
+
+{# ── Daily Financial Summary — owner panel ──────────────────────────── #}
+{# Alias the macro to avoid shadowing the context variable of the same name. #}
+{% from "_partials/daily_financial_summary.html" import daily_financial_summary as render_dfs %}
+{{ render_dfs(daily_financial_summary) }}
+
+{# ── Validation alerts ────────────────────────────────────────────────── #}
+{% if kpi_mismatch %}
+<div class="alert alert-danger py-1 px-3 mb-2 d-flex align-items-center gap-2" style="font-size:0.78rem;">
+    <i class="bi bi-exclamation-octagon-fill"></i>
+    <span><strong>Occupancy mismatch:</strong> Stayovers ({{ stayovers }}) + Today CI ({{ today_checkins }}) + Departures ({{ departures_today }}) + Overdue ({{ pending_checkouts|length }}) = {{ stayovers + today_checkins + departures_today + pending_checkouts|length }}, but In-House = {{ occupied }}.</span>
+</div>
+{% endif %}
+
+{# Focus Strip removed — alerts now live in the nav tab row (dashboard.html) #}
+
+{# ── KPI Grid — 31 cards · 4 rows × 8 columns ────────────────────── #}
+<div class="kpi-grid">
+
+{# 1. Total Rooms #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Total Rooms</span><i class="bi bi-building text-muted kpi-icon"></i></div>
+    <div class="kpi-val">{{ total_rooms }}</div>
+    <div class="kpi-subtitle">Hotel capacity</div>
+</div></div>
+
+{# 2. Guests In-House — modal #}
+<div class="card kpi-card border-0 shadow-sm {% if kpi_mismatch %}border-danger border-2{% endif %}" role="button" tabindex="0"
+     data-card-modal="in_house" data-card-title="Guests In-House" data-goto-url="{{ url_for('main.reservations') }}" data-goto-label="In House">
+<span class="kpi-card-eye"><i class="bi bi-eye"></i> preview</span>
+<div class="card-body">
+    <div class="kpi-label-row">
+        <span class="kpi-label">Guests In-House{% if kpi_mismatch %} <i class="bi bi-exclamation-circle-fill text-danger" style="font-size:0.65rem;"></i>{% endif %}</span>
+        <i class="bi bi-house-fill text-danger kpi-icon"></i>
+    </div>
+    <div class="kpi-val text-danger">{{ occupied }}</div>
+    <div class="kpi-subtitle">Active stays</div>
+</div></div>
+
+{# 3. Available Rooms — value computed server-side (occupancy_engine) #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Available Rooms</span><i class="bi bi-door-open-fill text-success kpi-icon"></i></div>
+    <div class="kpi-val text-success">{{ available_rooms }}</div>
+    <div class="kpi-subtitle">Ready to sell</div>
+</div></div>
+
+{# 4. Dirty — modal #}
+<div class="card kpi-card border-0 shadow-sm {% if dirty > 0 %}border-warning border-2{% endif %}" role="button" tabindex="0"
+     data-card-modal="dirty" data-card-title="Dirty Rooms" data-goto-url="{{ url_for('main.housekeeping') }}" data-goto-label="Housekeeping">
+<span class="kpi-card-eye"><i class="bi bi-eye"></i> preview</span>
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Dirty Rooms</span><i class="bi bi-brush-fill text-warning kpi-icon"></i></div>
+    <div class="kpi-val text-warning">{{ dirty }}</div>
+    <div class="kpi-subtitle">Needs cleaning</div>
+</div></div>
+
+{# 5. Out of Order — modal #}
+<div class="card kpi-card border-0 shadow-sm {% if maintenance > 0 %}border-danger border-2{% endif %}" role="button" tabindex="0"
+     data-card-modal="out_of_order" data-card-title="Out of Order Rooms" data-goto-url="{{ url_for('main.rooms') }}" data-goto-label="Rooms">
+<span class="kpi-card-eye"><i class="bi bi-eye"></i> preview</span>
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Out of Order</span><i class="bi bi-tools text-secondary kpi-icon"></i></div>
+    <div class="kpi-val text-secondary">{{ maintenance }}</div>
+    <div class="kpi-subtitle">Unavailable for booking</div>
+</div></div>
+
+{# Row 1 positions 6–7: Expected Arrivals Today, Pending Check-ins #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Expected Arrivals Today</span><i class="bi bi-calendar-check text-info kpi-icon"></i></div>
+    <div class="kpi-val text-info">{{ arrivals_today }}</div>
+    <div class="kpi-subtitle">Expected today</div>
+</div></div>
+
+<div class="card kpi-card border-0 shadow-sm {% if pending_arrivals > 0 %}border-warning border-2{% endif %}" role="button" tabindex="0"
+     data-card-modal="pending_checkins" data-card-title="Pending Check-ins" data-goto-url="{{ url_for('main.reservations') }}" data-goto-label="Front Desk">
+<span class="kpi-card-eye"><i class="bi bi-eye"></i> preview</span>
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Pending Check-ins</span><i class="bi bi-box-arrow-in-right text-warning kpi-icon"></i></div>
+    <div class="kpi-val text-warning">{{ pending_arrivals }}</div>
+    <div class="kpi-subtitle">Yet to arrive</div>
+</div></div>
+
+{# ── Row 2 — Guest Flow ─────────────────────────────────────────── #}
+
+{# Row 2 position 1: Today Check-ins #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Today Check-ins</span><i class="bi bi-box-arrow-in-down-right text-success kpi-icon"></i></div>
+    <div class="kpi-val text-success">{{ today_checkins }}</div>
+    <div class="kpi-subtitle">Checked in today</div>
+</div></div>
+
+{# Row 2 position 2: Stayovers #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Stayovers</span><i class="bi bi-people-fill text-primary kpi-icon"></i></div>
+    <div class="kpi-val">{{ stayovers }}</div>
+    <div class="kpi-subtitle">Continuing stays</div>
+</div></div>
+
+{# Row 2 position 3: Expected Departures #}
+<div class="card kpi-card border-0 shadow-sm" role="button" tabindex="0"
+     data-card-modal="departures" data-card-title="Departures Today" data-goto-url="{{ url_for('main.reservations') }}" data-goto-label="Front Desk">
+<span class="kpi-card-eye"><i class="bi bi-eye"></i> preview</span>
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Expected Departures</span><i class="bi bi-box-arrow-right text-secondary kpi-icon"></i></div>
+    <div class="kpi-val text-secondary">{{ departures_today }}</div>
+    <div class="kpi-subtitle">Guests leaving today</div>
+</div></div>
+
+{# Row 2 position 4: Overstays #}
+<div class="card kpi-card border-0 shadow-sm {% if pending_departures > 0 %}border-danger border-2{% endif %}" role="button" tabindex="0"
+     data-card-modal="pending_checkouts" data-card-title="Overstays" data-goto-url="{{ url_for('main.reservations') }}" data-goto-label="Front Desk">
+<span class="kpi-card-eye"><i class="bi bi-eye"></i> preview</span>
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Overstays</span><i class="bi bi-exclamation-triangle-fill {% if pending_departures > 0 %}text-danger{% else %}text-muted{% endif %} kpi-icon"></i></div>
+    <div class="kpi-val {% if pending_departures > 0 %}text-danger{% else %}text-muted{% endif %}">{{ pending_departures }}</div>
+    <div class="kpi-subtitle">Past departure date</div>
+</div></div>
+
+{# Row 2 position 5: Checked Outs Today #}
+<div class="card kpi-card border-0 shadow-sm" role="button" tabindex="0"
+     data-card-modal="checked_outs_today" data-card-title="Checked Outs Today" data-goto-url="{{ url_for('main.reservations') }}" data-goto-label="Front Desk">
+<span class="kpi-card-eye"><i class="bi bi-eye"></i> preview</span>
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Checked Outs Today</span><i class="bi bi-check2-square text-success kpi-icon"></i></div>
+    <div class="kpi-val text-success">{{ checked_out_today }}</div>
+    <div class="kpi-subtitle">Completed checkouts today</div>
+</div></div>
+
+{# Row 2 position 6: Hourly Checked-ins — hourly bookings currently in-house #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Hourly Checked-ins</span><i class="bi bi-clock-history text-info kpi-icon"></i></div>
+    <div class="kpi-val text-info">{{ hourly_checkins|default(0) }}</div>
+    <div class="kpi-subtitle">In-house now</div>
+</div></div>
+
+{# Row 2 position 7: Hourly Rooms Today — hourly check-ins across the day #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Hourly Rooms Today</span><i class="bi bi-alarm text-info kpi-icon"></i></div>
+    <div class="kpi-val text-info">{{ hourly_rooms_today|default(0) }}</div>
+    <div class="kpi-subtitle">Checked in today (hourly)</div>
+</div></div>
+
+{# ── Row 3 — Source mix & performance ───────────────────────────── #}
+
+{# Row 3 position 1: OTA Rooms (Today) #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">OTA Rooms (Today)</span><i class="bi bi-globe text-info kpi-icon"></i></div>
+    <div class="kpi-val text-info">{{ ota_rooms_today|default(0) }}</div>
+    <div class="kpi-subtitle">Checked in via OTA</div>
+</div></div>
+
+{# Row 3 position 2: Walk-in (Today) #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Walk-in (Today)</span><i class="bi bi-person-walking text-success kpi-icon"></i></div>
+    <div class="kpi-val text-success">{{ walkin_rooms_today|default(0) }}</div>
+    <div class="kpi-subtitle">Walked in today</div>
+</div></div>
+
+{# Row 3 position 3: Calling (Today) #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Calling (Today)</span><i class="bi bi-telephone text-secondary kpi-icon"></i></div>
+    <div class="kpi-val text-secondary">{{ calling_rooms_today|default(0) }}</div>
+    <div class="kpi-subtitle">Phone reservations today</div>
+</div></div>
+
+{# Row 3 position 4: Occupancy — defaults to LAST CLOSED scope.
+   Settled value (from NightAuditLog.occupancy_count) is the headline;
+   today's live occupancy is the secondary line, explicitly labelled. #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Occupancy</span><i class="bi bi-pie-chart-fill text-primary kpi-icon"></i></div>
+    {% if dashboard_scopes and dashboard_scopes.has_any_closed_audit and settled_occupancy is not none %}
+        <div class="kpi-val text-primary">
+            {{ settled_occ_pct }}%
+            <span class="scope-tag closed">{{ dashboard_scopes.last_closed_human }} · Closed</span>
+        </div>
+        <div class="kpi-subtitle">{{ settled_occupancy }}/{{ sellable_rooms }} rooms occupied · business date</div>
+        <div class="kpi-secondary-line">
+            Live: {{ occupancy_pct }}%
+            <span class="scope-tag live">{{ dashboard_scopes.today_real_human }} · Live (Unsettled)</span>
+        </div>
+    {% else %}
+        <div class="kpi-val text-primary">
+            {{ occupancy_pct }}%
+            <span class="scope-tag live">{{ dashboard_scopes.today_real_human if dashboard_scopes else 'Today' }} · Live</span>
+            {% if occ_change_pts > 0 %}<span class="kpi-trend up"><i class="bi bi-arrow-up-short"></i>{{ occ_change_pts }}pt</span>
+            {% elif occ_change_pts < 0 %}<span class="kpi-trend down"><i class="bi bi-arrow-down-short"></i>{{ (occ_change_pts * -1)|round(1) }}pt</span>{% endif %}
+        </div>
+        <div class="kpi-subtitle">{{ occupied }}/{{ sellable_rooms|default(total_rooms) }} sellable · No settled audit yet</div>
+    {% endif %}
+</div></div>
+
+{# Row 3 position 5: ARR — settled (derived from NightAuditLog accrual /
+   occupancy) is headline; live ARR sits below as the secondary line. #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">ADR</span><i class="bi bi-cash-coin text-info kpi-icon"></i></div>
+    {% if dashboard_scopes and dashboard_scopes.has_any_closed_audit and settled_adr %}
+        <div class="kpi-val">
+            ₹{{ "{:,.0f}".format(settled_adr) }}
+            <span class="scope-tag closed">{{ dashboard_scopes.last_closed_human }} · Closed</span>
+        </div>
+        <div class="kpi-subtitle">Settled avg room rate</div>
+        <div class="kpi-secondary-line">
+            Live: {% if occupied > 0 %}₹{{ "{:,.0f}".format(arr) }}{% else %}—{% endif %}
+            <span class="scope-tag live">Live (Unsettled)</span>
+        </div>
+    {% else %}
+        {% if occupied > 0 %}
+        <div class="kpi-val">
+            ₹{{ "{:,.0f}".format(arr) }}
+            <span class="scope-tag live">Live</span>
+        </div>
+        {% else %}
+        <div class="kpi-val text-muted">—</div>
+        {% endif %}
+        <div class="kpi-subtitle">Avg room rate · No settled audit</div>
+    {% endif %}
+</div></div>
+
+{# Row 3 position 6: RevPAR — settled from NightAuditLog snapshot (single
+   source of truth); live RevPAR (rate × occ_pct) shown below. #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">RevPAR</span><i class="bi bi-graph-up-arrow text-info kpi-icon"></i></div>
+    {% if dashboard_scopes and dashboard_scopes.has_any_closed_audit and settled_revpar %}
+        <div class="kpi-val">
+            ₹{{ "{:,.0f}".format(settled_revpar) }}
+            <span class="scope-tag closed">{{ dashboard_scopes.last_closed_human }} · Closed</span>
+        </div>
+        <div class="kpi-subtitle">Settled per available room</div>
+        <div class="kpi-secondary-line">
+            Live: {% if occupied > 0 %}₹{{ "{:,.0f}".format(revpar) }}{% else %}—{% endif %}
+            <span class="scope-tag live">Live (Unsettled)</span>
+        </div>
+    {% else %}
+        {% if occupied > 0 %}
+        <div class="kpi-val">
+            ₹{{ "{:,.0f}".format(revpar) }}
+            <span class="scope-tag live">Live</span>
+        </div>
+        {% else %}
+        <div class="kpi-val text-muted">—</div>
+        {% endif %}
+        <div class="kpi-subtitle">Per available room · No settled audit</div>
+    {% endif %}
+</div></div>
+
+{# Row 3 position 7: GOPPAR — (today_revenue * (1 - cost_ratio)) / available_rooms #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">GOPPAR</span><i class="bi bi-trophy-fill text-primary kpi-icon"></i></div>
+    <div class="kpi-val text-primary">{{ "{:,.0f}".format(goppar or 0) }}</div>
+    <div class="kpi-subtitle">{% if goppar_is_proxy %}Proxy · today / room{% else %}GOP / room{% endif %}</div>
+</div></div>
+
+{# ── Row 4 — Stay & Revenue mix ──────────────────────────────────── #}
+
+{# Row 4 position 1: ALOS #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">ALOS</span><i class="bi bi-calendar-range text-primary kpi-icon"></i></div>
+    <div class="kpi-val">{{ "{:.1f}".format(alos) }}</div>
+    <div class="kpi-subtitle">Avg length of stay</div>
+</div></div>
+
+{# ── Accounting-basis explainer — spans the full kpi-grid row above
+     the revenue/settlement tiles so staff understand why "Cash In"
+     and "Direct Revenue" can show different numbers. #}
+<div class="acct-basis-note">
+    <span class="lbl">Note</span>
+    <strong>Revenue is recognised per night, not when payment is received.</strong>
+    Tiles below: <strong>Revenue</strong> = earned from stay (accrual basis,
+    rate × nights) — sourced from the closed Night Audit. <strong>Settlement</strong>
+    (Cash In, UPI In, Cards In) = money received today (cash basis). They
+    are independent measures and routinely differ.
+</div>
+
+{# Row 4 position 2A: Cash Collected Today — direct payment cash basis
+   v2.2.11 semantic split: this replaces the prior "Total Settled Today"
+   tile which combined direct cash with OTA receivable postings into one
+   hybrid value. Combining them double-counted OTA receivable across this
+   tile AND the dedicated OTA Receivable tiles. The two components are
+   now surfaced as separate cards (this one + OTA Posted Today below). #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row">
+        <span class="kpi-label">
+            Cash Collected Today
+            <i class="bi bi-info-circle kpi-info"
+               title="Total cash collected today across all direct payment modes (Cash + UPI + Card). Cash basis — money in the hotel's hands. Does NOT include OTA receivable postings (see OTA Posted Today tile)."></i>
+        </span>
+        <i class="bi bi-cash-stack text-success kpi-icon"></i>
+    </div>
+    <div class="kpi-val text-success" style="font-size:1.05rem;">
+        ₹{{ "{:,.0f}".format(cash_collected_today|default(0)) }}
+        <span class="scope-tag live">Cash basis</span>
+    </div>
+    <div class="kpi-subtitle">Cash + UPI + Card · realised cash</div>
+</div></div>
+
+{# Row 4 position 2B: OTA Posted Today — OTA receivable postings (NOT cash)
+   Second half of the v2.2.11 semantic split. This is revenue settled to
+   a receivable head — money the OTA owes the hotel, not cash already
+   in hand. Aggregated lifetime OTA outstanding appears in the alert
+   pill strip at the top of the dashboard. #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row">
+        <span class="kpi-label">
+            OTA Posted Today
+            <i class="bi bi-info-circle kpi-info"
+               title="OTA receivable postings recorded today (MMT Paid, Booking.com Paid, etc.). Revenue settled to a receivable head — money the OTA owes the hotel, not cash already received."></i>
+        </span>
+        <i class="bi bi-globe text-warning kpi-icon"></i>
+    </div>
+    <div class="kpi-val text-warning" style="font-size:1.05rem;">
+        ₹{{ "{:,.0f}".format(ota_posted_today|default(0)) }}
+        <span class="scope-tag live">Receivable</span>
+    </div>
+    <div class="kpi-subtitle">OTA receivable postings · not yet collected</div>
+</div></div>
+
+{# Row 4 position 3: Direct Revenue — REVENUE SOURCING RULE:
+     Settled headline → NightAuditLog.total_revenue (snapshot, exact match)
+     Live secondary   → CHARGES (rate × nights + extras), not payments
+   Payments are settlement, not revenue. The previous "Live" line summed
+   the Payment table — that's why ₹1 / ₹2 test entries were inflating
+   the dashboard. The live line now reads from `live_today_revenue`
+   which is computed from charges via compute_live_today_charges(). #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row">
+        <span class="kpi-label">
+            Direct Revenue
+            <i class="bi bi-info-circle kpi-info"
+               title="Revenue = earned from stay (accrual basis). Headline value is the Night Audit snapshot (frozen at audit close). The 'Live' line below is today's earned revenue from charges (rate × nights + extras) and may shift until tonight's audit closes. NOT the same as money received — see Cash In / UPI In tiles for settlement."></i>
+        </span>
+        <i class="bi bi-currency-rupee text-success kpi-icon"></i>
+    </div>
+    {% if dashboard_scopes and dashboard_scopes.has_any_closed_audit and settled_revenue is not none %}
+        <div class="kpi-val text-success" style="font-size:1.05rem;">
+            ₹{{ "{:,.0f}".format(settled_revenue) }}
+            <span class="scope-tag closed">{{ dashboard_scopes.last_closed_human }} · Closed</span>
+        </div>
+        <div class="kpi-subtitle" title="From NightAuditLog.total_revenue — frozen at audit close">
+            Settled (audit snapshot)
+        </div>
+        <div class="kpi-secondary-line">
+            Live: ₹{{ "{:,.0f}".format(live_today_revenue or 0) }}
+            <span class="scope-tag live">{{ dashboard_scopes.today_real_human }} · Live (Unsettled)</span>
+        </div>
+    {% else %}
+        <div class="kpi-val text-success" style="font-size:1.05rem;">
+            ₹{{ "{:,.0f}".format(live_today_revenue or 0) }}
+            <span class="scope-tag live">Live</span>
+        </div>
+        <div class="kpi-subtitle">Charges-based (rate × nights + extras) · No settled audit</div>
+    {% endif %}
+</div></div>
+
+{# Row 4 positions 4-6: SETTLEMENT breakdown — what came in, by mode.
+   These are PAYMENTS today (cash, UPI, card), NOT revenue. Renamed
+   from "Cash Revenue" / "UPI Revenue" / "Cards Revenue" so the
+   dashboard never conflates settlement with revenue earned. #}
+
+{# Row 4 position 4: Cash Settlement #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row">
+        <span class="kpi-label">
+            Cash In
+            <i class="bi bi-info-circle kpi-info"
+               title="Settlement = money received (cash basis). Sum of cash payments collected today across all reservations. NOT the same as revenue earned today — a guest paying advance for a 3-night stay shows full amount here today, but revenue is recognised over the three nights of stay."></i>
+        </span>
+        <i class="bi bi-cash text-success kpi-icon"></i>
+    </div>
+    <div class="kpi-val text-success" style="font-size:1.05rem;">
+        ₹{{ "{:,.0f}".format(cash_only_revenue|default(0)) }}
+        <span class="scope-tag live">Settlement</span>
+    </div>
+    <div class="kpi-subtitle">Cash payments collected today</div>
+</div></div>
+
+{# Row 4 position 5: UPI Settlement #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row">
+        <span class="kpi-label">
+            UPI In
+            <i class="bi bi-info-circle kpi-info"
+               title="Settlement = money received (cash basis). Sum of UPI payments collected today. Independent from earned revenue — see Direct Revenue tile for accrual figure."></i>
+        </span>
+        <i class="bi bi-phone text-info kpi-icon"></i>
+    </div>
+    <div class="kpi-val text-info" style="font-size:1.05rem;">
+        ₹{{ "{:,.0f}".format(upi_revenue|default(0)) }}
+        <span class="scope-tag live">Settlement</span>
+    </div>
+    <div class="kpi-subtitle">UPI payments collected today</div>
+</div></div>
+
+{# Row 4 position 6: Cards Settlement #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row">
+        <span class="kpi-label">
+            Cards In
+            <i class="bi bi-info-circle kpi-info"
+               title="Settlement = money received (cash basis). Sum of credit/debit card payments collected today. Independent from earned revenue."></i>
+        </span>
+        <i class="bi bi-credit-card text-primary kpi-icon"></i>
+    </div>
+    <div class="kpi-val text-primary" style="font-size:1.05rem;">
+        ₹{{ "{:,.0f}".format(card_revenue|default(0)) }}
+        <span class="scope-tag live">Settlement</span>
+    </div>
+    <div class="kpi-subtitle">Card payments collected today</div>
+</div></div>
+
+{# Row 4 position 7: Calling-source settlement (payments from phone bookings) #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row">
+        <span class="kpi-label">
+            Calling Collections
+            <i class="bi bi-info-circle kpi-info"
+               title="Settlement = money received (cash basis). Sum of payments today against reservations whose source is 'Calling' (phone bookings). Settlement breakdown by booking source, not revenue."></i>
+        </span>
+        <i class="bi bi-telephone text-secondary kpi-icon"></i>
+    </div>
+    <div class="kpi-val text-secondary" style="font-size:1.05rem;">
+        ₹{{ "{:,.0f}".format(calling_revenue|default(0)) }}
+        <span class="scope-tag live">Settlement</span>
+    </div>
+    <div class="kpi-subtitle">Payments from phone bookings today</div>
+</div></div>
+
+{# Row 5 onwards — user will reorder in subsequent messages #}
+
+{# Pending Payments — modal #}
+<div class="card kpi-card border-0 shadow-sm {% if pending_payments > 0 %}border-danger border-2{% endif %}" role="button" tabindex="0"
+     data-card-modal="pending_payments" data-card-title="Pending Payments" data-goto-url="{{ url_for('main.reservations') }}" data-goto-label="Front Desk">
+<span class="kpi-card-eye"><i class="bi bi-eye"></i> preview</span>
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Pending Payments</span><i class="bi bi-exclamation-circle {% if pending_payments > 0 %}text-danger{% else %}text-muted{% endif %} kpi-icon"></i></div>
+    <div class="kpi-val {% if pending_payments > 0 %}text-danger{% endif %}" style="font-size:1.05rem;">₹{{ "{:,.0f}".format(pending_payments) }}</div>
+    <div class="kpi-subtitle">Unsettled balances</div>
+</div></div>
+
+{# Receivable (Individual Credit) — guests checked out with outstanding balance (NOT revenue) #}
+{% set _credit_total = credit_outstanding_total|default(0)|float %}
+{% set _credit_count = credit_outstanding_count|default(0)|int %}
+<a class="card kpi-card border-0 shadow-sm {% if _credit_total > 0 %}border-warning border-2{% endif %}"
+   href="{{ url_for('reports.credit_ledger') if _credit_count > 0 else '#' }}"
+   style="text-decoration:none;">
+<div class="card-body">
+    <div class="kpi-label-row">
+        <span class="kpi-label">
+            Receivable (Individual Credit)
+            <i class="bi bi-info-circle kpi-info"
+               title="Guest receivable — post-checkout debt from Manager-approved credit checkouts. Receivable ≠ revenue. Drops as later payments are recorded via Settle Credit."></i>
+        </span>
+        <i class="bi bi-person-badge {% if _credit_total > 0 %}text-warning{% else %}text-muted{% endif %} kpi-icon"></i>
+    </div>
+    <div class="kpi-val {% if _credit_total > 0 %}text-warning{% endif %}" style="font-size:1.05rem;">
+        ₹{{ "{:,.0f}".format(_credit_total) }}
+        <span class="scope-tag none">Receivable</span>
+    </div>
+    <div class="kpi-subtitle">{{ _credit_count }} guest{{ 's' if _credit_count != 1 }} on individual credit</div>
+</div></a>
+
+{# OTA Receivable — Today #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label" title="OTA Receivable Today">OTA Receivable Today</span><i class="bi bi-globe text-info kpi-icon"></i></div>
+    <div class="kpi-val text-info" style="font-size:1.05rem;">₹{{ "{:,.0f}".format(ota_receivable_today|default(0)) }}</div>
+    <div class="kpi-subtitle">Posted today (not cash)</div>
+</div></div>
+
+{# OTA Receivable — Month-to-Date (drill-down to receivables report) #}
+{% if current_user.role in ('Admin', 'Manager', 'Accountant') %}
+<a class="card kpi-card border-0 shadow-sm"
+   href="{{ url_for('reports.ota_receivables') }}" style="text-decoration:none;">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label" title="OTA Receivable MTD">OTA Receivable MTD</span><i class="bi bi-calendar-range text-info kpi-icon"></i></div>
+    <div class="kpi-val text-info" style="font-size:1.05rem;">₹{{ "{:,.0f}".format(ota_receivable_mtd|default(0)) }}</div>
+    <div class="kpi-subtitle">This month, posted to OTA heads</div>
+</div></a>
+{% endif %}
+
+{# Yesterday Revenue #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Yesterday Rev.</span><i class="bi bi-calendar-check text-success kpi-icon"></i></div>
+    <div class="kpi-val text-success" style="font-size:1.05rem;">₹{{ "{:,.0f}".format(yesterday_revenue) }}</div>
+    <div class="kpi-subtitle">Previous day total</div>
+</div></div>
+
+{# MTD Revenue #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">MTD Revenue</span><i class="bi bi-graph-up text-success kpi-icon"></i></div>
+    <div class="kpi-val text-success" style="font-size:1.05rem;">₹{{ "{:,.0f}".format(mtd_revenue) }}</div>
+    <div class="kpi-subtitle">Month to date</div>
+</div></div>
+
+{# Last Month Revenue #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Last Month Revenue</span><i class="bi bi-calendar3 text-secondary kpi-icon"></i></div>
+    <div class="kpi-val" style="font-size:1.05rem;">₹{{ "{:,.0f}".format(last_month_revenue) }}</div>
+    <div class="kpi-subtitle">Previous month</div>
+</div></div>
+
+{# Revenue Leakage — Admin/Manager only #}
+{% if current_user.role in ('Admin', 'Manager') %}
+<div class="card kpi-card border-0 shadow-sm {% if leakage_amount > 0 %}border-danger border-2{% endif %}">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Revenue Leakage</span><i class="bi bi-arrow-down-circle-fill text-danger kpi-icon"></i></div>
+    <div class="kpi-val text-danger" style="font-size:1rem;">−₹{{ "{:,.0f}".format(leakage_amount) }}</div>
+    <div class="kpi-subtitle">{{ leakage_rooms }} room{{ 's' if leakage_rooms != 1 }} · {{ leakage_pct }}% of today rev</div>
+</div></div>
+
+{# Upsell Revenue — Admin/Manager only #}
+<div class="card kpi-card border-0 shadow-sm {% if upsell_amount > 0 %}border-success border-2{% endif %}">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Upsell Revenue</span><i class="bi bi-arrow-up-circle-fill text-success kpi-icon"></i></div>
+    <div class="kpi-val text-success" style="font-size:1rem;">+₹{{ "{:,.0f}".format(upsell_amount) }}</div>
+    <div class="kpi-subtitle">{{ upsell_rooms }} room{{ 's' if upsell_rooms != 1 }} · {{ upsell_pct }}% of today rev</div>
+</div></div>
+{% else %}
+<div class="card kpi-card border-0 shadow-sm kpi-locked">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Revenue Leakage</span><i class="bi bi-lock-fill text-muted kpi-icon"></i></div>
+    <div class="kpi-val text-muted" style="font-size:1rem;"><i class="bi bi-shield-lock"></i> Manager+</div>
+</div></div>
+<div class="card kpi-card border-0 shadow-sm kpi-locked">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Upsell Revenue</span><i class="bi bi-lock-fill text-muted kpi-icon"></i></div>
+    <div class="kpi-val text-muted" style="font-size:1rem;"><i class="bi bi-shield-lock"></i> Manager+</div>
+</div></div>
+{% endif %}
+
+{# 26. Loyal Guests — modal #}
+<div class="card kpi-card border-0 shadow-sm" role="button" tabindex="0"
+     data-card-modal="loyal_guests" data-card-title="Loyal Guests" data-goto-url="{{ url_for('main.guest_database') }}" data-goto-label="Guest Database">
+<span class="kpi-card-eye"><i class="bi bi-eye"></i> preview</span>
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Loyal Guests</span><i class="bi bi-star-fill text-primary kpi-icon"></i></div>
+    <div class="kpi-val text-primary">{{ loyal_customers }}</div>
+    <div class="kpi-subtitle">Repeat visitors</div>
+</div></div>
+
+
+{# Row 4 — Intelligence #}
+
+{# 27. Total Profiles — modal #}
+<div class="card kpi-card border-0 shadow-sm" role="button" tabindex="0"
+     data-card-modal="total_profiles" data-card-title="Guest Profiles" data-goto-url="{{ url_for('main.guest_database') }}" data-goto-label="Guest Database">
+<span class="kpi-card-eye"><i class="bi bi-eye"></i> preview</span>
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Total Profiles</span><i class="bi bi-people-fill text-primary kpi-icon"></i></div>
+    <div class="kpi-val">{{ total_folios }}</div>
+    <div class="kpi-subtitle">Guest database</div>
+</div></div>
+
+{# 28. KYC Complete #}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">KYC Complete</span><i class="bi bi-person-check-fill text-success kpi-icon"></i></div>
+    <div class="kpi-val text-success">{{ complete_folios }}</div>
+    <div class="kpi-subtitle">Verified guests</div>
+</div></div>
+
+{# 29. KYC Incomplete — modal #}
+<div class="card kpi-card border-0 shadow-sm {% if incomplete_folios > 0 %}border-warning border-2{% endif %}" role="button" tabindex="0"
+     data-card-modal="kyc_pending" data-card-title="KYC Pending" data-goto-url="{{ url_for('main.guest_database') }}" data-goto-label="Guest Database">
+<span class="kpi-card-eye"><i class="bi bi-eye"></i> preview</span>
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">KYC Pending</span><i class="bi bi-person-exclamation text-warning kpi-icon"></i></div>
+    <div class="kpi-val text-warning">{{ incomplete_folios }}</div>
+    <div class="kpi-subtitle">Missing documents</div>
+</div></div>
+
+{# Revenue Target — role-gated #}
+{% if current_user.role in ('Admin', 'Manager') %}
+{% if revenue_target_configured %}
+{% set rev_color = 'success' if rev_achievement_pct >= 100 else ('warning' if rev_achievement_pct >= 70 else 'danger') %}
+<div class="card kpi-card border-0 shadow-sm" style="border-left:3px solid var(--bs-{{ rev_color }})!important;">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Revenue Target</span><i class="bi bi-bullseye text-{{ rev_color }} kpi-icon"></i></div>
+    <div class="kpi-target-vals text-{{ rev_color }}">₹{{ "{:,.0f}".format(mtd_revenue) }}<span class="text-muted fw-normal" style="font-size:0.6rem;"> /₹{{ "{:,.0f}".format(monthly_revenue_target) }}</span></div>
+    <div class="kpi-target-bottom">
+        <div class="progress flex-grow-1" style="height:3px;"><div class="progress-bar bg-{{ rev_color }}" style="width:{{ [rev_achievement_pct, 100]|min }}%"></div></div>
+        <span class="kpi-target-pct text-{{ rev_color }}">{{ rev_achievement_pct }}%</span>
+    </div>
+</div></div>
+{% else %}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Revenue Target</span><i class="bi bi-bullseye text-muted kpi-icon"></i></div>
+    <div class="kpi-val text-muted">—</div>
+    <div class="kpi-subtitle">Not configured</div>
+</div></div>
+{% endif %}
+
+{# 34. Occupancy Target — role-gated #}
+{% if occupancy_target_configured %}
+{% set occ_color = 'success' if occ_achievement_pct >= 100 else ('warning' if occ_achievement_pct >= 70 else 'danger') %}
+<div class="card kpi-card border-0 shadow-sm" style="border-left:3px solid var(--bs-{{ occ_color }})!important;">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Occupancy Target</span><i class="bi bi-speedometer2 text-{{ occ_color }} kpi-icon"></i></div>
+    <div class="kpi-target-vals text-{{ occ_color }}">{{ occupancy_pct }}%<span class="text-muted fw-normal" style="font-size:0.6rem;"> /{{ monthly_occupancy_target|int }}%</span></div>
+    <div class="kpi-target-bottom">
+        <div class="progress flex-grow-1" style="height:3px;"><div class="progress-bar bg-{{ occ_color }}" style="width:{{ [occ_achievement_pct, 100]|min }}%"></div></div>
+        <span class="kpi-target-pct text-{{ occ_color }}">{{ occ_achievement_pct }}%</span>
+    </div>
+</div></div>
+{% else %}
+<div class="card kpi-card border-0 shadow-sm">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Occupancy Target</span><i class="bi bi-speedometer2 text-muted kpi-icon"></i></div>
+    <div class="kpi-val text-muted">—</div>
+    <div class="kpi-subtitle">Not configured</div>
+</div></div>
+{% endif %}
+
+{% else %}{# FrontDesk — locked cards #}
+<div class="card kpi-card border-0 shadow-sm kpi-locked">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Revenue Target</span><i class="bi bi-lock-fill text-muted kpi-icon"></i></div>
+    <div class="kpi-val text-muted" style="font-size:1rem;"><i class="bi bi-shield-lock"></i> Manager+</div>
+</div></div>
+<div class="card kpi-card border-0 shadow-sm kpi-locked">
+<div class="card-body">
+    <div class="kpi-label-row"><span class="kpi-label">Occupancy Target</span><i class="bi bi-lock-fill text-muted kpi-icon"></i></div>
+    <div class="kpi-val text-muted" style="font-size:1rem;"><i class="bi bi-shield-lock"></i> Manager+</div>
+</div></div>
+{% endif %}
+
+</div>{# /kpi-grid #}
+
+{# ══════════════════════════════════════════════════════════════════════
+   INTELLIGENCE PANEL  (role-gated: Admin + Manager)
+══════════════════════════════════════════════════════════════════════ #}
+{% if current_user.role in ('Admin', 'Manager') %}
+<div class="intel-panel">
+
+    {# — Occupancy Forecast (7 days) — #}
+    <div class="intel-card">
+        <div class="intel-title"><i class="bi bi-calendar-week text-primary"></i>7-Day Occupancy Forecast</div>
+        <div class="fc-wrap">
+            {% for day in forecast_days %}
+            {% set bar_color = '#198754' if day.pct >= 80 else ('#fd7e14' if day.pct >= 60 else '#0dcaf0') %}
+            <div class="fc-col">
+                <span class="fc-pct" style="color:{{ bar_color }}">{{ day.pct }}%</span>
+                <div class="fc-bar-track">
+                    <div class="fc-bar-fill" style="height:{{ [day.pct, 100]|min }}%;background:{{ bar_color }};"></div>
+                </div>
+                <span class="fc-day">{{ day.label }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="mt-2" style="font-size:0.62rem;color:#9ca3af;">Based on reserved + confirmed + in-house bookings</div>
+    </div>
+
+    {# — Revenue Risk Alerts — #}
+    <div class="intel-card">
+        <div class="intel-title"><i class="bi bi-exclamation-triangle text-warning"></i>Revenue Risk</div>
+        {% if balance_due_count > 0 %}
+        <div class="intel-row">
+            <i class="bi bi-currency-rupee intel-row-icon text-danger"></i>
+            <div><strong>{{ balance_due_count }}</strong> in-house guest{{ 's' if balance_due_count > 1 else '' }} with outstanding balance<br>
+            <span style="color:#6c757d;">₹{{ "{:,.0f}".format(pending_payments) }} total pending</span></div>
+        </div>
+        {% endif %}
+        {% if overdue_count > 0 %}
+        <div class="intel-row">
+            <i class="bi bi-clock-history intel-row-icon text-danger"></i>
+            <div><strong>{{ overdue_count }}</strong> overdue checkout{{ 's' if overdue_count > 1 else '' }}<br>
+            <span style="color:#6c757d;">Rooms unavailable for new arrivals</span></div>
+        </div>
+        {% endif %}
+        {% if source_mismatch %}
+        <div class="intel-row">
+            <i class="bi bi-diagram-3 intel-row-icon text-warning"></i>
+            <div><strong>Source mismatch</strong> — OTA+Walk-in+Calling ≠ Today Check-ins<br>
+            <span style="color:#6c757d;">Booking source data may be incomplete</span></div>
+        </div>
+        {% endif %}
+        {% if revenue_target_configured and rev_achievement_pct < 100 %}
+        <div class="intel-row">
+            <i class="bi bi-graph-down intel-row-icon text-warning"></i>
+            <div>MTD revenue at <strong>{{ rev_achievement_pct }}%</strong> of target<br>
+            <span style="color:#6c757d;">₹{{ "{:,.0f}".format(monthly_revenue_target - mtd_revenue|float) }} gap to target</span></div>
+        </div>
+        {% endif %}
+        {% if balance_due_count == 0 and overdue_count == 0 and not source_mismatch and (not revenue_target_configured or rev_achievement_pct >= 100) %}
+        <div class="intel-row">
+            <i class="bi bi-check-circle-fill intel-row-icon text-success"></i>
+            <div style="color:#065f46;"><strong>No revenue risks detected</strong></div>
+        </div>
+        {% endif %}
+    </div>
+
+    {# — Smart Suggestions — #}
+    <div class="intel-card">
+        <div class="intel-title"><i class="bi bi-lightbulb text-warning"></i>Smart Suggestions</div>
+        {% for s in suggestions %}
+        <div class="intel-row">
+            <i class="bi {{ s.icon }} intel-row-icon text-{{ s.type }}"></i>
+            <div style="color:{% if s.type == 'danger' %}#991b1b{% elif s.type == 'warning' %}#92400e{% elif s.type == 'success' %}#065f46{% else %}#1e40af{% endif %};">{{ s.text }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>{# /intel-panel #}
+
+{# ══════════════════════════════════════════════════════════════════════
+   AI INSIGHTS  (Module 7 — explains WHY + suggests actions, via Gemini)
+   Loaded async so the dashboard never blocks on the LLM call.
+══════════════════════════════════════════════════════════════════════ #}
+<div class="ai-insights" id="aiInsightsPanel" data-endpoint="{{ url_for('ai.api_ai_insights') }}" data-refresh-endpoint="{{ url_for('ai.api_ai_insights_refresh') }}">
+    <div class="ai-insights-head">
+        <div class="ai-insights-title">
+            <i class="bi bi-stars"></i> AI Insights
+        </div>
+        <div class="ai-insights-meta">
+            <span class="ai-source-badge" id="aiInsightsSource">loading…</span>
+            <span id="aiInsightsTime"></span>
+            <button type="button" class="ai-insights-refresh" id="aiInsightsRefresh"
+                    title="Regenerate insights now (bypasses cache)">
+                <i class="bi bi-arrow-clockwise"></i> Refresh
+            </button>
+        </div>
+    </div>
+    <div class="ai-insights-summary" id="aiInsightsSummary">
+        <span class="text-muted">Analysing today's performance…</span>
+    </div>
+    <div class="ai-insights-grid">
+        <div class="ai-insights-col">
+            <div class="ai-insights-col-title">
+                <i class="bi bi-exclamation-circle text-warning"></i> Why these issues?
+            </div>
+            <div id="aiInsightsIssues">
+                <div class="ai-insights-empty">Loading…</div>
+            </div>
+        </div>
+        <div class="ai-insights-col">
+            <div class="ai-insights-col-title">
+                <i class="bi bi-lightning-charge text-success"></i> Suggested actions
+            </div>
+            <div id="aiInsightsActions">
+                <div class="ai-insights-empty">Loading…</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endif %}{# /if Admin|Manager intel-panel #}
+
+{# ── Staff Revenue Control Table — Admin/Manager only ────────────────── #}
+{% if current_user.role in ('Admin', 'Manager') and user_rev_table %}
+<div class="layer-header" style="margin-top:10px;"><i class="bi bi-person-lines-fill"></i>Staff Revenue Control — Today</div>
+<div class="card shadow-sm border-0 mb-2">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-sm table-hover align-middle mb-0" style="font-size:0.78rem;">
+        <thead class="table-dark" style="font-size:0.7rem;letter-spacing:0.03em;">
+          <tr>
+            <th>Staff</th>
+            <th class="text-end">Rooms</th>
+            <th class="text-end text-danger">Leakage</th>
+            <th class="text-end text-success">Upsell</th>
+            <th class="text-end text-warning">Discount</th>
+            <th class="text-end">Net Impact</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in user_rev_table %}
+          {# Color: RED=high leakage, GREEN=highest upsell, ORANGE=discount-heavy #}
+          {% set _row_cls = '' %}
+          {% if u.highest_leakage %}{% set _row_cls = 'table-danger' %}
+          {% elif u.highest_upsell %}{% set _row_cls = 'table-success' %}
+          {% elif u.discount > 0 and u.discount >= u.leakage and u.discount >= u.upsell %}{% set _row_cls = 'table-warning' %}
+          {% endif %}
+          <tr class="{{ _row_cls }}">
+            <td>
+              <strong>{{ u.username }}</strong>
+              {% if u.highest_leakage %}<span class="badge bg-danger ms-1" style="font-size:0.55rem;">Highest Leakage</span>{% endif %}
+              {% if u.highest_upsell %}<span class="badge bg-success ms-1" style="font-size:0.55rem;">Top Upsell</span>{% endif %}
+            </td>
+            <td class="text-end text-muted">{{ u.checkin_rooms }}</td>
+            <td class="text-end {% if u.leakage > 0 %}text-danger fw-semibold{% else %}text-muted{% endif %}">
+              {% if u.leakage > 0 %}−₹{{ "{:,.0f}".format(u.leakage) }}
+                <span class="text-muted fw-normal" style="font-size:0.65rem;">({{ u.leakage_rooms }}r)</span>
+              {% else %}—{% endif %}
+            </td>
+            <td class="text-end {% if u.upsell > 0 %}text-success fw-semibold{% else %}text-muted{% endif %}">
+              {% if u.upsell > 0 %}+₹{{ "{:,.0f}".format(u.upsell) }}
+                <span class="text-muted fw-normal" style="font-size:0.65rem;">({{ u.upsell_rooms }}r)</span>
+              {% else %}—{% endif %}
+            </td>
+            <td class="text-end {% if u.discount > 0 %}text-warning fw-semibold{% else %}text-muted{% endif %}">
+              {% if u.discount > 0 %}−₹{{ "{:,.0f}".format(u.discount) }}
+                <span class="text-muted fw-normal" style="font-size:0.65rem;">({{ u.discount_rooms }}r)</span>
+              {% else %}—{% endif %}
+            </td>
+            <td class="text-end fw-bold {% if u.net_impact < 0 %}text-danger{% elif u.net_impact > 0 %}text-success{% else %}text-muted{% endif %}">
+              {% if u.net_impact > 0 %}+{% endif %}₹{{ "{:,.0f}".format(u.net_impact) }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot class="table-light" style="font-size:0.7rem;">
+          <tr>
+            <td class="fw-semibold">Total ({{ user_rev_table | length }} staff)</td>
+            <td class="text-end fw-semibold">{{ user_rev_table | sum(attribute='checkin_rooms') }}</td>
+            <td class="text-end text-danger fw-semibold">−₹{{ "{:,.0f}".format(user_rev_table | sum(attribute='leakage')) }}</td>
+            <td class="text-end text-success fw-semibold">+₹{{ "{:,.0f}".format(user_rev_table | sum(attribute='upsell')) }}</td>
+            <td class="text-end text-warning fw-semibold">−₹{{ "{:,.0f}".format(user_rev_table | sum(attribute='discount')) }}</td>
+            {% set _total_ni = (user_rev_table | sum(attribute='upsell')) - (user_rev_table | sum(attribute='leakage')) - (user_rev_table | sum(attribute='discount')) %}
+            <td class="text-end fw-bold {% if _total_ni < 0 %}text-danger{% elif _total_ni > 0 %}text-success{% else %}text-muted{% endif %}">
+              {% if _total_ni > 0 %}+{% endif %}₹{{ "{:,.0f}".format(_total_ni) }}
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{# ── Live Revenue Alert Panel — Admin/Manager only ───────────────────── #}
+{% if current_user.role in ('Admin', 'Manager') %}
+<div class="layer-header" style="margin-top:10px;">
+  <i class="bi bi-bell-fill"></i>Live Revenue Alerts
+  {% if alert_counts and alert_counts.total > 0 %}
+  <span class="badge bg-danger ms-1">{{ alert_counts.total }}</span>
+  {% endif %}
+</div>
+<div class="card shadow-sm border-0 mb-2" id="alertPanelCard">
+  <div class="card-body p-2">
+    {# Summary badges #}
+    <div class="d-flex gap-2 flex-wrap mb-2">
+      {% if alert_counts %}
+      <span class="badge bg-danger px-2 py-1">
+        <i class="bi bi-exclamation-circle me-1"></i>HIGH: {{ alert_counts.HIGH }}
+      </span>
+      <span class="badge bg-warning text-dark px-2 py-1">
+        <i class="bi bi-exclamation-triangle me-1"></i>MED: {{ alert_counts.MEDIUM }}
+      </span>
+      <span class="badge bg-secondary px-2 py-1">
+        LOW: {{ alert_counts.LOW }}
+      </span>
+      {% endif %}
+      <button class="btn btn-xs btn-outline-secondary ms-auto" id="btnRefreshAlerts"
+              style="font-size:0.65rem;padding:2px 7px;">
+        <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+      </button>
+    </div>
+    <div id="liveAlertList" style="max-height:220px;overflow-y:auto;">
+      <div class="text-center text-muted small py-3">
+        <span class="spinner-border spinner-border-sm me-1"></span>Loading alerts…
+      </div>
+    </div>
+  </div>
+</div>
+<script nonce="{{ csp_nonce }}">
+(function () {
+  function loadLiveAlerts() {
+    fetch('/api/alerts/live?limit=20')
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        var box = document.getElementById('liveAlertList');
+        if (!box) return;
+        if (!data.alerts || data.alerts.length === 0) {
+          box.innerHTML = '<div class="text-center text-success small py-2"><i class="bi bi-shield-check me-1"></i>No active alerts</div>';
+          return;
+        }
+        var sevCls = {HIGH:'danger', MEDIUM:'warning', LOW:'secondary'};
+        var html = data.alerts.map(function (a) {
+          return '<div class="d-flex align-items-start gap-2 py-1 border-bottom" style="font-size:0.7rem;" data-alert-id="' + a.id + '">'
+            + '<span class="badge bg-' + (sevCls[a.severity] || 'secondary') + ' mt-1 flex-shrink-0">' + a.severity + '</span>'
+            + '<div class="flex-grow-1">'
+            + '<span class="fw-semibold">' + a.alert_type.replace(/_/g, ' ') + '</span>'
+            + '<span class="text-muted ms-1">(' + (a.username || '?') + ')</span>'
+            + '<div class="text-muted">' + a.message + '</div>'
+            + '</div>'
+            + '<div class="text-muted text-nowrap" style="font-size:0.62rem;">' + (a.created_at.split(' ')[1] || '') + '</div>'
+            + '<button class="btn btn-xs btn-outline-success flex-shrink-0 btn-resolve-alert" data-id="' + a.id + '"'
+            + ' style="font-size:0.62rem;padding:1px 5px;"><i class="bi bi-check"></i></button>'
+            + '</div>';
+        }).join('');
+        box.innerHTML = html;
+        // Attach resolve handlers via event delegation (CSP-safe)
+        box.querySelectorAll('.btn-resolve-alert').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var id = this.dataset.id;
+            var row = this.closest('[data-alert-id]');
+            this.disabled = true;
+            fetch('/api/alerts/' + id + '/resolve', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': (document.querySelector('meta[name="csrf-token"]') || {}).content || ''
+              }
+            })
+              .then(function (r) { return r.json(); })
+              .then(function (d) { if (d.success && row) row.remove(); else btn.disabled = false; })
+              .catch(function () { btn.disabled = false; });
+          });
+        });
+      })
+      .catch(function () {
+        var box = document.getElementById('liveAlertList');
+        if (box) box.innerHTML = '<div class="text-center text-danger small py-2"><i class="bi bi-exclamation-circle me-1"></i>Failed to load alerts</div>';
+      });
+  }
+
+  // Refresh button
+  var refreshBtn = document.getElementById('btnRefreshAlerts');
+  if (refreshBtn) refreshBtn.addEventListener('click', loadLiveAlerts);
+
+  // Auto-load — guard against DOMContentLoaded having already fired
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadLiveAlerts);
+  } else {
+    loadLiveAlerts();
+  }
+}());
+</script>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════════
+   REVENUE INTELLIGENCE ENGINE
+══════════════════════════════════════════════════════════════════════ #}
+<div class="layer-header" style="margin-top:10px;"><i class="bi bi-cpu"></i>Revenue Intelligence</div>
+
+<style>
+/* ── RI Signal Cards ─────────────────────────────────────────────────── */
+.ri-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 8px; }
+.ri-grid-2x1 { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-bottom: 8px; }
+@media (max-width: 767px) { .ri-grid-3, .ri-grid-2x1 { grid-template-columns: 1fr; } }
+
+.ri-card {
+    background: #fff; border: 1px solid #e9ecef; border-radius: 10px;
+    padding: 12px 14px; box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    display: flex; flex-direction: column; gap: 6px;
+}
+.ri-card-title {
+    font-size: 0.58rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.1em; color: #9ca3af; display: flex; align-items: center; gap: 5px;
+}
+.ri-signal-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 9px; border-radius: 12px; font-size: 0.7rem; font-weight: 700;
+}
+.ri-signal-badge.success { background:#d1fae5; color:#065f46; }
+.ri-signal-badge.warning { background:#fef3c7; color:#92400e; }
+.ri-signal-badge.danger  { background:#fee2e2; color:#991b1b; }
+.ri-signal-badge.info    { background:#dbeafe; color:#1e40af; }
+.ri-signal-badge.secondary { background:#f3f4f6; color:#374151; }
+
+.ri-main-val { font-size: 1.6rem; font-weight: 800; line-height: 1; }
+.ri-sub      { font-size: 0.7rem; color: #6c757d; line-height: 1.3; }
+.ri-sub strong { color: #374151; }
+
+/* ── Source bars ─────────────────────────────────────────────────────── */
+.src-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+.src-label { font-size: 0.68rem; color: #374151; font-weight: 600; width: 52px; flex-shrink: 0; }
+.src-bar-track { flex: 1; background: #f3f4f6; border-radius: 4px; height: 10px; overflow: hidden; }
+.src-bar-fill  { height: 100%; border-radius: 4px; min-width: 2px; }
+.src-pct { font-size: 0.65rem; font-weight: 700; width: 28px; text-align: right; flex-shrink: 0; }
+
+/* ── Leakage rows ────────────────────────────────────────────────────── */
+.lk-row { display: flex; justify-content: space-between; align-items: center;
+          padding: 4px 0; border-bottom: 1px solid #f3f4f6; font-size: 0.73rem; }
+.lk-row:last-child { border-bottom: none; font-weight: 700; }
+.lk-label { color: #6c757d; }
+.lk-val   { font-weight: 700; }
+
+/* ── Rules ───────────────────────────────────────────────────────────── */
+.ri-rule-row {
+    display: flex; gap: 10px; padding: 7px 0;
+    border-bottom: 1px solid #f3f4f6; align-items: flex-start;
+}
+.ri-rule-row:last-child { border-bottom: none; padding-bottom: 0; }
+.ri-rule-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+.ri-rule-signal {
+    font-size: 0.58rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: #9ca3af; margin-bottom: 1px;
+}
+.ri-rule-title { font-size: 0.74rem; font-weight: 700; color: #111827; line-height: 1.2; }
+.ri-rule-action { font-size: 0.7rem; color: #4b5563; line-height: 1.35; margin-top: 1px; }
+.ri-rule-metric {
+    display: inline-block; margin-top: 3px; padding: 1px 6px; border-radius: 8px;
+    font-size: 0.62rem; font-weight: 600; background: #f3f4f6; color: #6b7280;
+}
+
+/* ── Forecast mini-panel ─────────────────────────────────────────────── */
+.fc-mini-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; border-bottom: 1px solid #f3f4f6; }
+.fc-mini-row:last-child { border-bottom: none; }
+.fc-mini-label { font-size: 0.68rem; color: #374151; font-weight: 600; width: 68px; flex-shrink: 0; }
+.fc-mini-bar-track { flex: 1; background: #f3f4f6; border-radius: 4px; height: 12px; overflow: hidden; }
+.fc-mini-bar-fill  { height: 100%; border-radius: 4px; min-width: 2px; }
+.fc-mini-pct { font-size: 0.68rem; font-weight: 700; width: 30px; text-align: right; flex-shrink: 0; }
+.fc-mini-badge { font-size: 0.6rem; font-weight: 700; padding: 1px 5px; border-radius: 8px; flex-shrink: 0; }
+</style>
+
+{# ── Row 1: 3 Signal Cards ─────────────────────────────────────────────── #}
+<div class="ri-grid-3">
+
+    {# Demand Signal #}
+    <div class="ri-card" style="border-left: 4px solid var(--bs-{{ demand_color }});">
+        <div class="ri-card-title"><i class="bi bi-activity text-{{ demand_color }}"></i>Demand Signal</div>
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="ri-main-val text-{{ demand_color }}">{{ occupancy_pct }}%</div>
+            <span class="ri-signal-badge {{ demand_color }}">
+                {% if demand_signal == 'no_target' %}<i class="bi bi-dash"></i>
+                {% else %}<i class="bi bi-{{ 'arrow-up' if demand_gap_pts > 0 else ('arrow-down' if demand_gap_pts < 0 else 'dash') }}-short"></i>
+                {% endif %}
+                {{ demand_label }}
+            </span>
+        </div>
+        <div class="ri-sub">
+            {% if occupancy_target_configured %}
+                <strong>Target:</strong> {{ monthly_occupancy_target|int }}%
+                &nbsp;&bull;&nbsp;
+                {% if demand_gap_pts > 0 %}
+                    <span class="text-success fw-semibold">+{{ demand_gap_pts }}pt above target</span>
+                {% elif demand_gap_pts < 0 %}
+                    <span class="text-danger fw-semibold">{{ demand_gap_pts }}pt below target</span>
+                {% else %}
+                    <span class="text-secondary">At target</span>
+                {% endif %}
+            {% else %}
+                <span class="text-muted">Configure occupancy target in Settings</span>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Pricing Signal #}
+    <div class="ri-card" style="border-left: 4px solid var(--bs-{{ pricing_color }});">
+        <div class="ri-card-title"><i class="bi bi-tags text-{{ pricing_color }}"></i>Pricing Signal</div>
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="ri-main-val">{% if occupied > 0 %}₹{{ "{:,.0f}".format(arr) }}{% else %}<span class="text-muted" style="font-size:1rem;">—</span>{% endif %}</div>
+            <span class="ri-signal-badge {{ pricing_color }}">
+                {% if pricing_pct_diff > 0 %}<i class="bi bi-arrow-up-short"></i>+{{ pricing_pct_diff }}%
+                {% elif pricing_pct_diff < 0 %}<i class="bi bi-arrow-down-short"></i>{{ pricing_pct_diff }}%
+                {% else %}<i class="bi bi-dash"></i>
+                {% endif %}
+                {{ pricing_label }}
+            </span>
+        </div>
+        <div class="ri-sub">
+            {% if occupied > 0 %}
+            <strong>Current ARR:</strong> ₹{{ "{:,.0f}".format(arr) }}
+            &nbsp;&bull;&nbsp;
+            {% if recommended_rate > 0 and pricing_signal != 'hold' %}
+                <strong>Suggested:</strong>
+                <span class="text-{{ pricing_color }} fw-semibold">₹{{ "{:,.0f}".format(recommended_rate) }}</span>
+            {% else %}
+                <span class="text-secondary">Hold current rate</span>
+            {% endif %}
+            {% else %}
+            <span class="text-muted">No active stays — pricing signal unavailable</span>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Inventory Signal #}
+    <div class="ri-card" style="border-left: 4px solid var(--bs-{{ inventory_color }});">
+        <div class="ri-card-title"><i class="bi bi-door-open text-{{ inventory_color }}"></i>Inventory Signal</div>
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="ri-main-val text-{{ inventory_color }}">{{ ri_avail_rooms }}</div>
+            <span class="ri-signal-badge {{ inventory_color }}">
+                <i class="bi bi-circle-fill" style="font-size:0.5rem;"></i>{{ inventory_label }}
+            </span>
+        </div>
+        <div class="ri-sub">
+            <strong>{{ ri_avail_pct }}%</strong> of rooms available
+            &nbsp;&bull;&nbsp;{{ occupied }} occupied, {{ maintenance }} OOO
+        </div>
+    </div>
+
+</div>{# /row 1 #}
+
+{# ── Row 2: Revenue Driver + Source Analysis + Leakage ─────────────────── #}
+<div class="ri-grid-3">
+
+    {# Revenue Driver #}
+    <div class="ri-card">
+        <div class="ri-card-title"><i class="bi bi-speedometer2 text-primary"></i>Revenue Driver</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+            {# Occupancy #}
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:0.7rem;color:#6c757d;font-weight:600;">Occupancy</span>
+                <span style="font-size:0.95rem;font-weight:800;color:#0d6efd;">
+                    {{ occupancy_pct }}%
+                    {% if occ_change_pts > 0 %}<span class="kpi-trend up"><i class="bi bi-arrow-up-short"></i>{{ occ_change_pts }}pt</span>
+                    {% elif occ_change_pts < 0 %}<span class="kpi-trend down"><i class="bi bi-arrow-down-short"></i>{{ (occ_change_pts * -1)|round(1) }}pt</span>
+                    {% endif %}
+                </span>
+            </div>
+            {# ARR #}
+            <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #f3f4f6;padding-top:4px;">
+                <span style="font-size:0.7rem;color:#6c757d;font-weight:600;">ARR</span>
+                <span style="font-size:0.95rem;font-weight:800;">
+                    {% if occupied > 0 %}₹{{ "{:,.0f}".format(arr) }}
+                    {% if pricing_pct_diff > 0 %}<span class="kpi-trend up" style="font-size:0.55rem;">+{{ pricing_pct_diff }}%</span>{% endif %}
+                    {% else %}<span class="text-muted">—</span>{% endif %}
+                </span>
+            </div>
+            {# RevPAR #}
+            <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #f3f4f6;padding-top:4px;">
+                <span style="font-size:0.7rem;color:#6c757d;font-weight:600;">RevPAR</span>
+                <span style="font-size:0.95rem;font-weight:800;">{% if occupied > 0 %}₹{{ "{:,.0f}".format(revpar) }}{% else %}<span class="text-muted">—</span>{% endif %}</span>
+            </div>
+            {# Today Revenue #}
+            <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #f3f4f6;padding-top:4px;">
+                <span style="font-size:0.7rem;color:#6c757d;font-weight:600;">Cash Revenue</span>
+                <span style="font-size:0.95rem;font-weight:800;color:#198754;">
+                    ₹{{ "{:,.0f}".format(today_revenue) }}
+                    {% if revenue_change_pct > 0 %}<span class="kpi-trend up"><i class="bi bi-arrow-up-short"></i>{{ revenue_change_pct }}%</span>
+                    {% elif revenue_change_pct < 0 %}<span class="kpi-trend down"><i class="bi bi-arrow-down-short"></i>{{ (revenue_change_pct * -1)|round(1) }}%</span>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    {# Source Analysis #}
+    <div class="ri-card">
+        <div class="ri-card-title"><i class="bi bi-diagram-3 text-info"></i>Source Analysis
+            <span style="margin-left:auto;font-size:0.62rem;color:#9ca3af;text-transform:none;font-weight:400;letter-spacing:0;">{{ today_checkins }} CI today</span>
+        </div>
+        {% if today_checkins > 0 %}
+        <div>
+            <div class="src-row">
+                <span class="src-label">OTA</span>
+                <div class="src-bar-track"><div class="src-bar-fill" style="width:{{ ota_pct }}%;background:#0dcaf0;"></div></div>
+                <span class="src-pct text-info">{{ ota_pct }}%</span>
+            </div>
+            <div class="src-row">
+                <span class="src-label">Walk-in</span>
+                <div class="src-bar-track"><div class="src-bar-fill" style="width:{{ walkin_pct }}%;background:#198754;"></div></div>
+                <span class="src-pct text-success">{{ walkin_pct }}%</span>
+            </div>
+            <div class="src-row">
+                <span class="src-label">Calling</span>
+                <div class="src-bar-track"><div class="src-bar-fill" style="width:{{ calling_pct }}%;background:#6f42c1;"></div></div>
+                <span class="src-pct" style="color:#6f42c1;">{{ calling_pct }}%</span>
+            </div>
+            {% if source_mismatch %}
+            <div style="font-size:0.62rem;color:#92400e;background:#fef3c7;padding:3px 6px;border-radius:5px;margin-top:4px;">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i>Sources don't total 100% — booking source data may be incomplete
+            </div>
+            {% else %}
+            <div style="font-size:0.62rem;color:#6c757d;margin-top:2px;">OTA {{ ota_bookings }} &bull; Walk-in {{ walkin_bookings }} &bull; Calling {{ calling_bookings }}</div>
+            {% endif %}
+        </div>
+        {% else %}
+        <div style="font-size:0.75rem;color:#9ca3af;text-align:center;padding:10px 0;">No check-ins recorded today</div>
+        {% endif %}
+    </div>
+
+    {# Leakage Tracker #}
+    <div class="ri-card" style="border-left: 4px solid {% if (pending_payments + waived_today_dash + discount_amount) > 0 %}#dc3545{% else %}#198754{% endif %};">
+        <div class="ri-card-title">
+            <i class="bi bi-droplet-fill text-danger"></i>Leakage Tracker
+        </div>
+        <div>
+            <div class="lk-row">
+                <span class="lk-label"><i class="bi bi-shield-x me-1"></i>Waived Today</span>
+                <span class="lk-val {% if waived_today_dash > 0 %}text-danger{% else %}text-success{% endif %}">
+                    ₹{{ "{:,.0f}".format(waived_today_dash) }}
+                </span>
+            </div>
+            <div class="lk-row">
+                <span class="lk-label"><i class="bi bi-hourglass-split me-1"></i>Pending Amount</span>
+                <span class="lk-val {% if pending_payments > 0 %}text-warning{% else %}text-success{% endif %}">
+                    ₹{{ "{:,.0f}".format(pending_payments) }}
+                </span>
+            </div>
+            <div class="lk-row">
+                <span class="lk-label"><i class="bi bi-tag me-1"></i>Discount Impact</span>
+                <span class="lk-val {% if discount_amount > 0 %}text-info{% else %}text-success{% endif %}">
+                    ₹{{ "{:,.0f}".format(discount_amount) }}
+                    {% if discount_rooms > 0 %}<small class="text-muted fw-normal">({{ discount_rooms }}r)</small>{% endif %}
+                </span>
+            </div>
+            <div class="lk-row" style="margin-top:2px;">
+                <span class="lk-label" style="color:#111827;font-weight:700;">Total Leakage</span>
+                {% set total_leakage = waived_today_dash + pending_payments + discount_amount %}
+                <span class="lk-val {% if total_leakage > 0 %}text-danger{% else %}text-success{% endif %}" style="font-size:0.85rem;">
+                    ₹{{ "{:,.0f}".format(total_leakage) }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+</div>{# /row 2 #}
+
+{# ── Row 3: Rule-Based Actions + Forecast ─────────────────────────────── #}
+<div class="ri-grid-2x1">
+
+    {# Rule-Based Actions #}
+    <div class="ri-card">
+        <div class="ri-card-title"><i class="bi bi-lightning-charge-fill text-warning"></i>Rule-Based Actions
+            <span style="margin-left:auto;font-size:0.62rem;text-transform:none;letter-spacing:0;font-weight:400;color:#9ca3af;">{{ ri_rules|length }} active rule{{ 's' if ri_rules|length != 1 else '' }}</span>
+        </div>
+        {% if ri_rules %}
+        {% for rule in ri_rules %}
+        <div class="ri-rule-row">
+            <i class="bi {{ rule.icon }} ri-rule-icon text-{{ rule.type }}"></i>
+            <div style="min-width:0;">
+                <div class="ri-rule-signal">{{ rule.signal }}</div>
+                <div class="ri-rule-title">{{ rule.rule }}</div>
+                <div class="ri-rule-action">{{ rule.action }}</div>
+                <span class="ri-rule-metric">{{ rule.metric }}</span>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="ri-rule-row">
+            <i class="bi bi-check-circle-fill ri-rule-icon text-success"></i>
+            <div>
+                <div class="ri-rule-title text-success">All systems healthy</div>
+                <div class="ri-rule-action">No revenue rule violations detected. Keep monitoring.</div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {# Occupancy Forecast #}
+    <div class="ri-card">
+        <div class="ri-card-title"><i class="bi bi-calendar-week text-primary"></i>Occupancy Forecast</div>
+        <div>
+            {# Tonight #}
+            {% set tn_color = '#198754' if tonight_pct >= 80 else ('#fd7e14' if tonight_pct >= 60 else '#0dcaf0') %}
+            <div class="fc-mini-row">
+                <span class="fc-mini-label">Tonight</span>
+                <div class="fc-mini-bar-track"><div class="fc-mini-bar-fill" style="width:{{ tonight_pct }}%;background:{{ tn_color }};"></div></div>
+                <span class="fc-mini-pct" style="color:{{ tn_color }};">{{ tonight_pct }}%</span>
+                <span class="fc-mini-badge" style="background:{{ tn_color }}20;color:{{ tn_color }};">Live</span>
+            </div>
+            {# Tomorrow #}
+            {% set tm_color = '#dc3545' if tomorrow_pct >= 85 else ('#fd7e14' if tomorrow_pct >= 60 else '#198754') %}
+            <div class="fc-mini-row">
+                <span class="fc-mini-label">Tomorrow<br><span style="font-size:0.55rem;color:#9ca3af;">{{ tomorrow_date }}</span></span>
+                <div class="fc-mini-bar-track"><div class="fc-mini-bar-fill" style="width:{{ tomorrow_pct }}%;background:{{ tm_color }};"></div></div>
+                <span class="fc-mini-pct" style="color:{{ tm_color }};">{{ tomorrow_pct }}%</span>
+                <span class="fc-mini-badge" style="background:{{ tm_color }}20;color:{{ tm_color }};">{{ tomorrow_risk.split()[0] }}</span>
+            </div>
+            {# 7-day mini bars #}
+            <div style="margin-top:6px;">
+                <div style="font-size:0.58rem;color:#9ca3af;margin-bottom:3px;">NEXT 7 DAYS</div>
+                <div style="display:flex;gap:3px;align-items:flex-end;height:30px;">
+                    {% for day in forecast_days %}
+                    {% set dc = '#198754' if day.pct >= 80 else ('#fd7e14' if day.pct >= 60 else '#0dcaf0') %}
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;height:100%;justify-content:flex-end;" title="{{ day.date }}: {{ day.pct }}%">
+                        <div style="width:100%;background:{{ dc }};border-radius:2px 2px 0 0;height:{{ [day.pct * 30 // 100, 2]|max }}px;min-height:2px;"></div>
+                        <span style="font-size:0.5rem;color:#9ca3af;">{{ day.label[:1] }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {# Peak day callout #}
+            {% if fc_peak_pct > 0 %}
+            <div style="margin-top:6px;padding:4px 7px;background:#eff6ff;border-radius:6px;font-size:0.65rem;color:#1e40af;">
+                <i class="bi bi-star-fill me-1"></i>Peak: <strong>{{ fc_peak_date }}</strong> at <strong>{{ fc_peak_pct }}%</strong>
+                {% if fc_peak_pct >= 85 %} — consider rate increase{% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>{# /row 3 #}
+
+{# ── Live Operations ──────────────────────────────────────────────────── #}
+<div class="d-flex align-items-center mb-1 mt-2">
+    <span class="text-uppercase fw-semibold text-muted" style="font-size:0.58rem;letter-spacing:0.08em;"><i class="bi bi-activity me-1"></i>Live Operations</span>
+    <span class="badge bg-light text-muted border ms-2 px-2" style="font-size:0.55rem;" id="alertLastUpdated"></span>
+</div>
+<div class="row g-2 mb-2" id="overstayAlertRow">
+    <div class="col-6 col-md-3">
+        <a href="{{ url_for('main.reservations') }}" class="text-decoration-none">
+            <div class="card shadow-sm h-100 border-0" id="alertCard-hourly" style="border-left:3px solid #1D6FA4!important;transition:box-shadow .15s;">
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="text-muted" style="font-size:0.65rem;">Hourly Rooms Active</div>
+                        <i class="bi bi-clock-fill" style="color:#1D6FA4;font-size:0.9rem;"></i>
+                    </div>
+                    <h3 class="mb-0 fw-bold" id="alertVal-hourly" style="color:#1D6FA4;">—</h3>
+                    <div class="mt-1" style="font-size:0.68rem;color:#6c757d;" id="alertSub-hourly">loading…</div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-md-3">
+        <a href="{{ url_for('main.reservations') }}" class="text-decoration-none">
+            <div class="card shadow-sm h-100 border-0" id="alertCard-due" style="border-left:3px solid #fd7e14!important;transition:box-shadow .15s;">
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="text-muted" style="font-size:0.65rem;">Checkouts Due Soon</div>
+                        <i class="bi bi-hourglass-split" style="color:#fd7e14;font-size:0.9rem;"></i>
+                    </div>
+                    <h3 class="mb-0 fw-bold" id="alertVal-due" style="color:#fd7e14;">—</h3>
+                    <div class="mt-1" style="font-size:0.68rem;color:#6c757d;" id="alertSub-due">loading…</div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-md-3">
+        <a href="{{ url_for('main.reservations') }}" class="text-decoration-none">
+            <div class="card shadow-sm h-100 border-0" id="alertCard-overdue" style="border-left:3px solid #dee2e6!important;transition:border-color .3s,box-shadow .15s;">
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="text-muted" style="font-size:0.65rem;">Overdue Checkouts</div>
+                        <i class="bi bi-exclamation-triangle-fill" id="alertIcon-overdue" style="font-size:0.9rem;color:#dee2e6;"></i>
+                    </div>
+                    <h3 class="mb-0 fw-bold" id="alertVal-overdue" style="color:#6c757d;">—</h3>
+                    <div class="mt-1" style="font-size:0.68rem;color:#6c757d;" id="alertSub-overdue">loading…</div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-md-3">
+        <a href="{{ url_for('reports.overstay_control') }}" class="text-decoration-none">
+            <div class="card shadow-sm h-100 border-0" style="border-left:3px solid #198754!important;transition:box-shadow .15s;">
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="text-muted" style="font-size:0.65rem;">Overstay Revenue Today</div>
+                        <i class="bi bi-currency-rupee text-success" style="font-size:0.9rem;"></i>
+                    </div>
+                    <h3 class="mb-0 fw-bold text-success" id="alertVal-revenue">—</h3>
+                    <div class="mt-1" style="font-size:0.68rem;color:#6c757d;" id="alertSub-revenue">loading…</div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<script nonce="{{ csp_nonce }}">
+(function () {
+    'use strict';
+    function _fmtINR(amt) { return '\u20b9' + Number(amt).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
+    function _setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
+    function _setStyle(id, prop, val) { var el = document.getElementById(id); if (el) el.style[prop] = val; }
+    function _applyAlerts(d) {
+        _setText('alertVal-hourly', d.hourly_active);
+        var hParts = [];
+        if (d.hourly_due     > 0) hParts.push(d.hourly_due     + ' due soon');
+        if (d.hourly_overdue > 0) hParts.push(d.hourly_overdue + ' overdue');
+        _setText('alertSub-hourly', hParts.length ? hParts.join(' \u00b7 ') : 'All clear');
+        _setText('alertVal-due', d.due_soon_total);
+        _setText('alertSub-due', d.due_soon_total > 0 ? 'Hourly \u22643\u200a0\u200amin \u00b7 Regular \u22642\u200ahr' : 'None in window');
+        _setText('alertVal-overdue', d.overdue_total);
+        var borderColor, iconColor, numColor, subText;
+        if (d.overdue_critical > 0) {
+            borderColor = '#7f0000'; iconColor = '#7f0000'; numColor = '#7f0000'; subText = d.overdue_critical + ' critical (>60\u200amin)';
+        } else if (d.overdue_total > 0) {
+            borderColor = '#dc3545'; iconColor = '#dc3545'; numColor = '#dc3545'; subText = 'Action required';
+        } else {
+            borderColor = '#dee2e6'; iconColor = '#dee2e6'; numColor = '#6c757d'; subText = 'None overdue';
+        }
+        var ovCard = document.getElementById('alertCard-overdue');
+        if (ovCard) ovCard.style.borderLeftColor = borderColor;
+        _setStyle('alertVal-overdue', 'color', numColor);
+        _setStyle('alertIcon-overdue', 'color', iconColor);
+        _setText('alertSub-overdue', subText);
+        _setText('alertVal-revenue', _fmtINR(d.overstay_revenue_today));
+        _setText('alertSub-revenue', d.waived_today > 0 ? _fmtINR(d.waived_today) + ' waived today' : 'No waivers today');
+        var ts = new Date();
+        _setText('alertLastUpdated', 'Updated ' + ts.getHours().toString().padStart(2,'0') + ':' + ts.getMinutes().toString().padStart(2,'0'));
+    }
+    function fetchAlerts() {
+        fetch('/dashboard/alerts-summary').then(function(r){ if(!r.ok) throw r; return r.json(); }).then(_applyAlerts).catch(function(){});
+    }
+    fetchAlerts();
+    setInterval(fetchAlerts, 60000);
+}());
+</script>
+
+{# ── Charts ───────────────────────────────────────────────────────────── #}
+<div class="row g-2 mb-2">
+    <div class="col-12 col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 py-2">
+                <h6 class="mb-0 fw-bold" style="font-size:0.85rem;">Room Status</h6>
+            </div>
+            <div class="card-body p-2">
+                <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                    <span style="font-size:0.75rem;"><i class="bi bi-circle-fill text-danger"></i> Occupied Clean</span>
+                    <span class="badge bg-danger">{{ occupy_clean }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                    <span style="font-size:0.75rem;"><i class="bi bi-circle-fill text-danger" style="opacity:0.6;"></i> Occupied Dirty</span>
+                    <span class="badge bg-danger bg-opacity-50">{{ occupy_dirty }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                    <span style="font-size:0.75rem;"><i class="bi bi-circle-fill text-success"></i> Vacant Clean</span>
+                    <span class="badge bg-success">{{ vacant_clean }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span style="font-size:0.75rem;"><i class="bi bi-circle-fill text-warning"></i> Vacant Dirty</span>
+                    <span class="badge bg-warning">{{ vacant_dirty }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-5">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 py-2">
+                <h6 class="mb-0 fw-bold" style="font-size:0.85rem;">Revenue Trend</h6>
+            </div>
+            <div class="card-body p-2">
+                {% if yesterday_revenue == 0 and today_revenue == 0 and mtd_revenue == 0 and last_month_revenue == 0 %}
+                <div class="d-flex flex-column align-items-center justify-content-center text-muted" style="height:200px;">
+                    <i class="bi bi-bar-chart fs-2 mb-2"></i>
+                    <div style="font-size:0.8rem;">No revenue data recorded</div>
+                </div>
+                {% else %}
+                <div class="chart-container" style="height:200px;position:relative;">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 py-2">
+                <h6 class="mb-0 fw-bold" style="font-size:0.85rem;">Today's Booking Sources</h6>
+            </div>
+            <div class="card-body p-2">
+                {% if ota_bookings == 0 and walkin_bookings == 0 and calling_bookings == 0 %}
+                <div class="d-flex flex-column align-items-center justify-content-center text-muted" style="height:200px;">
+                    <i class="bi bi-pie-chart fs-2 mb-2"></i>
+                    <div style="font-size:0.8rem;">No booking sources recorded today</div>
+                </div>
+                {% else %}
+                <div class="chart-container" style="height:200px;position:relative;">
+                    <canvas id="sourceChart"></canvas>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='vendor/chartjs/chart.umd.min.js') }}"></script>
+<script nonce="{{ csp_nonce }}">
+(function() {
+    if (typeof Chart === 'undefined') { setTimeout(arguments.callee, 100); return; }
+    const revenueCtx = document.getElementById('revenueChart');
+    if (revenueCtx) {
+        new Chart(revenueCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Yesterday', 'Today', 'MTD', 'Last Month'],
+                datasets: [{ label: 'Revenue (₹)', data: [{{ yesterday_revenue|float }}, {{ today_revenue|float }}, {{ mtd_revenue|float }}, {{ last_month_revenue|float }}], backgroundColor: ['rgba(40,167,69,0.7)','rgba(40,167,69,0.9)','rgba(13,110,253,0.7)','rgba(108,117,125,0.7)'], borderColor: ['rgb(40,167,69)','rgb(40,167,69)','rgb(13,110,253)','rgb(108,117,125)'], borderWidth: 1 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+        });
+    }
+    const sourceCtx = document.getElementById('sourceChart');
+    if (sourceCtx) {
+        new Chart(sourceCtx, {
+            type: 'doughnut',
+            data: { labels: ['Walk-in','OTA','Calling'], datasets: [{ data: [{{ walkin_bookings }},{{ ota_bookings }},{{ calling_bookings }}], backgroundColor: ['rgba(23,162,184,0.8)','rgba(255,193,7,0.8)','rgba(111,66,193,0.8)'], borderWidth: 2, borderColor: '#fff' }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
+        });
+    }
+})();
+</script>

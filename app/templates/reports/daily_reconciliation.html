@@ -1,0 +1,306 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Daily Cash Reconciliation{% endblock %}
+{% block report_name %}Daily Cash Reconciliation{% endblock %}
+
+{% block report_content %}
+<style>
+@media print {
+    .d-print-none { display: none !important; }
+    @page { size: A4; margin: 15mm; }
+}
+</style>
+
+<div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+    <div>
+        <h5 class="mb-0">
+            <i class="bi bi-calculator text-primary me-2"></i>Daily Cash Reconciliation
+        </h5>
+        <small class="text-muted">{{ report_date.strftime('%d %B %Y') }}</small>
+    </div>
+    <div class="d-flex gap-2 d-print-none">
+        <a href="{{ url_for('reports.daily_reconciliation', **request.args, format='excel') }}"
+           class="btn btn-sm btn-success">
+            <i class="bi bi-file-earmark-excel me-1"></i>Excel
+        </a>
+        <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i>Print / PDF
+        </button>
+    </div>
+</div>
+
+{# Date picker #}
+<form class="d-flex align-items-center gap-2 mb-4 flex-wrap d-print-none">
+    <label class="fw-semibold small">Date</label>
+    <input type="date" name="date" class="form-control form-control-sm" style="width:auto;"
+           value="{{ date_str }}">
+    <button class="btn btn-sm btn-primary">Apply</button>
+</form>
+
+{# Top summary row #}
+<div class="row g-3 mb-4">
+    <div class="col-sm-3">
+        <div class="card border-primary shadow-sm text-center py-3">
+            <div class="fs-3 fw-bold text-primary">₹{{ '{:,.2f}'.format(total_collection) }}</div>
+            <div class="text-muted small">Total Collected</div>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="card border-danger shadow-sm text-center py-3">
+            <div class="fs-3 fw-bold text-danger">₹{{ '{:,.2f}'.format(total_refunds) }}</div>
+            <div class="text-muted small">Refunds</div>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="card border-success shadow-sm text-center py-3">
+            <div class="fs-3 fw-bold text-success">₹{{ '{:,.2f}'.format(total_tips) }}</div>
+            <div class="text-muted small">Tips</div>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="card border-dark shadow-sm text-center py-3">
+            <div class="fs-3 fw-bold">₹{{ '{:,.2f}'.format(net_collection) }}</div>
+            <div class="text-muted small">Net Collection</div>
+        </div>
+    </div>
+</div>
+
+{# Section 1: Collection by Payment Mode #}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white fw-semibold py-2">
+        <i class="bi bi-credit-card me-2 text-primary"></i>Section 1 — Collection by Payment Mode
+    </div>
+    <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0 small">
+            <thead class="table-primary">
+                <tr>
+                    <th>Payment Mode</th>
+                    <th class="text-end">Amount (₹)</th>
+                    <th class="text-end">Transactions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mode_name, data in by_mode.items() %}
+                <tr>
+                    <td>{{ mode_name }}</td>
+                    <td class="text-end fw-semibold">₹{{ '{:,.2f}'.format(data.amount) }}</td>
+                    <td class="text-end">{{ data.count }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" class="text-center text-muted py-3">No payments recorded.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% if by_mode %}
+            <tfoot class="table-primary fw-bold">
+                <tr>
+                    <td>Total Collection</td>
+                    <td class="text-end">₹{{ '{:,.2f}'.format(total_collection) }}</td>
+                    <td class="text-end">{{ total_payment_count }}</td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+</div>
+
+{# Section 2: Refunds #}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white fw-semibold py-2 d-flex align-items-center">
+        <i class="bi bi-arrow-counterclockwise me-2 text-danger"></i>Section 2 — Refunds
+        <span class="badge bg-danger ms-auto">{{ refunds|length }} records</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0 small">
+            <thead class="table-danger">
+                <tr>
+                    <th>Folio</th>
+                    <th>Guest</th>
+                    <th>Room</th>
+                    <th>Refund Mode</th>
+                    <th>Reason</th>
+                    <th class="text-end">Amount (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in refunds %}
+                {% set res = r.reservation %}
+                <tr>
+                    <td>
+                        {% if res %}
+                        <a href="{{ url_for('main.invoice', reservation_id=res.id) }}"
+                           class="text-primary fw-semibold text-decoration-none">
+                            {{ res.booking_reference or res.id }}
+                        </a>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>{{ res.guest.name if res and res.guest else '—' }}</td>
+                    <td>{{ res.room.room_number if res and res.room else '—' }}</td>
+                    <td>{{ r.refund_mode.name if r.refund_mode else '—' }}</td>
+                    <td class="text-capitalize">{{ r.reason or '—' }}</td>
+                    <td class="text-end fw-bold text-danger">₹{{ '{:,.2f}'.format(r.overpaid_amount) }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-3">No refunds today.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% if refunds %}
+            <tfoot class="table-danger fw-bold">
+                <tr>
+                    <td colspan="5" class="text-end">Total Refunds:</td>
+                    <td class="text-end">₹{{ '{:,.2f}'.format(total_refunds) }}</td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+</div>
+
+{# Section 3: Tips #}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white fw-semibold py-2 d-flex align-items-center">
+        <i class="bi bi-cash-coin me-2 text-success"></i>Section 3 — Tips
+        <span class="badge bg-success ms-auto">{{ tips|length }} records</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0 small">
+            <thead class="table-success">
+                <tr>
+                    <th>Folio</th>
+                    <th>Guest</th>
+                    <th>Room</th>
+                    <th>Waiter / Staff</th>
+                    <th>Remarks</th>
+                    <th class="text-end">Amount (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in tips %}
+                {% set res = r.reservation %}
+                <tr>
+                    <td>
+                        {% if res %}
+                        <a href="{{ url_for('main.invoice', reservation_id=res.id) }}"
+                           class="text-primary fw-semibold text-decoration-none">
+                            {{ res.booking_reference or res.id }}
+                        </a>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>{{ res.guest.name if res and res.guest else '—' }}</td>
+                    <td>{{ res.room.room_number if res and res.room else '—' }}</td>
+                    <td>{{ r.waiter_name or '—' }}</td>
+                    <td class="text-muted">{{ r.remarks or '—' }}</td>
+                    <td class="text-end fw-bold text-success">₹{{ '{:,.2f}'.format(r.overpaid_amount) }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-3">No tips recorded today.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% if tips %}
+            <tfoot class="table-success fw-bold">
+                <tr>
+                    <td colspan="5" class="text-end">Total Tips:</td>
+                    <td class="text-end">₹{{ '{:,.2f}'.format(total_tips) }}</td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+</div>
+
+{# Section 4: Other Income #}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white fw-semibold py-2 d-flex align-items-center">
+        <i class="bi bi-plus-circle me-2 text-info"></i>Section 4 — Other Income
+        <span class="badge bg-info ms-auto">{{ other_income|length }} records</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0 small">
+            <thead class="table-info">
+                <tr>
+                    <th>Folio</th>
+                    <th>Guest</th>
+                    <th>Room</th>
+                    <th>Reason</th>
+                    <th>Remarks</th>
+                    <th class="text-end">Amount (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in other_income %}
+                {% set res = r.reservation %}
+                <tr>
+                    <td>
+                        {% if res %}
+                        <a href="{{ url_for('main.invoice', reservation_id=res.id) }}"
+                           class="text-primary fw-semibold text-decoration-none">
+                            {{ res.booking_reference or res.id }}
+                        </a>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>{{ res.guest.name if res and res.guest else '—' }}</td>
+                    <td>{{ res.room.room_number if res and res.room else '—' }}</td>
+                    <td class="text-capitalize">{{ r.reason or '—' }}</td>
+                    <td class="text-muted">{{ r.remarks or '—' }}</td>
+                    <td class="text-end fw-bold text-info">₹{{ '{:,.2f}'.format(r.overpaid_amount) }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-3">No other income today.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% if other_income %}
+            <tfoot class="table-info fw-bold">
+                <tr>
+                    <td colspan="5" class="text-end">Total Other Income:</td>
+                    <td class="text-end">₹{{ '{:,.2f}'.format(total_other_income) }}</td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+</div>
+
+{# Section 5: Net Summary #}
+<div class="card shadow-sm border-dark mb-4">
+    <div class="card-header bg-dark text-white fw-semibold py-2">
+        <i class="bi bi-clipboard-data me-2"></i>Section 5 — Net Summary
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-sm align-middle mb-0 small">
+            <tbody>
+                <tr>
+                    <td class="ps-3">Total Collection (all modes)</td>
+                    <td class="text-end pe-3 fw-semibold text-primary">₹{{ '{:,.2f}'.format(total_collection) }}</td>
+                </tr>
+                <tr class="text-danger">
+                    <td class="ps-3">Less: Refunds</td>
+                    <td class="text-end pe-3 fw-semibold">− ₹{{ '{:,.2f}'.format(total_refunds) }}</td>
+                </tr>
+                <tr class="table-dark fw-bold">
+                    <td class="ps-3 fs-6">Net Collection</td>
+                    <td class="text-end pe-3 fs-6">₹{{ '{:,.2f}'.format(net_collection) }}</td>
+                </tr>
+                <tr class="text-muted">
+                    <td class="ps-3">Tips (off-balance, for staff)</td>
+                    <td class="text-end pe-3">₹{{ '{:,.2f}'.format(total_tips) }}</td>
+                </tr>
+                <tr class="text-muted">
+                    <td class="ps-3">Other Income (off-balance)</td>
+                    <td class="text-end pe-3">₹{{ '{:,.2f}'.format(total_other_income) }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<p class="small text-muted mt-2 d-print-none">
+    <i class="bi bi-info-circle me-1"></i>
+    Net Collection = Total Collected − Refunds. Tips and Other Income are shown for reference only and are not included in room revenue.
+</p>
+{% endblock %}

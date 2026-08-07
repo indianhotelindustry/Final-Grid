@@ -1,0 +1,50 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Fdepartures",
+  "anon_status": 302,
+  "body_bytes": 37614,
+  "body_sha256": "a1896496ca7e2e15d961fdd5ad4c7cda7df27ce30becd38c3f33ebf4298d5c5b",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 55,
+  "endpoint": "reports.departures",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "records[0][type]": "Reservation",
+    "records[10][type]": "Reservation",
+    "records[11][type]": "Reservation",
+    "records[1][type]": "Reservation",
+    "records[2][type]": "Reservation",
+    "records[3][type]": "Reservation",
+    "records[4][type]": "Reservation",
+    "records[5][type]": "Reservation",
+    "records[6][type]": "Reservation",
+    "records[7][type]": "Reservation",
+    "records[8][type]": "Reservation",
+    "records[9][type]": "Reservation",
+    "records[len]": "12",
+    "report_date": "2026-05-28",
+    "today": "2026-05-28"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.departures",
+  "templates": [
+    "reports/departures.html"
+  ],
+  "truncations": [],
+  "url": "/reports/departures"
+}

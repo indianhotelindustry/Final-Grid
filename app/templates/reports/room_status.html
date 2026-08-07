@@ -1,0 +1,90 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Room Status — {{ report_date.strftime('%d %b %Y') }}{% endblock %}
+{% block report_name %}Room Status Report{% endblock %}
+
+{% block report_content %}
+<div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+  <h5 class="mb-0">
+    <i class="bi bi-grid-3x3-gap-fill text-primary me-2"></i>
+    Room Status — {{ report_date.strftime('%d %B %Y') }}
+    <span class="badge bg-secondary ms-1">{{ rooms|length }} rooms</span>
+  </h5>
+  <div class="d-flex gap-2 d-print-none">
+    <a href="{{ url_for('reports.room_status_report', format='excel') }}"
+       class="btn btn-sm btn-success">
+      <i class="bi bi-file-earmark-excel me-1"></i>Excel
+    </a>
+    <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+      <i class="bi bi-printer me-1"></i>Print
+    </button>
+  </div>
+</div>
+
+{# Summary badges #}
+<div class="row g-2 mb-3">
+  {% set status_colors = {
+    'Available': 'success',
+    'Occupied':  'primary',
+    'Dirty':     'warning',
+    'OutOfOrder':'danger',
+    'Maintenance':'secondary'
+  } %}
+  {% for st, rooms_in in by_status.items() %}
+  <div class="col-auto">
+    <span class="badge bg-{{ status_colors.get(st, 'secondary') }} fs-6 px-3 py-2">
+      {{ st }}: {{ rooms_in|length }}
+    </span>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover table-sm align-middle mb-0 small">
+      <thead class="table-dark">
+        <tr>
+          <th>Room</th>
+          <th>Floor</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Guest</th>
+          <th>Check-out</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rooms %}
+        {% set res = res_by_room.get(r.id) %}
+        <tr>
+          <td class="fw-semibold">{{ r.room_number }}</td>
+          <td>{{ r.floor or '—' }}</td>
+          <td>{{ r.room_type.name if r.room_type else '—' }}</td>
+          <td>
+            <span class="badge bg-{{ status_colors.get(r.status, 'secondary') }}">
+              {{ r.status }}
+            </span>
+          </td>
+          <td>
+            {% if res and res.guest %}
+              {{ res.guest.name }}
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if res %}
+              {{ res.departure_date.strftime('%d %b %Y') }}
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-4">No rooms found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>@media print { .d-print-none { display:none !important; } }</style>
+{% endblock %}

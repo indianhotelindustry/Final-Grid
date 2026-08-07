@@ -1,0 +1,22 @@
+{# Compact loyalty info card — include in checkout.html / guest_database.html
+   Expects: loyalty_info dict with keys: enrolled, balance, tier, color, max_discount, loyalty_number, redemption_value
+   And: guest_id, reservation_id (for redemption) #}
+{% if loyalty_info and loyalty_info.enrolled %}
+<div class="alert alert-light border py-2 mb-3">
+    <div class="d-flex flex-wrap gap-3 align-items-center">
+        <span class="badge px-2 py-1" style="background:{{ loyalty_info.color }}">
+            <i class="bi bi-award me-1"></i>{{ loyalty_info.tier }}
+        </span>
+        <span class="fw-semibold">{{ "{:,}".format(loyalty_info.balance) }} pts</span>
+        <span class="text-muted small">{{ loyalty_info.loyalty_number }}</span>
+        <span class="text-muted">|</span>
+        <span class="small">Max discount: <strong>₹{{ "%.2f"|format(loyalty_info.max_discount) }}</strong></span>
+        {% if reservation_id %}
+        <button type="button" class="btn btn-sm btn-outline-primary ms-auto"
+                data-bs-toggle="modal" data-bs-target="#loyaltyRedeemModal">
+            <i class="bi bi-gift me-1"></i>Redeem
+        </button>
+        {% endif %}
+    </div>
+</div>
+{% endif %}

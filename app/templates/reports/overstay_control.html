@@ -1,0 +1,225 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Overstay Control Report{% endblock %}
+{% block report_name %}Overstay Control Report{% endblock %}
+
+{% block report_content %}
+
+{# ── Header + Filter bar ─────────────────────────────────────────────────── #}
+<div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+    <h5 class="mb-0">
+        <i class="bi bi-hourglass-split text-danger me-2"></i>Overstay Control Report
+        <span class="badge bg-secondary ms-1">{{ summary.total_records }}</span>
+    </h5>
+    <div class="d-flex gap-2 align-items-center d-print-none flex-wrap">
+        <form class="d-flex gap-1 align-items-center flex-wrap" action="{{ url_for('reports.overstay_control') }}">
+            <input type="date" class="form-control form-control-sm" name="from"
+                   value="{{ from_date.isoformat() }}" style="width:130px;">
+            <span class="small text-muted">→</span>
+            <input type="date" class="form-control form-control-sm" name="to"
+                   value="{{ to_date.isoformat() }}" style="width:130px;">
+            <select name="action" class="form-select form-select-sm" style="width:110px;">
+                <option value="all"    {% if action_filter=='all'    %}selected{% endif %}>All Actions</option>
+                <option value="charge" {% if action_filter=='charge' %}selected{% endif %}>Charge</option>
+                <option value="waive"  {% if action_filter=='waive'  %}selected{% endif %}>Waive</option>
+                <option value="extend" {% if action_filter=='extend' %}selected{% endif %}>Extend</option>
+            </select>
+            <input type="text" class="form-control form-control-sm" name="room"
+                   value="{{ room_filter }}" placeholder="Room no." style="width:80px;">
+            <input type="text" class="form-control form-control-sm" name="q"
+                   value="{{ guest_filter }}" placeholder="Guest / Phone" style="width:130px;">
+            <button class="btn btn-sm btn-danger">View</button>
+            <button class="btn btn-sm btn-outline-success" name="format" value="excel"
+                    title="Export Excel"><i class="bi bi-file-earmark-excel"></i></button>
+        </form>
+        <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i>Print
+        </button>
+    </div>
+</div>
+
+<div class="text-muted small mb-3">
+    Period: {{ from_date.strftime('%d %b %Y') }} — {{ to_date.strftime('%d %b %Y') }}
+    {% if action_filter != 'all' %} &nbsp;·&nbsp; Action: <strong>{{ action_filter|capitalize }}</strong>{% endif %}
+    {% if room_filter %} &nbsp;·&nbsp; Room: <strong>{{ room_filter }}</strong>{% endif %}
+    {% if guest_filter %} &nbsp;·&nbsp; Guest: <strong>{{ guest_filter }}</strong>{% endif %}
+</div>
+
+{# ── Summary cards ───────────────────────────────────────────────────────── #}
+<div class="row g-3 mb-4">
+
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="card border-0 shadow-sm h-100" style="border-left:4px solid #dc3545!important;border-left-style:solid!important;">
+            <div class="card-body py-2 px-3">
+                <div class="text-muted small">Overstay Revenue</div>
+                <div class="fw-bold fs-6 text-danger">₹{{ '{:,.2f}'.format(summary.total_charge_incl) }}</div>
+                <div class="text-muted" style="font-size:0.7rem;">incl. GST &nbsp;(₹{{ '{:,.2f}'.format(summary.total_charge_excl) }} + ₹{{ '{:,.2f}'.format(summary.total_gst) }} GST)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="card border-0 shadow-sm h-100" style="border-left:4px solid #fd7e14!important;border-left-style:solid!important;">
+            <div class="card-body py-2 px-3">
+                <div class="text-muted small">Total Waived</div>
+                <div class="fw-bold fs-6" style="color:#fd7e14;">₹{{ '{:,.2f}'.format(summary.total_waived_excl) }}</div>
+                <div class="text-muted" style="font-size:0.7rem;">excl. GST</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-4 col-md-4 col-xl-2">
+        <div class="card border-0 shadow-sm h-100 border-start border-4 border-danger">
+            <div class="card-body py-2 px-3">
+                <div class="text-muted small">Charge Actions</div>
+                <div class="fw-bold fs-5 text-danger">{{ summary.charge_count }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-4 col-md-4 col-xl-2">
+        <div class="card border-0 shadow-sm h-100 border-start border-4 border-warning">
+            <div class="card-body py-2 px-3">
+                <div class="text-muted small">Waive Actions</div>
+                <div class="fw-bold fs-5 text-warning">{{ summary.waive_count }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-4 col-md-4 col-xl-2">
+        <div class="card border-0 shadow-sm h-100 border-start border-4 border-primary">
+            <div class="card-body py-2 px-3">
+                <div class="text-muted small">Extend Actions</div>
+                <div class="fw-bold fs-5 text-primary">{{ summary.extend_count }}</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{# ── Data table ──────────────────────────────────────────────────────────── #}
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle mb-0 small">
+            <thead class="table-dark">
+                <tr>
+                    <th class="text-nowrap">Date / Time</th>
+                    <th>Res</th>
+                    <th>Room</th>
+                    <th>Guest</th>
+                    <th>Type</th>
+                    <th>Planned CO</th>
+                    <th>Action</th>
+                    <th class="text-nowrap">Billed From</th>
+                    <th class="text-nowrap">Billed Until</th>
+                    <th class="text-end">OD Min</th>
+                    <th class="text-end">Hrs</th>
+                    <th class="text-end">Hrly Rate</th>
+                    <th class="text-end">Excl GST</th>
+                    <th class="text-end">GST%</th>
+                    <th class="text-end">GST Amt</th>
+                    <th class="text-end fw-bold">Total</th>
+                    <th>Waive Reason</th>
+                    <th>By</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in rows %}
+                <tr class="{% if r.action == 'overstay_charged' %}table-danger{% elif r.action == 'overstay_waived' %}table-warning{% elif r.action == 'hourly_extended' %}table-primary{% endif %}" style="opacity:0.92;">
+                    <td class="text-nowrap">
+                        {{ r.timestamp.strftime('%d %b %H:%M') if r.timestamp else '—' }}
+                    </td>
+                    <td>
+                        <span class="text-muted small">#{{ r.res_id }}</span>
+                        {% if r.booking_ref %}<br><span style="font-size:0.68rem;" class="text-muted">{{ r.booking_ref }}</span>{% endif %}
+                    </td>
+                    <td class="fw-semibold">{{ r.room_number }}</td>
+                    <td>
+                        {{ r.guest_name }}
+                        {% if r.guest_phone %}<br><span class="text-muted" style="font-size:0.7rem;">{{ r.guest_phone }}</span>{% endif %}
+                    </td>
+                    <td>
+                        <span class="badge" style="background:#1D6FA4;font-size:0.65rem;">{{ r.booking_type }}</span>
+                    </td>
+                    <td class="text-nowrap small">{{ r.planned_co or '—' }}</td>
+                    <td>
+                        {% if r.action == 'overstay_charged' %}
+                            <span class="badge bg-danger">Charge</span>
+                        {% elif r.action == 'overstay_waived' %}
+                            <span class="badge bg-warning text-dark">Waive</span>
+                        {% elif r.action == 'hourly_extended' %}
+                            <span class="badge bg-primary">Extend</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ r.action_label }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-nowrap small text-muted">{{ r.billed_from or '—' }}</td>
+                    <td class="text-nowrap small text-muted">{{ r.billed_until or '—' }}</td>
+                    <td class="text-end">
+                        {% if r.overdue_min %}{{ '{:.0f}'.format(r.overdue_min|float) }}{% else %}—{% endif %}
+                    </td>
+                    <td class="text-end">
+                        {% if r.bill_hours %}{{ '{:.0f}'.format(r.bill_hours|float) }}{% else %}—{% endif %}
+                    </td>
+                    <td class="text-end">
+                        {% if r.hourly_rate %}₹{{ '{:,.2f}'.format(r.hourly_rate) }}{% else %}—{% endif %}
+                    </td>
+                    <td class="text-end">
+                        {% if r.charge_excl %}₹{{ '{:,.2f}'.format(r.charge_excl) }}{% else %}—{% endif %}
+                    </td>
+                    <td class="text-end text-muted">
+                        {% if r.gst_pct is not none and r.action != 'hourly_extended' %}{{ r.gst_pct }}%{% else %}—{% endif %}
+                    </td>
+                    <td class="text-end text-muted">
+                        {% if r.gst_amt and r.action != 'hourly_extended' %}₹{{ '{:,.2f}'.format(r.gst_amt) }}{% else %}—{% endif %}
+                    </td>
+                    <td class="text-end fw-semibold">
+                        {% if r.total_amt and r.action != 'hourly_extended' %}₹{{ '{:,.2f}'.format(r.total_amt) }}{% else %}—{% endif %}
+                    </td>
+                    <td class="small text-muted" style="max-width:140px;word-break:break-word;">
+                        {{ r.waive_reason or '' }}
+                    </td>
+                    <td class="small text-nowrap">
+                        {{ r.actioned_by }}
+                        {% if r.actioned_role %}<br><span class="badge bg-light text-dark border" style="font-size:0.6rem;">{{ r.actioned_role }}</span>{% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="18" class="text-center text-muted py-5">
+                        <i class="bi bi-inbox fs-4 d-block mb-2"></i>
+                        No overstay actions found for this period and filter.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+            {% if rows %}
+            <tfoot class="table-secondary fw-semibold small">
+                <tr>
+                    <td colspan="12" class="text-end">Totals:</td>
+                    <td class="text-end">₹{{ '{:,.2f}'.format(summary.total_charge_excl + summary.total_waived_excl) }}</td>
+                    <td></td>
+                    <td class="text-end">₹{{ '{:,.2f}'.format(summary.total_gst) }}</td>
+                    <td class="text-end fw-bold text-danger">₹{{ '{:,.2f}'.format(summary.total_charge_incl) }}</td>
+                    <td colspan="2"></td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+</div>
+
+<div class="text-muted mt-2 d-print-none" style="font-size:0.7rem;">
+    <i class="bi bi-info-circle me-1"></i>
+    GST calculated per India hotel GST slabs (≤₹1000: 0%, ₹1001–₹7500: 12%, >₹7500: 18%) based on reservation rate.
+    Totals shown are charge actions only; waived amounts are excluded from revenue total.
+</div>
+
+<style>
+@media print {
+    .d-print-none { display: none !important; }
+    .table { font-size: 0.65rem; }
+}
+</style>
+
+{% endblock %}

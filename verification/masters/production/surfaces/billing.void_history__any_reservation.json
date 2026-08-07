@@ -1,0 +1,41 @@
+{
+  "anon_location": "/auth/login?next=%2Fbilling%2Fvoid%2Fhistory%2F1",
+  "anon_status": 302,
+  "body_bytes": 22085,
+  "body_sha256": "50a3b2e199812b7aaaed67ee1ee471156031901323700bae2f44e6cab5a75a86",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 19,
+  "endpoint": "billing.void_history",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "reservation[type]": "Reservation",
+    "void_requests[len]": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "Void and reversal history for a stay.",
+  "origin": "declared",
+  "params": {
+    "id": 1,
+    "resolver": "any_reservation",
+    "rule": "lowest reservation id"
+  },
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "billing.void_history__any_reservation",
+  "templates": [
+    "billing/void_history.html"
+  ],
+  "truncations": [],
+  "url": "/billing/void/history/1"
+}

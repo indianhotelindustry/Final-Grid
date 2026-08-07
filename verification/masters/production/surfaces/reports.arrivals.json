@@ -1,0 +1,38 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Farrivals",
+  "anon_status": 302,
+  "body_bytes": 24223,
+  "body_sha256": "c475aa4f18f7af6bb9911a3d2233192bc646c1acbf6cce8b0c513fa8df1c0291",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 38,
+  "endpoint": "reports.arrivals",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-05-28",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "records[len]": "0",
+    "report_date": "2026-05-28",
+    "today": "2026-05-28"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.arrivals",
+  "templates": [
+    "reports/arrivals.html"
+  ],
+  "truncations": [],
+  "url": "/reports/arrivals"
+}

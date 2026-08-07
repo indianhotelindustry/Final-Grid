@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Form C — {{ guest.name }}</title>
+<style>
+@page { size: A4 portrait; margin: 14mm; }
+body { font-family: Helvetica, Arial, sans-serif; font-size: 9pt; color: #111827; margin: 0; padding: 0; }
+h1 { font-size: 14pt; text-align: center; margin: 0 0 2pt; }
+.subtitle { text-align: center; font-size: 9pt; margin-bottom: 2pt; }
+.legal { text-align: center; font-size: 7.5pt; color: #6b7280; margin-bottom: 10pt; }
+h2 { font-size: 10pt; margin: 10pt 0 4pt; color: #0d1b2a; border-bottom: 1pt solid #d1d5db; padding-bottom: 2pt; }
+table { width: 100%; border-collapse: collapse; }
+.form-table td { border: 0.5pt solid #d1d5db; padding: 4pt 6pt; vertical-align: top; }
+.form-label { background: #f3f4f6; font-weight: 600; width: 35%; font-size: 8.5pt; }
+.form-value { font-size: 9pt; }
+.sig-line { border-top: 0.5pt solid #000; margin-top: 40pt; padding-top: 4pt; text-align: center; font-size: 8pt; }
+.footer { text-align: center; font-size: 7pt; color: #9ca3af; margin-top: 12pt; }
+.photo-box { width: 80pt; height: 100pt; border: 0.5pt solid #d1d5db; text-align: center; }
+.photo-box img { max-width: 78pt; max-height: 98pt; }
+</style>
+</head>
+<body>
+
+<h1>FORM C</h1>
+<div class="subtitle">Registration of Foreigner(s) at Hotel</div>
+<div class="legal">(Under the Registration of Foreigners Rules, 1992 &mdash; Rule 14)</div>
+
+<!-- ═══ HOTEL DETAILS ═══ -->
+<h2>1. Hotel / Accommodation Details</h2>
+<table class="form-table">
+<tr><td class="form-label">Name of Hotel</td><td class="form-value">{{ hotel.get('hotel_name', '') }}</td></tr>
+<tr><td class="form-label">Address</td><td class="form-value">{{ hotel.get('hotel_address', '') }}</td></tr>
+<tr><td class="form-label">Contact</td><td class="form-value">{{ hotel.get('hotel_contact', '') }} | {{ hotel.get('hotel_email', '') }}</td></tr>
+{% if hotel.get('hotel_gstin') %}
+<tr><td class="form-label">GSTIN</td><td class="form-value">{{ hotel.hotel_gstin }}</td></tr>
+{% endif %}
+</table>
+
+<!-- ═══ FOREIGNER DETAILS ═══ -->
+<h2>2. Foreigner's Particulars</h2>
+<table class="form-table">
+<tr>
+    <td class="form-label">Photo</td>
+    <td class="form-value" style="width:90pt;">
+        <div class="photo-box">
+        {% if guest_photo %}
+        <img src="file://{{ guest_photo }}">
+        {% else %}
+        <div style="padding-top:30pt;color:#9ca3af;font-size:8pt;">No Photo</div>
+        {% endif %}
+        </div>
+    </td>
+    <td class="form-label">Full Name<br>(Surname first)</td>
+    <td class="form-value">{{ guest.name }}</td>
+</tr>
+</table>
+<table class="form-table">
+<tr><td class="form-label">Nationality</td><td class="form-value">{{ foreign_info.nationality if foreign_info else guest.country or '—' }}</td></tr>
+<tr><td class="form-label">Date of Birth</td><td class="form-value">{{ guest.date_of_birth.strftime('%d %b %Y') if guest.date_of_birth else '—' }}</td></tr>
+<tr><td class="form-label">Gender</td><td class="form-value">{{ guest.gender or '—' }}</td></tr>
+<tr><td class="form-label">Purpose of Visit to India</td><td class="form-value">{{ (foreign_info.purpose_of_visit if foreign_info else guest.purpose_of_visit) or '—' }}</td></tr>
+</table>
+
+<!-- ═══ PASSPORT ═══ -->
+<h2>3. Passport Details</h2>
+<table class="form-table">
+<tr><td class="form-label">Passport Number</td><td class="form-value">{{ foreign_info.passport_number if foreign_info else '—' }}</td></tr>
+<tr><td class="form-label">Place of Issue</td><td class="form-value">{{ foreign_info.passport_issue_place if foreign_info else '—' }}</td></tr>
+<tr><td class="form-label">Date of Issue</td><td class="form-value">{{ foreign_info.passport_issue_date.strftime('%d %b %Y') if foreign_info and foreign_info.passport_issue_date else '—' }}</td></tr>
+<tr><td class="form-label">Date of Expiry</td><td class="form-value">{{ foreign_info.passport_expiry_date.strftime('%d %b %Y') if foreign_info and foreign_info.passport_expiry_date else '—' }}</td></tr>
+</table>
+
+<!-- ═══ VISA ═══ -->
+<h2>4. Visa Details</h2>
+<table class="form-table">
+<tr><td class="form-label">Visa Number</td><td class="form-value">{{ foreign_info.visa_number if foreign_info else '—' }}</td></tr>
+<tr><td class="form-label">Visa Type</td><td class="form-value">{{ foreign_info.visa_type if foreign_info else '—' }}</td></tr>
+<tr><td class="form-label">Place of Issue</td><td class="form-value">{{ foreign_info.visa_issue_place if foreign_info else '—' }}</td></tr>
+<tr><td class="form-label">Date of Issue</td><td class="form-value">{{ foreign_info.visa_issue_date.strftime('%d %b %Y') if foreign_info and foreign_info.visa_issue_date else '—' }}</td></tr>
+<tr><td class="form-label">Date of Expiry</td><td class="form-value">{{ foreign_info.visa_expiry_date.strftime('%d %b %Y') if foreign_info and foreign_info.visa_expiry_date else '—' }}</td></tr>
+</table>
+
+<!-- ═══ STAY DETAILS ═══ -->
+<h2>5. Stay Details</h2>
+<table class="form-table">
+<tr><td class="form-label">Room Number</td><td class="form-value">{{ reservation.room.room_number if reservation.room else '—' }}</td></tr>
+<tr><td class="form-label">Date of Arrival</td><td class="form-value">{{ reservation.arrival_date.strftime('%d %b %Y') }}</td></tr>
+<tr><td class="form-label">Expected Date of Departure</td><td class="form-value">{{ reservation.departure_date.strftime('%d %b %Y') }}</td></tr>
+<tr><td class="form-label">Arrived From (City/Country)</td><td class="form-value">{{ foreign_info.arrival_from if foreign_info else '—' }}</td></tr>
+<tr><td class="form-label">Next Destination</td><td class="form-value">{{ foreign_info.next_destination if foreign_info else '—' }}</td></tr>
+<tr><td class="form-label">Employed in India</td><td class="form-value">{{ 'Yes — ' + foreign_info.employer_name if foreign_info and foreign_info.employed_in_india else 'No' }}</td></tr>
+</table>
+
+<!-- ═══ ACCOMPANYING PERSONS ═══ -->
+{% if passengers %}
+<h2>6. Accompanying Persons</h2>
+<table class="form-table">
+<tr style="background:#f3f4f6;font-weight:600;">
+    <td>Name</td><td>Nationality</td><td>Passport No.</td><td>Relation</td>
+</tr>
+{% for p in passengers %}
+<tr>
+    <td class="form-value">{{ p.name }}</td>
+    <td class="form-value">—</td>
+    <td class="form-value">{{ p.id_number or '—' }}</td>
+    <td class="form-value">{{ p.relationship or '—' }}</td>
+</tr>
+{% endfor %}
+</table>
+{% endif %}
+
+<!-- ═══ SIGNATURES ═══ -->
+<h2>{% if passengers %}7{% else %}6{% endif %}. Signatures</h2>
+<table>
+<tr>
+    <td style="width:50%;">
+        {% if signature %}
+        <div style="text-align:center;margin-bottom:4pt;">
+            <img src="file://{{ signature }}" style="max-width:180pt;max-height:50pt;">
+        </div>
+        {% endif %}
+        <div class="sig-line">Signature of Guest</div>
+        <div style="text-align:center;font-size:7pt;color:#6b7280;">
+            Date: {{ generated_at.strftime('%d %b %Y') }}
+        </div>
+    </td>
+    <td style="width:50%;">
+        <div class="sig-line">Signature of Hotel Manager / Authorised Person</div>
+        <div style="text-align:center;font-size:7pt;color:#6b7280;">
+            Date: _______________
+        </div>
+    </td>
+</tr>
+</table>
+
+<div class="footer">
+    This form is to be submitted to the nearest Foreigners Regional Registration Office (FRRO) within 24 hours of arrival.<br>
+    Generated by {{ hotel.get('hotel_name', '') }} PMS on {{ generated_at.strftime('%d %b %Y %H:%M') }}
+</div>
+
+</body>
+</html>

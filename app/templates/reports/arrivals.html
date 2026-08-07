@@ -1,0 +1,67 @@
+{% extends 'reports/_layout.html' %}
+{% block title %}Arrivals — {{ report_date.strftime('%d %b %Y') }}{% endblock %}
+{% block report_name %}Arrivals List{% endblock %}
+
+{% block report_content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h5 class="mb-0"><i class="bi bi-box-arrow-in-right text-success me-2"></i>
+        Arrivals — {{ report_date.strftime('%d %B %Y') }}
+        <span class="badge bg-secondary ms-1">{{ records|length }}</span>
+    </h5>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('reports.arrivals', date=report_date.isoformat(), format='excel') }}"
+           class="btn btn-sm btn-success">
+            <i class="bi bi-file-earmark-excel me-1"></i>Excel
+        </a>
+        <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i>Print / PDF
+        </button>
+    </div>
+</div>
+
+{% include 'reports/_date_nav.html' with context %}
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle mb-0 small">
+            <thead class="table-success">
+                <tr>
+                    <th>Ref</th><th>Guest</th><th>Phone</th><th>Room Type</th>
+                    <th>Room</th><th>Nights</th><th>Adults</th><th>Rate/Night</th>
+                    <th>Advance</th><th>Source</th><th>Status</th><th>Special Requests</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in records %}
+                {% set nights = (r.departure_date - r.arrival_date).days %}
+                <tr>
+                    <td class="fw-semibold text-primary">{{ r.booking_reference or r.id }}</td>
+                    <td>{{ r.guest.name if r.guest else '—' }}</td>
+                    <td>{{ r.guest.phone if r.guest else '—' }}</td>
+                    <td>{{ r.room_type.name if r.room_type else '—' }}</td>
+                    <td>{% if r.room %}<strong>{{ r.room.room_number }}</strong>{% else %}<span class="text-muted">Unassigned</span>{% endif %}</td>
+                    <td class="text-center">{{ nights }}</td>
+                    <td class="text-center">{{ r.adults }}{% if r.children %}+{{ r.children }}{% endif %}</td>
+                    <td>₹{{ '{:,.0f}'.format(r.rate_per_night) }}</td>
+                    <td>{% if r.advance_payment %}₹{{ '{:,.0f}'.format(r.advance_payment) }}{% else %}—{% endif %}</td>
+                    <td><span class="badge bg-secondary">{{ r.source or 'Walk-in' }}</span></td>
+                    <td>
+                        <span class="badge
+                            {% if r.status == 'CheckedIn' %}bg-success
+                            {% elif r.status == 'Confirmed' %}bg-primary
+                            {% else %}bg-secondary{% endif %}">
+                            {{ r.status }}
+                        </span>
+                    </td>
+                    <td class="text-muted small">{{ r.special_requests or '—' }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="12" class="text-center text-muted py-4">No arrivals for this date.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>@media print { .btn, nav, .navbar { display:none !important; } }</style>
+{% endblock %}

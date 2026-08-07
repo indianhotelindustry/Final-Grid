@@ -1,0 +1,26 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/api/cico/preview",
+  "anon_status": 302,
+  "body_bytes": 36,
+  "body_sha256": "cf6657ab26c62f8fe213a1e492d00a8db61fcae3f821ccc83038e4a2ad073baa",
+  "category": "OPERATIONAL",
+  "content_type": "application/json",
+  "duration_ms": 4,
+  "endpoint": "main.api_cico_preview",
+  "error": "",
+  "figure_source": "json",
+  "figures": {
+    "$[len]": "1"
+  },
+  "location": "",
+  "normalisation_hits": {},
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "WARN",
+  "status": 400,
+  "surface_id": "main.api_cico_preview",
+  "templates": [],
+  "truncations": [],
+  "url": "/api/cico/preview"
+}
