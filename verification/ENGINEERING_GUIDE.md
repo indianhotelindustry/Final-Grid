@@ -200,7 +200,49 @@ Every change is committed. The commit message states what was verified and
 how, because six months later the commit message is the only place that
 information still exists. Rollback is `git reset --hard <tag>`.
 
-The baseline tag is `v2.2.18-preWave1`.
+| Tag | Meaning |
+|---|---|
+| `v2.2.18-preWave1` | engineering baseline, before Wave 0.5 |
+| `v2.2.18-wave0.5` | Wave 0.5 complete |
+| `v2.2.18-wave0.5-frozen` | freeze point before Wave 1 |
+
+No tag on this repository asserts certification, and none may until D7 —
+the Certification Engine — exists and issues one.
+
+### Repository protection (R0)
+
+The repository carries the code, the governance documents and all 83
+evidence packs. Losing it loses the audit trail, which under Phase 2.6 §13
+is release evidence.
+
+**Bundle.** A single-file snapshot of every branch and tag:
+
+```bash
+git bundle create ../repo-backups/SukoonPMS-<date>-<tag>.bundle --all
+git bundle verify ../repo-backups/SukoonPMS-<date>-<tag>.bundle
+```
+
+**Restore, and prove the restore.** A backup that has never been restored
+is not a backup — the same principle D5 applies to controls (P9):
+
+```bash
+git clone <bundle> /some/fresh/dir
+git -C /some/fresh/dir rev-parse 'HEAD^{tree}'   # must equal the origin's
+git -C /some/fresh/dir fsck
+```
+
+Refresh the bundle at every tag, and keep it off this machine.
+
+**What the bundle does NOT contain**, by design:
+
+- `instance/pms.db` — the production database
+- `.env` — secrets
+- `verification/_work/` — disposable copies
+
+**Repository protection is not data protection.** The database needs its
+own backup, on its own schedule, and that backup needs its own restore
+test. D5 recorded that the system cannot currently tell whether its
+backups are restorable (`FLT-D04`, `FLT-D05`, both blocked on D9).
 
 ---
 
