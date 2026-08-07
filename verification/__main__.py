@@ -454,6 +454,102 @@ def _cmd_inv_json(args) -> int:
     return 0
 
 
+def _cmd_ds_registry(args) -> int:
+    """Print the dataset registry. Touches no database."""
+    from verification.datasets import report as dsreport
+
+    text = dsreport.render_registry()
+    print(text)
+    if args.tag:
+        import datetime as _dt
+        started = _dt.datetime.utcnow().replace(microsecond=0).isoformat()
+        pack = dsreport.write_pack(dsreport.registry_payload(), text,
+                                   f'ds_registry_{args.tag}', started)
+        print(f'[ds] evidence pack: {pack}')
+    return 0
+
+
+def _cmd_ds_build(args) -> int:
+    """Materialise one dataset and report what it produced."""
+    from verification.datasets import builder, registry
+
+    # registry.get raises KeyError for an unknown id rather than returning
+    # None. An unknown id is a usage error, not a crash.
+    try:
+        d = registry.get(args.id)
+    except KeyError:
+        known = [x.key for x in registry.all_datasets()]
+        print(f'unknown dataset {args.id!r}. '
+              f'Registered: {", ".join(known) if known else "none"}')
+        return 3
+
+    m = builder.build(d)
+    print(f'dataset          : {d.key}')
+    print(f'database         : {m.db_path}')
+    print(f'rows removed     : {m.rows_removed}')
+    print(f'rows inserted    : {m.rows_inserted}')
+    print(f'tables touched   : {len(m.tables_touched)}')
+    print(f'business date    : {m.business_date}')
+    print(f'content hash     : {m.content_hash}')
+    print(f'production intact: {m.production_unchanged}')
+    if m.error:
+        print(f'ERROR            : {m.error}')
+    if not args.keep:
+        builder.discard(m)
+        print('copy discarded.')
+    if m.error:
+        return 3
+    return 0 if m.production_unchanged else 4
+
+
+def _cmd_ds_run(args) -> int:
+    """Evaluate every dataset against its own declaration."""
+    from verification.datasets import builder, evaluate, registry
+
+    datasets = registry.select(ids=args.id) if args.id \
+        else registry.all_datasets()
+    if not datasets:
+        print('No dataset is registered, so nothing was evaluated.')
+        print()
+        print('The verdict is INCOMPLETE, never PASS: a platform that has')
+        print('measured nothing has demonstrated nothing, and reporting that')
+        print('as a pass would be silence presented as evidence (P10).')
+        return 2
+
+    failed = 0
+    for d in datasets:
+        if not args.quiet:
+            print(f'[ds] evaluating {d.key} …')
+        m = builder.build(d)
+        try:
+            result = evaluate.evaluate(d, m)
+            print(f'  {d.key:<28} {result.verdict:<12} '
+                  f'met={len(result.met)} unmet={len(result.unmet)} '
+                  f'not_run={len(result.not_run)}')
+            if result.verdict != 'PASS':
+                failed += 1
+        finally:
+            builder.discard(m)
+    return 1 if failed else 0
+
+
+def _cmd_ds_commission(args) -> int:
+    """Prove every dataset can be made to fail."""
+    from verification.datasets import commission
+    from verification.datasets import report as dsreport
+
+    run = commission.run(ids=args.id or None, quiet=args.quiet)
+    text = dsreport.render_commission(run)
+    print()
+    print(text)
+    if args.tag:
+        pack = dsreport.write_pack(commission.payload(run), text,
+                                   f'ds_commission_{args.tag}',
+                                   run.started_at)
+        print(f'[ds] evidence pack: {pack}')
+    return run.exit_code
+
+
 def _cmd_fault_registry(args) -> int:
     """Print the fault taxonomy. No database is touched."""
     from verification.faults import report as fipreport
@@ -682,6 +778,37 @@ def main(argv=None) -> int:
     fk.add_argument('--id', action='append')
     fk.add_argument('--quiet', action='store_true')
     fk.set_defaults(fn=_cmd_fault_commission)
+
+    # -- D6: regression dataset platform -----------------------------------
+    dr = sub.add_parser('ds-registry',
+                        help='print the dataset registry and its matrices')
+    dr.add_argument('--tag', default='',
+                    help='also write an evidence pack under this tag')
+    dr.set_defaults(fn=_cmd_ds_registry)
+
+    db_ = sub.add_parser('ds-build',
+                         help='materialise a dataset into its own database')
+    db_.add_argument('--id', required=True,
+                     help='dataset id, or id@version')
+    db_.add_argument('--keep', action='store_true',
+                     help='do not discard the built copy')
+    db_.set_defaults(fn=_cmd_ds_build)
+
+    dn = sub.add_parser('ds-run',
+                        help='evaluate every dataset against its declaration')
+    dn.add_argument('--id', action='append',
+                    help='evaluate only these datasets (repeatable)')
+    dn.add_argument('--tag', default='production')
+    dn.add_argument('--quiet', action='store_true')
+    dn.set_defaults(fn=_cmd_ds_run)
+
+    dk = sub.add_parser(
+        'ds-commission',
+        help='commission every dataset (six elements): prove it discriminates')
+    dk.add_argument('--id', action='append')
+    dk.add_argument('--tag', default='')
+    dk.add_argument('--quiet', action='store_true')
+    dk.set_defaults(fn=_cmd_ds_commission)
 
     args = p.parse_args(argv)
     return args.fn(args)

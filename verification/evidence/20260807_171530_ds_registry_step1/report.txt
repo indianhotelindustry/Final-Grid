@@ -1,0 +1,66 @@
+====================================================================================================
+DSBC FRONTLINE — REGRESSION DATASET REGISTRY
+Production Verification Framework, Wave 0 Deliverable 6
+====================================================================================================
+Registered datasets : 0
+
+----------------------------------------------------------------------------------------------------
+EMPTY REGISTRY
+----------------------------------------------------------------------------------------------------
+No dataset is declared. This is the expected state after D6
+Step 1, which wires the platform and deliberately introduces no
+business knowledge.
+
+The platform is nonetheless proved to work: this report ran, the
+registry resolved, and the commissioning gate is reachable. What
+it has not been shown to do is discriminate, because nothing has
+been declared for it to discriminate on.
+
+An empty registry is reported INCOMPLETE by ds-run and
+ds-commission, never PASS. A platform with no datasets has
+demonstrated nothing, and reporting that as a pass would be
+silence presented as evidence (P10).
+
+Declarations belong in:
+  datasets_core.py        baseline narratives — an ordinary hotel
+  datasets_activation.py  datasets that activate a silent control
+
+----------------------------------------------------------------------------------------------------
+PURPOSE MATRIX
+----------------------------------------------------------------------------------------------------
+  ACTIVATE_INVARIANT           0
+  BASELINE                     0
+  NEGATIVE                     0
+  DEGENERATE                   0
+  EXPLORATORY                  0
+
+----------------------------------------------------------------------------------------------------
+ORIGIN MATRIX
+----------------------------------------------------------------------------------------------------
+  SYNTHETIC                    0
+  DERIVED_FROM_PRODUCTION      0
+  ANONYMISED_PRODUCTION        0
+
+----------------------------------------------------------------------------------------------------
+INVARIANT ACTIVATION — the reason this deliverable exists
+----------------------------------------------------------------------------------------------------
+  Invariants with an activating dataset : 0 of 24
+
+  Invariants with no activating dataset : 24
+  INV-A01, INV-A02, INV-A03, INV-A04, INV-A05, INV-A06, INV-B01, INV-B02, INV-B03, INV-B04, INV-B05, INV-B06, INV-C01, INV-C02, INV-C03, INV-C04, INV-C05, INV-C06, INV-D01, INV-D02, INV-D03, INV-D04, INV-D05, INV-D06
+
+  These are reported so the gap is tracked. An invariant with no
+  dataset behind it is exercised only by whatever production
+  happens to contain, which for a VACUOUS invariant is nothing.
+
+----------------------------------------------------------------------------------------------------
+COMMISSIONING
+----------------------------------------------------------------------------------------------------
+  Datasets not commissioned    : 0
+  Unbacked COMMISSIONED claims : 0
+  Checked against              : no commissioning evidence pack
+  Declared not materialisable  : 0
+
+====================================================================================================
+END OF REGISTRY
+====================================================================================================

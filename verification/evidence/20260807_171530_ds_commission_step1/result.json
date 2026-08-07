@@ -1,0 +1,16 @@
+{
+  "duration_seconds": 0.0008503999997628853,
+  "elements": [
+    "BUILD",
+    "POSITIVE",
+    "PERTURBATION",
+    "DISCRIMINATION",
+    "ACTIVATION",
+    "ISOLATION"
+  ],
+  "outcomes": [],
+  "registered": 0,
+  "results": [],
+  "started_at": "2026-08-07T17:15:30",
+  "verdict": "INCOMPLETE"
+}
