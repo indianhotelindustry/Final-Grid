@@ -3,9 +3,18 @@
 Measurement instrumentation for DSBC Frontline. **Contains no production
 code and is never imported by the application.**
 
-Governing documents: Phase 1 (Architecture Audit), Phase 2 (Financial Truth
-Certification), Phase 2.5 (Engineering Blueprint), Phase 2.6 (Financial
-Constitution & PVF).
+Governing documents, in this repository:
+
+- [`CONSTITUTION.md`](CONSTITUTION.md) — the Financial Constitution, P1–P14
+- [`ENGINEERING_GUIDE.md`](ENGINEERING_GUIDE.md) — workflow, rules, evidence model, release process
+- [`WAVE0_STATUS.md`](WAVE0_STATUS.md) — D1–D10 status and every open finding
+
+Governing documents cited but **not present in this repository**: Phase 1
+(Architecture Audit), Phase 2 (Financial Truth Certification), Phase 2.5
+(Engineering Blueprint), Phase 2.6 (Financial Constitution & PVF). This
+framework defers to Phase 2.6 §10 and §13, which nobody can currently
+read. `CONSTITUTION.md` was recovered from the enforcing registry in
+Wave 0.5; the rest remain unrecovered.
 
 ---
 
@@ -18,7 +27,7 @@ Constitution & PVF).
 | D3 | Historical Replay Framework | **Complete — commissioned 21/21** |
 | D4 | Financial Invariant Engine | **Complete — commissioned 26/26** |
 | D5 | Fault Injection Framework | **Complete — commissioned 37/37** |
-| D6 | Regression Dataset Framework | Not started |
+| D6 | Regression Dataset Framework | **Partial — six modules exist; registry raises ImportError. See `WAVE0_STATUS.md` §3** |
 | D7 | Certification Engine | Not started |
 | D8 | CI/CD Verification Pipeline | Not started |
 | D9 | Backup Restore Verification | Not started |
