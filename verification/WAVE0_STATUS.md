@@ -40,6 +40,38 @@ Live registry counts, 2026-08-07:
 
 ---
 
+## 1a. Measured state at the freeze point
+
+`python -m verification inv-run --tag wave0_freeze`, 2026-08-07.
+Evidence: `evidence/20260807_163441_inv_run_wave0_freeze`. **Exit 1.**
+
+```
+Registered 24    HOLDS 14    VIOLATED 6    VACUOUS 4
+Violations found  : 57
+Uncommissioned    : 0
+OVERALL VERDICT   : FAIL
+Release blocking  : 2
+Cert. blocking    : 5
+```
+
+| Invariant | Violations | Note |
+|---|---|---|
+| `INV-A02` Every financial row belongs to a folio | **40** | the universal NULL folio attribution defect |
+| `INV-C01` A walk-in is never settled through an OTA head | 5 | all 5 `ota_receivable` payments are on walk-ins |
+| `INV-C05` An OTA settlement identifies the agent | 5 | same population |
+| `INV-A03` Charges summed over folios equal charges | 5 | follows from `INV-A02` |
+| `INV-B03` Recomputing a closed day reproduces its figures | 1 | **CRITICAL / RELEASE_BLOCKING** |
+| `INV-C04` No room is occupied by two reservations | 1 | |
+
+The four `VACUOUS` are `INV-A06`, `INV-C06`, `INV-D02`, `INV-D05` — the
+exact four D6 exists to activate.
+
+**This is why nothing here may be described as certified.** The engine
+reports `FAIL` with two release-blocking violations, and D7 — the
+Certification Engine that would issue a certificate — does not exist.
+
+---
+
 ## 2. D1–D5 — complete and commissioned
 
 Each was independently commissioned, each demonstrated production-safe
