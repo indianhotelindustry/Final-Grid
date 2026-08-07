@@ -161,6 +161,12 @@ def compare_to_baseline(result: RunResult, name: str) -> dict:
     expected to hold, and a value that held when it was expected to move.
     The second case is the one teams forget, and it means the change under
     test did not take effect.
+
+    Baselines captured before the Wave 0.5 rename are keyed ``P01``-``P22``.
+    Their keys are translated to the canonical ``Q01``-``Q22`` in memory as
+    they are read; the stored file is never rewritten (P12). Without this,
+    the rename alone would report 22 REMOVED and 22 ADDED quantities and
+    destroy the only baseline the release gate has.
     """
     path = _baseline_path(name)
     if not os.path.isfile(path):
@@ -168,8 +174,15 @@ def compare_to_baseline(result: RunResult, name: str) -> dict:
             f'No baseline named {name!r}. Capture one first:\n'
             f'    python -m verification baseline --tag {name}')
 
+    # Imported here rather than at module scope: this module keeps
+    # verification.quantities lazy so commands that never measure (selfcheck)
+    # do not pay for loading it.
+    from verification.quantities import canonicalise_quantity_map
+
     with open(path, encoding='utf-8') as fh:
         base = json.load(fh)
+
+    base['quantities'] = canonicalise_quantity_map(base.get('quantities', {}))
 
     current = _baseline_payload(result)
     changes: list[dict] = []

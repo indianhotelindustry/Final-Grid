@@ -173,7 +173,7 @@ EXCLUSIONS: list[Exclusion] = [
     Exclusion(r'^/auth/shift/close',
               'GET handler with a side effect (closes the open shift). '
               'Excluded to keep capture free of state change; shift '
-              'closure figures are covered by P21 and by '
+              'closure figures are covered by Q21 and by '
               '/reports/shift-reconciliation.'),
     Exclusion(r'^/feedback/submit/',
               'Requires a single-use guest token. Deferred to D6 '

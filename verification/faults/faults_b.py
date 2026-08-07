@@ -98,14 +98,14 @@ def _b01():
     expected_detection=(Layer.D4_INVARIANTS, Layer.D3_REPLAY,
                         Layer.D1_PARITY),
     expected_invariants=('INV-A02',),
-    expected_quantities=('P09', 'P14'),
+    expected_quantities=('Q09', 'Q14'),
     expected_reconciliations=(),
     expected_replay_behaviour=(
         'The ledger gains the payment; the engine follows. The unrouted '
         'state itself does not move any total, so only the invariant '
         'names it.'),
     expected_parity_behaviour=(
-        'P09 rises and P14 (folio partition integrity) records another '
+        'Q09 rises and Q14 (folio partition integrity) records another '
         'unrouted row.'),
     expected_certification_impact=(
         'Certification-blocking: unattributable money.'),
@@ -154,13 +154,13 @@ def _b02():
     expected_detection=(Layer.D4_INVARIANTS, Layer.D3_REPLAY,
                         Layer.D1_PARITY),
     expected_invariants=('INV-B03',),
-    expected_quantities=('P09', 'P15'),
+    expected_quantities=('Q09', 'Q15'),
     expected_reconciliations=(),
     expected_replay_behaviour=(
         'History drift: the recomputed collected total for the closed '
         'date no longer equals the frozen snapshot.'),
     expected_parity_behaviour=(
-        'P15 (night audit stored vs recomputed) diverges further.'),
+        'Q15 (night audit stored vs recomputed) diverges further.'),
     expected_certification_impact=(
         'Release-blocking: a reported period has changed.'),
     expected_severity=Severity.CRITICAL,
@@ -275,7 +275,7 @@ def _b04():
     expected_replay_behaviour=(
         'None expected: no money moves.'),
     expected_parity_behaviour=(
-        'None declared. P14 counts unrouted rows rather than orphan '
+        'None declared. Q14 counts unrouted rows rather than orphan '
         'folios.'),
     expected_certification_impact=(
         'Release-blocking: a financial container with no provenance.'),
@@ -321,7 +321,7 @@ def _b05():
     expected_reconciliations=(),
     expected_replay_behaviour=(
         'None expected: the amount is unchanged, only its provenance.'),
-    expected_parity_behaviour='None expected: P07 totals are unchanged.',
+    expected_parity_behaviour='None expected: Q07 totals are unchanged.',
     expected_certification_impact=(
         'Certification-blocking: an indefensible tax line.'),
     expected_severity=Severity.HIGH,
@@ -366,13 +366,13 @@ def _b06():
     target_layer=TargetLayer.DATA,
     expected_detection=(Layer.D4_INVARIANTS, Layer.D1_PARITY),
     expected_invariants=('INV-B04',),
-    expected_quantities=('P09',),
+    expected_quantities=('Q09',),
     expected_reconciliations=(),
     expected_replay_behaviour=(
         'None expected: the replay window ends at the business date, so a '
         'future-dated row falls outside it entirely — which is exactly '
         'how a figure hides from a historical review.'),
-    expected_parity_behaviour='P09 (payments total) rises.',
+    expected_parity_behaviour='Q09 (payments total) rises.',
     expected_certification_impact=(
         'Release-blocking: the temporal basis is broken.'),
     expected_severity=Severity.CRITICAL,
@@ -428,7 +428,7 @@ def _b07():
         'night moves ninety days out, beyond the replay window, so it '
         'does not reappear anywhere.'),
     expected_parity_behaviour=(
-        'None declared: P04 reads the reservation tariff, not the nightly '
+        'None declared: Q04 reads the reservation tariff, not the nightly '
         'rows.'),
     expected_certification_impact=(
         'Release-blocking: revenue attributed to an unsold night.'),
@@ -480,7 +480,7 @@ def _b08():
         'collected total for the day falls while the ledger, which does '
         'not sign, holds — a genuine divergence between two views.'),
     expected_parity_behaviour=(
-        'None declared. P09 compares signed against raw payments, so it '
+        'None declared. Q09 compares signed against raw payments, so it '
         'may move; the declaration stays with the invariant that names '
         'the cause.'),
     expected_certification_impact=(

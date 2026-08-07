@@ -103,7 +103,7 @@ def _d01():
     expected_replay_behaviour=(
         'The snapshot integrity verdict for the date flips to false.'),
     expected_parity_behaviour=(
-        'None declared: P15 compares stored column totals, which the edit '
+        'None declared: Q15 compares stored column totals, which the edit '
         'leaves alone.'),
     expected_certification_impact=(
         'Release-blocking: the record of a closed day cannot be vouched '
@@ -149,19 +149,19 @@ def _d02():
     expected_detection=(Layer.D4_INVARIANTS, Layer.D3_REPLAY,
                         Layer.D1_PARITY),
     expected_invariants=('INV-B03',),
-    expected_quantities=('P15',),
+    expected_quantities=('Q15',),
     expected_reconciliations=(),
     expected_replay_behaviour=(
         'History drift between the recomputed collected total and the '
         'stored close.'),
     expected_parity_behaviour=(
-        'P15 diverges on total_revenue.'),
+        'Q15 diverges on total_revenue.'),
     expected_certification_impact=(
         'Release-blocking: the reported day and the computed day '
         'disagree.'),
     expected_severity=Severity.CRITICAL,
     expected_evidence=(
-        'INV-B03 names the date and field with both values; P15 '
+        'INV-B03 names the date and field with both values; Q15 '
         'attributes the divergence to the stored column.'),
     cleanup_strategy=CLEANUP,
     repeatability=REPEATABLE,
@@ -322,7 +322,7 @@ def _d05():
         'None declared: the replay reconciliations read stored tax lines '
         'rather than recomputing GST.'),
     expected_parity_behaviour=(
-        'None declared: P07 totals the stored components, which the '
+        'None declared: Q07 totals the stored components, which the '
         'setting does not touch.'),
     expected_certification_impact=(
         'Certification-blocking: invoices would be issued under the wrong '
@@ -541,7 +541,7 @@ def _d09():
         'control does not fire, it becomes inapplicable, which is the '
         'more dangerous failure.'),
     expected_parity_behaviour=(
-        'None declared: P15 iterates audit logs regardless of status.'),
+        'None declared: Q15 iterates audit logs regardless of status.'),
     expected_certification_impact=(
         'Release-blocking: a reported period has been un-reported.'),
     expected_severity=Severity.CRITICAL,

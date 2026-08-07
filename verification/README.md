@@ -354,7 +354,7 @@ and `verification/baselines/` elsewhere first.
 
 ## Known limitations
 
-- **P11 and P21 are `VACUOUS`.** Refund/void and shift/cash have no
+- **Q11 and Q21 are `VACUOUS`.** Refund/void and shift/cash have no
   production data. They need regression datasets (D6).
 - **Fourteen quantities cannot be commissioned by data mutation.** The
   reasons are recorded in `evidence/*_commission/commission.json`. Some
@@ -443,7 +443,7 @@ and `verification/baselines/` elsewhere first.
   be the sole evidence that a change was safe.
 - **`ENGINE_PATCH` cannot reach a callable bound at import time under a
   different name.** FLT-C01 declares this explicitly rather than dropping
-  the expectation: D1's P16 and P18 reach `get_cash_revenue` through the
+  the expectation: D1's Q16 and Q18 reach `get_cash_revenue` through the
   `get_daily_revenue` alias, which a wrapper on the canonical name does
   not cover.
 - **Three D4 invariants are challenged by no D5 fault.** Not unverified —

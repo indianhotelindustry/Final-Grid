@@ -1,7 +1,7 @@
 """
 Rendering a surface and reading back what it computed.
 
-This is the piece D1 was missing. Quantities P16–P18 — daily report
+This is the piece D1 was missing. Quantities Q16–Q18 — daily report
 totals, MIS aggregates, dashboard tiles — are produced inside Flask route
 handlers, so the parity harness could not reach them and reported
 NOT_IMPLEMENTED. With an authenticated client and the

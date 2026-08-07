@@ -45,13 +45,70 @@ def quantity(qid: str, label: str, policy: str, severity: str,
     and has already compared each concept against its own counterpart.
     For those, the default flat comparison is not merely redundant, it is
     wrong: it would compare ADR against accrual revenue and report a
-    divergence that means nothing. P16 did exactly that the first time it
+    divergence that means nothing. Q16 did exactly that the first time it
     ran, reporting DIVERGED while all seven of its concept pairs agreed.
     """
     def deco(fn):
         REGISTRY.append((qid, label, policy, severity, self_compared, fn))
         return fn
     return deco
+
+
+# ---------------------------------------------------------------------------
+# Legacy identifiers (Wave 0.5)
+# ---------------------------------------------------------------------------
+
+#: These quantities were declared ``P01``-``P22`` until Wave 0.5. The prefix
+#: collided with the constitutional principles ``P1``-``P14``: README line
+#: 357 read "P11 and P21 are VACUOUS" — quantities — while
+#: ``datasets/model.py`` read "P11 (observable correctness)" — a principle.
+#: Two different P11s in one framework, one of them constitutional.
+#:
+#: The quantities were renamed because they are the junior namespace; the
+#: constitution is cited by external governance documents and by every
+#: invariant declaration.
+#:
+#: Retained evidence is NOT rewritten. The 81 evidence packs and
+#: ``baselines/v2.2.18_preWave1.json`` are release evidence under P12
+#: (historical immutability) and Phase 2.6 §13; editing them so that a
+#: measurement taken in August reads as though it had always used the new
+#: identifier would be falsifying the record — precisely the failure mode
+#: this framework exists to detect. So the old identifiers stay in the
+#: artifacts and are translated on READ instead.
+LEGACY_QUANTITY_IDS: dict = {f'P{n:02d}': f'Q{n:02d}' for n in range(1, 23)}
+
+
+def canonical_quantity_id(qid: str) -> str:
+    """Translate a pre-Wave-0.5 quantity id to its current form.
+
+    Returns ``qid`` unchanged if it is already canonical or unrecognised —
+    an unknown id is the caller's problem to report, not this function's
+    to silently rewrite.
+    """
+    return LEGACY_QUANTITY_IDS.get(qid, qid)
+
+
+def canonicalise_quantity_map(mapping: dict) -> dict:
+    """Rekey a stored ``{quantity_id: ...}`` map onto canonical ids.
+
+    Used when reading a baseline captured before the rename. A file
+    already keyed canonically passes through unchanged, so this is safe to
+    apply unconditionally.
+
+    A collision — the same quantity present under both its legacy and its
+    canonical id — is refused rather than resolved. Silently preferring
+    one would make the release gate compare against a value nobody chose.
+    """
+    out: dict = {}
+    for key, value in mapping.items():
+        canonical = canonical_quantity_id(key)
+        if canonical in out:
+            raise ValueError(
+                f'Baseline contains {canonical!r} under both its legacy and '
+                f'its canonical identifier. Refusing to guess which value '
+                f'the release gate should compare against.')
+        out[canonical] = value
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -216,12 +273,12 @@ class Context:
 
 
 # ---------------------------------------------------------------------------
-# P01 — Reservation census
+# Q01 — Reservation census
 # ---------------------------------------------------------------------------
 
-@quantity('P01', 'Reservation count and status distribution',
+@quantity('Q01', 'Reservation count and status distribution',
           Policy.EXACT, Severity.BLOCK)
-def p01(ctx: Context) -> tuple[dict, list, dict, str]:
+def q01(ctx: Context) -> tuple[dict, list, dict, str]:
     by_status: dict[str, int] = {}
     for r in ctx.reservations:
         by_status[r.status] = by_status.get(r.status, 0) + 1
@@ -236,12 +293,12 @@ def p01(ctx: Context) -> tuple[dict, list, dict, str]:
 
 
 # ---------------------------------------------------------------------------
-# P02 — Charge census
+# Q02 — Charge census
 # ---------------------------------------------------------------------------
 
-@quantity('P02', 'Charge count and total by category',
+@quantity('Q02', 'Charge count and total by category',
           Policy.EXACT, Severity.BLOCK)
-def p02(ctx: Context) -> tuple[dict, list, dict, str]:
+def q02(ctx: Context) -> tuple[dict, list, dict, str]:
     from app.services import signed_extra_charge_amount
     EC = ctx.M['ExtraCharge']
     charges = EC.query.order_by(EC.id).all()
@@ -269,12 +326,12 @@ def p02(ctx: Context) -> tuple[dict, list, dict, str]:
 
 
 # ---------------------------------------------------------------------------
-# P03 — Room revenue per reservation (THE three-definition quantity)
+# Q03 — Room revenue per reservation (THE three-definition quantity)
 # ---------------------------------------------------------------------------
 
-@quantity('P03', 'Room revenue per reservation (3 definitions)',
+@quantity('Q03', 'Room revenue per reservation (3 definitions)',
           Policy.EXACT, Severity.BLOCK)
-def p03(ctx: Context) -> tuple[dict, list, dict, str]:
+def q03(ctx: Context) -> tuple[dict, list, dict, str]:
     from app.services import get_room_revenue, is_room_rent_charge
 
     tot_canonical = Decimal('0')
@@ -307,7 +364,7 @@ def p03(ctx: Context) -> tuple[dict, list, dict, str]:
 
         # D1 vs D3 is the comparison that matters: same scope (full stay),
         # different source. D2 is a per-night figure and is compared at
-        # date level in P04, not here.
+        # date level in Q04, not here.
         if abs(d1 - d3) > Decimal('0.01'):
             div.append(Divergence(
                 f'reservation {r.id}', 'D1 canonical get_room_revenue',
@@ -331,12 +388,12 @@ def p03(ctx: Context) -> tuple[dict, list, dict, str]:
 
 
 # ---------------------------------------------------------------------------
-# P04 — Room revenue per business date
+# Q04 — Room revenue per business date
 # ---------------------------------------------------------------------------
 
-@quantity('P04', 'Room revenue per business date',
+@quantity('Q04', 'Room revenue per business date',
           Policy.EXACT, Severity.BLOCK)
-def p04(ctx: Context) -> tuple[dict, list, dict, str]:
+def q04(ctx: Context) -> tuple[dict, list, dict, str]:
     from app import kpi_helpers as K
     from app.models import ExtraCharge
 
@@ -385,12 +442,12 @@ def p04(ctx: Context) -> tuple[dict, list, dict, str]:
 
 
 # ---------------------------------------------------------------------------
-# P05 — Ancillary revenue by category
+# Q05 — Ancillary revenue by category
 # ---------------------------------------------------------------------------
 
-@quantity('P05', 'Ancillary revenue by category',
+@quantity('Q05', 'Ancillary revenue by category',
           Policy.EXACT, Severity.BLOCK)
-def p05(ctx: Context) -> tuple[dict, list, dict, str]:
+def q05(ctx: Context) -> tuple[dict, list, dict, str]:
     from app import kpi_helpers as K
 
     tot_kpi = Decimal('0')
@@ -433,12 +490,12 @@ def p05(ctx: Context) -> tuple[dict, list, dict, str]:
 
 
 # ---------------------------------------------------------------------------
-# P06 — Taxable base
+# Q06 — Taxable base
 # ---------------------------------------------------------------------------
 
-@quantity('P06', 'Taxable base (deduplicated vs raw)',
+@quantity('Q06', 'Taxable base (deduplicated vs raw)',
           Policy.RUPEE, Severity.BLOCK)
-def p06(ctx: Context) -> tuple[dict, list, dict, str]:
+def q06(ctx: Context) -> tuple[dict, list, dict, str]:
     from app.gst_service import get_gst_report
     TL = ctx.M['TaxLine']
 
@@ -476,12 +533,12 @@ def p06(ctx: Context) -> tuple[dict, list, dict, str]:
 
 
 # ---------------------------------------------------------------------------
-# P07 — Tax by component
+# Q07 — Tax by component
 # ---------------------------------------------------------------------------
 
-@quantity('P07', 'Tax by component (CGST / SGST / IGST)',
+@quantity('Q07', 'Tax by component (CGST / SGST / IGST)',
           Policy.RUPEE, Severity.BLOCK)
-def p07(ctx: Context) -> tuple[dict, list, dict, str]:
+def q07(ctx: Context) -> tuple[dict, list, dict, str]:
     from app.gst_service import compute_stay_gst
     TL = ctx.M['TaxLine']
 
@@ -506,12 +563,12 @@ def p07(ctx: Context) -> tuple[dict, list, dict, str]:
 
 
 # ---------------------------------------------------------------------------
-# P08 — Discount
+# Q08 — Discount
 # ---------------------------------------------------------------------------
 
-@quantity('P08', 'Discount applied per reservation',
+@quantity('Q08', 'Discount applied per reservation',
           Policy.EXACT, Severity.BLOCK)
-def p08(ctx: Context) -> tuple[dict, list, dict, str]:
+def q08(ctx: Context) -> tuple[dict, list, dict, str]:
     from app.services import calculate_stay_amount
 
     field_total = Decimal('0')
@@ -549,12 +606,12 @@ def p08(ctx: Context) -> tuple[dict, list, dict, str]:
 
 
 # ---------------------------------------------------------------------------
-# P09 — Payments total, correction-signed
+# Q09 — Payments total, correction-signed
 # ---------------------------------------------------------------------------
 
-@quantity('P09', 'Payments total (signed vs raw)',
+@quantity('Q09', 'Payments total (signed vs raw)',
           Policy.EXACT, Severity.BLOCK)
-def p09(ctx: Context) -> tuple[dict, list, dict, str]:
+def q09(ctx: Context) -> tuple[dict, list, dict, str]:
     from app.services import signed_payment_amount, calculate_stay_amount
     P = ctx.M['Payment']
 
@@ -583,12 +640,12 @@ def p09(ctx: Context) -> tuple[dict, list, dict, str]:
 
 
 # ---------------------------------------------------------------------------
-# P10 — Payments by mode and purpose
+# Q10 — Payments by mode and purpose
 # ---------------------------------------------------------------------------
 
-@quantity('P10', 'Payments by mode and purpose',
+@quantity('Q10', 'Payments by mode and purpose',
           Policy.EXACT, Severity.BLOCK)
-def p10(ctx: Context) -> tuple[dict, list, dict, str]:
+def q10(ctx: Context) -> tuple[dict, list, dict, str]:
     from app import kpi_helpers as K
     P, PM = ctx.M['Payment'], ctx.M['PaymentMode']
 
@@ -620,12 +677,12 @@ def p10(ctx: Context) -> tuple[dict, list, dict, str]:
 
 
 # ---------------------------------------------------------------------------
-# P11 — Refunds separated from voids
+# Q11 — Refunds separated from voids
 # ---------------------------------------------------------------------------
 
-@quantity('P11', 'Refunds, separated from voids',
+@quantity('Q11', 'Refunds, separated from voids',
           Policy.EXACT, Severity.BLOCK)
-def p11(ctx: Context) -> tuple[dict, list, dict, str]:
+def q11(ctx: Context) -> tuple[dict, list, dict, str]:
     P = ctx.M['Payment']
     voided = P.query.filter(P.is_voided == True).all()  # noqa: E712
     void_total = sum(_d(p.amount) for p in voided)
@@ -650,12 +707,12 @@ def p11(ctx: Context) -> tuple[dict, list, dict, str]:
 
 
 # ---------------------------------------------------------------------------
-# P12 — Outstanding per reservation (the dual-balance quantity)
+# Q12 — Outstanding per reservation (the dual-balance quantity)
 # ---------------------------------------------------------------------------
 
-@quantity('P12', 'Outstanding per reservation (2 bases)',
+@quantity('Q12', 'Outstanding per reservation (2 bases)',
           Policy.EXACT, Severity.BLOCK)
-def p12(ctx: Context) -> tuple[dict, list, dict, str]:
+def q12(ctx: Context) -> tuple[dict, list, dict, str]:
     from app.services import calculate_stay_amount
 
     tot_balance = Decimal('0')
@@ -689,12 +746,12 @@ def p12(ctx: Context) -> tuple[dict, list, dict, str]:
 
 
 # ---------------------------------------------------------------------------
-# P13 — Settlement status distribution
+# Q13 — Settlement status distribution
 # ---------------------------------------------------------------------------
 
-@quantity('P13', 'Settlement status distribution',
+@quantity('Q13', 'Settlement status distribution',
           Policy.EXACT, Severity.BLOCK)
-def p13(ctx: Context) -> tuple[dict, list, dict, str]:
+def q13(ctx: Context) -> tuple[dict, list, dict, str]:
     from app.services import calculate_stay_amount
     from app.financial import SETTLEMENT_TOLERANCE
 
@@ -725,12 +782,12 @@ def p13(ctx: Context) -> tuple[dict, list, dict, str]:
 
 
 # ---------------------------------------------------------------------------
-# P14 — Folio partition
+# Q14 — Folio partition
 # ---------------------------------------------------------------------------
 
-@quantity('P14', 'Folio balances / partition integrity',
+@quantity('Q14', 'Folio balances / partition integrity',
           Policy.EXACT, Severity.BLOCK)
-def p14(ctx: Context) -> tuple[dict, list, dict, str]:
+def q14(ctx: Context) -> tuple[dict, list, dict, str]:
     from app.services import calculate_folio_amount, calculate_stay_amount
 
     folio_charges = Decimal('0')
@@ -765,12 +822,12 @@ def p14(ctx: Context) -> tuple[dict, list, dict, str]:
 
 
 # ---------------------------------------------------------------------------
-# P15 — Night audit sections
+# Q15 — Night audit sections
 # ---------------------------------------------------------------------------
 
-@quantity('P15', 'Night audit — stored vs recomputed sections',
+@quantity('Q15', 'Night audit — stored vs recomputed sections',
           Policy.EXACT, Severity.BLOCK)
-def p15(ctx: Context) -> tuple[dict, list, dict, str]:
+def q15(ctx: Context) -> tuple[dict, list, dict, str]:
     div: list[Divergence] = []
     per_date: dict[str, dict] = {}
 
@@ -823,7 +880,7 @@ def p15(ctx: Context) -> tuple[dict, list, dict, str]:
 
 
 # ---------------------------------------------------------------------------
-# P16-P18 — report / dashboard surfaces
+# Q16-Q18 — report / dashboard surfaces
 # ---------------------------------------------------------------------------
 # Implemented once D2 (Golden Master Framework) provided an authenticated
 # client and a way to read a route's template context. Every URL below
@@ -850,10 +907,10 @@ def _surface_pairs(pairs: list, policy: str) -> tuple[dict, list]:
     return impls, div
 
 
-@quantity('P16', 'Daily report totals vs canonical engines',
+@quantity('Q16', 'Daily report totals vs canonical engines',
           Policy.RUPEE, Severity.BLOCK,
           self_compared=True)
-def p16(ctx: Context) -> tuple[dict, list, dict, str]:
+def q16(ctx: Context) -> tuple[dict, list, dict, str]:
     """Does the Flash Report show what the canonical engines say?"""
     from verification.golden.surfaces import require_context, pick
     from app.kpi_helpers import (get_daily_revenue, get_accrual_revenue,
@@ -902,10 +959,10 @@ def p16(ctx: Context) -> tuple[dict, list, dict, str]:
     return impls, div, detail, note
 
 
-@quantity('P17', 'MIS aggregates vs canonical engines and the flash report',
+@quantity('Q17', 'MIS aggregates vs canonical engines and the flash report',
           Policy.RUPEE, Severity.WARN,
           self_compared=True)
-def p17(ctx: Context) -> tuple[dict, list, dict, str]:
+def q17(ctx: Context) -> tuple[dict, list, dict, str]:
     """Does the Front Office MIS agree with the other daily surfaces?"""
     from verification.golden.surfaces import require_context, pick
     from app.kpi_helpers import get_daily_revenue, get_occupancy, get_adr
@@ -953,10 +1010,10 @@ def p17(ctx: Context) -> tuple[dict, list, dict, str]:
     return impls, div, detail, note
 
 
-@quantity('P18', 'Executive dashboard tiles vs canonical engines',
+@quantity('Q18', 'Executive dashboard tiles vs canonical engines',
           Policy.RUPEE, Severity.BLOCK,
           self_compared=True)
-def p18(ctx: Context) -> tuple[dict, list, dict, str]:
+def q18(ctx: Context) -> tuple[dict, list, dict, str]:
     """Does the dashboard show what the reports and engines say?"""
     from verification.golden.surfaces import require_context, pick
     from app.kpi_helpers import get_daily_revenue, get_occupancy
@@ -997,12 +1054,12 @@ def p18(ctx: Context) -> tuple[dict, list, dict, str]:
 
 
 # ---------------------------------------------------------------------------
-# P19 — Occupancy and rooms sold
+# Q19 — Occupancy and rooms sold
 # ---------------------------------------------------------------------------
 
-@quantity('P19', 'Occupancy and rooms sold',
+@quantity('Q19', 'Occupancy and rooms sold',
           Policy.EXACT, Severity.BLOCK)
-def p19(ctx: Context) -> tuple[dict, list, dict, str]:
+def q19(ctx: Context) -> tuple[dict, list, dict, str]:
     from app.occupancy_engine import (occupancy_snapshot, occupied_rooms,
                                       occupied_room_nights, sellable_rooms)
     from app import kpi_helpers as K
@@ -1033,12 +1090,12 @@ def p19(ctx: Context) -> tuple[dict, list, dict, str]:
 
 
 # ---------------------------------------------------------------------------
-# P20 — ADR and RevPAR
+# Q20 — ADR and RevPAR
 # ---------------------------------------------------------------------------
 
-@quantity('P20', 'ADR and RevPAR (multiple definitions)',
+@quantity('Q20', 'ADR and RevPAR (multiple definitions)',
           Policy.EXACT, Severity.BLOCK)
-def p20(ctx: Context) -> tuple[dict, list, dict, str]:
+def q20(ctx: Context) -> tuple[dict, list, dict, str]:
     from app import kpi_helpers as K
     from app.occupancy_engine import occupied_room_nights
 
@@ -1078,12 +1135,12 @@ def p20(ctx: Context) -> tuple[dict, list, dict, str]:
 
 
 # ---------------------------------------------------------------------------
-# P21 — Cash position and variance
+# Q21 — Cash position and variance
 # ---------------------------------------------------------------------------
 
-@quantity('P21', 'Cash position and variance',
+@quantity('Q21', 'Cash position and variance',
           Policy.EXACT, Severity.BLOCK)
-def p21(ctx: Context) -> tuple[dict, list, dict, str, int]:
+def q21(ctx: Context) -> tuple[dict, list, dict, str, int]:
     from app.shift_service import calculate_expected_cash
 
     rows: list[dict] = []
@@ -1120,12 +1177,12 @@ def p21(ctx: Context) -> tuple[dict, list, dict, str, int]:
 
 
 # ---------------------------------------------------------------------------
-# P22 — Receivables
+# Q22 — Receivables
 # ---------------------------------------------------------------------------
 
-@quantity('P22', 'Receivables — OTA, corporate, individual',
+@quantity('Q22', 'Receivables — OTA, corporate, individual',
           Policy.EXACT, Severity.BLOCK)
-def p22(ctx: Context) -> tuple[dict, list, dict, str]:
+def q22(ctx: Context) -> tuple[dict, list, dict, str]:
     from app.ota_settlement_service import compute_ota_outstanding
     from app.ota_reconciliation import get_ota_pending
     Company, Reservation = ctx.M['Company'], ctx.M['Reservation']

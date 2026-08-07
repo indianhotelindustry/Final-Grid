@@ -73,8 +73,8 @@ class SeedOutcome:
 
 SEEDS: list[Seed] = [
     Seed(
-        seed_id='S-P03',
-        target='P03',
+        seed_id='S-Q03',
+        target='Q03',
         description=(
             'Post a room_rent ledger row for one reservation. This is the '
             'exact condition under which the three room-revenue definitions '
@@ -89,8 +89,8 @@ SEEDS: list[Seed] = [
         expect_from=Verdict.AGREED, expect_to=Verdict.DIVERGED,
     ),
     Seed(
-        seed_id='S-P04',
-        target='P04',
+        seed_id='S-Q04',
+        target='Q04',
         description=(
             'Same room_rent posting seen at date level: the ledger-posted '
             'implementation becomes non-zero and must be compared.'),
@@ -104,8 +104,8 @@ SEEDS: list[Seed] = [
         expect_from=Verdict.AGREED, expect_to=Verdict.DIVERGED,
     ),
     Seed(
-        seed_id='S-P09',
-        target='P09',
+        seed_id='S-Q09',
+        target='Q09',
         description=(
             'Insert a payment reversal row. Raw summation adds it; signed '
             'summation subtracts it. This is the 29-of-31 defect.'),
@@ -120,11 +120,11 @@ SEEDS: list[Seed] = [
         expect_from=Verdict.AGREED, expect_to=Verdict.DIVERGED,
     ),
     Seed(
-        seed_id='S-P02',
-        target='P02',
+        seed_id='S-Q02',
+        target='Q02',
         description=(
             'Insert an extra-charge reversal row — the charge-side twin of '
-            'S-P09.'),
+            'S-Q09.'),
         sql=[
             "INSERT INTO extra_charges "
             "(reservation_id, description, amount, charge_date, charge_type, "
@@ -135,8 +135,8 @@ SEEDS: list[Seed] = [
         expect_from=Verdict.AGREED, expect_to=Verdict.DIVERGED,
     ),
     Seed(
-        seed_id='S-P07',
-        target='P07',
+        seed_id='S-Q07',
+        target='Q07',
         description=(
             'Corrupt one stored tax line. Stored tax must then disagree '
             'with live recomputation — an invoice-versus-balance gap.'),
@@ -147,8 +147,8 @@ SEEDS: list[Seed] = [
         expect_from=Verdict.AGREED, expect_to=Verdict.DIVERGED,
     ),
     Seed(
-        seed_id='S-P15',
-        target='P15',
+        seed_id='S-Q15',
+        target='Q15',
         description=(
             'Tamper with a stored night-audit total. The recomputation must '
             'no longer match what was frozen.'),
@@ -159,8 +159,8 @@ SEEDS: list[Seed] = [
         expect_from=Verdict.AGREED, expect_to=Verdict.DIVERGED,
     ),
     Seed(
-        seed_id='S-P22',
-        target='P22',
+        seed_id='S-Q22',
+        target='Q22',
         description=(
             'Record an OTA payout. Gross outstanding ignores it; net '
             'outstanding must fall. Proves the receivable comparison is live.'),
@@ -173,8 +173,8 @@ SEEDS: list[Seed] = [
         expect_from=Verdict.DIVERGED, expect_to=Verdict.DIVERGED,
     ),
     Seed(
-        seed_id='S-P14',
-        target='P14',
+        seed_id='S-Q14',
+        target='Q14',
         description=(
             'Route one charge to a folio. The folio partition sum must move '
             'toward the reservation sum, proving the partition check reads '
@@ -195,28 +195,28 @@ SEEDS: list[Seed] = [
 #: named implementations are already structurally equivalent, so their
 #: agreement is tautological rather than verified.
 NOT_SEEDABLE = {
-    'P01': 'Census quantity — single source by design, nothing to compare.',
-    'P05': ('Both implementations apply the same room_rent exclusion filter '
+    'Q01': 'Census quantity — single source by design, nothing to compare.',
+    'Q05': ('Both implementations apply the same room_rent exclusion filter '
             'over the same rows. Agreement is structural; no data mutation '
             'can separate them. Divergence would require a code change.'),
-    'P06': 'Already DIVERGED on production data — detection demonstrated live.',
-    'P08': ('Discount suppression only triggers when nightly rows or '
-            'room_rent rows exist; covered indirectly by S-P03.'),
-    'P10': ('kpi_helpers and the ORM aggregation read identical rows with '
+    'Q06': 'Already DIVERGED on production data — detection demonstrated live.',
+    'Q08': ('Discount suppression only triggers when nightly rows or '
+            'room_rent rows exist; covered indirectly by S-Q03.'),
+    'Q10': ('kpi_helpers and the ORM aggregation read identical rows with '
             'identical filters. Structural agreement.'),
-    'P11': 'VACUOUS — requires refund/void regression data (Wave 0 D6).',
-    'P12': 'Already DIVERGED on production data — detection demonstrated live.',
-    'P13': 'Already DIVERGED on production data — detection demonstrated live.',
-    'P16': ('Implemented in D2. The flash report delegates to the same '
+    'Q11': 'VACUOUS — requires refund/void regression data (Wave 0 D6).',
+    'Q12': 'Already DIVERGED on production data — detection demonstrated live.',
+    'Q13': 'Already DIVERGED on production data — detection demonstrated live.',
+    'Q16': ('Implemented in D2. The flash report delegates to the same '
             'canonical helpers it is compared against, so no data mutation '
             'can separate them — a divergence would require a code change. '
             'Structural agreement.'),
-    'P17': 'Already DIVERGED on production data — detection demonstrated live.',
-    'P18': 'Already DIVERGED on production data — detection demonstrated live.',
-    'P19': ('Both implementations delegate to occupancy_engine, which is '
+    'Q17': 'Already DIVERGED on production data — detection demonstrated live.',
+    'Q18': 'Already DIVERGED on production data — detection demonstrated live.',
+    'Q19': ('Both implementations delegate to occupancy_engine, which is '
             'already the converged canonical source (Phase 2 §3).'),
-    'P20': 'Already DIVERGED on production data — detection demonstrated live.',
-    'P21': 'VACUOUS — requires shift regression data (Wave 0 D6).',
+    'Q20': 'Already DIVERGED on production data — detection demonstrated live.',
+    'Q21': 'VACUOUS — requires shift regression data (Wave 0 D6).',
 }
 
 

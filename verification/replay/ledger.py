@@ -227,7 +227,7 @@ def _tax(conn: sqlite3.Connection, day: str, acc: _Acc) -> None:
     A GST regime raises several component lines (CGST and SGST) against
     one taxable amount, so the raw sum of ``taxable_amount`` double
     counts; both are recorded because the application has historically
-    used each of them in different places (Phase 2, P06).
+    used each of them in different places (Phase 2, Q06).
     """
     if not _table_exists(conn, 'tax_lines'):
         return

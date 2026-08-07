@@ -48,14 +48,14 @@ CLEANUP = ('The private copy is deleted and its absence verified; the '
     expected_detection=(Layer.D4_INVARIANTS, Layer.D3_REPLAY,
                         Layer.D1_PARITY),
     expected_invariants=('INV-C01', 'INV-C05'),
-    expected_quantities=('P10',),
+    expected_quantities=('Q10',),
     expected_reconciliations=(),
     expected_replay_behaviour=(
         'The day ledger moves money from the direct bucket to the OTA '
         'bucket; the engine follows, so the reconciliations hold and the '
         'movement shows as a changed ledger rather than a broken rule.'),
     expected_parity_behaviour=(
-        'P10 (payments by mode and purpose) changes composition while the '
+        'Q10 (payments by mode and purpose) changes composition while the '
         'gross total is unchanged — the signature of a misclassification '
         'rather than a loss.'),
     expected_certification_impact=(
@@ -166,7 +166,7 @@ def _a02():
     #: no overpayment record. That is detection by consequence, not by
     #: cause, and the completion report says so.
     expected_invariants=('INV-A06',),
-    expected_quantities=('P09', 'P10'),
+    expected_quantities=('Q09', 'Q10'),
     expected_reconciliations=(),
     expected_replay_behaviour=(
         'The day ledger and the engine both rise by the duplicated '
@@ -174,7 +174,7 @@ def _a02():
         'reports more money than it took — detectable as movement, not as '
         'a broken rule.'),
     expected_parity_behaviour=(
-        'P09 and P10 both rise. No parity quantity can distinguish a '
+        'Q09 and Q10 both rise. No parity quantity can distinguish a '
         'duplicate from a genuine second payment.'),
     expected_certification_impact=(
         'Certification-blocking: the cash figure is overstated and the '
@@ -236,7 +236,7 @@ def _a03():
         'the accrual engines read the reservation tariff rather than the '
         'nightly rows — which is itself the finding.'),
     expected_parity_behaviour=(
-        'None declared. P03 reads get_room_revenue, which falls back to '
+        'None declared. Q03 reads get_room_revenue, which falls back to '
         'the flat tariff when nightly rows are absent, so the loss is '
         'invisible to it.'),
     expected_certification_impact=(
@@ -291,7 +291,7 @@ def _a04():
         'ledger total changes. A fault that money-based checks cannot '
         'see.'),
     expected_parity_behaviour=(
-        'None expected. P07 totals tax by component, which the rate '
+        'None expected. Q07 totals tax by component, which the rate '
         'change leaves alone.'),
     expected_certification_impact=(
         'Certification-blocking: a GST return would be filed from a line '
@@ -341,14 +341,14 @@ def _a05():
     expected_detection=(Layer.D4_INVARIANTS, Layer.D3_REPLAY,
                         Layer.D1_PARITY),
     expected_invariants=('INV-D03', 'INV-A04'),
-    expected_quantities=('P10',),
+    expected_quantities=('Q10',),
     expected_reconciliations=('RC11',),
     expected_replay_behaviour=(
         'RC11 breaks: the night audit counts the orphan as direct cash '
         'while the ledger counts it as neither, so the two part company '
         'by exactly the orphan amount.'),
     expected_parity_behaviour=(
-        'P10 loses the row from its by-mode breakdown.'),
+        'Q10 loses the row from its by-mode breakdown.'),
     expected_certification_impact=(
         'Release-blocking: two canonical engines disagree about the same '
         'money.'),
@@ -398,13 +398,13 @@ def _a06():
     expected_detection=(Layer.D4_INVARIANTS, Layer.D3_REPLAY,
                         Layer.D1_PARITY),
     expected_invariants=('INV-A06',),
-    expected_quantities=('P09', 'P12'),
+    expected_quantities=('Q09', 'Q12'),
     expected_reconciliations=(),
     expected_replay_behaviour=(
         'The day ledger and the engine both rise by the overpayment, so '
         'reconciliations hold; the day reports more cash than it owed.'),
     expected_parity_behaviour=(
-        'P09 rises and P12 (outstanding per reservation) goes negative.'),
+        'Q09 rises and Q12 (outstanding per reservation) goes negative.'),
     expected_certification_impact=(
         'Certification-blocking: an unrecorded liability.'),
     expected_severity=Severity.HIGH,
@@ -457,7 +457,7 @@ def _a07():
         'The ledger occupancy count for the affected night changes; the '
         'engine follows.'),
     expected_parity_behaviour=(
-        'None declared. P19 counts distinct rooms, which a double '
+        'None declared. Q19 counts distinct rooms, which a double '
         'allocation leaves unchanged — the reason an invariant is needed.'),
     expected_certification_impact=(
         'Certification-blocking: occupancy and rate metrics overstated.'),
@@ -511,13 +511,13 @@ def _a08():
     expected_detection=(Layer.D4_INVARIANTS, Layer.D3_REPLAY,
                         Layer.D1_PARITY),
     expected_invariants=('INV-C02',),
-    expected_quantities=('P02', 'P12'),
+    expected_quantities=('Q02', 'Q12'),
     expected_reconciliations=('RC07',),
     expected_replay_behaviour=(
         'The charge lands on a date inside the replay window, so the '
         'ledger extras total and the accrual engine both move together.'),
     expected_parity_behaviour=(
-        'P02 (charge census) and P12 (outstanding) both move.'),
+        'Q02 (charge census) and Q12 (outstanding) both move.'),
     expected_certification_impact=(
         'Certification-blocking: an unrecoverable receivable with no '
         'authorisation behind it.'),
@@ -572,12 +572,12 @@ def _a09():
     #: the same nights, so the room-night clash invariant fires. Nothing
     #: names the duplication itself.
     expected_invariants=('INV-C04',),
-    expected_quantities=('P01',),
+    expected_quantities=('Q01',),
     expected_reconciliations=(),
     expected_replay_behaviour=(
         'Occupancy and accrual room revenue rise for the duplicated '
         'nights; the ledger and the engine move together.'),
-    expected_parity_behaviour='P01 (reservation census) rises by one.',
+    expected_parity_behaviour='Q01 (reservation census) rises by one.',
     expected_certification_impact=(
         'Certification-blocking: occupancy and accrual revenue overstated.'),
     expected_severity=Severity.HIGH,

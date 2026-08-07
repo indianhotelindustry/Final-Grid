@@ -15,7 +15,7 @@ completely unexercised.
 
 Each fault names a *specific* canonical engine, because that is what
 makes the result interpretable. "Revenue is wrong somewhere" tells you
-nothing; "``get_cash_revenue`` doubles and RC01 catches it while P16 does
+nothing; "``get_cash_revenue`` doubles and RC01 catches it while Q16 does
 not" tells you exactly which control you have and which you do not.
 """
 from __future__ import annotations
@@ -60,7 +60,7 @@ CLEANUP = ('Nothing to clean: the wrapper exists only inside the probe '
         'RC01 and RC02 break on every date with a payment: the engine '
         'reports twice what the primary record holds.'),
     expected_parity_behaviour=(
-        'None declared. P16 and P18 reach the helper through the '
+        'None declared. Q16 and Q18 reach the helper through the '
         'get_daily_revenue alias, which is bound at import time and so is '
         'not covered by a wrapper on the canonical name — a real limit of '
         'this injection, stated rather than hidden.'),
@@ -113,7 +113,7 @@ def _c01():
         'on it. Three reconciliations failing from one cause is the '
         'signature the report should show.'),
     expected_parity_behaviour=(
-        'None declared: P05 reads the charge table rather than the '
+        'None declared: Q05 reads the charge table rather than the '
         'helper.'),
     expected_certification_impact=(
         'Release-blocking: earned revenue overstated.'),
@@ -156,13 +156,13 @@ def _c02():
     target_layer=TargetLayer.ENGINE,
     expected_detection=(Layer.D4_INVARIANTS, Layer.D1_PARITY),
     expected_invariants=('INV-A01',),
-    expected_quantities=('P12',),
+    expected_quantities=('Q12',),
     expected_reconciliations=(),
     expected_replay_behaviour=(
         'None declared: the replay reconciliations do not read the '
         'settlement identity.'),
     expected_parity_behaviour=(
-        'P12 (outstanding per reservation) moves on every reservation.'),
+        'Q12 (outstanding per reservation) moves on every reservation.'),
     expected_certification_impact=(
         'Release-blocking: every guest is told the wrong balance.'),
     expected_severity=Severity.CRITICAL,
@@ -256,13 +256,13 @@ def _c04():
     expected_detection=(Layer.D4_INVARIANTS, Layer.D3_REPLAY,
                         Layer.D1_PARITY),
     expected_invariants=('INV-B03',),
-    expected_quantities=('P15',),
+    expected_quantities=('Q15',),
     expected_reconciliations=('RC16',),
     expected_replay_behaviour=(
         'History drift on occupancy for the closed date, and RC16 breaks '
         'against the ledger\'s span-derived room count.'),
     expected_parity_behaviour=(
-        'P15 (night audit stored vs recomputed) diverges on '
+        'Q15 (night audit stored vs recomputed) diverges on '
         'occupancy_count.'),
     expected_certification_impact=(
         'Release-blocking: a reported period no longer recomputes.'),
@@ -308,7 +308,7 @@ def _c05():
     target_layer=TargetLayer.ENGINE,
     expected_detection=(Layer.D1_PARITY,),
     expected_invariants=(),
-    expected_quantities=('P03', 'P04'),
+    expected_quantities=('Q03', 'Q04'),
     expected_reconciliations=(),
     expected_replay_behaviour=(
         'None declared: the replay reconciliations read the reservation '
@@ -316,14 +316,14 @@ def _c05():
         'engine can move without a single reconciliation noticing is '
         'itself worth knowing.'),
     expected_parity_behaviour=(
-        'P03 is the three-definition quantity and is built to catch '
+        'Q03 is the three-definition quantity and is built to catch '
         'exactly this: the canonical definition parts company with the '
         'two legacy ones.'),
     expected_certification_impact=(
         'Release-blocking: room revenue has two answers.'),
     expected_severity=Severity.CRITICAL,
     expected_evidence=(
-        'P03 reports the canonical, single-night and rate x nights '
+        'Q03 reports the canonical, single-night and rate x nights '
         'definitions side by side with per-reservation attribution.'),
     cleanup_strategy=CLEANUP,
     repeatability=REPEATABLE,
@@ -368,7 +368,7 @@ def _c06():
         'RC03 breaks on every date with an OTA posting: the engine '
         'reports zero where the ledger holds the money.'),
     expected_parity_behaviour=(
-        'None declared: P22 reads the payment table directly.'),
+        'None declared: Q22 reads the payment table directly.'),
     expected_certification_impact=(
         'Certification-blocking: a receivable vanishes from every report.'),
     expected_severity=Severity.HIGH,
@@ -416,7 +416,7 @@ def _c07():
         'one primary and two derived — is what distinguishes a fault in '
         'the base helper from a fault in the bundle.'),
     expected_parity_behaviour=(
-        'None declared: P04 sums the tariff itself rather than through '
+        'None declared: Q04 sums the tariff itself rather than through '
         'this helper.'),
     expected_certification_impact=(
         'Release-blocking: earned revenue doubled.'),
@@ -467,7 +467,7 @@ def _c08():
         'RC14 breaks against the stored tax lines, and the closed date '
         'shows history drift on tax.'),
     expected_parity_behaviour=(
-        'None declared: P07 reads the tax table directly.'),
+        'None declared: Q07 reads the tax table directly.'),
     expected_certification_impact=(
         'Certification-blocking: the audit and the return disagree about '
         'tax.'),
@@ -513,13 +513,13 @@ def _c09():
     expected_detection=(Layer.D3_REPLAY, Layer.D4_INVARIANTS,
                         Layer.D1_PARITY),
     expected_invariants=('INV-B03',),
-    expected_quantities=('P15',),
+    expected_quantities=('Q15',),
     expected_reconciliations=('RC11',),
     expected_replay_behaviour=(
         'RC11 breaks by exactly the injected amount, and the closed date '
         'shows history drift on collected cash.'),
     expected_parity_behaviour=(
-        'P15 diverges on total_revenue between the stored close and the '
+        'Q15 diverges on total_revenue between the stored close and the '
         'recomputation.'),
     expected_certification_impact=(
         'Release-blocking: the day cannot be reconciled.'),
