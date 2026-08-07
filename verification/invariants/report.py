@@ -79,7 +79,7 @@ def render_registry() -> str:
     add('')
 
     add('-' * W)
-    add('CONSTITUTIONAL COVERAGE — the Financial Constitution, P1 to P12')
+    add('CONSTITUTIONAL COVERAGE — the Financial Constitution, P1 to P14')
     add('-' * W)
     add('Some principles are obligations of the SYSTEM and are enforced by')
     add('invariants. Others are obligations of the VERIFICATION FRAMEWORK')

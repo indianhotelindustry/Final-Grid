@@ -18,7 +18,7 @@ nobody has actually thought through.
 
 Constitutional basis
 --------------------
-Phase 2.6 and the Financial Constitution, P1–P12. Each invariant names
+Phase 2.6 and the Financial Constitution, P1–P14. Each invariant names
 the principles it enforces in ``principles``; the engine reports coverage
 per principle, so a principle with no invariant is visible as a gap
 rather than assumed to be satisfied.
@@ -42,7 +42,7 @@ from typing import Callable
 # Vocabularies
 # ---------------------------------------------------------------------------
 
-#: The Financial Constitution, P1-P12, in the order the governing document
+#: The Financial Constitution, P1-P14, in the order the governing document
 #: declares them. Held here so that ``principles=('P7',)`` on an invariant
 #: is a reference to something written down rather than a private code.
 #:
