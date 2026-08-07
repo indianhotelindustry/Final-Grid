@@ -1,0 +1,78 @@
+{
+  "app_version": "2.2.18",
+  "business_date": "2026-05-28",
+  "certification_blocking": [],
+  "commissioning_evidence_pack": "C:\\Users\\SIPL Server\\Downloads\\DSS\\SukoonPMS\\SukoonPMS\\verification\\evidence\\20260804_172142_inv_commission",
+  "commissioning_gaps": [],
+  "copy_method": "sqlite-backup-api",
+  "counts": {
+    "VACUOUS": 1,
+    "evaluated": 1,
+    "registered": 1,
+    "uncommissioned": 0,
+    "violations": 0
+  },
+  "determinism_proven": true,
+  "duration_seconds": 1.17,
+  "financial_impact": {},
+  "finished_at": "2026-08-07T16:14:27",
+  "freeze_proven": true,
+  "frozen_at": "2026-05-28T12:00:00",
+  "mode": "ENTIRE_DATABASE",
+  "order_independence_proven": true,
+  "order_mismatches": [],
+  "overall": "INCOMPLETE",
+  "pvf_version": "0.5.0",
+  "read_only_verified": true,
+  "registry_size": 1,
+  "release_blocking": [],
+  "repeatability_mismatches": [],
+  "results": [
+    {
+      "blocking": "CERTIFICATION_BLOCKING",
+      "category": "A-ACCOUNTING",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [],
+        "business_date": "2026-05-28",
+        "confidence": "NONE",
+        "evidence_files": [],
+        "expected_result": "every overpaid reservation is logged",
+        "inputs": {
+          "overpaid": 0,
+          "overpayment_log_rows": 2,
+          "reservations_examined": 28
+        },
+        "observed_result": "overpaid reservations: no rows in scope",
+        "replay_context": {},
+        "root_cause_candidates": [],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": ""
+      },
+      "invariant_id": "INV-A06",
+      "metering": {
+        "db_reads": 171,
+        "db_writes": 0,
+        "duration_ms": 136,
+        "memory_peak_kb": 1303,
+        "rows_examined": 3
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 0,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "HIGH",
+      "status": "VACUOUS",
+      "title": "A guest who has paid more than they owe has an overpayment record",
+      "violation_count": 0,
+      "violations": []
+    }
+  ],
+  "scope": "ENTIRE_DATABASE",
+  "source_db": "C:\\Users\\SIPL Server\\Downloads\\DSS\\SukoonPMS\\SukoonPMS\\instance\\pms.db",
+  "source_hash_after": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+  "source_hash_before": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+  "started_at": "2026-08-07T16:14:26",
+  "total_writes": 0,
+  "unbacked_commissioning_claims": []
+}
