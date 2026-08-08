@@ -1,6 +1,6 @@
 # Wave 0 — Deliverable Status
 
-DSBC Frontline v2.2.18. Last verified 2026-08-08 (Wave 0.6).
+DSBC Frontline v2.2.18. Last verified 2026-08-08 (Wave 0.7).
 
 Counts in this document are read from the live registries, not
 transcribed from the completion reports. Where a report and the
@@ -20,7 +20,7 @@ commissioned.** Five are. Wave 0 is half done.
 | D3 | Historical Replay Framework | Complete | 21 / 21 |
 | D4 | Financial Invariant Engine | Complete | 27 / 27 |
 | D5 | Fault Injection Platform | Complete | 37 / 37 |
-| D6 | Regression Dataset Framework | **Step 2 begun — 1 dataset of 6 declared and commissioned** | 1 / 1 |
+| D6 | Regression Dataset Framework | **Step 2 — 2 datasets of 7 commissioned; `INV-D02` activated** | 2 / 2 |
 | D7 | Certification Engine | Not started | — |
 | D8 | CI/CD Verification Pipeline | Not started | — |
 | D9 | Backup Restore Verification | **Blocked** | — |
@@ -33,10 +33,11 @@ Live registry counts, 2026-08-08:
 | Parity quantities (D1) | 22 — `Q01`–`Q22` |
 | Invariants (D4) | **25** — `INV-D07` added by R-4, 2026-08-08; **all 25 COMMISSIONED** |
 | Faults (D5) | 40 — 10 each in classes A/B/C/D; 36 COMMISSIONED, 4 UNCOVERED |
-| Regression datasets (D6) | 1 — `DS-ACT-INHOUSE@1.0`, COMMISSIONED (2026-08-08) |
+| Regression datasets (D6) | 2 — `DS-ACT-INHOUSE@1.0`, `DS-ACT-CORRECTION@1.0`, both COMMISSIONED |
+| Invariants with an activating dataset | 1 of 25 — `INV-D02` |
 | Golden master surfaces (D2) | 158 — 6 UNRESOLVED |
 | Replayed business dates (D3) | 28 |
-| Retained evidence packs | 108 |
+| Retained evidence packs | 117 |
 | Constitutional principles enforced | 14 — no principle uncovered |
 
 ---
@@ -158,6 +159,9 @@ the D1 release gate is byte-identical before and after — 41 changes,
 
 ### Probe remediation complete (2026-08-08)
 
+R-7 followed in Wave 0.7: the probes summed `amount` unsigned, so a
+reversal was added where it must be subtracted. See §7.
+
 `financials.py` carried three defects that would have been baked into the
 Step 2 baseline. R-1, R-2, R-3 and R-6 are applied and verified; the same
 D1 gate is byte-identical again, a third time. See §7 and
@@ -179,7 +183,7 @@ reads and reports; nothing repairs.
 | Overpayment recording (`INV-A06`) | D4 | VACUOUS — commissioned, never exercised. **Every overpayment this hotel has recorded is below its ₹1.00 threshold**, so its real coverage is zero; see the R-5 proposal |
 | Orphan overpayment records (`INV-D07`) | D4 | **Not vacuous** — population 2, HOLDS. Added by R-4 |
 | Corporate credit backing | D4 | VACUOUS |
-| Correction/reversal traceability | D4 | VACUOUS |
+| Correction/reversal traceability (`INV-D02`) | D4 | **CLOSED 2026-08-08** — activated by `DS-ACT-CORRECTION@1.0`, population 4, HOLDS. Still VACUOUS on production, correctly: production holds no correction |
 | Void/credit-note traceability | D4 | VACUOUS |
 | **6** golden master surfaces | D2 | UNRESOLVED — 3 need a checked-in reservation, 2 a company, 1 a group block. `DS-ACT-INHOUSE` closes the first 3 **on the dataset**; production is unchanged |
 
@@ -246,6 +250,24 @@ Recorded in the completion reports and not rediscovered here:
 - Dashboard KPI methods ignoring historical dates
 - Dormant financial divergence awaiting `room_rent` posting
 
+Added 2026-08-08, found by `DS-ACT-CORRECTION` and **not repaired**:
+
+- **`compute_stay_gst` taxes reversed money.** `gst_service.py:492` reads
+  `ec.amount` unsigned and never calls `signed_extra_charge_amount`, so a
+  reversed charge is taxed instead of untaxed. Measured: **₹180.00 of GST
+  on a ₹500 charge that was taken back**, compounding with each further
+  correction, inherited by checkout, the invoice, `settlement_balance` and
+  every report downstream of `calculate_stay_amount`. A new instance of
+  the "multiple independent definitions" class — `tax_lines` says one
+  thing, `compute_stay_gst` computes another — and the first anybody has
+  been able to point at, because production holds no correction row.
+  `DS-ACT-CORRECTION` declares `INV-C02` VIOLATED by exactly that amount.
+  Evidence: `evidence/20260808_gst_reversal_defect/`.
+- **`tax_lines` cannot express a reversal.** No `is_reversal`, no
+  `corrects_id`. The correction pattern that exists for money has no
+  counterpart for tax, so a reversed taxed charge has no declared way to
+  unwind its tax line. Schema gap; belongs with whoever owns the GST path.
+
 ---
 
 ## 5. Blockers on Wave 1
@@ -288,6 +310,7 @@ documents were **not present in the repository** and remain unrecovered.
 | `D5_5_R5_MATERIALITY_PROPOSAL.md` | Written 2026-08-08; **awaiting owner approval** |
 | `D6_SEQUENCING_DECISION.md` | Written 2026-08-08; the group/overpay re-sequencing and its evidence |
 | `D6_COVERAGE_LEDGER.md` | Written 2026-08-08; the Added/Lost/Changed obligation |
+| `D6_DS_ACT_CORRECTION.md` | Written 2026-08-08; the first activating dataset, and the GST-on-reversed-money defect |
 | `D1`–`D5` completion reports | Pre-existing, retained |
 | `D5_5_REMEDIATION_APPLIED.md` | Written 2026-08-08; records R-1/R-2/R-3/R-6 and four errors found in the D5.5 documents |
 | `D6_STEP2_DS_ACT_INHOUSE.md` | Written 2026-08-08; the first commissioned dataset, and the D2 measurement behind it |
@@ -358,7 +381,7 @@ Three things it established that were not known before:
   for it and `Layer.D2_GOLDEN` is dead vocabulary. The dataset's main
   purpose is the one thing the registry cannot check.
 
-### Wave 0.6 — the four instructed pieces, all landed
+### Wave 0.6 — the four instructed pieces (accepted)
 
 Wave 0.5 and D6 Step 2 were accepted 2026-08-08. The four follow-on
 instructions:
@@ -376,6 +399,39 @@ invariants lose their population** on `DS-ACT-INHOUSE` — `INV-A03`,
 figure covered D2 surfaces only. It was right about surfaces and silent
 about invariants, and the dataset covers substantially less of the
 invariant registry than production does.
+
+### Wave 0.7 — `INV-D02` activated
+
+The owner re-sequenced again, on a stated principle worth keeping:
+**a regression dataset should activate the highest-risk verification
+before extending ordinary business coverage, because Wave 0's objective is
+verification completeness rather than business-feature completeness.**
+
+| | Commit | State |
+|---|---|---|
+| **R-7** — probes must sign corrections and reversals | `6653f15` | Commissioned in both directions, 19 checks |
+| **`DS-ACT-CORRECTION@1.0`** | `1254eab` | COMMISSIONED 6/6. **`INV-D02` activated**, population 0 → 4. Ledger `AS_DECLARED` |
+
+**`INV-D02` was the only VACUOUS invariant that was RELEASE_BLOCKING. It is
+now exercised by a commissioned dataset.** The three that remain
+(`INV-A06`, `INV-C06`, `INV-D05`) are all certification-blocking.
+
+Two things it found:
+
+- **R-7.** `financials.py` summed `amount` unsigned, so a reversal was
+  added where it must be subtracted — wrong by twice the reversed amount.
+  On this dataset the pre-R-7 probes read `outstanding = −3,072.00` against
+  a truth of `0.00`. Invisible on production for exactly the reason the
+  dataset exists: no correction rows, which is the same sentence as
+  "`INV-D02` is VACUOUS".
+- **A production defect, reported and not repaired.**
+  `gst_service.compute_stay_gst` reads extra charges unsigned
+  (`gst_service.py:492`) and therefore **taxes reversed money** — ₹180.00
+  of GST on a ₹500 charge that was taken back, compounding with each
+  further correction, inherited by checkout, the invoice and every report
+  downstream of `calculate_stay_amount`. `INV-C02` is declared VIOLATED by
+  exactly that amount. First identified instance of a class already on the
+  register. See `D6_DS_ACT_CORRECTION.md` §4.
 
 ### The next piece of work
 
@@ -412,11 +468,11 @@ before the next. **Do not write five datasets and then try to commission
 them** — the gate is the part most likely to reveal that a declaration was
 wrong, and on the first dataset it was.
 
-**Flagged, not acted on:** `INV-D02` is the only VACUOUS invariant that is
-`RELEASE_BLOCKING`; the other three are certification-blocking. On blocking
-severity alone `DS-ACT-CORRECTION` outranks most of what sits above it.
-The instruction covered the group/overpay pair only, so the rest was left
-as it stands — re-ordering it is the owner's call.
+**That flag was taken up.** `INV-D02` was the only VACUOUS invariant that
+was `RELEASE_BLOCKING`, and the owner re-sequenced `DS-ACT-CORRECTION`
+ahead of everything on the principle recorded above. It is now
+commissioned and `INV-D02` is activated. The three VACUOUS invariants that
+remain are all certification-blocking.
 
 ### Decisions waiting on the project owner
 
