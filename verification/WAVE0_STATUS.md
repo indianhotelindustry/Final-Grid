@@ -1,6 +1,6 @@
 # Wave 0 — Deliverable Status
 
-DSBC Frontline v2.2.18. Last verified 2026-08-07 (Wave 0.5).
+DSBC Frontline v2.2.18. Last verified 2026-08-08 (Wave 0.6).
 
 Counts in this document are read from the live registries, not
 transcribed from the completion reports. Where a report and the
@@ -18,7 +18,7 @@ commissioned.** Five are. Wave 0 is half done.
 | D1 | Financial Parity Harness | Complete | 8 / 8 |
 | D2 | Golden Master Framework | Complete | 16 / 16 |
 | D3 | Historical Replay Framework | Complete | 21 / 21 |
-| D4 | Financial Invariant Engine | Complete | 26 / 26 |
+| D4 | Financial Invariant Engine | Complete | 27 / 27 |
 | D5 | Fault Injection Platform | Complete | 37 / 37 |
 | D6 | Regression Dataset Framework | **Step 2 begun — 1 dataset of 6 declared and commissioned** | 1 / 1 |
 | D7 | Certification Engine | Not started | — |
@@ -26,17 +26,17 @@ commissioned.** Five are. Wave 0 is half done.
 | D9 | Backup Restore Verification | **Blocked** | — |
 | D10 | Release Gate Framework | Not started | — |
 
-Live registry counts, 2026-08-07:
+Live registry counts, 2026-08-08:
 
 | Artefact | Count |
 |---|---|
 | Parity quantities (D1) | 22 — `Q01`–`Q22` |
-| Invariants (D4) | 24 — 6 each in classes A/B/C/D, **all 24 COMMISSIONED** |
+| Invariants (D4) | **25** — `INV-D07` added by R-4, 2026-08-08; **all 25 COMMISSIONED** |
 | Faults (D5) | 40 — 10 each in classes A/B/C/D; 36 COMMISSIONED, 4 UNCOVERED |
 | Regression datasets (D6) | 1 — `DS-ACT-INHOUSE@1.0`, COMMISSIONED (2026-08-08) |
 | Golden master surfaces (D2) | 158 — 6 UNRESOLVED |
 | Replayed business dates (D3) | 28 |
-| Retained evidence packs | 80 |
+| Retained evidence packs | 108 |
 | Constitutional principles enforced | 14 — no principle uncovered |
 
 ---
@@ -67,6 +67,12 @@ Cert. blocking    : 5
 The four `VACUOUS` are `INV-A06`, `INV-C06`, `INV-D02`, `INV-D05` — the
 exact four D6 exists to activate.
 
+**This section records the freeze run and is not rewritten.** Since R-4 the
+registry holds 25 and the same run reports `HOLDS 15 / VIOLATED 6 /
+VACUOUS 4`: `INV-D07` holds over a population of 2. Violations, the
+violated set, release-blocking and certification-blocking counts are all
+unchanged. Latest: `evidence/20260808_074618_inv_run_d07_final`.
+
 **This is why nothing here may be described as certified.** The engine
 reports `FAIL` with two release-blocking violations, and D7 — the
 Certification Engine that would issue a certificate — does not exist.
@@ -92,8 +98,9 @@ while being the declared detector for 3.
 reconciled three ways: LEDGER (plain SQL, no application code), ENGINE
 (the application, clock frozen), RECORDED (the night-audit snapshot).
 
-**D4 — Financial Invariant Engine.** 24 declared invariants, every one
+**D4 — Financial Invariant Engine.** 25 declared invariants, every one
 commissioned across eight elements. Zero writes is measured, not assumed.
+`INV-D07` was added by R-4 in Wave 0.6.
 
 **D5 — Fault Injection Platform.** 40 faults across five injection
 methods. Asks the question the other four cannot: inject one defect, ask
@@ -169,7 +176,8 @@ reads and reports; nothing repairs.
 |---|---|---|
 | `Q11` refunds/voids | D1 | VACUOUS — no production rows |
 | `Q21` shift cash and variance | D1 | VACUOUS — no shifts |
-| Overpayment recording | D4 | VACUOUS — commissioned, never exercised |
+| Overpayment recording (`INV-A06`) | D4 | VACUOUS — commissioned, never exercised. **Every overpayment this hotel has recorded is below its ₹1.00 threshold**, so its real coverage is zero; see the R-5 proposal |
+| Orphan overpayment records (`INV-D07`) | D4 | **Not vacuous** — population 2, HOLDS. Added by R-4 |
 | Corporate credit backing | D4 | VACUOUS |
 | Correction/reversal traceability | D4 | VACUOUS |
 | Void/credit-note traceability | D4 | VACUOUS |
@@ -276,6 +284,10 @@ documents were **not present in the repository** and remain unrecovered.
 | `ENGINEERING_GUIDE.md` | Written Wave 0.5 |
 | `WAVE0_STATUS.md` | This file |
 | `README.md` | Pre-existing, authoritative for framework usage |
+| `D4_INV_D07_COMPLETION.md` | Written 2026-08-08; R-4 |
+| `D5_5_R5_MATERIALITY_PROPOSAL.md` | Written 2026-08-08; **awaiting owner approval** |
+| `D6_SEQUENCING_DECISION.md` | Written 2026-08-08; the group/overpay re-sequencing and its evidence |
+| `D6_COVERAGE_LEDGER.md` | Written 2026-08-08; the Added/Lost/Changed obligation |
 | `D1`–`D5` completion reports | Pre-existing, retained |
 | `D5_5_REMEDIATION_APPLIED.md` | Written 2026-08-08; records R-1/R-2/R-3/R-6 and four errors found in the D5.5 documents |
 | `D6_STEP2_DS_ACT_INHOUSE.md` | Written 2026-08-08; the first commissioned dataset, and the D2 measurement behind it |
@@ -346,13 +358,53 @@ Three things it established that were not known before:
   for it and `Layer.D2_GOLDEN` is dead vocabulary. The dataset's main
   purpose is the one thing the registry cannot check.
 
+### Wave 0.6 — the four instructed pieces, all landed
+
+Wave 0.5 and D6 Step 2 were accepted 2026-08-08. The four follow-on
+instructions:
+
+| | Commit | State |
+|---|---|---|
+| **R-4** — `INV-D07`, orphan overpayment records | `fdb992b` | COMMISSIONED, 8/8 elements plus null and write controls. Registry 24 → 25, HOLDS 14 → 15 |
+| **R-5** — materiality proposal | `3254d59` | **Written. Awaiting owner approval. No policy changed, no constant moved** |
+| D6 re-sequencing | `eead335` | `DS-ACT-GROUP` now precedes `DS-ACT-OVERPAY` |
+| Coverage ledger | `6beb1a7` | `ds-coverage` command, itself commissioned. `DS-ACT-INHOUSE` backfilled |
+
+What the coverage ledger found on its first real measurement: **eight
+invariants lose their population** on `DS-ACT-INHOUSE` — `INV-A03`,
+`B01`, `B02`, `B03`, `B05`, `C01`, `C05`, `D07`. The earlier `+3 / −1`
+figure covered D2 surfaces only. It was right about surfaces and silent
+about invariants, and the dataset covers substantially less of the
+invariant registry than production does.
+
 ### The next piece of work
 
-**`DS-ACT-OVERPAY`, and R-4 and R-5 must land first.** R-4 is a full Class
-D invariant declaration with a commissioning obligation — treat it as D4
-work, not a footnote. R-5 is the owner decision below, and it is genuinely
-blocking here rather than advisory: the ₹1.00 threshold determines what
-the dataset has to produce to enter `INV-A06`'s population at all.
+**`DS-ACT-GROUP`.** It is the only unblocked dataset, and the only route to
+`groups.detail` — the one UNRESOLVED D2 surface with no planned owner.
+`group_blocks` is empty and trivially materialisable: 5 required columns
+(`group_name`, `group_code`, `arrival_date`, `departure_date`,
+`total_rooms`).
+
+In this order, and the order is the point:
+
+1. declare `coverage_expectation` **before** the dataset is built — the
+   ledger cannot catch anything if the declaration follows the measurement;
+2. `ds-commission` passes all six elements;
+3. `ds-coverage --id DS-ACT-GROUP --tag <tag>` exits 0;
+4. the ledger appears in its completion record.
+
+**It activates no invariant.** Nothing in D1, D4 or D5 references
+`group_blocks`, so it is a D2-coverage dataset and its record must say so
+rather than let the `DS-ACT-` prefix imply otherwise. See
+`D6_SEQUENCING_DECISION.md` §3 — that prefix is wrong for this dataset and
+for `DS-ACT-INHOUSE`, and neither `datasets_core` nor `datasets_activation`
+has a category for a dataset that exists to give a golden-master resolver
+an entity to pin to.
+
+**`DS-ACT-OVERPAY` is blocked on R-5** and stays blocked until the owner
+answers. The threshold determines what the dataset must contain to enter
+`INV-A06`'s population; declaring expectations against an unsettled policy
+is the mistake the D5.5 probe remediation existed to prevent.
 
 Then `DS-ACT-CORPCREDIT` (closes 2 more D2 surfaces), `DS-ACT-CORRECTION`,
 `DS-ACT-VOIDCN`, `DS-ACT-SHIFT`. One dataset at a time, each commissioned
@@ -360,23 +412,35 @@ before the next. **Do not write five datasets and then try to commission
 them** — the gate is the part most likely to reveal that a declaration was
 wrong, and on the first dataset it was.
 
-**`DS-ACT-GROUP` is missing from the plan.** `groups.detail` is UNRESOLVED,
-`group_blocks` is empty, and no planned dataset covers it. Add one or
-record the surface as permanently unresolved.
+**Flagged, not acted on:** `INV-D02` is the only VACUOUS invariant that is
+`RELEASE_BLOCKING`; the other three are certification-blocking. On blocking
+severity alone `DS-ACT-CORRECTION` outranks most of what sits above it.
+The instruction covered the group/overpay pair only, so the rest was left
+as it stands — re-ordering it is the owner's call.
 
 ### Decisions waiting on the project owner
 
-These block nothing mechanical, but three of them affect correctness of
-work not yet done.
+**R-5 now blocks work.** The others do not.
 
 1. **P15.** `CONSTITUTION.md` documents P1–P14, recovered from the
    enforcing registry. The charter says P1–P15 and names *"Independent
    evidence"*. No P15 exists in code. Its wording is not recoverable and
    was not invented. See `CONSTITUTION.md` §3.1.
-2. **R-5 — the ₹1.00 materiality threshold** in `INV-A06`. Currently an
-   implicit constant. Either state it in the invariant's business rule, or
-   add a second invariant that aggregates sub-rupee overpayments. Affects
-   how `DS-ACT-OVERPAY` is declared.
+2. **R-5 — the ₹1.00 materiality threshold.** **Proposal written and
+   awaiting approval: `D5_5_R5_MATERIALITY_PROPOSAL.md`.** Three options
+   costed against measured data. Recommended: lower to the rounding floor
+   and state it in the business rule, on coverage grounds — with the
+   counter-argument stated, since it makes every rounding paisa a tracked
+   item and nobody has sized that at real occupancy.
+
+   Measured: **all 28 reservations, 2 in credit, both ₹0.15, both below the
+   threshold.** Every overpayment this hotel has ever recorded is in the
+   unmeasured band, so `INV-A06`'s coverage on real data is zero and always
+   has been. Since R-4 the threshold is also declared in two places, which
+   is a P1 defect held open deliberately until this is answered.
+
+   **Blocks `DS-ACT-OVERPAY` and the collapse of the duplicate constant.
+   Nothing else.**
 3. **Private remote.** Not configured; no `gh` CLI on this machine.
    Operational, explicitly not an engineering gate. Bundles in
    `../repo-backups/` are the interim protection.
