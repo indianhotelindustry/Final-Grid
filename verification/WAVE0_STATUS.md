@@ -20,7 +20,7 @@ commissioned.** Five are. Wave 0 is half done.
 | D3 | Historical Replay Framework | Complete | 21 / 21 |
 | D4 | Financial Invariant Engine | Complete | 27 / 27 |
 | D5 | Fault Injection Platform | Complete | 37 / 37 |
-| D6 | Regression Dataset Framework | **Step 2 — 4 datasets commissioned; every non-blocked one is done** | 4 / 4 |
+| D6 | Regression Dataset Framework | **Step 2 — 5 datasets commissioned. Every unblocked one is written; the rest need a decision** | 5 / 5 |
 | D7 | Certification Engine | Not started | — |
 | D8 | CI/CD Verification Pipeline | Not started | — |
 | D9 | Backup Restore Verification | **Blocked** | — |
@@ -33,11 +33,11 @@ Live registry counts, 2026-08-08:
 | Parity quantities (D1) | 22 — `Q01`–`Q22` |
 | Invariants (D4) | **25** — `INV-D07` added by R-4, 2026-08-08; **all 25 COMMISSIONED** |
 | Faults (D5) | 40 — 10 each in classes A/B/C/D; 36 COMMISSIONED, 4 UNCOVERED |
-| Regression datasets (D6) | 4 — `DS-ACT-INHOUSE`, `DS-ACT-CORRECTION`, `DS-ACT-VOIDCN`, `DS-ACT-GROUP`, all COMMISSIONED, all with a passing coverage ledger |
+| Regression datasets (D6) | 5 — `DS-ACT-INHOUSE`, `DS-ACT-CORRECTION`, `DS-ACT-VOIDCN`, `DS-ACT-GROUP`, `DS-ACT-SHIFT`, all COMMISSIONED, all with a passing coverage ledger |
 | Invariants with an activating dataset | 2 of 25 — `INV-D02`, `INV-D05` |
 | Golden master surfaces (D2) | 158 — 6 UNRESOLVED on production; `groups.detail` now resolves on a dataset |
 | Replayed business dates (D3) | 28 |
-| Retained evidence packs | 140 |
+| Retained evidence packs | 145 |
 | Constitutional principles enforced | 14 — no principle uncovered |
 
 ---
@@ -179,7 +179,7 @@ reads and reports; nothing repairs.
 | Item | Layer | Why it proves nothing |
 |---|---|---|
 | `Q11` refunds/voids | D1 | **CLOSED 2026-08-08** — lifted to DIVERGED by `DS-ACT-VOIDCN`, and it found the night audit reporting voided payments as refunds |
-| `Q21` shift cash and variance | D1 | VACUOUS — no shifts |
+| `Q21` shift cash and variance | D1 | **CLOSED 2026-08-08** — activated by `DS-ACT-SHIFT`, AGREED over one balanced shift |
 | Overpayment recording (`INV-A06`) | D4 | VACUOUS — commissioned, never exercised. **Every overpayment this hotel has recorded is below its ₹1.00 threshold**, so its real coverage is zero; see the R-5 proposal |
 | Orphan overpayment records (`INV-D07`) | D4 | **Not vacuous** — population 2, HOLDS. Added by R-4 |
 | Corporate credit backing | D4 | VACUOUS |
@@ -300,6 +300,12 @@ Added 2026-08-08, found by `DS-ACT-VOIDCN` and **not repaired**:
   the moment a correction or reversal exists. `Q09` measures exactly the
   defect class R-7 fixed and had never been able to fire. Found by
   extending the coverage ledger to D1.
+- **`Q18` and `Q20` diverge on extra charges, not on occupancy.** The
+  executive dashboard tiles and the ADR/RevPAR definitions agree on a
+  room-only hotel and disagree the moment an extra charge exists —
+  established across five datasets, two rooms appearing on both sides of
+  the split. This narrows a production DIVERGED that predates Wave 0 to its
+  cause. Found by the coverage ledger.
 
 ---
 
@@ -345,7 +351,8 @@ documents were **not present in the repository** and remain unrecovered.
 | `D6_COVERAGE_LEDGER.md` | Written 2026-08-08; the Added/Lost/Changed obligation |
 | `D6_DS_ACT_CORRECTION.md` | Written 2026-08-08; the first activating dataset, and the GST-on-reversed-money defect |
 | `D6_DS_ACT_VOIDCN.md` | Written 2026-08-08; `INV-D05` and `Q11`, the refund `corrects_id` defect, and the voids-reported-as-refunds divergence |
-| `D6_DS_ACT_GROUP.md` | Written 2026-08-08; the last non-blocked dataset, and the absence of master-account routing |
+| `D6_DS_ACT_GROUP.md` | Written 2026-08-08; the group dataset, and the absence of master-account routing |
+| `D6_DS_ACT_SHIFT.md` | Written 2026-08-08; `Q21`, and what five datasets settled about `Q18`/`Q20` |
 | `D1`–`D5` completion reports | Pre-existing, retained |
 | `D5_5_REMEDIATION_APPLIED.md` | Written 2026-08-08; records R-1/R-2/R-3/R-6 and four errors found in the D5.5 documents |
 | `D6_STEP2_DS_ACT_INHOUSE.md` | Written 2026-08-08; the first commissioned dataset, and the D2 measurement behind it |
@@ -538,15 +545,72 @@ recorded** — and three of them matter:
   constraint rather than surfacing an opaque `IntegrityError` — the
   failure mode it was written after (`FLT-A10`), working.
 
-### The next piece of work
+### `DS-ACT-SHIFT` — `Q21` activated (`32e8b60`)
 
-**`DS-ACT-SHIFT` is the only genuinely unblocked item left.** It lifts
-`Q21` (shift cash and variance, VACUOUS) — a D1 quantity, no invariant. It
-was not started here because the instruction was to implement
-`DS-ACT-GROUP` *before returning to governance-dependent work*, and that is
-where the queue now points.
+The last VACUOUS parity quantity any planned dataset could reach. One
+shift, opened with a float, one cash settlement inside the window, petty
+cash out, drawer counted and balanced.
 
-Everything else waits on a decision, not on engineering.
+The perturbation changes the payout without touching the stored
+`expected_cash`: every financial probe and the declared closing figure are
+unchanged and only the recomputation moves — the failure `Q21` exists to
+catch, a till that balances on paper because the expected figure was
+written down once and never recomputed.
+
+**The ledger settled something nobody had.** The prediction named `Q18` and
+`Q20` as its weak points and got them wrong — it reasoned they track
+occupancy. Five datasets falsify that:
+
+| dataset | rooms | extras | `Q18`/`Q20` → AGREED |
+|---|---|---|---|
+| `DS-ACT-INHOUSE` | 2 | no | **yes** |
+| `DS-ACT-SHIFT` | 1 | no | **yes** |
+| `DS-ACT-CORRECTION` | 1 | yes | no |
+| `DS-ACT-VOIDCN` | 1 | yes | no |
+| `DS-ACT-GROUP` | 2 | yes | no |
+
+Occupancy does not predict it; **extra charges predict it exactly**. The
+dashboard tiles and the ADR/RevPAR definitions agree on a room-only hotel
+and disagree the moment an extra charge exists — a long-standing production
+DIVERGED narrowed to its cause, by the ledger rather than by reading.
+
+---
+
+## 7a. Every unblocked dataset is written. What remains needs a decision.
+
+Five datasets, all commissioned, all with a passing coverage ledger. Of the
+empty populations D6 exists to close:
+
+| | State |
+|---|---|
+| `INV-D02` corrections | **closed** — `DS-ACT-CORRECTION` |
+| `INV-D05` voids / credit notes | **closed** — `DS-ACT-VOIDCN` |
+| `Q11` refunds vs voids | **closed** — `DS-ACT-VOIDCN` |
+| `Q21` shift cash | **closed** — `DS-ACT-SHIFT` |
+| 3 in-house D2 surfaces | **closed** — `DS-ACT-INHOUSE` |
+| `groups.detail` | **closed** — `DS-ACT-GROUP` |
+| **`INV-A06`** overpayment | **blocked — R-5**, governance, awaiting approval |
+| **`INV-C06`** corporate credit | **blocked — the `companies` / `content_hash` question** |
+
+### The two decisions, stated so they can be taken
+
+**R-5 — the ₹1.00 materiality threshold.** Proposal written and awaiting
+approval: `D5_5_R5_MATERIALITY_PROPOSAL.md`. Three options costed against
+measured data; recommended (c), lower to the rounding floor and state it in
+the business rule, with the counter-argument stated.
+
+**The master-data identity question.** `companies` is a PRESERVED table and
+`builder.content_hash` covers only the transactional and guest tables, so a
+dataset declaring a company would carry master data **outside its own
+identity** — `strip()` never clears it, and the hash a certificate is
+issued against would not cover it. The exclusion is deliberate and well
+argued, but it was reasoned about master data *inherited* from production,
+not master data a dataset *declares*. Until it is settled,
+`DS-ACT-CORPCREDIT` cannot be written and `INV-C06` cannot be activated.
+
+**Beyond those two, D6 Step 2 has nothing left that engineering can
+unblock.** The next deliverables are D7–D10, and D9 remains blocked on its
+own schema exception.
 
 **Closed since:** the coverage ledger now measures **D1 as well as D2 and
 D4**. `DS-ACT-VOIDCN`'s `Q11` claim is mechanical rather than hand-measured.
