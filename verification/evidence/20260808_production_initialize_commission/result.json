@@ -1,0 +1,70 @@
+{
+ "purpose": "Commission the Production Initialization Framework (W1-PREP-001).",
+ "tool": "tools/production_initialize.py with tools/initialization_classification.py",
+ "production_touched": "never, except read-only. Production SHA-256 compared before and after the whole run and unchanged.",
+ "checks": 43,
+ "failed": 0,
+ "groups": {
+  "aborts": [
+   "unknown table - and names it, and changes nothing",
+   "MASTER declaring an FK into a cleared table",
+   "corrupt source database",
+   "missing database",
+   "no --confirm leaves the file byte-identical"
+  ],
+  "real_run": [
+   "every cleared table empty",
+   "every master untouched and still populated",
+   "schema_migrations / settings / users / rooms preserved",
+   "no foreign key violations",
+   "integrity ok",
+   "business date today",
+   "hotel unlocked",
+   "no reservations, shifts, night audits or payments",
+   "no orphaned reservation_rooms - the reset_transactional_data.py gap"
+  ],
+  "backup": [
+   "exists",
+   "holds the ORIGINAL rows not the reset ones",
+   "row counts match the pre-run source",
+   "manifest records both hashes",
+   "restoring reproduces the original counts"
+  ],
+  "idempotency": [
+   "second run reports ALREADY INITIALIZED",
+   "removes 0 rows",
+   "row counts unchanged"
+  ],
+  "preserve_guests": [
+   "guests retained",
+   "reservations still cleared",
+   "no FK violation"
+  ],
+  "determinism": [
+   "same deletion order",
+   "same rows removed",
+   "identical resulting row counts"
+  ]
+ },
+ "defects_found_by_commissioning": [
+  "verify_result checked residue against the CLASSIFICATION rather than the set actually cleared, so it failed its own --preserve-guests option by demanding a table it had been told to keep be empty. Fixed by verifying against intent rather than taxonomy.",
+  "backups from a commissioning run landed in the production backup store, which is how a rehearsal artefact ends up looking like a production event. Fixed by adding --backup-dir."
+ ],
+ "defect_found_by_the_tool_on_its_author": "the first dry run aborted on notification_logs, a table the classification had missed. There is no default and no catch-all, which is exactly the omission reset_transactional_data.py makes silently for four tables.",
+ "classification": {
+  "total": 53,
+  "MASTER": 12,
+  "SYSTEM": 2,
+  "TEMPORARY": 3,
+  "TRANSACTION": 36
+ },
+ "specimen_run": {
+  "rows_removed": 437,
+  "rows_preserved": 187,
+  "tables_cleared": 39,
+  "tables_preserved": 14,
+  "verification_checks": 8,
+  "all_passed": true,
+  "target": "a copy, not production"
+ }
+}
