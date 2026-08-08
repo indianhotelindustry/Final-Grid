@@ -91,6 +91,19 @@ PROBES = {
     # -- charges ----------------------------------------------------------
     'extra_charges_total': ('money',
                             'SELECT SUM(amount) FROM extra_charges'),
+    #: The two slices of ``extra_charges_total``, split on the exclusion
+    #: ``outstanding`` applies. Recorded separately for the reason
+    #: ``replay/ledger.py`` records them separately: a change to the
+    #: exclusion is then visible rather than absorbed. Room rent posted by
+    #: the night audit is excluded from the balance because room revenue is
+    #: already counted from the reservation tariff.
+    'extra_charges_room_rent': ('money',
+                                'SELECT SUM(amount) FROM extra_charges '
+                                "WHERE charge_type = 'room_rent'"),
+    'extra_charges_non_room_rent': ('money',
+                                    'SELECT SUM(amount) FROM extra_charges '
+                                    'WHERE charge_type IS NULL '
+                                    "   OR charge_type <> 'room_rent'"),
     'extra_charges_reversals': ('money',
                                 'SELECT SUM(amount) FROM extra_charges '
                                 'WHERE COALESCE(is_reversal,0)=1'),
@@ -101,8 +114,39 @@ PROBES = {
                       'FROM reservation_night_rates'),
 
     # -- tax --------------------------------------------------------------
+    #: ``tax_amount`` is summed plainly: Indian GST splits into CGST and
+    #: SGST and each row carries its own half, so the rows add up.
     'tax_total': ('money', 'SELECT SUM(tax_amount) FROM tax_lines'),
-    'taxable_total': ('money', 'SELECT SUM(taxable_amount) FROM tax_lines'),
+
+    #: ``taxable_amount`` is the opposite. ``tax_lines`` holds one row per
+    #: tax component and **every component repeats the full taxable base**,
+    #: so summing the column counts each base once per component. The base
+    #: is therefore taken once per charge.
+    #:
+    #: The grouping includes ``reservation_id``, which is not optional:
+    #: ``charge_source_id`` is a label like ``night_2026-05-27`` and is
+    #: unique only within a reservation. Grouping without it collapses the
+    #: same stay-night across every reservation that has one — measured on
+    #: the production database, 33 real bases collapse to 5.
+    #:
+    #: ``DISTINCT`` rather than ``MAX``: if two components ever disagreed
+    #: about the base, this figure moves. A ``MAX`` would silently pick one
+    #: and report a clean number over an inconsistency (P9 — a measurement
+    #: that cannot move is not a measurement).
+    'taxable_total': ('money',
+                      'SELECT SUM(taxable_amount) FROM '
+                      '(SELECT DISTINCT reservation_id, charge_source_type, '
+                      '        charge_source_id, taxable_amount '
+                      ' FROM tax_lines)'),
+    'tax_lines_count': ('count', 'SELECT COUNT(*) FROM tax_lines'),
+    #: One per taxed charge. ``tax_lines_count`` divided by this is the
+    #: component count; if that ratio moves off 2 on a domestic dataset,
+    #: the shape of the tax table has changed and ``taxable_total`` should
+    #: be re-read before it is trusted.
+    'tax_base_count': ('count',
+                       'SELECT COUNT(*) FROM '
+                       '(SELECT DISTINCT reservation_id, charge_source_type, '
+                       '        charge_source_id FROM tax_lines)'),
 
     # -- adjustments — the populations D4 found VACUOUS -------------------
     'overpayment_total': ('money',
@@ -118,15 +162,57 @@ PROBES = {
                            'SELECT COUNT(*) FROM folios '
                            'WHERE company_id IS NOT NULL'),
 
+    # -- the invoice ------------------------------------------------------
+    #: What the guest was actually billed, as opposed to what the component
+    #: rows add up to. The two are not the same figure and a dataset that
+    #: wants to declare an exact per-reservation balance needs both.
+    #:
+    #: ``unrounded + round_off = rounded`` holds exactly, per reservation,
+    #: on all 28 production rows. What does *not* hold is
+    #: ``unrounded == room + extras + tax``: the invoice rounds tax over the
+    #: whole bill while ``tax_lines`` rounds it per component, and the two
+    #: paths differ by up to a paisa per reservation. Both slices are
+    #: recorded so the difference is a measured quantity rather than an
+    #: unexplained residue.
+    'invoice_unrounded_grand_total': ('money',
+                                      'SELECT SUM(invoice_unrounded_grand_total) '
+                                      'FROM reservations'),
+    'invoice_round_off_total': ('money',
+                                'SELECT SUM(invoice_round_off_amount) '
+                                'FROM reservations'),
+    'invoice_rounded_grand_total': ('money',
+                                    'SELECT SUM(invoice_rounded_grand_total) '
+                                    'FROM reservations'),
+    'invoice_round_off_rows': ('count',
+                               'SELECT COUNT(*) FROM reservations '
+                               'WHERE COALESCE(invoice_round_off_amount,0) <> 0'),
+
     # -- the balance ------------------------------------------------------
     #: Charges the hotel raised, less what it collected. The single figure
     #: a manager would recognise, and the one most likely to move when
     #: anything at all is wrong.
+    #:
+    #: Tax is part of the charge. Guests settle tax-inclusive totals, so a
+    #: balance that omits tax subtracts money against a charge it never
+    #: counted and reports the whole book as overpaid by exactly the tax.
+    #:
+    #: Room rent is counted once, from ``reservation_night_rates``. When the
+    #: night audit posts it into ``extra_charges`` the same revenue appears
+    #: in both tables, so the ``extra_charges`` term excludes it — the same
+    #: exclusion ``kpi_helpers.get_accrual_extras`` and ``NightAuditService``
+    #: apply, mirrored in ``replay/ledger.py``. On the current database
+    #: ``0 of 30`` night-rate rows are posted and the exclusion removes
+    #: nothing; it is here so that the first night audit to post room rent
+    #: does not silently double the balance.
     'outstanding': ('money',
                     'SELECT COALESCE((SELECT SUM(final_rate) '
                     '                 FROM reservation_night_rates), 0) '
                     '     + COALESCE((SELECT SUM(amount) '
-                    '                 FROM extra_charges), 0) '
+                    '                 FROM extra_charges '
+                    '                 WHERE charge_type IS NULL '
+                    "                    OR charge_type <> 'room_rent'), 0) "
+                    '     + COALESCE((SELECT SUM(tax_amount) '
+                    '                 FROM tax_lines), 0) '
                     '     - COALESCE((SELECT SUM(amount) FROM payments '
                     '                 WHERE COALESCE(is_voided,0)=0), 0)'),
 }

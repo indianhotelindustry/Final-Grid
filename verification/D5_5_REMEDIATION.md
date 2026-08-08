@@ -1,5 +1,12 @@
 # D5.5 — Proposed Remediation
 
+> **Superseded in part, 2026-08-08.** R-1, R-2, R-3 and R-6 have been
+> applied — see `D5_5_REMEDIATION_APPLIED.md`, which also records three
+> places where the specification below is wrong (R-1's "21 of 28", R-3's
+> grouping key, and R-3's expected value). R-4 and R-5 are still open.
+> The body of this document is left as written; it is the record of what
+> was proposed, not of what was done.
+
 Companion to `D5_5_CONSISTENCY_AUDIT.md`. **Nothing here has been
 applied.** Kept separate from the investigation so the findings stand on
 their own evidence and are not read through the lens of a proposed fix.

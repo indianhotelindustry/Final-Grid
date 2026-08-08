@@ -20,7 +20,7 @@ commissioned.** Five are. Wave 0 is half done.
 | D3 | Historical Replay Framework | Complete | 21 / 21 |
 | D4 | Financial Invariant Engine | Complete | 26 / 26 |
 | D5 | Fault Injection Platform | Complete | 37 / 37 |
-| D6 | Regression Dataset Framework | **Step 1 complete — infrastructure wired, no datasets declared** | — |
+| D6 | Regression Dataset Framework | **Step 1 complete + probe remediation; no datasets declared** | — |
 | D7 | Certification Engine | Not started | — |
 | D8 | CI/CD Verification Pipeline | Not started | — |
 | D9 | Backup Restore Verification | **Blocked** | — |
@@ -100,7 +100,7 @@ all four layers at once which noticed and which stayed silent.
 
 ---
 
-## 3. D6 — Regression Dataset Framework: partial, and currently broken
+## 3. D6 — Regression Dataset Framework: partial
 
 The roadmap and `README.md` both record D6 as "Not started". **This is
 wrong.** Six modules exist, written 2026-08-05 06:15–06:20, after the D5
@@ -147,6 +147,13 @@ hide a genuinely absent declaration file later.
 Verified at Step 1: production `sha256` unchanged, 64 modules import, and
 the D1 release gate is byte-identical before and after — 41 changes,
 `IMPL_ADDED` 38 / `VERDICT_CHANGED` 3, `Q16`–`Q18`, both runs.
+
+### Probe remediation complete (2026-08-08)
+
+`financials.py` carried three defects that would have been baked into the
+Step 2 baseline. R-1, R-2, R-3 and R-6 are applied and verified; the same
+D1 gate is byte-identical again, a third time. See §7 and
+`D5_5_REMEDIATION_APPLIED.md`. **Step 2 is no longer blocked.**
 
 ---
 
@@ -266,6 +273,7 @@ documents were **not present in the repository** and remain unrecovered.
 | `WAVE0_STATUS.md` | This file |
 | `README.md` | Pre-existing, authoritative for framework usage |
 | `D1`–`D5` completion reports | Pre-existing, retained |
+| `D5_5_REMEDIATION_APPLIED.md` | Written 2026-08-08; records R-1/R-2/R-3/R-6 and four errors found in the D5.5 documents |
 | Phase 1 Architecture Audit | **Absent** |
 | Phase 2 Financial Truth Certification | **Absent** |
 | Phase 2.5 Migration Blueprint | **Absent** |
@@ -280,36 +288,48 @@ Recovering those documents is not optional work.
 
 **This section is the handover. Read it first.**
 
-State as of 2026-08-07, HEAD `23e3b94`, working tree clean, three tags:
+State as of 2026-08-08, working tree clean, three tags:
 `v2.2.18-preWave1`, `v2.2.18-wave0.5`, `v2.2.18-wave0.5-frozen`.
+
+### The probe fixes are done
+
+**R-1, R-2, R-3 and R-6 landed 2026-08-08.** `datasets/financials.py` is
+now safe to declare expectations against — which was the whole reason they
+blocked Step 2.
+
+| | Fix | Result |
+|---|---|---|
+| **R-1** | `outstanding` omits tax | −1,697.32 → **+199.92** ✓ |
+| **R-2** | `outstanding` will double count once room rent posts | excluded; **commissioned by injecting all 30 night rates** — probe holds at 199.92 where the old form moves to 37,417.04 |
+| **R-3** | `taxable_total` double counts CGST/SGST | 75,893.34 → **37,946.67** ✓ |
+| R-6 | no probe models `invoice_round_off_amount` | four invoice probes added; `unrounded + round_off = rounded` exact on all 28 |
+
+21 of the 23 pre-existing probes hold; the 2 that moved are the 2 declared
+to move. D1, D4 and `ds-registry` are unchanged, and the 68 production
+`.py` files and `pms.db` hash identically before and after.
+
+Report: `D5_5_REMEDIATION_APPLIED.md`.
+Evidence: `evidence/20260808_r123_remediation/`.
+
+**Three specification errors were found while applying it** — R-1's
+"21 of 28" (it is 19), R-3's grouping key (omitting `reservation_id`
+under-counts to 18,613.29), and R-3's expected value (37,946.67, not
+37,946.97). A fourth is in the audit: BS-4's residue attribution. All four
+are recorded in `D5_5_REMEDIATION_APPLIED.md` §8. The audit's final
+authoritative table is confirmed in full and remains the truth to declare
+against.
 
 ### The next piece of work
 
-**D6 Step 2 — but R-1, R-2 and R-3 must land first.**
-
-`datasets/financials.py` has three probe defects found by the D5.5 audit,
-and Step 2 declares regression expectations *against those probes*. Doing
-it in the wrong order bakes the defects into the baseline permanently:
-
-| | Fix | Effect |
-|---|---|---|
-| **R-1** | `outstanding` omits tax | −1,697.32 → **+199.92** |
-| **R-2** | `outstanding` will double count once room rent posts | ~₹37,217 latent error |
-| **R-3** | `taxable_total` double counts CGST/SGST | 75,893.34 → ~37,946.97 |
-| R-6 | no probe models `invoice_round_off_amount` | ±0.01–0.16 residue |
-
-R-1 and R-2 **must ship together**. Fixing the tax alone converts a
-known-wrong probe into a plausibly-wrong one, which is worse.
-
-Full specification and sequencing: `D5_5_REMEDIATION.md`.
-Authoritative financial truth to declare against:
-`D5_5_CONSISTENCY_AUDIT.md`, final table.
-
-Then Step 2, cheapest dataset first: `DS-ACT-INHOUSE` (resolves D2's four
+**D6 Step 2.** Cheapest dataset first: `DS-ACT-INHOUSE` (resolves D2's four
 UNRESOLVED surfaces and costs almost nothing), then `DS-ACT-OVERPAY`, then
 the rest. One dataset at a time, each commissioned before the next.
 **Do not write six datasets and then try to commission them** — the gate
 is the part most likely to reveal that a declaration was wrong.
+
+**R-4 must land before `DS-ACT-OVERPAY`,** not before `DS-ACT-INHOUSE`. It
+is a full Class D invariant declaration with a commissioning obligation —
+treat it as D4 work. `DS-ACT-OVERPAY` also needs the R-5 decision below.
 
 ### Decisions waiting on the project owner
 

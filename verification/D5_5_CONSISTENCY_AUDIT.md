@@ -1,5 +1,15 @@
 # D5.5 — Verification Consistency Audit
 
+> **Two corrections, 2026-08-08**, from applying the remediation. The
+> residue table below names **nine** reservations, not the seven BS-4
+> states, and then adds "21 others" — 9 + 21 = 30 against a population of
+> 28; the enumeration is right and the count is wrong. BS-4's second
+> claim, that `invoice_round_off_amount` is the *sole* cause of the
+> residue, is also wrong: four of the nine have zero round-off and a
+> different mechanism behind them. **The final authoritative table is
+> unaffected and every figure in it is confirmed.** See
+> `D5_5_REMEDIATION_APPLIED.md` §2 and §5.
+
 Investigation. 2026-08-07. **No production financial logic, schema object
 or configuration value was modified.** Every figure below was read through
 a `mode=ro` connection to `instance/pms.db`; the file's SHA-256 is

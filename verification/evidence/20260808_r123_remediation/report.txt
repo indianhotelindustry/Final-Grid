@@ -1,0 +1,29 @@
+== aggregate, production database (read-only) ==
+OK   R-1  outstanding                               got 199.92       want 199.92
+OK   R-3  taxable_total                             got 37946.67     want 37946.67
+OK   R-3  taxable_total == charges excl tax - untaxed extras got 37946.67     want 37946.67
+OK   R-3  tax_lines_count == 2 x tax_base_count     got 66           want 66
+OK   R-6  unrounded + round_off == rounded          got 39844.00     want 39844.00
+OK   R-2  extra_charges slices sum to the total     got 729.85       want 729.85
+
+== per-reservation trace (R-1 verification) ==
+OK   R-1  reservations at exactly 0.00              got 19           want 19
+OK   R-1  reservations with a residue               got 9            want 9
+OK   R-1  residues sum to the aggregate             got 199.92       want 199.92
+     residues: resv 1 +200.00, resv 6 -0.01, resv 7 -0.50, resv 9 -0.01, resv 10 +0.15, resv 17 +0.15, resv 23 -0.01, resv 27 -0.01, resv 28 +0.16
+
+== residue attribution (R-6 scope) ==
+OK   R-6  round_off accounts for                    got 0.25         want 0.25
+OK   R-6  tax-rounding path accounts for            got -0.04        want -0.04
+OK   R-6  remainder after both rounding causes      got 199.71       want 199.71
+OK   R-6    = resv 1 unpaid, less the two real overpayments got 199.71       want 199.71
+
+== R-2 commissioning (disposable copy, production untouched) ==
+OK   copy reproduces production outstanding         got 199.92       want 199.92
+     injected 30 room_rent rows totalling 37217.12
+OK   R-2  probe HOLDS at 199.92 with room rent posted got 199.92       want 199.92
+OK   R-2  pre-R-2 form would have moved to          got 37417.04     want 37417.04
+OK   R-2  room_rent slice now visible               got 37217.12     want 37217.12
+OK   R-2  non_room_rent slice unchanged             got 729.85       want 729.85
+
+18 checks, 0 failed

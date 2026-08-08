@@ -1,0 +1,75 @@
+{
+ "change": "D5.5 remediation R-1, R-2, R-3, R-6 applied to verification/datasets/financials.py",
+ "production_untouched": {
+  "db_sha256_before": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+  "db_sha256_after": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+  "db_unchanged": true,
+  "app_tree_sha256_before": "8b1533325d4d8e81008280b07e0eaf7ba44611f9e1838eb69061d0954715a153",
+  "app_tree_sha256_after": "8b1533325d4d8e81008280b07e0eaf7ba44611f9e1838eb69061d0954715a153",
+  "app_unchanged": true,
+  "app_py_files": 68
+ },
+ "declared_movement": {
+  "outstanding": {
+   "from": "-1697.32",
+   "to": "199.92",
+   "cause": "R-1 adds the tax component"
+  },
+  "taxable_total": {
+   "from": "75893.34",
+   "to": "37946.67",
+   "cause": "R-3 takes each taxable base once"
+  }
+ },
+ "probes_moved": {
+  "taxable_total": {
+   "before": "75893.34",
+   "after": "37946.67"
+  },
+  "outstanding": {
+   "before": "-1697.32",
+   "after": "199.92"
+  }
+ },
+ "probes_added": {
+  "extra_charges_room_rent": "0.00",
+  "extra_charges_non_room_rent": "729.85",
+  "tax_lines_count": "66",
+  "tax_base_count": "33",
+  "invoice_unrounded_grand_total": "39844.25",
+  "invoice_round_off_total": "-0.25",
+  "invoice_rounded_grand_total": "39844.00",
+  "invoice_round_off_rows": "6"
+ },
+ "probes_held": [
+  "corporate_bookings",
+  "corporate_credit_used",
+  "credit_note_count",
+  "credit_note_total",
+  "extra_charges_reversals",
+  "extra_charges_total",
+  "folios_count",
+  "guests_count",
+  "overpayment_count",
+  "overpayment_total",
+  "payments_corrections",
+  "payments_count",
+  "payments_gross",
+  "payments_net",
+  "payments_reversals",
+  "payments_voided",
+  "reservations_count",
+  "room_discount",
+  "room_revenue",
+  "tax_total",
+  "void_request_count"
+ ],
+ "probes_held_count": 21,
+ "probes_before_count": 23,
+ "framework_neutrality": {
+  "selfcheck": "READ-ONLY VERIFIED, exit 0",
+  "d1_compare_vs_v2.2.18_preWave1": "41 changes, IMPL_ADDED 38 / VERDICT_CHANGED 3, Q16-Q18 - identical to the D6 Step 1 result",
+  "d4_inv_run": "registered 24, violations 57, uncommissioned 0, release_blocking [INV-A03, INV-B03] - identical to the wave0_freeze state",
+  "d6_ds_registry": "exit 0 against the empty registry"
+ }
+}
