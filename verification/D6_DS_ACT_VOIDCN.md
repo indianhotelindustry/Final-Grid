@@ -178,11 +178,15 @@ quietly added.
 
 ### What the ledger still cannot see
 
-`Q11` is half this dataset's justification and **`coverage.py` does not
-measure D1**. Predicted in advance and measured by hand instead — the same
-way `DS-ACT-INHOUSE`'s D2 claim had to be. Two of the three datasets now
-carry a headline claim the ledger cannot check. That is an argument for
-extending it to D1 and D2, not for trusting it further than it goes.
+`Q11` is half this dataset's justification and, at the time, **`coverage.py`
+did not measure D1**. Predicted in advance and measured by hand instead.
+
+**Closed 2026-08-08.** The ledger now measures D1, and `Q11` is confirmed
+mechanically. Two corrections to what this section originally said: the
+ledger *did* already measure D2 surfaces — `DS-ACT-INHOUSE`'s claim was
+hand-measured only because the ledger did not yet exist — and extending it
+to D1 immediately found three further movements nobody had recorded,
+including `Q09` going AGREED → DIVERGED here and on `DS-ACT-CORRECTION`.
 
 ---
 

@@ -206,6 +206,15 @@ def _validate(d: Dataset) -> None:
                     f'{d.key}: coverage_expectation.{key} names '
                     f'{invariant_id}, which is not in the D4 registry.')
 
+    known_quantities_for_coverage = _known_quantity_ids()
+    if known_quantities_for_coverage:
+        for key in ('quantities_activated', 'quantities_deactivated'):
+            for quantity_id in d.coverage_expectation.get(key) or ():
+                if quantity_id not in known_quantities_for_coverage:
+                    raise RegistrationError(
+                        f'{d.key}: coverage_expectation.{key} names '
+                        f'{quantity_id}, which is not in the D1 registry.')
+
     declared = set(d.perturbation_breaks)
     targets = (set(d.expectations.financial) | set(d.expectations.invariants)
                | set(d.expectations.replay) | set(d.expectations.parity)

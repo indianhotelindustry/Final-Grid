@@ -34,18 +34,36 @@ production — and nothing in D6 measured the difference.
 | **Coverage Changed** | what both exercise, but differently — a status that moved, or a population that shrank |
 | **Expected vs Unexpected** | movement the dataset declared, against movement it did not |
 
-Two layers are measured: **D2 surfaces** (which resolve) and **D4
-invariants** (status *and population*).
+Three layers are measured: **D1 parity quantities** (verdict), **D2
+surfaces** (which resolve) and **D4 invariants** (status *and population*).
 
 Population is the part that matters. An invariant holding over 28
 reservations and one holding over 0 are both `HOLDS`, and only one of them
 proves anything (P10). A drop to zero is a coverage loss even though
-nothing failed, and it is invisible in every other report.
+nothing failed, and it is invisible in every other report. **D1 applies the
+same rule**: `VACUOUS` agreed over an empty population and
+`NOT_IMPLEMENTED` was never measured, so neither counts as coverage.
 
-**D1 and D3 are not measured.** Both are per-quantity and per-date rather
-than per-entity, and a delta over them needs a definition of "covered" this
-module would have to invent. Stated as a gap rather than approximated: an
-approximated ledger is worse than none, because it reads as complete.
+**D3 is not measured, and that is not a temporary gap.** Its unit is a
+business date rather than an entity, and a dataset declares exactly one
+against production's 28. A delta over it would report a catastrophic loss
+on every dataset ever written — noise dressed as a finding. Stated rather
+than approximated: an approximated ledger is worse than none, because it
+reads as complete.
+
+### D1 was added 2026-08-08, and found four things immediately
+
+| Quantity | Movement | What it means |
+|---|---|---|
+| `Q11` | VACUOUS → DIVERGED on `DS-ACT-VOIDCN` | The activation that dataset was written for. Previously its headline claim had to be measured by hand |
+| `Q15` | AGREED → VACUOUS on **all three** datasets | A coverage loss nobody had recorded — none declares a night audit |
+| `Q09` | AGREED → DIVERGED on two datasets | *Payments total (signed vs raw)* — the D1 quantity measuring exactly the defect class R-7 fixed. It agrees on production only because production has no reversal |
+| `Q02`, `Q07` | AGREED → DIVERGED on `DS-ACT-CORRECTION` | Charge count by category, and tax by component. Same cause: they agree on production only because it holds no correction |
+
+`Q09`, `Q02` and `Q07` are the sharp result. Three BLOCK-severity parity
+quantities read AGREED on production and **their agreement proves nothing**
+— the population that would make them disagree does not exist there. Only a
+dataset could show that, and only the ledger could notice.
 
 ---
 
@@ -72,7 +90,8 @@ a dataset nobody has thought about — not a way to opt out.
 A **status change** is read against `expectations.invariants`, not declared
 again here. A dataset that already says `INV-A02: HOLDS` has declared the
 change from production's `VIOLATED`; duplicating it would be two
-declarations of one intent that can drift apart.
+declarations of one intent that can drift apart. **A parity verdict change
+is read against `expectations.parity` the same way**, for the same reason.
 
 **Declared-but-absent is a failure too.** A dataset claiming it resolves a
 surface and not resolving it has made a claim the ledger cannot support —

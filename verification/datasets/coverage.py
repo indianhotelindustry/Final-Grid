@@ -30,23 +30,31 @@ And the fourth question, which is the one that actually catches mistakes:
 
 What is measured
 ----------------
-Two layers, because they are the two a dataset actually moves.
+Three layers.
 
-**D2 surfaces.** Which parameterised golden-master surfaces resolve. A
-surface whose resolver finds no entity is captured as UNRESOLVED and is
-not evidence of anything.
+**D1 parity quantities.** The verdict per quantity. A quantity is covered
+when it actually compared something: ``VACUOUS`` agreed over an empty
+population and ``NOT_IMPLEMENTED`` was never measured at all, so neither
+counts (P10). ``DS-ACT-VOIDCN`` lifting ``Q11`` from VACUOUS to DIVERGED
+is a coverage gain, and it is the movement that showed why D1 belonged
+here: half that dataset's justification was a claim this ledger could not
+check, and it had to be measured by hand.
+
+**D2 surfaces.** Which golden-master surfaces resolve. A surface whose
+resolver finds no entity is captured as UNRESOLVED and is not evidence of
+anything.
 
 **D4 invariants.** Status and population per invariant. Population is the
-part that matters here: an invariant that holds over 28 reservations and
-an invariant that holds over 0 are both ``HOLDS`` and only one of them
-proves anything (P10). A drop to VACUOUS is a coverage loss even though
-nothing failed.
+part that matters: an invariant holding over 28 reservations and one
+holding over 0 are both ``HOLDS`` and only one of them proves anything
+(P10). A drop to zero is a coverage loss even though nothing failed.
 
-D1 and D3 are deliberately not measured yet. Both are per-quantity and
-per-date rather than per-entity, and a coverage delta over them needs a
-definition of "covered" that this module would have to invent. Stated as a
-gap rather than approximated — an approximated ledger is worse than none,
-because it reads as complete.
+**D3 replay is not measured, and that is not a temporary gap.** Its unit
+is a business date rather than an entity, and a dataset declares exactly
+one date against production's 28. A delta over it would report a
+catastrophic loss on every dataset ever written, which is noise dressed as
+a finding. Stated rather than approximated — an approximated ledger is
+worse than none, because it reads as complete.
 
 Cost
 ----
@@ -72,7 +80,15 @@ from verification.config import PROJECT_ROOT
 EXPECTATION_KEYS = (
     'surfaces_added', 'surfaces_lost',
     'invariants_activated', 'invariants_deactivated',
+    'quantities_activated', 'quantities_deactivated',
 )
+
+#: D1 verdicts that mean the quantity measured nothing. A quantity that is
+#: VACUOUS agreed over an empty population, and one that is
+#: NOT_IMPLEMENTED was never measured at all; neither is coverage (P10).
+#: Every other verdict — AGREED, SINGLE_SOURCE, DIVERGED, ERROR — means
+#: something was actually compared.
+UNCOVERED_VERDICTS = ('VACUOUS', 'NOT_IMPLEMENTED', '')
 
 
 class CoverageError(RuntimeError):
@@ -127,6 +143,8 @@ class Snapshot:
     surfaces: set = field(default_factory=set)
     #: invariant id -> (status, population)
     invariants: dict = field(default_factory=dict)
+    #: quantity id -> verdict
+    quantities: dict = field(default_factory=dict)
 
     @property
     def populated_invariants(self) -> set:
@@ -138,13 +156,26 @@ class Snapshot:
         return {iid for iid, (_status, population) in self.invariants.items()
                 if population}
 
+    @property
+    def measured_quantities(self) -> set:
+        """Quantities that actually compared something.
+
+        The D1 equivalent of ``populated_invariants``: agreement over an
+        empty population proves nothing, so VACUOUS and NOT_IMPLEMENTED
+        are not coverage.
+        """
+        return {qid for qid, verdict in self.quantities.items()
+                if verdict not in UNCOVERED_VERDICTS}
+
     def as_dict(self) -> dict:
         return {'label': self.label,
                 'surfaces': sorted(self.surfaces),
                 'surface_count': len(self.surfaces),
                 'invariants': {k: {'status': v[0], 'population': v[1]}
                                for k, v in sorted(self.invariants.items())},
-                'populated_invariant_count': len(self.populated_invariants)}
+                'populated_invariant_count': len(self.populated_invariants),
+                'quantities': dict(sorted(self.quantities.items())),
+                'measured_quantity_count': len(self.measured_quantities)}
 
 
 def measure(db_path: str, label: str = '') -> Snapshot:
@@ -174,7 +205,12 @@ def measure(db_path: str, label: str = '') -> Snapshot:
               int((entry or {}).get('population', 0) or 0))
         for iid, entry in (evaluated.get('invariants') or {}).items()}
 
-    return Snapshot(label=label, surfaces=surfaces, invariants=invariants)
+    measured = _probe('_measure', db_path, '---PVF-JSON---')
+    quantities = {qid: str((entry or {}).get('verdict', ''))
+                  for qid, entry in (measured or {}).items()}
+
+    return Snapshot(label=label, surfaces=surfaces, invariants=invariants,
+                    quantities=quantities)
 
 
 # ---------------------------------------------------------------------------
@@ -193,17 +229,23 @@ class Delta:
     invariants_deactivated: list = field(default_factory=list)
     #: Covered by both, but the status or population moved.
     invariants_changed: list = field(default_factory=list)
+    quantities_activated: list = field(default_factory=list)
+    quantities_deactivated: list = field(default_factory=list)
+    #: Measured by both, but the verdict moved.
+    quantities_changed: list = field(default_factory=list)
 
     unexpected: list = field(default_factory=list)
     expected_but_absent: list = field(default_factory=list)
 
     @property
     def added_count(self) -> int:
-        return len(self.surfaces_added) + len(self.invariants_activated)
+        return (len(self.surfaces_added) + len(self.invariants_activated)
+                + len(self.quantities_activated))
 
     @property
     def lost_count(self) -> int:
-        return len(self.surfaces_lost) + len(self.invariants_deactivated)
+        return (len(self.surfaces_lost) + len(self.invariants_deactivated)
+                + len(self.quantities_deactivated))
 
     @property
     def clean(self) -> bool:
@@ -221,11 +263,15 @@ class Delta:
             'dataset': self.dataset_label,
             'coverage_added': {
                 'surfaces': self.surfaces_added,
-                'invariants': self.invariants_activated},
+                'invariants': self.invariants_activated,
+                'quantities': self.quantities_activated},
             'coverage_lost': {
                 'surfaces': self.surfaces_lost,
-                'invariants': self.invariants_deactivated},
-            'coverage_changed': self.invariants_changed,
+                'invariants': self.invariants_deactivated,
+                'quantities': self.quantities_deactivated},
+            'coverage_changed': {
+                'invariants': self.invariants_changed,
+                'quantities': self.quantities_changed},
             'unexpected_movement': self.unexpected,
             'declared_but_not_observed': self.expected_but_absent,
             'verdict': 'AS_DECLARED' if self.clean else 'UNDECLARED_MOVEMENT',
@@ -234,15 +280,16 @@ class Delta:
 
 def compare(baseline: Snapshot, dataset: Snapshot,
             expectation: dict | None = None,
-            declared_statuses: dict | None = None) -> Delta:
+            declared_statuses: dict | None = None,
+            declared_verdicts: dict | None = None) -> Delta:
     """Build the ledger, and classify every movement against *expectation*.
 
-    ``declared_statuses`` is the dataset's ``expectations.invariants``. It
-    is consulted rather than duplicated: a dataset that already says
-    ``INV-A02: HOLDS`` has declared the status change from production's
-    VIOLATED, and making it say so a second time in
-    ``coverage_expectation`` would be two declarations of one intent that
-    can drift apart.
+    ``declared_statuses`` is the dataset's ``expectations.invariants`` and
+    ``declared_verdicts`` its ``expectations.parity``. Both are consulted
+    rather than duplicated: a dataset that already says ``INV-A02: HOLDS``
+    has declared the change from production's VIOLATED, and making it say
+    so a second time in ``coverage_expectation`` would be two declarations
+    of one intent that can drift apart.
     """
     delta = Delta(baseline_label=baseline.label,
                   dataset_label=dataset.label)
@@ -265,6 +312,17 @@ def compare(baseline: Snapshot, dataset: Snapshot,
                 'now': f'{now_status} over {now_population}',
                 'status_moved': was_status != now_status})
 
+    base_measured = baseline.measured_quantities
+    ds_measured = dataset.measured_quantities
+    delta.quantities_activated = sorted(ds_measured - base_measured)
+    delta.quantities_deactivated = sorted(base_measured - ds_measured)
+    for qid in sorted(base_measured & ds_measured):
+        if baseline.quantities[qid] != dataset.quantities[qid]:
+            delta.quantities_changed.append({
+                'quantity': qid,
+                'was': baseline.quantities[qid],
+                'now': dataset.quantities[qid]})
+
     expectation = expectation or {}
     declared = {key: set(expectation.get(key) or ()) for key in
                 EXPECTATION_KEYS}
@@ -273,6 +331,8 @@ def compare(baseline: Snapshot, dataset: Snapshot,
         'surfaces_lost': set(delta.surfaces_lost),
         'invariants_activated': set(delta.invariants_activated),
         'invariants_deactivated': set(delta.invariants_deactivated),
+        'quantities_activated': set(delta.quantities_activated),
+        'quantities_deactivated': set(delta.quantities_deactivated),
     }
 
     for key in EXPECTATION_KEYS:
@@ -298,6 +358,20 @@ def compare(baseline: Snapshot, dataset: Snapshot,
                                  'target': invariant_id,
                                  'detail': f'{change["was"]} -> '
                                            f'{change["now"]}'})
+
+    # The same rule for D1, for the same reason. A quantity that agrees on
+    # production and diverges on a dataset has found something the
+    # production population could not show — Q09 is exactly that — and it
+    # is not allowed to pass unremarked.
+    declared_verdicts = declared_verdicts or {}
+    for change in delta.quantities_changed:
+        quantity_id = change['quantity']
+        if declared_verdicts.get(quantity_id) == change['now']:
+            continue
+        delta.unexpected.append({'movement': 'quantity_verdict_changed',
+                                 'target': quantity_id,
+                                 'detail': f'{change["was"]} -> '
+                                           f'{change["now"]}'})
     return delta
 
 
@@ -316,6 +390,8 @@ def render(delta: Delta) -> str:
         add(f'  + surface    {name}')
     for name in delta.invariants_activated:
         add(f'  + invariant  {name}')
+    for name in delta.quantities_activated:
+        add(f'  + quantity   {name}')
     if not delta.added_count:
         add('  (none)')
 
@@ -325,16 +401,22 @@ def render(delta: Delta) -> str:
         add(f'  - surface    {name}')
     for name in delta.invariants_deactivated:
         add(f'  - invariant  {name}  (population fell to zero)')
+    for name in delta.quantities_deactivated:
+        add(f'  - quantity   {name}  (nothing left to compare)')
     if not delta.lost_count:
         add('  (none)')
 
+    changed = len(delta.invariants_changed) + len(delta.quantities_changed)
     add('')
-    add(f'COVERAGE CHANGED ({len(delta.invariants_changed)})')
+    add(f'COVERAGE CHANGED ({changed})')
     for change in delta.invariants_changed:
         marker = '!' if change['status_moved'] else ' '
         add(f'  {marker} {change["invariant"]:<10} {change["was"]} -> '
             f'{change["now"]}')
-    if not delta.invariants_changed:
+    for change in delta.quantities_changed:
+        add(f'  ! {change["quantity"]:<10} {change["was"]} -> '
+            f'{change["now"]}')
+    if not changed:
         add('  (none)')
 
     add('')
@@ -353,8 +435,10 @@ def render(delta: Delta) -> str:
     add('')
     add(f'VERDICT: {delta.as_dict()["verdict"]}')
     add('')
-    add('Not measured: D1 parity and D3 replay. Both are per-quantity and')
-    add('per-date rather than per-entity, and a coverage delta over them')
-    add('needs a definition of "covered" this module would have to invent.')
+    add('Measured: D1 parity quantities, D2 golden-master surfaces,')
+    add('D4 invariants. Not measured: D3 replay — its unit is a business')
+    add('date rather than an entity, and a dataset declares one date, so a')
+    add('delta over it would compare a single day against 28 and read as a')
+    add('catastrophic loss on every dataset.')
     add('=' * 78)
     return '\n'.join(out)

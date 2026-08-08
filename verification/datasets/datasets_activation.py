@@ -403,6 +403,22 @@ _CASH = 1                 # payment mode 1, category direct_payment.
             # declaring a hotel that let someone walk.
             'INV-C02': 'HOLDS',
         },
+
+        # Element 6. BACKFILLED when the coverage ledger was extended to
+        # D1 — this dataset predates that dimension, so the verdicts were
+        # measured and then declared. Future datasets declare first.
+        #
+        # DIVERGED -> AGREED on a dataset is not the framework improving.
+        # It means production's divergence needs a population this
+        # narrative does not contain, so the dataset cannot see it. Each is
+        # declared so that a dataset silently losing the ability to
+        # reproduce a known divergence is a failure rather than a quiet
+        # green.
+        parity={
+            'Q12': 'AGREED', 'Q13': 'AGREED', 'Q14': 'AGREED',
+            'Q17': 'AGREED', 'Q18': 'AGREED', 'Q20': 'AGREED',
+            'Q22': 'AGREED',
+        },
     ),
 
     # -- the rows, parents before children -------------------------------
@@ -597,6 +613,9 @@ _CASH = 1                 # payment mode 1, category direct_payment.
         # Eight invariants lose their population. Each follows from
         # something the narrative does not contain, and none of them was
         # visible before the ledger existed:
+        'quantities_activated': (),
+        # Q15 recomputes the night audit, and there is no night audit.
+        'quantities_deactivated': ('Q15',),
         'invariants_deactivated': (
             'INV-A03',   # no extra_charges at all, so nothing to group
             'INV-B01',   # no night audit
@@ -934,6 +953,31 @@ _ROOM_CORR = 3            # 103, Deluxe.
             # Cash only, so the OTA population is empty (P10).
             'INV-C01': 'VACUOUS',
         },
+
+        # Element 6. BACKFILLED when the coverage ledger was extended to
+        # D1 — this dataset predates that dimension, so the verdicts were
+        # measured and then declared. Future datasets declare first.
+        #
+        # DIVERGED -> AGREED on a dataset is not the framework improving.
+        # It means production's divergence needs a population this
+        # narrative does not contain, so the dataset cannot see it. Each is
+        # declared so that a dataset silently losing the ability to
+        # reproduce a known divergence is a failure rather than a quiet
+        # green.
+        #
+        # Q02, Q07 and Q09 go AGREED -> DIVERGED here, and that is the
+        # finding. All three agree on production only because production
+        # holds no correction; the first dataset that contains one makes
+        # them disagree. Q09 in particular is "Payments total (signed vs
+        # raw)" — the D1 quantity that measures exactly the defect class
+        # R-7 fixed in the probes, and it had never been able to fire.
+        parity={
+            'Q02': 'DIVERGED',   # charge count and total by category
+            'Q07': 'DIVERGED',   # tax by component
+            'Q09': 'DIVERGED',   # payments total, signed vs raw
+            'Q12': 'AGREED', 'Q13': 'AGREED', 'Q14': 'AGREED',
+            'Q17': 'AGREED', 'Q22': 'AGREED',
+        },
     ),
 
     rows=(
@@ -1087,6 +1131,8 @@ _ROOM_CORR = 3            # 103, Deluxe.
         'invariants_activated': (
             'INV-D02',
         ),
+        'quantities_activated': (),
+        'quantities_deactivated': ('Q15',),   # no night audit
         # Seven, not the eight DS-ACT-INHOUSE lost. INV-A03 is the
         # difference: that dataset had no extra_charges at all, this one
         # has three, so INV-A03 keeps a population and should merely
@@ -1344,6 +1390,29 @@ _ADMIN = 1                # the only user on this installation.
             'INV-D06': 'HOLDS',
             'INV-C01': 'VACUOUS',
         },
+
+        # Element 6. BACKFILLED when the coverage ledger was extended to
+        # D1 — this dataset predates that dimension, so the verdicts were
+        # measured and then declared. Future datasets declare first.
+        #
+        # DIVERGED -> AGREED on a dataset is not the framework improving.
+        # It means production's divergence needs a population this
+        # narrative does not contain, so the dataset cannot see it. Each is
+        # declared so that a dataset silently losing the ability to
+        # reproduce a known divergence is a failure rather than a quiet
+        # green.
+        #
+        # Q11 is the activation this dataset was written for: refunds
+        # separated from voids, VACUOUS on production and DIVERGED here
+        # because the night audit counts voided payments as refunds.
+        # Q09 diverges for the same reason it does on DS-ACT-CORRECTION —
+        # the refund row is flagged is_reversal.
+        parity={
+            'Q09': 'DIVERGED',   # payments total, signed vs raw
+            'Q11': 'DIVERGED',   # refunds vs voids — the activation
+            'Q12': 'AGREED', 'Q13': 'AGREED', 'Q14': 'AGREED',
+            'Q17': 'AGREED', 'Q22': 'AGREED',
+        },
     ),
 
     rows=(
@@ -1507,6 +1576,10 @@ _ADMIN = 1                # the only user on this installation.
         'invariants_activated': (
             'INV-D05', 'INV-D02',
         ),
+        # Q11 lifted from VACUOUS. Until the ledger measured D1 this was
+        # the dataset's headline claim and had to be checked by hand.
+        'quantities_activated': ('Q11',),
+        'quantities_deactivated': ('Q15',),   # no night audit
         # Seven, the same set DS-ACT-CORRECTION lost. INV-A03 survives
         # here too, because there is an extra charge on the folio.
         'invariants_deactivated': (

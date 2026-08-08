@@ -508,11 +508,13 @@ that is the right reason to do it and the wrong reason to expect much of
 it — its record must say so rather than let the `DS-ACT-` prefix imply
 otherwise.
 
-**Also outstanding:** the coverage ledger does not measure D1 or D2, and
-two of the three datasets now carry a headline claim it cannot check
-(`DS-ACT-INHOUSE`'s D2 surfaces, `DS-ACT-VOIDCN`'s `Q11`). Both were
-measured by hand. That is an argument for extending the ledger, not for
-trusting it further than it goes.
+**Closed since:** the coverage ledger now measures **D1 as well as D2 and
+D4**. `DS-ACT-VOIDCN`'s `Q11` claim is mechanical rather than hand-measured.
+
+*Correction to the line that stood here:* it said the ledger measured
+neither D1 nor D2. The D2 half was wrong — it has measured golden-master
+surfaces since it was built, and `DS-ACT-INHOUSE`'s backfill pack shows it
+reporting three surfaces added. Only D1 was missing.
 
 In this order, and the order is the point:
 

@@ -1,0 +1,15 @@
+{
+ "change": "coverage ledger extended to D1 parity quantities",
+ "correction": "I previously wrote, in WAVE0_STATUS and D6_DS_ACT_VOIDCN, that the ledger does not measure D1 OR D2. The D2 half was wrong - it has measured golden-master surfaces since it was built, and the DS-ACT-INHOUSE backfill pack shows it reporting 3 surfaces added and 158 vs 160 captured. Only D1 was absent. Corrected in both documents.",
+ "coverage_rule": "a quantity counts as covered only when it compared something. VACUOUS agreed over an empty population and NOT_IMPLEMENTED was never measured, so neither is coverage (P10) - the D1 equivalent of a zero invariant population.",
+ "parity_cross_check": "a verdict move on a jointly-measured quantity is unexpected unless declared in expectations.parity, exactly as an invariant status move is read against expectations.invariants. One intent, declared once.",
+ "d3_not_measured": "and not a temporary gap: its unit is a business date, and a dataset declares one against production 28, so a delta would report a catastrophic loss on every dataset ever written.",
+ "what_it_found_immediately": {
+  "Q11": "VACUOUS -> DIVERGED on DS-ACT-VOIDCN. Now mechanical; it was that dataset headline claim and had to be measured by hand.",
+  "Q15": "AGREED -> VACUOUS on all three datasets. A coverage loss nobody had recorded - none of them declares a night audit.",
+  "Q09": "AGREED -> DIVERGED on DS-ACT-CORRECTION and DS-ACT-VOIDCN. Payments total, signed vs raw - the D1 quantity that measures exactly the defect class R-7 fixed. It agrees on production only because production has no reversal, so its agreement proved nothing.",
+  "Q02_Q07": "AGREED -> DIVERGED on DS-ACT-CORRECTION. Charge count by category, and tax by component. Same cause: they agree on production only because production holds no correction."
+ },
+ "commissioning": "36 checks, 0 failed. The 15 pre-existing cases still pass; 15 new ones cover the D1 dimension including VACUOUS and NOT_IMPLEMENTED not counting as coverage, activation, loss, verdict moves against expectations.parity, declaring the WRONG verdict, and the three layers counting together.",
+ "datasets_recommissioned": "3 of 3 PASS at 52 / 55 / 54 expectations, all three ledgers AS_DECLARED"
+}

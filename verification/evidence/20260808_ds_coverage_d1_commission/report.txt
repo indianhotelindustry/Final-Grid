@@ -1,0 +1,51 @@
+== the ledger must distinguish four kinds of movement ==
+OK   identical snapshots are AS_DECLARED                        got True    want True
+OK     and report no movement                                   got 0       want 0
+OK   undeclared addition is not clean                           got False   want False
+OK     and is listed as added                                   got ['NEW__r'] want ['NEW__r']
+OK   undeclared loss is not clean                               got False   want False
+OK     and is listed as lost                                    got ['c__z'] want ['c__z']
+OK   declared loss is AS_DECLARED                               got True    want True
+OK   declared-but-absent is not clean                           got False   want False
+OK     and is reported separately from unexpected               got ['never__happens'] want ['never__happens']
+OK     with nothing in unexpected                               got []      want []
+
+== population, not status, decides whether a rule is covered ==
+OK   HOLDS over 0 counts as deactivated                         got ['INV-1'] want ['INV-1']
+OK     even though the status did not move                      got HOLDS   want HOLDS
+OK   a population appearing counts as activated                 got ['INV-4'] want ['INV-4']
+OK     and declaring it is enough to be clean                   got True    want True
+
+== a status change is read against expectations.invariants ==
+OK   a declared status change is clean                          got True    want True
+OK   an undeclared status change is not                         got False   want False
+OK     and names the invariant                                  got ['INV-2'] want ['INV-2']
+OK   declaring the WRONG status does not excuse it              got False   want False
+
+== population movement without status movement is Changed, not Lost ==
+OK   a shrunken population is reported as changed               got ['INV-3'] want ['INV-3']
+OK     and is not counted as a loss                             got []      want []
+OK     and does not by itself fail the ledger                   got True    want True
+
+== D1: a quantity is covered only when it compared something ==
+OK   VACUOUS is not counted as covered                          got False   want False
+OK   NOT_IMPLEMENTED is not counted as covered                  got False   want False
+OK   AGREED is                                                  got True    want True
+OK   DIVERGED is too — disagreement is a measurement            got True    want True
+OK   a quantity leaving VACUOUS is an activation                got ['Q03'] want ['Q03']
+OK     and undeclared it fails the ledger                       got False   want False
+OK     declared, it is clean                                    got True    want True
+OK   a quantity falling to VACUOUS is a loss                    got ['Q01'] want ['Q01']
+OK     declared, it is clean                                    got True    want True
+
+== D1: a verdict move is read against expectations.parity ==
+OK   an undeclared verdict move fails                           got False   want False
+OK     and names the quantity                                   got ['Q01'] want ['Q01']
+OK   declaring it in parity is enough                           got True    want True
+OK   declaring the WRONG verdict does not excuse it             got False   want False
+
+== the three layers are counted together ==
+OK   added_count spans surfaces and quantities                  got 2       want 2
+OK     and the ledger is clean                                  got True    want True
+
+36 checks, 0 failed

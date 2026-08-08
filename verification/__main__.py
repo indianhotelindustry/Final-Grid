@@ -573,7 +573,8 @@ def _cmd_ds_coverage(args) -> int:
         builder.discard(materialisation)
 
     delta = coverage.compare(baseline, snapshot, d.coverage_expectation,
-                             d.expectations.invariants)
+                             d.expectations.invariants,
+                             d.expectations.parity)
     text = coverage.render(delta)
     print()
     print(text)

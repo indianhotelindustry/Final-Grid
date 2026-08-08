@@ -1,0 +1,53 @@
+==============================================================================
+COVERAGE LEDGER — DS-ACT-VOIDCN@1.0
+baseline: production
+==============================================================================
+
+COVERAGE ADDED (3)
+  + invariant  INV-D02
+  + invariant  INV-D05
+  + quantity   Q11
+
+COVERAGE LOST (9)
+  - surface    reports.night_audit_snapshot__night_audit_log
+  - invariant  INV-B01  (population fell to zero)
+  - invariant  INV-B02  (population fell to zero)
+  - invariant  INV-B03  (population fell to zero)
+  - invariant  INV-B05  (population fell to zero)
+  - invariant  INV-C01  (population fell to zero)
+  - invariant  INV-C05  (population fell to zero)
+  - invariant  INV-D07  (population fell to zero)
+  - quantity   Q15  (nothing left to compare)
+
+COVERAGE CHANGED (19)
+    INV-A01    HOLDS over 28 -> HOLDS over 1
+  ! INV-A02    VIOLATED over 40 -> HOLDS over 4
+  ! INV-A03    VIOLATED over 5 -> HOLDS over 1
+    INV-A04    HOLDS over 35 -> HOLDS over 2
+    INV-A05    HOLDS over 66 -> HOLDS over 4
+    INV-B06    HOLDS over 35 -> HOLDS over 3
+    INV-C02    HOLDS over 28 -> HOLDS over 1
+    INV-C03    HOLDS over 106 -> HOLDS over 8
+  ! INV-C04    VIOLATED over 30 -> HOLDS over 1
+    INV-D01    HOLDS over 28 -> HOLDS over 1
+    INV-D03    HOLDS over 35 -> HOLDS over 3
+    INV-D04    HOLDS over 66 -> HOLDS over 4
+    INV-D06    HOLDS over 30 -> HOLDS over 1
+  ! Q09        AGREED -> DIVERGED
+  ! Q12        DIVERGED -> AGREED
+  ! Q13        DIVERGED -> AGREED
+  ! Q14        DIVERGED -> AGREED
+  ! Q17        DIVERGED -> AGREED
+  ! Q22        DIVERGED -> AGREED
+
+EXPECTED vs UNEXPECTED
+  every movement was declared, and every declared movement happened
+
+VERDICT: AS_DECLARED
+
+Measured: D1 parity quantities, D2 golden-master surfaces,
+D4 invariants. Not measured: D3 replay — its unit is a business
+date rather than an entity, and a dataset declares one date, so a
+delta over it would compare a single day against 28 and read as a
+catastrophic loss on every dataset.
+==============================================================================
