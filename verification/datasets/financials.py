@@ -275,6 +275,39 @@ PROBES = {
                     '                 FROM tax_lines), 0) '
                     f'     - COALESCE(({SIGNED_PAYMENTS} '
                     '                 WHERE COALESCE(is_voided,0)=0), 0)'),
+
+    # -- R-8: what is actually still collectable --------------------------
+    #: ``outstanding`` less credit notes.
+    #:
+    #: ``outstanding`` answers "charges raised, less collections", and that
+    #: is the right question for it: a charge that was raised WAS raised,
+    #: and the folio says so. A credit note does not remove the charge —
+    #: it is a separate instrument that writes off what will not be
+    #: collected, which is why it lives in its own table rather than as a
+    #: reversal row.
+    #:
+    #: The consequence, found by ``DS-ACT-VOIDCN``: after a credit note is
+    #: issued, ``outstanding`` reports money the hotel has already agreed
+    #: it will never see. On that dataset it reads 236.00 while the true
+    #: receivable is 0.00.
+    #:
+    #: This is added as a SEPARATE quantity rather than folded into
+    #: ``outstanding``, because the two answer different questions and a
+    #: single probe meaning whichever the reader assumed is the defect R-7
+    #: was careful to avoid. Note it was also not treated as blocking:
+    #: unlike R-1, R-2, R-3 and R-7 this was a MISSING quantity rather
+    #: than a WRONG one, so no baseline was ever declared against an error.
+    'net_receivable': ('money',
+                       'SELECT COALESCE((SELECT SUM(final_rate) '
+                       '                 FROM reservation_night_rates), 0) '
+                       f'     + COALESCE(({SIGNED_CHARGES} '
+                       f'                 WHERE {NOT_ROOM_RENT}), 0) '
+                       '     + COALESCE((SELECT SUM(tax_amount) '
+                       '                 FROM tax_lines), 0) '
+                       f'     - COALESCE(({SIGNED_PAYMENTS} '
+                       '                 WHERE COALESCE(is_voided,0)=0), 0) '
+                       '     - COALESCE((SELECT SUM(total_amount) '
+                       '                 FROM credit_notes), 0)'),
 }
 
 

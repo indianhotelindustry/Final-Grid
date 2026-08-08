@@ -1,0 +1,32 @@
+{
+ "change": "R-8: net_receivable probe in verification/datasets/financials.py",
+ "scope": "verification layer only - one probe. No application code, no schema, no production write.",
+ "question": "outstanding answers charges raised less collections. net_receivable answers what is actually still collectable, after credit notes.",
+ "why_separate": "the two answer different questions. Folding credit notes into outstanding would give one probe meaning whichever the reader assumed - the defect R-7 was careful to avoid.",
+ "why_not_blocking": "unlike R-1, R-2, R-3 and R-7 this is a MISSING quantity rather than a WRONG one, so no baseline was ever declared against an error. Recorded as a candidate when DS-ACT-VOIDCN found it, implemented on instruction.",
+ "measurements": {
+  "production": {
+   "outstanding": "199.92",
+   "credit_note_total": "0.00",
+   "net_receivable": "199.92",
+   "note": "no credit notes, so neutral"
+  },
+  "DS-ACT-INHOUSE": {
+   "outstanding": "1100.00",
+   "credit_note_total": "0.00",
+   "net_receivable": "1100.00"
+  },
+  "DS-ACT-CORRECTION": {
+   "outstanding": "0.00",
+   "credit_note_total": "0.00",
+   "net_receivable": "0.00"
+  },
+  "DS-ACT-VOIDCN": {
+   "outstanding": "236.00",
+   "credit_note_total": "236.00",
+   "net_receivable": "0.00",
+   "note": "the pair that motivated the quantity: 236.00 still owed on the folio, 0.00 actually collectable"
+  }
+ },
+ "datasets_recommissioned": "3 of 3 PASS, 45 / 47 / 47 expectations"
+}

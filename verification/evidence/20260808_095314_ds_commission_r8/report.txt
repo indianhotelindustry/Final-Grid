@@ -1,0 +1,62 @@
+====================================================================================================
+DSBC FRONTLINE — REGRESSION DATASET COMMISSIONING
+Production Verification Framework, Wave 0 Deliverable 6
+====================================================================================================
+Started            : 2026-08-08T09:53:14
+Duration           : 11.3s
+Registered         : 3
+Commissioned       : 3
+Not commissioned   : 0
+Unbacked claims    : 0
+OVERALL VERDICT    : PASS
+
+----------------------------------------------------------------------------------------------------
+THE SIX ELEMENTS
+----------------------------------------------------------------------------------------------------
+  BUILD          the dataset materialises on the real schema
+  POSITIVE       every declared expectation holds on the clean build
+  PERTURBATION   the perturbation actually changes rows
+  DISCRIMINATION every declared target breaks when it is applied
+  ACTIVATION     every activation claim lifts its invariant out of
+                 VACUOUS
+  ISOLATION      production is byte-identical throughout
+
+----------------------------------------------------------------------------------------------------
+DS-ACT-INHOUSE@1.0  [COMMISSIONED]
+----------------------------------------------------------------------------------------------------
+  One guest in house part paid, one departed and settled
+  content hash : 061b19c2df20e765
+  [PASS] BUILD           19 rows into 8 tables, content hash 061b19c2df20
+  [PASS] POSITIVE        all 45 declared expectation(s) met
+  [PASS] PERTURBATION    2 row(s) changed by 2 statement(s)
+  [PASS] DISCRIMINATION  all 4 declared target(s) broke; 1 further target(s) also broke: net_receivable
+  [PASS] ACTIVATION      0 claim(s) verified
+  [PASS] ISOLATION       production byte-identical across both builds
+
+----------------------------------------------------------------------------------------------------
+DS-ACT-CORRECTION@1.0  [COMMISSIONED]
+----------------------------------------------------------------------------------------------------
+  A charge and a payment, each corrected the way the audit requires
+  content hash : aa36f32d073b8924
+  [PASS] BUILD           15 rows into 8 tables, content hash aa36f32d073b
+  [PASS] POSITIVE        all 47 declared expectation(s) met
+  [PASS] PERTURBATION    1 row(s) changed by 1 statement(s)
+  [PASS] DISCRIMINATION  all 1 declared target(s) broke
+  [PASS] ACTIVATION      1 claim(s) verified
+  [PASS] ISOLATION       production byte-identical across both builds
+
+----------------------------------------------------------------------------------------------------
+DS-ACT-VOIDCN@1.0  [COMMISSIONED]
+----------------------------------------------------------------------------------------------------
+  A duplicate payment voided, and a disputed charge credited
+  content hash : 20d069cfa2bb4b4d
+  [PASS] BUILD           15 rows into 10 tables, content hash 20d069cfa2bb
+  [PASS] POSITIVE        all 47 declared expectation(s) met
+  [PASS] PERTURBATION    1 row(s) changed by 1 statement(s)
+  [PASS] DISCRIMINATION  all 1 declared target(s) broke
+  [PASS] ACTIVATION      2 claim(s) verified
+  [PASS] ISOLATION       production byte-identical across both builds
+
+====================================================================================================
+END OF REPORT
+====================================================================================================

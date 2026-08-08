@@ -363,6 +363,10 @@ _CASH = 1                 # payment mode 1, category direct_payment.
             # in full, so a non-zero figure here would mean the departed
             # stay had left money on the table.
             'outstanding': '1100.00',
+            # R-8. No credit note in this narrative, so it equals
+            # `outstanding` — which is the assertion that nothing here has
+            # been written off.
+            'net_receivable': '1100.00',
         },
 
         # Element 4. Declared from the narrative, not transcribed from a
@@ -884,6 +888,10 @@ _ROOM_CORR = 3            # 103, Deluxe.
             # -3,072.00, which is what makes this the sharpest single
             # assertion in the dataset.
             'outstanding': '0.00',
+            # R-8. A correction is not a write-off: the charge was
+            # reversed on the folio, not credited, so there is no credit
+            # note and the two figures agree.
+            'net_receivable': '0.00',
         },
 
         invariants={
@@ -1303,9 +1311,15 @@ _ADMIN = 1                # the only user on this installation.
 
             'charges_net': '1286.00',
             # 1,286.00 raised less 1,050.00 net collected. The credit note
-            # is NOT netted here — no probe does that. The true receivable
-            # is outstanding - credit_note_total = 0.00.
+            # is NOT netted here, by design: the minibar WAS raised and the
+            # folio says so.
             'outstanding': '236.00',
+            # R-8, added because of this dataset. The credit note writes
+            # off the 236.00, so nothing is actually still collectable.
+            # This is the pair of figures that motivated the quantity: one
+            # probe reporting 236.00 and another reporting 0.00, each
+            # answering a different question correctly.
+            'net_receivable': '0.00',
         },
 
         invariants={

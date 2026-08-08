@@ -1,0 +1,14 @@
+R-8 - net_receivable
+========================================
+
+                        outstanding credit notes    net recv.
+production                   199.92         0.00       199.92
+DS-ACT-INHOUSE              1100.00         0.00      1100.00
+DS-ACT-CORRECTION              0.00         0.00         0.00
+DS-ACT-VOIDCN                236.00       236.00         0.00
+
+Neutral wherever no credit note exists. On DS-ACT-VOIDCN the two
+figures differ by the credit note, each answering its own question
+correctly.
+
+Datasets re-commissioned: 3 of 3 PASS, 45 / 47 / 47 expectations
