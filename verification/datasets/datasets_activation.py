@@ -25,16 +25,45 @@ Target                       Layer  Evidence it is empty
 4 golden master surfaces     D2     UNRESOLVED — no checked-in reservation
 ===========================  =====  ====================================
 
-Planned, cheapest first::
+Planned. **Re-sequenced 2026-08-08** — see `D6_SEQUENCING_DECISION.md` for
+the evidence behind the swap::
 
-    DS-ACT-INHOUSE      a checked-in reservation. Resolves D2's four
-                        UNRESOLVED surfaces and costs almost nothing.
-    DS-ACT-OVERPAY      a reservation overpaid by more than Rs.1.
-    DS-ACT-CORPCREDIT   a corporate booking with company credit behind it.
-    DS-ACT-CORRECTION   a correction and a reversal, each naming what it
-                        corrects.
-    DS-ACT-VOIDCN       a void request and a credit note. Also lifts Q11.
-    DS-ACT-SHIFT        a shift with cash counted. Lifts Q21.
+    1 DS-ACT-INHOUSE    COMMISSIONED. A checked-in reservation, plus a
+                        departed one so the trade is not a net loss.
+                        Activates 0 invariants; D2 +3 / -1.
+    2 DS-ACT-GROUP      NEXT. A group block. Closes groups.detail, the only
+                        UNRESOLVED D2 surface with no planned owner.
+                        Activates 0 invariants — no invariant, fault or
+                        quantity references group_blocks anywhere.
+    3 DS-ACT-OVERPAY    BLOCKED on R-5. A reservation overpaid by more than
+                        the materiality threshold — and what that threshold
+                        is, is the open decision. Lifts INV-A06 and gives
+                        INV-D07 its first real population.
+    4 DS-ACT-CORPCREDIT lifts INV-C06; closes the 2 company D2 surfaces.
+    5 DS-ACT-CORRECTION lifts INV-D02 — the only RELEASE_BLOCKING one of
+                        the four VACUOUS invariants.
+    6 DS-ACT-VOIDCN     lifts INV-D05. Also lifts Q11.
+    7 DS-ACT-SHIFT      lifts Q21.
+
+Overpayment was not demoted because group coverage is worth more; it is
+not. It was demoted because ``DS-ACT-OVERPAY`` cannot be declared
+correctly until R-5 settles the threshold that defines its population,
+and declaring expectations against an unsettled policy is the mistake the
+D5.5 remediation existed to prevent. ``FLT-A07`` is already COMMISSIONED,
+so overpayment *detection* is proven; what is missing is a standing
+population, which is a coverage gap rather than a correctness risk.
+
+**The DS-ACT- prefix is wrong for two of these.** It means "activates a
+VACUOUS D4 control", and ``DS-ACT-INHOUSE`` and ``DS-ACT-GROUP`` activate
+none — they exist to give a golden-master resolver an entity to pin to.
+Neither this module nor ``datasets_core`` has a category for that. Not
+renamed: ``dataset_id@version`` is a dataset's identity and editing it in
+place is what the versioning rule exists to prevent. Recorded so the third
+one does not inherit the confusion by default.
+
+**Every dataset from DS-ACT-GROUP onward carries a coverage ledger** —
+Added, Lost, Changed, and expected vs unexpected movement, measured rather
+than asserted. See ``D6_COVERAGE_LEDGER.md``.
 
 Two things to get right
 -----------------------
