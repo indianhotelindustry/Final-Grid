@@ -1,0 +1,3062 @@
+{
+  "commissioning_evidence_pack": "C:\\Users\\SIPL Server\\Downloads\\DSS\\SukoonPMS\\SukoonPMS\\verification\\evidence\\20260808_103655_ds_commission_shift",
+  "commissioning_gaps": [],
+  "datasets": [
+    {
+      "activates_invariants": [],
+      "applicable_releases": "all",
+      "business_date": "2026-06-15",
+      "business_narrative": "A small hotel with two stays and nothing wrong with either.\n\nPriya Nair arrives on 13 June for one night in room 102 at 1,050.00 inclusive of 5% GST, settles in full in cash when she leaves on the 14th, and is invoiced for 1,050.00 with no rounding adjustment. Rohit Sharma walks in on the 14th and takes room 101 for two nights, departing on the 16th, at the same rate. He pays 1,000.00 in cash at the desk on arrival. On the morning of the 15th \u2014 the business date this dataset represents \u2014 he is still in the room, both his nights are priced, no invoice has been raised against him, and the hotel is owed 1,100.00.\n\nNothing is wrong in this narrative. That is the point of it. Every declared expectation holds, so the dataset is a positive control: it is what a perturbation has to be perturbed away from, and it is the only kind of evidence that can show correct data passing rather than merely showing broken data failing.\n\nWhat it creates that production does not have is a reservation with status CheckedIn. All 28 production reservations are CheckedOut, so three declared golden-master surfaces \u2014 the open folio, the checkout screen and POS room charges \u2014 have never had an entity to pin a master to and are recorded UNRESOLVED. Priya is here so that giving them one does not take the four checked-out surfaces away; see the note above her rows.\n\nThat D2 claim is NOT declared as an expectation below, and it cannot be: Expectations carries charter elements 3 to 7 (financial, invariants, replay, parity, faults) and there is no element for D2. See the note under REGISTRY GAP in this module.",
+      "certification_status": "UNCERTIFIED",
+      "certified_content_hash": "",
+      "commissioning_status": "COMMISSIONED",
+      "coverage_expectation": {
+        "invariants_activated": [],
+        "invariants_deactivated": [
+          "INV-A03",
+          "INV-B01",
+          "INV-B02",
+          "INV-B03",
+          "INV-B05",
+          "INV-C01",
+          "INV-C05",
+          "INV-D07"
+        ],
+        "quantities_activated": [],
+        "quantities_deactivated": [
+          "Q15"
+        ],
+        "surfaces_added": [
+          "main.checkout__inhouse_reservation",
+          "main.reservation_folio__inhouse_reservation",
+          "pos.room_charges_api__inhouse_reservation"
+        ],
+        "surfaces_lost": [
+          "reports.night_audit_snapshot__night_audit_log"
+        ]
+      },
+      "covered_by_deliverable": "",
+      "dataset_id": "DS-ACT-INHOUSE",
+      "expectations": {
+        "faults": {},
+        "financial": {
+          "charges_net": "3150.00",
+          "corporate_bookings": "0",
+          "corporate_credit_used": "0.00",
+          "credit_note_count": "0",
+          "credit_note_total": "0.00",
+          "extra_charges_net": "0.00",
+          "extra_charges_non_room_rent": "0.00",
+          "extra_charges_non_room_rent_net": "0.00",
+          "extra_charges_reversals": "0.00",
+          "extra_charges_room_rent": "0.00",
+          "extra_charges_total": "0.00",
+          "folios_count": "2",
+          "guests_count": "2",
+          "invoice_round_off_rows": "0",
+          "invoice_round_off_total": "0.00",
+          "invoice_rounded_grand_total": "1050.00",
+          "invoice_unrounded_grand_total": "1050.00",
+          "net_receivable": "1100.00",
+          "outstanding": "1100.00",
+          "overpayment_count": "0",
+          "overpayment_total": "0.00",
+          "payments_corrections": "0.00",
+          "payments_count": "2",
+          "payments_gross": "2050.00",
+          "payments_net": "2050.00",
+          "payments_reversals": "0.00",
+          "payments_voided": "0.00",
+          "reservations_count": "2",
+          "room_discount": "0.00",
+          "room_revenue": "3000.00",
+          "tax_base_count": "3",
+          "tax_lines_count": "6",
+          "tax_total": "150.00",
+          "taxable_total": "3000.00",
+          "void_request_count": "0"
+        },
+        "golden": {
+          "groups.detail__any_group": "UNRESOLVED",
+          "main.checkout__inhouse_reservation": "RESOLVED",
+          "main.company_detail__any_company": "UNRESOLVED",
+          "main.get_company_credit__any_company": "UNRESOLVED",
+          "main.reservation_folio__inhouse_reservation": "RESOLVED",
+          "pos.room_charges_api__inhouse_reservation": "RESOLVED",
+          "reports.night_audit_snapshot__night_audit_log": "UNRESOLVED"
+        },
+        "invariants": {
+          "INV-A02": "HOLDS",
+          "INV-A05": "HOLDS",
+          "INV-C01": "VACUOUS",
+          "INV-C02": "HOLDS",
+          "INV-C03": "HOLDS",
+          "INV-C04": "HOLDS",
+          "INV-D01": "HOLDS",
+          "INV-D03": "HOLDS",
+          "INV-D04": "HOLDS",
+          "INV-D06": "HOLDS"
+        },
+        "parity": {
+          "Q12": "AGREED",
+          "Q13": "AGREED",
+          "Q14": "AGREED",
+          "Q17": "AGREED",
+          "Q18": "AGREED",
+          "Q20": "AGREED",
+          "Q22": "AGREED"
+        },
+        "replay": {}
+      },
+      "modes": [
+        "REGRESSION",
+        "CONTINUOUS_VERIFICATION"
+      ],
+      "not_materialisable_reason": "",
+      "perturbation": [
+        "UPDATE payments SET amount = 500.00 WHERE id = 1",
+        "UPDATE payments SET folio_id = NULL WHERE id = 1"
+      ],
+      "perturbation_breaks": [
+        "outstanding",
+        "payments_gross",
+        "payments_net",
+        "INV-A02"
+      ],
+      "principles": [
+        "P9",
+        "P10",
+        "P14"
+      ],
+      "provenance": {
+        "author": "Wave 0.5 / D6 Step 2",
+        "base_dataset": "",
+        "contains_real_guest_data": false,
+        "created": "2026-08-08",
+        "derivation": "Written by hand from the narrative above. No production row was copied, transformed or sampled. The guest name and phone are invented; the room, room type and payment mode are preserved master rows and are this hotel's real configuration, which is what makes the dataset measure this hotel rather than an invented one.",
+        "disclosure": "Publishable. Contains no real guest and no real stay.",
+        "origin": "SYNTHETIC",
+        "rationale": "SYNTHETIC because the population being created does not exist in production at all \u2014 there is no in-house stay to derive one from."
+      },
+      "purpose": "BASELINE",
+      "rows": [
+        [
+          "guests",
+          [
+            "id",
+            "name",
+            "phone"
+          ],
+          [
+            [
+              1,
+              "Rohit Sharma",
+              "9800000001"
+            ],
+            [
+              2,
+              "Priya Nair",
+              "9800000002"
+            ]
+          ]
+        ],
+        [
+          "reservations",
+          [
+            "id",
+            "guest_id",
+            "room_id",
+            "room_type_id",
+            "arrival_date",
+            "departure_date",
+            "adults",
+            "status",
+            "rate_per_night",
+            "standard_tariff",
+            "expected_tariff",
+            "advance_payment",
+            "source",
+            "booking_type",
+            "pricing_mode",
+            "created_at",
+            "checked_in_at",
+            "checkin_by",
+            "noshow_exempt",
+            "checkout_initiated",
+            "credit_amount",
+            "credit_settled_amount",
+            "cancellation_amount_refunded",
+            "cancellation_amount_forfeited",
+            "cancellation_amount_credit_voucher"
+          ],
+          [
+            [
+              1,
+              1,
+              1,
+              2,
+              "2026-06-14",
+              "2026-06-16",
+              1,
+              "CheckedIn",
+              1000.0,
+              1000.0,
+              1000.0,
+              1000.0,
+              "Walk-in",
+              "Regular",
+              "standard",
+              "2026-06-14 09:00:00.000000",
+              "2026-06-14 09:00:00.000000",
+              "admin",
+              0,
+              0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          ]
+        ],
+        [
+          "reservations",
+          [
+            "id",
+            "guest_id",
+            "room_id",
+            "room_type_id",
+            "arrival_date",
+            "departure_date",
+            "adults",
+            "status",
+            "rate_per_night",
+            "standard_tariff",
+            "expected_tariff",
+            "advance_payment",
+            "source",
+            "booking_type",
+            "pricing_mode",
+            "created_at",
+            "checked_in_at",
+            "checkin_by",
+            "checked_out_at",
+            "checkout_by",
+            "checkout_time",
+            "invoice_number",
+            "invoice_unrounded_grand_total",
+            "invoice_round_off_amount",
+            "invoice_rounded_grand_total",
+            "noshow_exempt",
+            "checkout_initiated",
+            "credit_amount",
+            "credit_settled_amount",
+            "cancellation_amount_refunded",
+            "cancellation_amount_forfeited",
+            "cancellation_amount_credit_voucher"
+          ],
+          [
+            [
+              2,
+              2,
+              2,
+              2,
+              "2026-06-13",
+              "2026-06-14",
+              1,
+              "CheckedOut",
+              1000.0,
+              1000.0,
+              1000.0,
+              0.0,
+              "Walk-in",
+              "Regular",
+              "standard",
+              "2026-06-13 14:00:00.000000",
+              "2026-06-13 14:00:00.000000",
+              "admin",
+              "2026-06-14 08:30:00.000000",
+              "admin",
+              "08:30",
+              "INV-2026-000001",
+              1050.0,
+              0.0,
+              1050.0,
+              0,
+              1,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          ]
+        ],
+        [
+          "reservation_rooms",
+          [
+            "id",
+            "reservation_id",
+            "room_id",
+            "is_primary",
+            "created_at"
+          ],
+          [
+            [
+              1,
+              1,
+              1,
+              1,
+              "2026-06-14 09:00:00.000000"
+            ],
+            [
+              2,
+              2,
+              2,
+              1,
+              "2026-06-13 14:00:00.000000"
+            ]
+          ]
+        ],
+        [
+          "folios",
+          [
+            "id",
+            "reservation_id",
+            "folio_letter",
+            "label",
+            "is_closed",
+            "created_at"
+          ],
+          [
+            [
+              1,
+              1,
+              "A",
+              "Guest",
+              0,
+              "2026-06-14 09:00:00.000000"
+            ],
+            [
+              2,
+              2,
+              "A",
+              "Guest",
+              1,
+              "2026-06-13 14:00:00.000000"
+            ]
+          ]
+        ],
+        [
+          "reservation_night_rates",
+          [
+            "id",
+            "reservation_id",
+            "stay_date",
+            "room_type_id",
+            "room_id",
+            "standard_rate",
+            "resolved_rate",
+            "final_rate",
+            "discount_amount",
+            "rate_source",
+            "pricing_mode",
+            "manual_override",
+            "tax_rate",
+            "is_posted",
+            "is_locked",
+            "created_at",
+            "updated_at"
+          ],
+          [
+            [
+              1,
+              1,
+              "2026-06-14",
+              2,
+              1,
+              1000.0,
+              1000.0,
+              1000.0,
+              0.0,
+              "base_rate",
+              "standard",
+              0,
+              5,
+              0,
+              0,
+              "2026-06-14 09:00:00.000000",
+              "2026-06-14 09:00:00.000000"
+            ],
+            [
+              2,
+              1,
+              "2026-06-15",
+              2,
+              1,
+              1000.0,
+              1000.0,
+              1000.0,
+              0.0,
+              "base_rate",
+              "standard",
+              0,
+              5,
+              0,
+              0,
+              "2026-06-14 09:00:00.000000",
+              "2026-06-14 09:00:00.000000"
+            ],
+            [
+              3,
+              2,
+              "2026-06-13",
+              2,
+              2,
+              1000.0,
+              1000.0,
+              1000.0,
+              0.0,
+              "base_rate",
+              "standard",
+              0,
+              5,
+              0,
+              0,
+              "2026-06-13 14:00:00.000000",
+              "2026-06-13 14:00:00.000000"
+            ]
+          ]
+        ],
+        [
+          "tax_lines",
+          [
+            "id",
+            "reservation_id",
+            "charge_source_type",
+            "charge_source_id",
+            "charge_date",
+            "taxable_amount",
+            "tax_type",
+            "tax_rate",
+            "tax_amount",
+            "is_interstate",
+            "is_exempted",
+            "sac_code",
+            "created_at"
+          ],
+          [
+            [
+              1,
+              1,
+              "room_night",
+              "night_2026-06-14",
+              "2026-06-14",
+              1000.0,
+              "CGST",
+              2.5,
+              25.0,
+              0,
+              0,
+              "996311",
+              "2026-06-14 09:00:00.000000"
+            ],
+            [
+              2,
+              1,
+              "room_night",
+              "night_2026-06-14",
+              "2026-06-14",
+              1000.0,
+              "SGST",
+              2.5,
+              25.0,
+              0,
+              0,
+              "996311",
+              "2026-06-14 09:00:00.000000"
+            ],
+            [
+              3,
+              1,
+              "room_night",
+              "night_2026-06-15",
+              "2026-06-15",
+              1000.0,
+              "CGST",
+              2.5,
+              25.0,
+              0,
+              0,
+              "996311",
+              "2026-06-14 09:00:00.000000"
+            ],
+            [
+              4,
+              1,
+              "room_night",
+              "night_2026-06-15",
+              "2026-06-15",
+              1000.0,
+              "SGST",
+              2.5,
+              25.0,
+              0,
+              0,
+              "996311",
+              "2026-06-14 09:00:00.000000"
+            ],
+            [
+              5,
+              2,
+              "room_night",
+              "night_2026-06-13",
+              "2026-06-13",
+              1000.0,
+              "CGST",
+              2.5,
+              25.0,
+              0,
+              0,
+              "996311",
+              "2026-06-13 14:00:00.000000"
+            ],
+            [
+              6,
+              2,
+              "room_night",
+              "night_2026-06-13",
+              "2026-06-13",
+              1000.0,
+              "SGST",
+              2.5,
+              25.0,
+              0,
+              0,
+              "996311",
+              "2026-06-13 14:00:00.000000"
+            ]
+          ]
+        ],
+        [
+          "payments",
+          [
+            "id",
+            "reservation_id",
+            "folio_id",
+            "payment_mode_id",
+            "amount",
+            "payment_date",
+            "reference_number",
+            "created_at",
+            "is_voided",
+            "is_correction",
+            "is_reversal",
+            "payment_purpose"
+          ],
+          [
+            [
+              1,
+              1,
+              1,
+              1,
+              1000.0,
+              "2026-06-14",
+              "",
+              "2026-06-14 09:05:00.000000",
+              0,
+              0,
+              0,
+              "settlement"
+            ],
+            [
+              2,
+              2,
+              2,
+              1,
+              1050.0,
+              "2026-06-14",
+              "",
+              "2026-06-14 08:30:00.000000",
+              0,
+              0,
+              0,
+              "settlement"
+            ]
+          ]
+        ]
+      ],
+      "timeline": [
+        {
+          "amount": "1050.00",
+          "date": "2026-06-13",
+          "description": "Priya Nair checks into room 102 for one night at 1,050.00 inclusive.",
+          "tables": [
+            "guests",
+            "reservations",
+            "reservation_rooms",
+            "folios",
+            "reservation_night_rates",
+            "tax_lines"
+          ]
+        },
+        {
+          "amount": "1050.00",
+          "date": "2026-06-14",
+          "description": "She checks out, settles 1,050.00 in cash, and is invoiced. The invoice total is exact, so no round-off is recorded against it.",
+          "tables": [
+            "payments",
+            "reservations"
+          ]
+        },
+        {
+          "amount": "2100.00",
+          "date": "2026-06-14",
+          "description": "Rohit Sharma walks in and takes room 101 for two nights, and both nights are priced at check-in as the application does.",
+          "tables": [
+            "guests",
+            "reservations",
+            "reservation_rooms",
+            "folios",
+            "reservation_night_rates",
+            "tax_lines"
+          ]
+        },
+        {
+          "amount": "1000.00",
+          "date": "2026-06-14",
+          "description": "He pays 1,000.00 in cash at the desk. The payment is posted to folio A.",
+          "tables": [
+            "payments"
+          ]
+        },
+        {
+          "amount": "1100.00",
+          "date": "2026-06-15",
+          "description": "Business date. Rohit is still in house, no invoice has been raised against him, and 1,100.00 is outstanding across the hotel.",
+          "tables": [
+            "business_date"
+          ]
+        }
+      ],
+      "title": "One guest in house part paid, one departed and settled",
+      "version": "1.0"
+    },
+    {
+      "activates_invariants": [
+        "INV-D02"
+      ],
+      "applicable_releases": "all",
+      "business_date": "2026-07-11",
+      "business_narrative": "Anita Desai stays one night in room 103 on 10 July at 1,050.00 inclusive of 5% GST. A 500.00 laundry charge is posted to her folio the same evening.\n\nOn the morning of the 11th, as she checks out, two errors come to light. The laundry was somebody else's and only 200.00 of it was hers, and the 1,000.00 she was asked for at the desk was short of what she owed. Neither original row is edited. The laundry charge is reversed in full and re-posted at 200.00; the payment is reversed in full and re-posted at 1,286.00. All four new rows name the row they correct and carry the reason.\n\nShe leaves settled to the rupee, owing nothing, and the folio shows every step: what was charged, what was wrong with it, and what replaced it.\n\nNothing the hotel DID here is wrong. The correction path worked, which is the only way to give INV-D02 a population it can hold over \u2014 a dataset that activated it with a broken correction would prove the rule fires but never that a correct correction passes it.\n\nWhat is wrong is what the system then calculates. compute_stay_gst reads extra charges unsigned, so it taxes the reversed 500.00 as well as the corrected 200.00 and reports GST of 266.00 where the truth is 86.00 \u2014 180.00 of tax on money that was taken back. INV-C02 is therefore declared VIOLATED, by exactly that amount. The guest paid what she owed; the engine believes she still owes 180.00. See the note above the declaration.\n\nINV-D02 is the only VACUOUS invariant that is RELEASE_BLOCKING, and until now the only thing exercising it was a D5 fault injection. Its own VACUOUS message records the consequence: the signing logic in signed_extra_charge_amount is untested by live data. This dataset is the first data of that shape the framework has ever held.",
+      "certification_status": "UNCERTIFIED",
+      "certified_content_hash": "",
+      "commissioning_status": "COMMISSIONED",
+      "coverage_expectation": {
+        "invariants_activated": [
+          "INV-D02"
+        ],
+        "invariants_deactivated": [
+          "INV-B01",
+          "INV-B02",
+          "INV-B03",
+          "INV-B05",
+          "INV-C01",
+          "INV-C05",
+          "INV-D07"
+        ],
+        "quantities_activated": [],
+        "quantities_deactivated": [
+          "Q15"
+        ],
+        "surfaces_added": [],
+        "surfaces_lost": [
+          "reports.night_audit_snapshot__night_audit_log"
+        ]
+      },
+      "covered_by_deliverable": "",
+      "dataset_id": "DS-ACT-CORRECTION",
+      "expectations": {
+        "faults": {},
+        "financial": {
+          "charges_net": "1286.00",
+          "corporate_bookings": "0",
+          "corporate_credit_used": "0.00",
+          "credit_note_count": "0",
+          "credit_note_total": "0.00",
+          "extra_charges_net": "200.00",
+          "extra_charges_non_room_rent": "1200.00",
+          "extra_charges_non_room_rent_net": "200.00",
+          "extra_charges_reversals": "500.00",
+          "extra_charges_room_rent": "0.00",
+          "extra_charges_total": "1200.00",
+          "folios_count": "1",
+          "guests_count": "1",
+          "invoice_round_off_rows": "0",
+          "invoice_round_off_total": "0.00",
+          "invoice_rounded_grand_total": "1286.00",
+          "invoice_unrounded_grand_total": "1286.00",
+          "net_receivable": "0.00",
+          "outstanding": "0.00",
+          "overpayment_count": "0",
+          "overpayment_total": "0.00",
+          "payments_corrections": "2286.00",
+          "payments_count": "3",
+          "payments_gross": "3286.00",
+          "payments_net": "1286.00",
+          "payments_reversals": "1000.00",
+          "payments_voided": "0.00",
+          "reservations_count": "1",
+          "room_discount": "0.00",
+          "room_revenue": "1000.00",
+          "tax_base_count": "2",
+          "tax_lines_count": "4",
+          "tax_total": "86.00",
+          "taxable_total": "1200.00",
+          "void_request_count": "0"
+        },
+        "golden": {},
+        "invariants": {
+          "INV-A02": "HOLDS",
+          "INV-A03": "HOLDS",
+          "INV-A05": "HOLDS",
+          "INV-C01": "VACUOUS",
+          "INV-C02": "VIOLATED",
+          "INV-C03": "HOLDS",
+          "INV-C04": "HOLDS",
+          "INV-D01": "HOLDS",
+          "INV-D02": "HOLDS",
+          "INV-D03": "HOLDS",
+          "INV-D04": "HOLDS",
+          "INV-D06": "HOLDS"
+        },
+        "parity": {
+          "Q02": "DIVERGED",
+          "Q07": "DIVERGED",
+          "Q09": "DIVERGED",
+          "Q12": "AGREED",
+          "Q13": "AGREED",
+          "Q14": "AGREED",
+          "Q17": "AGREED",
+          "Q22": "AGREED"
+        },
+        "replay": {}
+      },
+      "modes": [
+        "REGRESSION",
+        "INVARIANT_ACTIVATION",
+        "CONTINUOUS_VERIFICATION"
+      ],
+      "not_materialisable_reason": "",
+      "perturbation": [
+        "UPDATE payments SET corrects_id = NULL WHERE id = 2"
+      ],
+      "perturbation_breaks": [
+        "INV-D02"
+      ],
+      "principles": [
+        "P9",
+        "P10",
+        "P11",
+        "P14"
+      ],
+      "provenance": {
+        "author": "Wave 0.6 / D6 Step 2",
+        "base_dataset": "",
+        "contains_real_guest_data": false,
+        "created": "2026-08-08",
+        "derivation": "Written by hand from the narrative above, following the correction pattern documented on app.models.Payment and app.models.ExtraCharge and implemented in app.services.post_payment_correction. No production row was copied, transformed or sampled \u2014 production contains no correction of any kind, which is why this dataset exists.",
+        "disclosure": "Publishable. Contains no real guest and no real stay.",
+        "origin": "SYNTHETIC",
+        "rationale": "SYNTHETIC by necessity rather than choice: the population is empty in production, so there is nothing to derive from."
+      },
+      "purpose": "ACTIVATE_INVARIANT",
+      "rows": [
+        [
+          "guests",
+          [
+            "id",
+            "name",
+            "phone"
+          ],
+          [
+            [
+              1,
+              "Anita Desai",
+              "9800000003"
+            ]
+          ]
+        ],
+        [
+          "reservations",
+          [
+            "id",
+            "guest_id",
+            "room_id",
+            "room_type_id",
+            "arrival_date",
+            "departure_date",
+            "adults",
+            "status",
+            "rate_per_night",
+            "standard_tariff",
+            "expected_tariff",
+            "advance_payment",
+            "source",
+            "booking_type",
+            "pricing_mode",
+            "created_at",
+            "checked_in_at",
+            "checkin_by",
+            "checked_out_at",
+            "checkout_by",
+            "checkout_time",
+            "invoice_number",
+            "invoice_unrounded_grand_total",
+            "invoice_round_off_amount",
+            "invoice_rounded_grand_total",
+            "noshow_exempt",
+            "checkout_initiated",
+            "credit_amount",
+            "credit_settled_amount",
+            "cancellation_amount_refunded",
+            "cancellation_amount_forfeited",
+            "cancellation_amount_credit_voucher"
+          ],
+          [
+            [
+              1,
+              1,
+              3,
+              2,
+              "2026-07-10",
+              "2026-07-11",
+              1,
+              "CheckedOut",
+              1000.0,
+              1000.0,
+              1000.0,
+              0.0,
+              "Walk-in",
+              "Regular",
+              "standard",
+              "2026-07-10 13:00:00.000000",
+              "2026-07-10 13:00:00.000000",
+              "admin",
+              "2026-07-11 09:15:00.000000",
+              "admin",
+              "09:15",
+              "INV-2026-000001",
+              1286.0,
+              0.0,
+              1286.0,
+              0,
+              1,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          ]
+        ],
+        [
+          "reservation_rooms",
+          [
+            "id",
+            "reservation_id",
+            "room_id",
+            "is_primary",
+            "created_at"
+          ],
+          [
+            [
+              1,
+              1,
+              3,
+              1,
+              "2026-07-10 13:00:00.000000"
+            ]
+          ]
+        ],
+        [
+          "folios",
+          [
+            "id",
+            "reservation_id",
+            "folio_letter",
+            "label",
+            "is_closed",
+            "created_at"
+          ],
+          [
+            [
+              1,
+              1,
+              "A",
+              "Guest",
+              1,
+              "2026-07-10 13:00:00.000000"
+            ]
+          ]
+        ],
+        [
+          "reservation_night_rates",
+          [
+            "id",
+            "reservation_id",
+            "stay_date",
+            "room_type_id",
+            "room_id",
+            "standard_rate",
+            "resolved_rate",
+            "final_rate",
+            "discount_amount",
+            "rate_source",
+            "pricing_mode",
+            "manual_override",
+            "tax_rate",
+            "is_posted",
+            "is_locked",
+            "created_at",
+            "updated_at"
+          ],
+          [
+            [
+              1,
+              1,
+              "2026-07-10",
+              2,
+              3,
+              1000.0,
+              1000.0,
+              1000.0,
+              0.0,
+              "base_rate",
+              "standard",
+              0,
+              5,
+              0,
+              0,
+              "2026-07-10 13:00:00.000000",
+              "2026-07-10 13:00:00.000000"
+            ]
+          ]
+        ],
+        [
+          "tax_lines",
+          [
+            "id",
+            "reservation_id",
+            "charge_source_type",
+            "charge_source_id",
+            "charge_date",
+            "taxable_amount",
+            "tax_type",
+            "tax_rate",
+            "tax_amount",
+            "is_interstate",
+            "is_exempted",
+            "sac_code",
+            "created_at"
+          ],
+          [
+            [
+              1,
+              1,
+              "room_night",
+              "night_2026-07-10",
+              "2026-07-10",
+              1000.0,
+              "CGST",
+              2.5,
+              25.0,
+              0,
+              0,
+              "996311",
+              "2026-07-10 13:00:00.000000"
+            ],
+            [
+              2,
+              1,
+              "room_night",
+              "night_2026-07-10",
+              "2026-07-10",
+              1000.0,
+              "SGST",
+              2.5,
+              25.0,
+              0,
+              0,
+              "996311",
+              "2026-07-10 13:00:00.000000"
+            ],
+            [
+              3,
+              1,
+              "extra_charge",
+              "3",
+              "2026-07-11",
+              200.0,
+              "CGST",
+              9.0,
+              18.0,
+              0,
+              0,
+              "999719",
+              "2026-07-11 09:05:00.000000"
+            ],
+            [
+              4,
+              1,
+              "extra_charge",
+              "3",
+              "2026-07-11",
+              200.0,
+              "SGST",
+              9.0,
+              18.0,
+              0,
+              0,
+              "999719",
+              "2026-07-11 09:05:00.000000"
+            ]
+          ]
+        ],
+        [
+          "extra_charges",
+          [
+            "id",
+            "reservation_id",
+            "folio_id",
+            "description",
+            "amount",
+            "charge_date",
+            "charge_type",
+            "charge_category",
+            "is_correction",
+            "is_reversal",
+            "corrects_id",
+            "correction_reason",
+            "created_at"
+          ],
+          [
+            [
+              1,
+              1,
+              1,
+              "Laundry",
+              500.0,
+              "2026-07-10",
+              "laundry",
+              "Laundry",
+              0,
+              0,
+              null,
+              null,
+              "2026-07-10 19:30:00.000000"
+            ],
+            [
+              2,
+              1,
+              1,
+              "Laundry - reversal",
+              500.0,
+              "2026-07-11",
+              "laundry",
+              "Laundry",
+              1,
+              1,
+              1,
+              "Charge belonged to another room",
+              "2026-07-11 09:05:00.000000"
+            ],
+            [
+              3,
+              1,
+              1,
+              "Laundry - corrected",
+              200.0,
+              "2026-07-11",
+              "laundry",
+              "Laundry",
+              1,
+              0,
+              1,
+              "Charge belonged to another room",
+              "2026-07-11 09:05:00.000000"
+            ]
+          ]
+        ],
+        [
+          "payments",
+          [
+            "id",
+            "reservation_id",
+            "folio_id",
+            "payment_mode_id",
+            "amount",
+            "payment_date",
+            "reference_number",
+            "created_at",
+            "is_voided",
+            "is_correction",
+            "is_reversal",
+            "corrects_id",
+            "correction_reason",
+            "payment_purpose"
+          ],
+          [
+            [
+              1,
+              1,
+              1,
+              1,
+              1000.0,
+              "2026-07-10",
+              "",
+              "2026-07-10 13:05:00.000000",
+              0,
+              0,
+              0,
+              null,
+              null,
+              "settlement"
+            ],
+            [
+              2,
+              1,
+              1,
+              1,
+              1000.0,
+              "2026-07-11",
+              "",
+              "2026-07-11 09:10:00.000000",
+              0,
+              1,
+              1,
+              1,
+              "Collected short of the folio total",
+              "settlement"
+            ],
+            [
+              3,
+              1,
+              1,
+              1,
+              1286.0,
+              "2026-07-11",
+              "",
+              "2026-07-11 09:10:00.000000",
+              0,
+              1,
+              0,
+              1,
+              "Collected short of the folio total",
+              "settlement"
+            ]
+          ]
+        ]
+      ],
+      "timeline": [
+        {
+          "amount": "1050.00",
+          "date": "2026-07-10",
+          "description": "Anita Desai checks into room 103 for one night at 1,050.00 inclusive.",
+          "tables": [
+            "guests",
+            "reservations",
+            "reservation_rooms",
+            "folios",
+            "reservation_night_rates",
+            "tax_lines"
+          ]
+        },
+        {
+          "amount": "500.00",
+          "date": "2026-07-10",
+          "description": "A 500.00 laundry charge is posted to her folio.",
+          "tables": [
+            "extra_charges"
+          ]
+        },
+        {
+          "amount": "1000.00",
+          "date": "2026-07-10",
+          "description": "She pays 1,000.00 in cash at the desk.",
+          "tables": [
+            "payments"
+          ]
+        },
+        {
+          "amount": "200.00",
+          "date": "2026-07-11",
+          "description": "The laundry is found to be wrong. The original row is left untouched; a reversal of 500.00 and a replacement of 200.00 are posted, both naming the charge they correct.",
+          "tables": [
+            "extra_charges"
+          ]
+        },
+        {
+          "amount": "1286.00",
+          "date": "2026-07-11",
+          "description": "The payment is found to be short. It is reversed in full and re-posted at 1,286.00, both rows naming the payment they correct.",
+          "tables": [
+            "payments"
+          ]
+        },
+        {
+          "amount": "0.00",
+          "date": "2026-07-11",
+          "description": "She checks out settled, is invoiced 1,286.00, and the hotel is owed nothing.",
+          "tables": [
+            "reservations"
+          ]
+        }
+      ],
+      "title": "A charge and a payment, each corrected the way the audit requires",
+      "version": "1.0"
+    },
+    {
+      "activates_invariants": [
+        "INV-D05",
+        "INV-D02"
+      ],
+      "applicable_releases": "all",
+      "business_date": "2026-08-03",
+      "business_narrative": "Vikram Rao stays one night in room 104 on 2 August. The bill is 1,286.00 \u2014 1,050.00 for the room including 5% GST, and 236.00 of minibar including 18%. He settles in full on the 3rd.\n\nThe desk takes the payment twice. The duplicate is voided rather than deleted, and a void request records who asked for it and why, so a reversal of 1,286.00 that never reached the bank is accounted for rather than silently absent.\n\nLater that day he disputes the minibar. It is not reversed on the folio \u2014 the charge was raised and the folio says so \u2014 instead a credit note is issued against the invoice for 236.00 and the money is refunded to him.\n\nTwo cancellation instruments, each naming what it cancels: the void request names its payment, the credit note names its reservation and the invoice it credits. That is INV-D05, and this is the first data of that shape the framework has held.\n\nOne thing here is wrong and it is not the hotel doing it. The refund row is built the way the application builds every refund \u2014 is_reversal set, corrects_id left null \u2014 and INV-D02 forbids exactly that. The invariant is declared VIOLATED rather than worked around. See the note above this declaration.",
+      "certification_status": "UNCERTIFIED",
+      "certified_content_hash": "",
+      "commissioning_status": "COMMISSIONED",
+      "coverage_expectation": {
+        "invariants_activated": [
+          "INV-D05",
+          "INV-D02"
+        ],
+        "invariants_deactivated": [
+          "INV-B01",
+          "INV-B02",
+          "INV-B03",
+          "INV-B05",
+          "INV-C01",
+          "INV-C05",
+          "INV-D07"
+        ],
+        "quantities_activated": [
+          "Q11"
+        ],
+        "quantities_deactivated": [
+          "Q15"
+        ],
+        "surfaces_added": [],
+        "surfaces_lost": [
+          "reports.night_audit_snapshot__night_audit_log"
+        ]
+      },
+      "covered_by_deliverable": "",
+      "dataset_id": "DS-ACT-VOIDCN",
+      "expectations": {
+        "faults": {},
+        "financial": {
+          "charges_net": "1286.00",
+          "corporate_bookings": "0",
+          "corporate_credit_used": "0.00",
+          "credit_note_count": "1",
+          "credit_note_total": "236.00",
+          "extra_charges_net": "200.00",
+          "extra_charges_non_room_rent": "200.00",
+          "extra_charges_non_room_rent_net": "200.00",
+          "extra_charges_reversals": "0.00",
+          "extra_charges_room_rent": "0.00",
+          "extra_charges_total": "200.00",
+          "folios_count": "1",
+          "guests_count": "1",
+          "invoice_round_off_rows": "0",
+          "invoice_round_off_total": "0.00",
+          "invoice_rounded_grand_total": "1286.00",
+          "invoice_unrounded_grand_total": "1286.00",
+          "net_receivable": "0.00",
+          "outstanding": "236.00",
+          "overpayment_count": "0",
+          "overpayment_total": "0.00",
+          "payments_corrections": "0.00",
+          "payments_count": "3",
+          "payments_gross": "2808.00",
+          "payments_net": "1050.00",
+          "payments_reversals": "236.00",
+          "payments_voided": "1286.00",
+          "reservations_count": "1",
+          "room_discount": "0.00",
+          "room_revenue": "1000.00",
+          "tax_base_count": "2",
+          "tax_lines_count": "4",
+          "tax_total": "86.00",
+          "taxable_total": "1200.00",
+          "void_request_count": "1"
+        },
+        "golden": {},
+        "invariants": {
+          "INV-A02": "HOLDS",
+          "INV-A03": "HOLDS",
+          "INV-A05": "HOLDS",
+          "INV-C01": "VACUOUS",
+          "INV-C03": "HOLDS",
+          "INV-C04": "HOLDS",
+          "INV-D01": "HOLDS",
+          "INV-D02": "VIOLATED",
+          "INV-D03": "HOLDS",
+          "INV-D04": "HOLDS",
+          "INV-D05": "HOLDS",
+          "INV-D06": "HOLDS"
+        },
+        "parity": {
+          "Q09": "DIVERGED",
+          "Q11": "DIVERGED",
+          "Q12": "AGREED",
+          "Q13": "AGREED",
+          "Q14": "AGREED",
+          "Q17": "AGREED",
+          "Q22": "AGREED"
+        },
+        "replay": {}
+      },
+      "modes": [
+        "REGRESSION",
+        "INVARIANT_ACTIVATION",
+        "CONTINUOUS_VERIFICATION"
+      ],
+      "not_materialisable_reason": "",
+      "perturbation": [
+        "UPDATE void_requests SET payment_id = 99999 WHERE id = 1"
+      ],
+      "perturbation_breaks": [
+        "INV-D05"
+      ],
+      "principles": [
+        "P9",
+        "P10",
+        "P11",
+        "P14"
+      ],
+      "provenance": {
+        "author": "Wave 0.7 / D6 Step 2",
+        "base_dataset": "",
+        "contains_real_guest_data": false,
+        "created": "2026-08-08",
+        "derivation": "Written by hand from the narrative above. The refund row follows app.services.post_cancellation_disposition field for field, including the missing corrects_id, because what the application actually produces is the point of the row. No production row was copied: production holds no void, no credit note and no refund.",
+        "disclosure": "Publishable. Contains no real guest and no real stay.",
+        "origin": "SYNTHETIC",
+        "rationale": "SYNTHETIC by necessity \u2014 all three populations are empty in production, so there is nothing to derive from."
+      },
+      "purpose": "ACTIVATE_INVARIANT",
+      "rows": [
+        [
+          "guests",
+          [
+            "id",
+            "name",
+            "phone"
+          ],
+          [
+            [
+              1,
+              "Vikram Rao",
+              "9800000004"
+            ]
+          ]
+        ],
+        [
+          "reservations",
+          [
+            "id",
+            "guest_id",
+            "room_id",
+            "room_type_id",
+            "arrival_date",
+            "departure_date",
+            "adults",
+            "status",
+            "rate_per_night",
+            "standard_tariff",
+            "expected_tariff",
+            "advance_payment",
+            "source",
+            "booking_type",
+            "pricing_mode",
+            "created_at",
+            "checked_in_at",
+            "checkin_by",
+            "checked_out_at",
+            "checkout_by",
+            "checkout_time",
+            "invoice_number",
+            "invoice_unrounded_grand_total",
+            "invoice_round_off_amount",
+            "invoice_rounded_grand_total",
+            "noshow_exempt",
+            "checkout_initiated",
+            "credit_amount",
+            "credit_settled_amount",
+            "cancellation_amount_refunded",
+            "cancellation_amount_forfeited",
+            "cancellation_amount_credit_voucher"
+          ],
+          [
+            [
+              1,
+              1,
+              4,
+              2,
+              "2026-08-02",
+              "2026-08-03",
+              1,
+              "CheckedOut",
+              1000.0,
+              1000.0,
+              1000.0,
+              0.0,
+              "Walk-in",
+              "Regular",
+              "standard",
+              "2026-08-02 14:00:00.000000",
+              "2026-08-02 14:00:00.000000",
+              "admin",
+              "2026-08-03 10:00:00.000000",
+              "admin",
+              "10:00",
+              "INV-2026-000001",
+              1286.0,
+              0.0,
+              1286.0,
+              0,
+              1,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          ]
+        ],
+        [
+          "reservation_rooms",
+          [
+            "id",
+            "reservation_id",
+            "room_id",
+            "is_primary",
+            "created_at"
+          ],
+          [
+            [
+              1,
+              1,
+              4,
+              1,
+              "2026-08-02 14:00:00.000000"
+            ]
+          ]
+        ],
+        [
+          "folios",
+          [
+            "id",
+            "reservation_id",
+            "folio_letter",
+            "label",
+            "is_closed",
+            "created_at"
+          ],
+          [
+            [
+              1,
+              1,
+              "A",
+              "Guest",
+              1,
+              "2026-08-02 14:00:00.000000"
+            ]
+          ]
+        ],
+        [
+          "reservation_night_rates",
+          [
+            "id",
+            "reservation_id",
+            "stay_date",
+            "room_type_id",
+            "room_id",
+            "standard_rate",
+            "resolved_rate",
+            "final_rate",
+            "discount_amount",
+            "rate_source",
+            "pricing_mode",
+            "manual_override",
+            "tax_rate",
+            "is_posted",
+            "is_locked",
+            "created_at",
+            "updated_at"
+          ],
+          [
+            [
+              1,
+              1,
+              "2026-08-02",
+              2,
+              4,
+              1000.0,
+              1000.0,
+              1000.0,
+              0.0,
+              "base_rate",
+              "standard",
+              0,
+              5,
+              0,
+              0,
+              "2026-08-02 14:00:00.000000",
+              "2026-08-02 14:00:00.000000"
+            ]
+          ]
+        ],
+        [
+          "extra_charges",
+          [
+            "id",
+            "reservation_id",
+            "folio_id",
+            "description",
+            "amount",
+            "charge_date",
+            "charge_type",
+            "charge_category",
+            "is_correction",
+            "is_reversal",
+            "corrects_id",
+            "correction_reason",
+            "created_at"
+          ],
+          [
+            [
+              1,
+              1,
+              1,
+              "Minibar",
+              200.0,
+              "2026-08-02",
+              "minibar",
+              "Minibar",
+              0,
+              0,
+              null,
+              null,
+              "2026-08-02 21:00:00.000000"
+            ]
+          ]
+        ],
+        [
+          "tax_lines",
+          [
+            "id",
+            "reservation_id",
+            "charge_source_type",
+            "charge_source_id",
+            "charge_date",
+            "taxable_amount",
+            "tax_type",
+            "tax_rate",
+            "tax_amount",
+            "is_interstate",
+            "is_exempted",
+            "sac_code",
+            "created_at"
+          ],
+          [
+            [
+              1,
+              1,
+              "room_night",
+              "night_2026-08-02",
+              "2026-08-02",
+              1000.0,
+              "CGST",
+              2.5,
+              25.0,
+              0,
+              0,
+              "996311",
+              "2026-08-02 14:00:00.000000"
+            ],
+            [
+              2,
+              1,
+              "room_night",
+              "night_2026-08-02",
+              "2026-08-02",
+              1000.0,
+              "SGST",
+              2.5,
+              25.0,
+              0,
+              0,
+              "996311",
+              "2026-08-02 14:00:00.000000"
+            ],
+            [
+              3,
+              1,
+              "extra_charge",
+              "1",
+              "2026-08-02",
+              200.0,
+              "CGST",
+              9.0,
+              18.0,
+              0,
+              0,
+              "996311",
+              "2026-08-02 21:00:00.000000"
+            ],
+            [
+              4,
+              1,
+              "extra_charge",
+              "1",
+              "2026-08-02",
+              200.0,
+              "SGST",
+              9.0,
+              18.0,
+              0,
+              0,
+              "996311",
+              "2026-08-02 21:00:00.000000"
+            ]
+          ]
+        ],
+        [
+          "payments",
+          [
+            "id",
+            "reservation_id",
+            "folio_id",
+            "payment_mode_id",
+            "amount",
+            "payment_date",
+            "reference_number",
+            "created_at",
+            "is_voided",
+            "voided_at",
+            "voided_by_user_id",
+            "void_reason",
+            "is_correction",
+            "is_reversal",
+            "corrects_id",
+            "correction_reason",
+            "payment_purpose"
+          ],
+          [
+            [
+              1,
+              1,
+              1,
+              1,
+              1286.0,
+              "2026-08-03",
+              "",
+              "2026-08-03 09:50:00.000000",
+              0,
+              null,
+              null,
+              null,
+              0,
+              0,
+              null,
+              null,
+              "settlement"
+            ],
+            [
+              2,
+              1,
+              1,
+              1,
+              1286.0,
+              "2026-08-03",
+              "",
+              "2026-08-03 09:52:00.000000",
+              1,
+              "2026-08-03 09:55:00.000000",
+              1,
+              "Duplicate capture at the desk",
+              0,
+              0,
+              null,
+              null,
+              "settlement"
+            ],
+            [
+              3,
+              1,
+              1,
+              1,
+              236.0,
+              "2026-08-03",
+              "",
+              "2026-08-03 16:00:00.000000",
+              0,
+              null,
+              null,
+              null,
+              0,
+              1,
+              null,
+              "Cancellation refund | Minibar disputed",
+              "refund"
+            ]
+          ]
+        ],
+        [
+          "void_requests",
+          [
+            "id",
+            "payment_id",
+            "requested_by_user_id",
+            "requested_at",
+            "reason",
+            "status",
+            "decided_by_user_id",
+            "decided_at"
+          ],
+          [
+            [
+              1,
+              2,
+              1,
+              "2026-08-03 09:54:00.000000",
+              "Duplicate capture at the desk",
+              "approved",
+              1,
+              "2026-08-03 09:55:00.000000"
+            ]
+          ]
+        ],
+        [
+          "credit_notes",
+          [
+            "id",
+            "credit_note_number",
+            "reservation_id",
+            "original_invoice_number",
+            "reason",
+            "taxable_amount",
+            "cgst_amount",
+            "sgst_amount",
+            "igst_amount",
+            "total_amount",
+            "issued_by_user_id",
+            "issued_at",
+            "notes"
+          ],
+          [
+            [
+              1,
+              "CN-2026-000001",
+              1,
+              "INV-2026-000001",
+              "Minibar disputed by guest",
+              200.0,
+              18.0,
+              18.0,
+              0.0,
+              236.0,
+              1,
+              "2026-08-03 15:55:00.000000",
+              "Refunded in cash the same day"
+            ]
+          ]
+        ]
+      ],
+      "timeline": [
+        {
+          "amount": "1050.00",
+          "date": "2026-08-02",
+          "description": "Vikram Rao checks into room 104 for one night at 1,050.00 inclusive.",
+          "tables": [
+            "guests",
+            "reservations",
+            "reservation_rooms",
+            "folios",
+            "reservation_night_rates",
+            "tax_lines"
+          ]
+        },
+        {
+          "amount": "236.00",
+          "date": "2026-08-02",
+          "description": "236.00 of minibar is posted to his folio, including 18% GST.",
+          "tables": [
+            "extra_charges",
+            "tax_lines"
+          ]
+        },
+        {
+          "amount": "1286.00",
+          "date": "2026-08-03",
+          "description": "He settles 1,286.00 in cash and checks out.",
+          "tables": [
+            "payments",
+            "reservations"
+          ]
+        },
+        {
+          "amount": "1286.00",
+          "date": "2026-08-03",
+          "description": "The desk takes the same 1,286.00 a second time. It is voided, and a void request records who asked and why.",
+          "tables": [
+            "payments",
+            "void_requests"
+          ]
+        },
+        {
+          "amount": "236.00",
+          "date": "2026-08-03",
+          "description": "He disputes the minibar. A credit note for 236.00 is issued against the invoice and the money is refunded.",
+          "tables": [
+            "credit_notes",
+            "payments"
+          ]
+        }
+      ],
+      "title": "A duplicate payment voided, and a disputed charge credited",
+      "version": "1.0"
+    },
+    {
+      "activates_invariants": [],
+      "applicable_releases": "all",
+      "business_date": "2026-09-21",
+      "business_narrative": "The Nair wedding party books two rooms for the night of 20 September under one group block, GRP-2026-0001. Both rooms are taken at the group rate of 1,050.00 inclusive, and a 590.00 banqueting charge for the reception is posted to the first room, which carries the reception. On departure each room settles its own folio \u2014 1,640.00 and 1,050.00 \u2014 and the block closes owing nothing.\n\nIt settles room by room rather than to one master account because **the application has no master-account routing**: group_blocks.billing_instructions is free text, services_group_stay only links reservations to rooms, and nothing anywhere moves one reservation's charges onto another's folio. The first draft of this dataset assumed otherwise, and INV-C02 correctly reported the second room as a checked-out reservation that was never settled.\n\nNothing here is wrong, and nothing here is clever. It is an ordinary group stay, which is what the framework has never had.\n\nThis dataset **activates no invariant, no fault and no parity quantity** \u2014 nothing in D1, D4 or D5 references a group table. What it does is resolve groups.detail, the last golden-master surface UNRESOLVED on production that no other planned dataset could ever close, because group_blocks is empty and nothing else creates one.\n\nIt is written now because everything with more verification value is blocked on a decision rather than on engineering: INV-A06 on R-5, INV-C06 on the companies / content_hash question. This is the last non-blocked business coverage there is.",
+      "certification_status": "UNCERTIFIED",
+      "certified_content_hash": "",
+      "commissioning_status": "COMMISSIONED",
+      "coverage_expectation": {
+        "invariants_activated": [],
+        "invariants_deactivated": [
+          "INV-B01",
+          "INV-B02",
+          "INV-B03",
+          "INV-B05",
+          "INV-C01",
+          "INV-C05",
+          "INV-D07"
+        ],
+        "quantities_activated": [],
+        "quantities_deactivated": [
+          "Q15"
+        ],
+        "surfaces_added": [
+          "groups.detail__any_group"
+        ],
+        "surfaces_lost": [
+          "reports.night_audit_snapshot__night_audit_log"
+        ]
+      },
+      "covered_by_deliverable": "",
+      "dataset_id": "DS-ACT-GROUP",
+      "expectations": {
+        "faults": {},
+        "financial": {
+          "charges_net": "2690.00",
+          "corporate_bookings": "0",
+          "corporate_credit_used": "0.00",
+          "credit_note_count": "0",
+          "credit_note_total": "0.00",
+          "extra_charges_net": "500.00",
+          "extra_charges_non_room_rent": "500.00",
+          "extra_charges_non_room_rent_net": "500.00",
+          "extra_charges_reversals": "0.00",
+          "extra_charges_room_rent": "0.00",
+          "extra_charges_total": "500.00",
+          "folios_count": "2",
+          "guests_count": "2",
+          "invoice_round_off_rows": "0",
+          "invoice_round_off_total": "0.00",
+          "invoice_rounded_grand_total": "2690.00",
+          "invoice_unrounded_grand_total": "2690.00",
+          "net_receivable": "0.00",
+          "outstanding": "0.00",
+          "overpayment_count": "0",
+          "overpayment_total": "0.00",
+          "payments_corrections": "0.00",
+          "payments_count": "2",
+          "payments_gross": "2690.00",
+          "payments_net": "2690.00",
+          "payments_reversals": "0.00",
+          "payments_voided": "0.00",
+          "reservations_count": "2",
+          "room_discount": "0.00",
+          "room_revenue": "2000.00",
+          "tax_base_count": "3",
+          "tax_lines_count": "6",
+          "tax_total": "190.00",
+          "taxable_total": "2500.00",
+          "void_request_count": "0"
+        },
+        "golden": {
+          "groups.detail__any_group": "RESOLVED",
+          "main.checkout__inhouse_reservation": "UNRESOLVED",
+          "main.company_detail__any_company": "UNRESOLVED",
+          "main.get_company_credit__any_company": "UNRESOLVED",
+          "reports.night_audit_snapshot__night_audit_log": "UNRESOLVED"
+        },
+        "invariants": {
+          "INV-A02": "HOLDS",
+          "INV-A03": "HOLDS",
+          "INV-A05": "HOLDS",
+          "INV-C01": "VACUOUS",
+          "INV-C02": "HOLDS",
+          "INV-C03": "HOLDS",
+          "INV-C04": "HOLDS",
+          "INV-D01": "HOLDS",
+          "INV-D03": "HOLDS",
+          "INV-D04": "HOLDS",
+          "INV-D06": "HOLDS"
+        },
+        "parity": {
+          "Q12": "AGREED",
+          "Q13": "AGREED",
+          "Q14": "AGREED",
+          "Q17": "DIVERGED",
+          "Q22": "AGREED"
+        },
+        "replay": {}
+      },
+      "modes": [
+        "REGRESSION",
+        "CONTINUOUS_VERIFICATION"
+      ],
+      "not_materialisable_reason": "",
+      "perturbation": [
+        "UPDATE extra_charges SET folio_id = NULL WHERE id = 1"
+      ],
+      "perturbation_breaks": [
+        "INV-A02"
+      ],
+      "principles": [
+        "P9",
+        "P10",
+        "P14"
+      ],
+      "provenance": {
+        "author": "Wave 0.7 / D6 Step 2",
+        "base_dataset": "",
+        "contains_real_guest_data": false,
+        "created": "2026-08-08",
+        "derivation": "Written by hand from the narrative above. No production row was copied: production has never held a group block, which is why groups.detail has never resolved.",
+        "disclosure": "Publishable. Contains no real guest and no real stay.",
+        "origin": "SYNTHETIC",
+        "rationale": "SYNTHETIC by necessity \u2014 group_blocks is empty in production, so there is nothing to derive from."
+      },
+      "purpose": "BASELINE",
+      "rows": [
+        [
+          "group_blocks",
+          [
+            "id",
+            "group_name",
+            "group_code",
+            "contact_name",
+            "contact_phone",
+            "arrival_date",
+            "departure_date",
+            "total_rooms",
+            "group_rate",
+            "status",
+            "billing_instructions",
+            "created_by_user_id",
+            "created_at"
+          ],
+          [
+            [
+              1,
+              "Nair Wedding Party",
+              "GRP-2026-0001",
+              "Meera Nair",
+              "9800000005",
+              "2026-09-20",
+              "2026-09-21",
+              2,
+              1000.0,
+              "Completed",
+              "Reception billed to room 105",
+              1,
+              "2026-09-15 11:00:00.000000"
+            ]
+          ]
+        ],
+        [
+          "guests",
+          [
+            "id",
+            "name",
+            "phone"
+          ],
+          [
+            [
+              1,
+              "Meera Nair",
+              "9800000005"
+            ],
+            [
+              2,
+              "Arun Nair",
+              "9800000006"
+            ]
+          ]
+        ],
+        [
+          "reservations",
+          [
+            "id",
+            "guest_id",
+            "room_id",
+            "room_type_id",
+            "group_block_id",
+            "arrival_date",
+            "departure_date",
+            "adults",
+            "status",
+            "rate_per_night",
+            "standard_tariff",
+            "expected_tariff",
+            "advance_payment",
+            "source",
+            "booking_type",
+            "pricing_mode",
+            "created_at",
+            "checked_in_at",
+            "checkin_by",
+            "checked_out_at",
+            "checkout_by",
+            "checkout_time",
+            "invoice_number",
+            "invoice_unrounded_grand_total",
+            "invoice_round_off_amount",
+            "invoice_rounded_grand_total",
+            "noshow_exempt",
+            "checkout_initiated",
+            "credit_amount",
+            "credit_settled_amount",
+            "cancellation_amount_refunded",
+            "cancellation_amount_forfeited",
+            "cancellation_amount_credit_voucher"
+          ],
+          [
+            [
+              1,
+              1,
+              5,
+              2,
+              1,
+              "2026-09-20",
+              "2026-09-21",
+              2,
+              "CheckedOut",
+              1000.0,
+              1000.0,
+              1000.0,
+              0.0,
+              "Walk-in",
+              "Group",
+              "standard",
+              "2026-09-15 11:00:00.000000",
+              "2026-09-20 14:00:00.000000",
+              "admin",
+              "2026-09-21 10:00:00.000000",
+              "admin",
+              "10:00",
+              "INV-2026-000001",
+              1640.0,
+              0.0,
+              1640.0,
+              0,
+              1,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              2,
+              2,
+              6,
+              2,
+              1,
+              "2026-09-20",
+              "2026-09-21",
+              2,
+              "CheckedOut",
+              1000.0,
+              1000.0,
+              1000.0,
+              0.0,
+              "Walk-in",
+              "Group",
+              "standard",
+              "2026-09-15 11:00:00.000000",
+              "2026-09-20 14:00:00.000000",
+              "admin",
+              "2026-09-21 10:00:00.000000",
+              "admin",
+              "10:00",
+              "INV-2026-000002",
+              1050.0,
+              0.0,
+              1050.0,
+              0,
+              1,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          ]
+        ],
+        [
+          "reservation_rooms",
+          [
+            "id",
+            "reservation_id",
+            "room_id",
+            "is_primary",
+            "created_at"
+          ],
+          [
+            [
+              1,
+              1,
+              5,
+              1,
+              "2026-09-20 14:00:00.000000"
+            ],
+            [
+              2,
+              2,
+              6,
+              1,
+              "2026-09-20 14:00:00.000000"
+            ]
+          ]
+        ],
+        [
+          "folios",
+          [
+            "id",
+            "reservation_id",
+            "folio_letter",
+            "label",
+            "is_closed",
+            "created_at"
+          ],
+          [
+            [
+              1,
+              1,
+              "A",
+              "Guest",
+              1,
+              "2026-09-20 14:00:00.000000"
+            ],
+            [
+              2,
+              2,
+              "A",
+              "Guest",
+              1,
+              "2026-09-20 14:00:00.000000"
+            ]
+          ]
+        ],
+        [
+          "reservation_night_rates",
+          [
+            "id",
+            "reservation_id",
+            "stay_date",
+            "room_type_id",
+            "room_id",
+            "standard_rate",
+            "resolved_rate",
+            "final_rate",
+            "discount_amount",
+            "rate_source",
+            "pricing_mode",
+            "manual_override",
+            "tax_rate",
+            "is_posted",
+            "is_locked",
+            "created_at",
+            "updated_at"
+          ],
+          [
+            [
+              1,
+              1,
+              "2026-09-20",
+              2,
+              5,
+              1000.0,
+              1000.0,
+              1000.0,
+              0.0,
+              "base_rate",
+              "standard",
+              0,
+              5,
+              0,
+              0,
+              "2026-09-20 14:00:00.000000",
+              "2026-09-20 14:00:00.000000"
+            ],
+            [
+              2,
+              2,
+              "2026-09-20",
+              2,
+              6,
+              1000.0,
+              1000.0,
+              1000.0,
+              0.0,
+              "base_rate",
+              "standard",
+              0,
+              5,
+              0,
+              0,
+              "2026-09-20 14:00:00.000000",
+              "2026-09-20 14:00:00.000000"
+            ]
+          ]
+        ],
+        [
+          "extra_charges",
+          [
+            "id",
+            "reservation_id",
+            "folio_id",
+            "description",
+            "amount",
+            "charge_date",
+            "charge_type",
+            "charge_category",
+            "is_correction",
+            "is_reversal",
+            "corrects_id",
+            "correction_reason",
+            "created_at"
+          ],
+          [
+            [
+              1,
+              1,
+              1,
+              "Reception banqueting",
+              500.0,
+              "2026-09-20",
+              "banquet",
+              "Other",
+              0,
+              0,
+              null,
+              null,
+              "2026-09-20 20:00:00.000000"
+            ]
+          ]
+        ],
+        [
+          "tax_lines",
+          [
+            "id",
+            "reservation_id",
+            "charge_source_type",
+            "charge_source_id",
+            "charge_date",
+            "taxable_amount",
+            "tax_type",
+            "tax_rate",
+            "tax_amount",
+            "is_interstate",
+            "is_exempted",
+            "sac_code",
+            "created_at"
+          ],
+          [
+            [
+              1,
+              1,
+              "room_night",
+              "night_2026-09-20",
+              "2026-09-20",
+              1000.0,
+              "CGST",
+              2.5,
+              25.0,
+              0,
+              0,
+              "996311",
+              "2026-09-20 14:00:00.000000"
+            ],
+            [
+              2,
+              1,
+              "room_night",
+              "night_2026-09-20",
+              "2026-09-20",
+              1000.0,
+              "SGST",
+              2.5,
+              25.0,
+              0,
+              0,
+              "996311",
+              "2026-09-20 14:00:00.000000"
+            ],
+            [
+              3,
+              2,
+              "room_night",
+              "night_2026-09-20",
+              "2026-09-20",
+              1000.0,
+              "CGST",
+              2.5,
+              25.0,
+              0,
+              0,
+              "996311",
+              "2026-09-20 14:00:00.000000"
+            ],
+            [
+              4,
+              2,
+              "room_night",
+              "night_2026-09-20",
+              "2026-09-20",
+              1000.0,
+              "SGST",
+              2.5,
+              25.0,
+              0,
+              0,
+              "996311",
+              "2026-09-20 14:00:00.000000"
+            ],
+            [
+              5,
+              1,
+              "extra_charge",
+              "1",
+              "2026-09-20",
+              500.0,
+              "CGST",
+              9.0,
+              45.0,
+              0,
+              0,
+              "996311",
+              "2026-09-20 20:00:00.000000"
+            ],
+            [
+              6,
+              1,
+              "extra_charge",
+              "1",
+              "2026-09-20",
+              500.0,
+              "SGST",
+              9.0,
+              45.0,
+              0,
+              0,
+              "996311",
+              "2026-09-20 20:00:00.000000"
+            ]
+          ]
+        ],
+        [
+          "payments",
+          [
+            "id",
+            "reservation_id",
+            "folio_id",
+            "payment_mode_id",
+            "amount",
+            "payment_date",
+            "reference_number",
+            "created_at",
+            "is_voided",
+            "is_correction",
+            "is_reversal",
+            "payment_purpose"
+          ],
+          [
+            [
+              1,
+              1,
+              1,
+              1,
+              1640.0,
+              "2026-09-21",
+              "",
+              "2026-09-21 09:50:00.000000",
+              0,
+              0,
+              0,
+              "settlement"
+            ],
+            [
+              2,
+              2,
+              2,
+              1,
+              1050.0,
+              "2026-09-21",
+              "",
+              "2026-09-21 09:50:00.000000",
+              0,
+              0,
+              0,
+              "settlement"
+            ]
+          ]
+        ]
+      ],
+      "timeline": [
+        {
+          "amount": "2100.00",
+          "date": "2026-09-20",
+          "description": "The Nair wedding party checks into rooms 105 and 106 under group block GRP-2026-0001, both at 1,050.00 inclusive.",
+          "tables": [
+            "group_blocks",
+            "guests",
+            "reservations",
+            "reservation_rooms",
+            "folios",
+            "reservation_night_rates",
+            "tax_lines"
+          ]
+        },
+        {
+          "amount": "590.00",
+          "date": "2026-09-20",
+          "description": "A 590.00 banqueting charge for the reception is posted to the master account on room 105.",
+          "tables": [
+            "extra_charges",
+            "tax_lines"
+          ]
+        },
+        {
+          "amount": "2690.00",
+          "date": "2026-09-21",
+          "description": "Each room settles its own folio - 1,640.00 and 1,050.00 - and both check out owing nothing.",
+          "tables": [
+            "payments",
+            "reservations"
+          ]
+        }
+      ],
+      "title": "A two-room group block settling room by room",
+      "version": "1.0"
+    },
+    {
+      "activates_invariants": [],
+      "applicable_releases": "all",
+      "business_date": "2026-10-05",
+      "business_narrative": "The front desk opens the morning shift on 5 October with a 2,000.00 float. Sunil Menon checks into room 107 for the night, and settles 1,050.00 in cash at 10:00. At noon 200.00 of petty cash goes out for supplies, recorded against the shift. The drawer is counted at close: 2,850.00, exactly what it should be.\n\nNothing is wrong. That is deliberate \u2014 the variance case, a till that does not balance, is a negative dataset and belongs in its own declaration. A framework that has only ever seen a broken till cannot tell you a correct one passes.\n\nQ21 has been VACUOUS since the framework was built, because this hotel has never opened a shift. It is Severity.BLOCK, and cash control is the one part of a hotel's money that walks out of the building if nobody counts it. This dataset is the first shift the framework has ever held.\n\nIt activates nothing else. No invariant and no fault references a shift table.",
+      "certification_status": "UNCERTIFIED",
+      "certified_content_hash": "",
+      "commissioning_status": "COMMISSIONED",
+      "coverage_expectation": {
+        "invariants_activated": [],
+        "invariants_deactivated": [
+          "INV-A03",
+          "INV-B01",
+          "INV-B02",
+          "INV-B03",
+          "INV-B05",
+          "INV-C01",
+          "INV-C05",
+          "INV-D07"
+        ],
+        "quantities_activated": [
+          "Q21"
+        ],
+        "quantities_deactivated": [
+          "Q15"
+        ],
+        "surfaces_added": [],
+        "surfaces_lost": [
+          "reports.night_audit_snapshot__night_audit_log"
+        ]
+      },
+      "covered_by_deliverable": "",
+      "dataset_id": "DS-ACT-SHIFT",
+      "expectations": {
+        "faults": {},
+        "financial": {
+          "charges_net": "1050.00",
+          "corporate_bookings": "0",
+          "corporate_credit_used": "0.00",
+          "credit_note_count": "0",
+          "credit_note_total": "0.00",
+          "extra_charges_net": "0.00",
+          "extra_charges_non_room_rent": "0.00",
+          "extra_charges_non_room_rent_net": "0.00",
+          "extra_charges_reversals": "0.00",
+          "extra_charges_room_rent": "0.00",
+          "extra_charges_total": "0.00",
+          "folios_count": "1",
+          "guests_count": "1",
+          "invoice_round_off_rows": "0",
+          "invoice_round_off_total": "0.00",
+          "invoice_rounded_grand_total": "1050.00",
+          "invoice_unrounded_grand_total": "1050.00",
+          "net_receivable": "0.00",
+          "outstanding": "0.00",
+          "overpayment_count": "0",
+          "overpayment_total": "0.00",
+          "payments_corrections": "0.00",
+          "payments_count": "1",
+          "payments_gross": "1050.00",
+          "payments_net": "1050.00",
+          "payments_reversals": "0.00",
+          "payments_voided": "0.00",
+          "reservations_count": "1",
+          "room_discount": "0.00",
+          "room_revenue": "1000.00",
+          "tax_base_count": "1",
+          "tax_lines_count": "2",
+          "tax_total": "50.00",
+          "taxable_total": "1000.00",
+          "void_request_count": "0"
+        },
+        "golden": {
+          "groups.detail__any_group": "UNRESOLVED",
+          "main.checkout__inhouse_reservation": "UNRESOLVED",
+          "reports.night_audit_snapshot__night_audit_log": "UNRESOLVED"
+        },
+        "invariants": {
+          "INV-A02": "HOLDS",
+          "INV-A03": "VACUOUS",
+          "INV-A05": "HOLDS",
+          "INV-C01": "VACUOUS",
+          "INV-C02": "HOLDS",
+          "INV-C03": "HOLDS",
+          "INV-C04": "HOLDS",
+          "INV-D01": "HOLDS",
+          "INV-D03": "HOLDS",
+          "INV-D04": "HOLDS",
+          "INV-D06": "HOLDS"
+        },
+        "parity": {
+          "Q12": "AGREED",
+          "Q13": "AGREED",
+          "Q14": "AGREED",
+          "Q17": "AGREED",
+          "Q18": "AGREED",
+          "Q20": "AGREED",
+          "Q21": "AGREED",
+          "Q22": "AGREED"
+        },
+        "replay": {}
+      },
+      "modes": [
+        "REGRESSION",
+        "INVARIANT_ACTIVATION",
+        "CONTINUOUS_VERIFICATION"
+      ],
+      "not_materialisable_reason": "",
+      "perturbation": [
+        "UPDATE shift_adjustments SET amount = 500.00 WHERE id = 1"
+      ],
+      "perturbation_breaks": [
+        "Q21"
+      ],
+      "principles": [
+        "P9",
+        "P10",
+        "P14"
+      ],
+      "provenance": {
+        "author": "Wave 0.8 / D6 Step 2",
+        "base_dataset": "",
+        "contains_real_guest_data": false,
+        "created": "2026-08-08",
+        "derivation": "Written by hand from the narrative above, with the shift window taken from shift_service.calculate_expected_cash so the payment timestamp falls inside it. No production row was copied: production has never held a shift, which is why Q21 has never measured anything.",
+        "disclosure": "Publishable. Contains no real guest and no real stay.",
+        "origin": "SYNTHETIC",
+        "rationale": "SYNTHETIC by necessity \u2014 shifts is empty in production, so there is nothing to derive from."
+      },
+      "purpose": "ACTIVATE_INVARIANT",
+      "rows": [
+        [
+          "guests",
+          [
+            "id",
+            "name",
+            "phone"
+          ],
+          [
+            [
+              1,
+              "Sunil Menon",
+              "9800000007"
+            ]
+          ]
+        ],
+        [
+          "reservations",
+          [
+            "id",
+            "guest_id",
+            "room_id",
+            "room_type_id",
+            "arrival_date",
+            "departure_date",
+            "adults",
+            "status",
+            "rate_per_night",
+            "standard_tariff",
+            "expected_tariff",
+            "advance_payment",
+            "source",
+            "booking_type",
+            "pricing_mode",
+            "created_at",
+            "checked_in_at",
+            "checkin_by",
+            "checked_out_at",
+            "checkout_by",
+            "checkout_time",
+            "invoice_number",
+            "invoice_unrounded_grand_total",
+            "invoice_round_off_amount",
+            "invoice_rounded_grand_total",
+            "noshow_exempt",
+            "checkout_initiated",
+            "credit_amount",
+            "credit_settled_amount",
+            "cancellation_amount_refunded",
+            "cancellation_amount_forfeited",
+            "cancellation_amount_credit_voucher"
+          ],
+          [
+            [
+              1,
+              1,
+              7,
+              2,
+              "2026-10-04",
+              "2026-10-05",
+              1,
+              "CheckedOut",
+              1000.0,
+              1000.0,
+              1000.0,
+              0.0,
+              "Walk-in",
+              "Regular",
+              "standard",
+              "2026-10-04 15:00:00.000000",
+              "2026-10-04 15:00:00.000000",
+              "admin",
+              "2026-10-05 10:05:00.000000",
+              "admin",
+              "10:05",
+              "INV-2026-000001",
+              1050.0,
+              0.0,
+              1050.0,
+              0,
+              1,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          ]
+        ],
+        [
+          "reservation_rooms",
+          [
+            "id",
+            "reservation_id",
+            "room_id",
+            "is_primary",
+            "created_at"
+          ],
+          [
+            [
+              1,
+              1,
+              7,
+              1,
+              "2026-10-04 15:00:00.000000"
+            ]
+          ]
+        ],
+        [
+          "folios",
+          [
+            "id",
+            "reservation_id",
+            "folio_letter",
+            "label",
+            "is_closed",
+            "created_at"
+          ],
+          [
+            [
+              1,
+              1,
+              "A",
+              "Guest",
+              1,
+              "2026-10-04 15:00:00.000000"
+            ]
+          ]
+        ],
+        [
+          "reservation_night_rates",
+          [
+            "id",
+            "reservation_id",
+            "stay_date",
+            "room_type_id",
+            "room_id",
+            "standard_rate",
+            "resolved_rate",
+            "final_rate",
+            "discount_amount",
+            "rate_source",
+            "pricing_mode",
+            "manual_override",
+            "tax_rate",
+            "is_posted",
+            "is_locked",
+            "created_at",
+            "updated_at"
+          ],
+          [
+            [
+              1,
+              1,
+              "2026-10-04",
+              2,
+              7,
+              1000.0,
+              1000.0,
+              1000.0,
+              0.0,
+              "base_rate",
+              "standard",
+              0,
+              5,
+              0,
+              0,
+              "2026-10-04 15:00:00.000000",
+              "2026-10-04 15:00:00.000000"
+            ]
+          ]
+        ],
+        [
+          "tax_lines",
+          [
+            "id",
+            "reservation_id",
+            "charge_source_type",
+            "charge_source_id",
+            "charge_date",
+            "taxable_amount",
+            "tax_type",
+            "tax_rate",
+            "tax_amount",
+            "is_interstate",
+            "is_exempted",
+            "sac_code",
+            "created_at"
+          ],
+          [
+            [
+              1,
+              1,
+              "room_night",
+              "night_2026-10-04",
+              "2026-10-04",
+              1000.0,
+              "CGST",
+              2.5,
+              25.0,
+              0,
+              0,
+              "996311",
+              "2026-10-04 15:00:00.000000"
+            ],
+            [
+              2,
+              1,
+              "room_night",
+              "night_2026-10-04",
+              "2026-10-04",
+              1000.0,
+              "SGST",
+              2.5,
+              25.0,
+              0,
+              0,
+              "996311",
+              "2026-10-04 15:00:00.000000"
+            ]
+          ]
+        ],
+        [
+          "payments",
+          [
+            "id",
+            "reservation_id",
+            "folio_id",
+            "payment_mode_id",
+            "amount",
+            "payment_date",
+            "reference_number",
+            "created_at",
+            "is_voided",
+            "is_correction",
+            "is_reversal",
+            "payment_purpose"
+          ],
+          [
+            [
+              1,
+              1,
+              1,
+              1,
+              1050.0,
+              "2026-10-05",
+              "",
+              "2026-10-05 10:00:00.000000",
+              0,
+              0,
+              0,
+              "settlement"
+            ]
+          ]
+        ],
+        [
+          "shifts",
+          [
+            "id",
+            "user_id",
+            "shift_type",
+            "start_time",
+            "end_time",
+            "opening_cash",
+            "closing_cash",
+            "expected_cash",
+            "declared_closing_cash",
+            "variance",
+            "close_notes",
+            "closed_by_user_id",
+            "status",
+            "approval_status"
+          ],
+          [
+            [
+              1,
+              1,
+              "Morning",
+              "2026-10-05 06:00:00.000000",
+              "2026-10-05 18:00:00.000000",
+              2000.0,
+              2850.0,
+              2850.0,
+              2850.0,
+              0.0,
+              "Drawer counted and balanced",
+              1,
+              "Closed",
+              "Approved"
+            ]
+          ]
+        ],
+        [
+          "shift_adjustments",
+          [
+            "id",
+            "shift_id",
+            "adjustment_type",
+            "amount",
+            "description",
+            "created_by_user_id",
+            "created_at"
+          ],
+          [
+            [
+              1,
+              1,
+              "petty_cash",
+              200.0,
+              "Stationery and supplies",
+              1,
+              "2026-10-05 12:00:00.000000"
+            ]
+          ]
+        ]
+      ],
+      "timeline": [
+        {
+          "amount": "2000.00",
+          "date": "2026-10-05",
+          "description": "The morning shift opens with a 2,000.00 float.",
+          "tables": [
+            "shifts"
+          ]
+        },
+        {
+          "amount": "1050.00",
+          "date": "2026-10-05",
+          "description": "Sunil Menon checks into room 107 for one night at 1,050.00 inclusive and settles in cash at 10:00, inside the shift window.",
+          "tables": [
+            "guests",
+            "reservations",
+            "reservation_rooms",
+            "folios",
+            "reservation_night_rates",
+            "tax_lines",
+            "payments"
+          ]
+        },
+        {
+          "amount": "200.00",
+          "date": "2026-10-05",
+          "description": "200.00 of petty cash goes out for supplies, recorded against the shift.",
+          "tables": [
+            "shift_adjustments"
+          ]
+        },
+        {
+          "amount": "2850.00",
+          "date": "2026-10-05",
+          "description": "The drawer is counted at close: 2,850.00 expected, 2,850.00 declared, no variance.",
+          "tables": [
+            "shifts"
+          ]
+        }
+      ],
+      "title": "One front-desk shift, opened, transacted and balanced",
+      "version": "1.0"
+    }
+  ],
+  "datasets_without_coverage_ledger": [],
+  "invariant_activation_matrix": {
+    "INV-A01": [],
+    "INV-A02": [],
+    "INV-A03": [],
+    "INV-A04": [],
+    "INV-A05": [],
+    "INV-A06": [],
+    "INV-B01": [],
+    "INV-B02": [],
+    "INV-B03": [],
+    "INV-B04": [],
+    "INV-B05": [],
+    "INV-B06": [],
+    "INV-C01": [],
+    "INV-C02": [],
+    "INV-C03": [],
+    "INV-C04": [],
+    "INV-C05": [],
+    "INV-C06": [],
+    "INV-D01": [],
+    "INV-D02": [
+      "DS-ACT-CORRECTION@1.0",
+      "DS-ACT-VOIDCN@1.0"
+    ],
+    "INV-D03": [],
+    "INV-D04": [],
+    "INV-D05": [
+      "DS-ACT-VOIDCN@1.0"
+    ],
+    "INV-D06": [],
+    "INV-D07": []
+  },
+  "origin_matrix": {
+    "SYNTHETIC": [
+      "DS-ACT-INHOUSE@1.0",
+      "DS-ACT-CORRECTION@1.0",
+      "DS-ACT-VOIDCN@1.0",
+      "DS-ACT-GROUP@1.0",
+      "DS-ACT-SHIFT@1.0"
+    ]
+  },
+  "purpose_matrix": {
+    "ACTIVATE_INVARIANT": [
+      "DS-ACT-CORRECTION@1.0",
+      "DS-ACT-VOIDCN@1.0",
+      "DS-ACT-SHIFT@1.0"
+    ],
+    "BASELINE": [
+      "DS-ACT-INHOUSE@1.0",
+      "DS-ACT-GROUP@1.0"
+    ]
+  },
+  "registered": 5,
+  "unactivated_invariants": [
+    "INV-A01",
+    "INV-A02",
+    "INV-A03",
+    "INV-A04",
+    "INV-A05",
+    "INV-A06",
+    "INV-B01",
+    "INV-B02",
+    "INV-B03",
+    "INV-B04",
+    "INV-B05",
+    "INV-B06",
+    "INV-C01",
+    "INV-C02",
+    "INV-C03",
+    "INV-C04",
+    "INV-C05",
+    "INV-C06",
+    "INV-D01",
+    "INV-D03",
+    "INV-D04",
+    "INV-D06",
+    "INV-D07"
+  ],
+  "unbacked_commissioning_claims": [],
+  "unbuildable_datasets": [],
+  "version_matrix": {
+    "DS-ACT-CORRECTION": [
+      "1.0"
+    ],
+    "DS-ACT-GROUP": [
+      "1.0"
+    ],
+    "DS-ACT-INHOUSE": [
+      "1.0"
+    ],
+    "DS-ACT-SHIFT": [
+      "1.0"
+    ],
+    "DS-ACT-VOIDCN": [
+      "1.0"
+    ]
+  }
+}

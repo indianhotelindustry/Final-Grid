@@ -2014,3 +2014,359 @@ _ROOM_G2 = 6              # 106, Deluxe.
 )
 def _group():
     pass
+
+
+# ---------------------------------------------------------------------------
+# DS-ACT-SHIFT
+# ---------------------------------------------------------------------------
+#
+# Activates Q21 — cash position and variance — the last VACUOUS parity
+# quantity that any planned dataset can reach. Severity.BLOCK in the D1
+# registry, and empty on production because this hotel has never opened a
+# shift. No invariant and no fault references a shift table, so Q21 is the
+# whole of what this dataset activates, and the declaration says so.
+#
+# THE WINDOW IS THE PART THAT MATTERS
+# ------------------------------------
+# `shift_service.calculate_expected_cash` selects cash payments by
+# `Payment.created_at` between `start_time` and `end_time` — **the
+# timestamp, not `payment_date`**. A payment dated to the right day but
+# stamped outside the window contributes nothing, and Q21 would then report
+# the stored `expected_cash` diverging from the recomputation. The dataset
+# would be wrong and the system right, which is the least useful kind of
+# red.
+#
+# So every timestamp below is inside 06:00–18:00 on 5 October, and the
+# arithmetic is:
+#
+#   opening float                                     2,000.00
+#   + cash received in the window                     1,050.00
+#   - cash voided in the window                           0.00
+#   + float_add                                           0.00
+#   - payout / float_remove / petty_cash               - 200.00
+#                                                     ----------
+#   expected_cash                                     2,850.00
+#   declared_closing_cash, counted at close           2,850.00
+#   variance                                              0.00
+#
+# A clean drawer. The variance case — a shift that does not balance — is a
+# NEGATIVE dataset and belongs in its own declaration; this one is the
+# positive control that has to exist first, because a framework that has
+# only ever seen a broken till cannot tell you a correct one passes.
+
+_ROOM_S = 7               # 107, Deluxe.
+
+
+@dataset(
+    dataset_id='DS-ACT-SHIFT',
+    version='1.0',
+    title='One front-desk shift, opened, transacted and balanced',
+    purpose=Purpose.ACTIVATE_INVARIANT,
+
+    business_narrative=(
+        'The front desk opens the morning shift on 5 October with a '
+        '2,000.00 float. Sunil Menon checks into room 107 for the night, '
+        'and settles 1,050.00 in cash at 10:00. At noon 200.00 of petty '
+        'cash goes out for supplies, recorded against the shift. The '
+        'drawer is counted at close: 2,850.00, exactly what it should '
+        'be.\n\n'
+        'Nothing is wrong. That is deliberate — the variance case, a till '
+        'that does not balance, is a negative dataset and belongs in its '
+        'own declaration. A framework that has only ever seen a broken '
+        'till cannot tell you a correct one passes.\n\n'
+        'Q21 has been VACUOUS since the framework was built, because this '
+        'hotel has never opened a shift. It is Severity.BLOCK, and cash '
+        'control is the one part of a hotel\'s money that walks out of the '
+        'building if nobody counts it. This dataset is the first shift the '
+        'framework has ever held.\n\n'
+        'It activates nothing else. No invariant and no fault references a '
+        'shift table.'
+    ),
+
+    timeline=(
+        Event(date='2026-10-05',
+              description='The morning shift opens with a 2,000.00 float.',
+              tables=('shifts',),
+              amount='2000.00'),
+        Event(date='2026-10-05',
+              description='Sunil Menon checks into room 107 for one night '
+                          'at 1,050.00 inclusive and settles in cash at '
+                          '10:00, inside the shift window.',
+              tables=('guests', 'reservations', 'reservation_rooms',
+                      'folios', 'reservation_night_rates', 'tax_lines',
+                      'payments'),
+              amount='1050.00'),
+        Event(date='2026-10-05',
+              description='200.00 of petty cash goes out for supplies, '
+                          'recorded against the shift.',
+              tables=('shift_adjustments',),
+              amount='200.00'),
+        Event(date='2026-10-05',
+              description='The drawer is counted at close: 2,850.00 '
+                          'expected, 2,850.00 declared, no variance.',
+              tables=('shifts',),
+              amount='2850.00'),
+    ),
+
+    provenance=Provenance(
+        origin=Origin.SYNTHETIC,
+        author='Wave 0.8 / D6 Step 2',
+        created='2026-08-08',
+        derivation=(
+            'Written by hand from the narrative above, with the shift '
+            'window taken from shift_service.calculate_expected_cash so '
+            'the payment timestamp falls inside it. No production row was '
+            'copied: production has never held a shift, which is why Q21 '
+            'has never measured anything.'),
+        contains_real_guest_data=False,
+        disclosure='Publishable. Contains no real guest and no real stay.',
+        rationale=(
+            'SYNTHETIC by necessity — shifts is empty in production, so '
+            'there is nothing to derive from.'),
+    ),
+
+    expectations=Expectations(
+        financial={
+            'reservations_count': '1',
+            'guests_count': '1',
+            'folios_count': '1',
+            'payments_count': '1',
+
+            'payments_gross': '1050.00',
+            'payments_voided': '0.00',
+            'payments_net': '1050.00',
+            'payments_corrections': '0.00',
+            'payments_reversals': '0.00',
+
+            # No extra charge at all. This is what makes INV-A03
+            # deactivate here where it survived on the last three.
+            'extra_charges_total': '0.00',
+            'extra_charges_room_rent': '0.00',
+            'extra_charges_non_room_rent': '0.00',
+            'extra_charges_reversals': '0.00',
+            'extra_charges_net': '0.00',
+            'extra_charges_non_room_rent_net': '0.00',
+
+            'room_revenue': '1000.00',
+            'room_discount': '0.00',
+
+            'tax_total': '50.00',
+            'taxable_total': '1000.00',
+            'tax_lines_count': '2',
+            'tax_base_count': '1',
+
+            'overpayment_total': '0.00',
+            'overpayment_count': '0',
+            'credit_note_total': '0.00',
+            'credit_note_count': '0',
+            'void_request_count': '0',
+            'corporate_credit_used': '0.00',
+            'corporate_bookings': '0',
+
+            'invoice_unrounded_grand_total': '1050.00',
+            'invoice_round_off_total': '0.00',
+            'invoice_rounded_grand_total': '1050.00',
+            'invoice_round_off_rows': '0',
+
+            'charges_net': '1050.00',
+            'outstanding': '0.00',
+            'net_receivable': '0.00',
+        },
+
+        invariants={
+            'INV-A02': 'HOLDS',
+            'INV-A05': 'HOLDS',
+            'INV-C02': 'HOLDS',
+            'INV-C03': 'HOLDS',
+            'INV-C04': 'HOLDS',
+            'INV-D01': 'HOLDS',
+            'INV-D03': 'HOLDS',
+            'INV-D04': 'HOLDS',
+            'INV-D06': 'HOLDS',
+            'INV-C01': 'VACUOUS',
+            # No extra_charges row, so nothing to group by folio.
+            'INV-A03': 'VACUOUS',
+        },
+
+        parity={
+            # THE TARGET. Stored expected_cash equal to the recomputation,
+            # so no divergence: the drawer and the engine agree.
+            'Q21': 'AGREED',
+            'Q12': 'AGREED', 'Q13': 'AGREED', 'Q14': 'AGREED',
+            'Q17': 'AGREED', 'Q22': 'AGREED',
+
+            # PREDICTED NOT TO MOVE, MEASURED AGREED. The prediction named
+            # these two as its weak points and got them wrong, on the
+            # hypothesis that they track occupancy — DS-ACT-INHOUSE has two
+            # rooms and moved them, the single-room datasets did not.
+            #
+            # Five datasets now falsify that. Occupancy does not predict
+            # it; **extra charges do, exactly**:
+            #
+            #   dataset             rooms  extras  Q18/Q20 -> AGREED
+            #   DS-ACT-INHOUSE        2      no          yes
+            #   DS-ACT-SHIFT          1      no          yes
+            #   DS-ACT-CORRECTION     1      yes         no
+            #   DS-ACT-VOIDCN         1      yes         no
+            #   DS-ACT-GROUP          2      yes         no
+            #
+            # So the dashboard tiles and the ADR/RevPAR definitions agree
+            # on a room-only hotel and disagree the moment an extra charge
+            # exists. That narrows a long-standing production DIVERGED to
+            # its cause, and it is a finding the coverage ledger produced
+            # rather than anybody's reading.
+            'Q18': 'AGREED', 'Q20': 'AGREED',
+        },
+
+        golden={
+            # Nothing gained. Declared so the absence is stated rather
+            # than assumed.
+            'main.checkout__inhouse_reservation': 'UNRESOLVED',
+            'groups.detail__any_group': 'UNRESOLVED',
+            'reports.night_audit_snapshot__night_audit_log': 'UNRESOLVED',
+        },
+    ),
+
+    rows=(
+        ('guests',
+         ('id', 'name', 'phone'),
+         ((1, 'Sunil Menon', '9800000007'),)),
+
+        ('reservations',
+         ('id', 'guest_id', 'room_id', 'room_type_id',
+          'arrival_date', 'departure_date', 'adults', 'status',
+          'rate_per_night', 'standard_tariff', 'expected_tariff',
+          'advance_payment', 'source', 'booking_type', 'pricing_mode',
+          'created_at', 'checked_in_at', 'checkin_by',
+          'checked_out_at', 'checkout_by', 'checkout_time',
+          'invoice_number', 'invoice_unrounded_grand_total',
+          'invoice_round_off_amount', 'invoice_rounded_grand_total',
+          'noshow_exempt', 'checkout_initiated', 'credit_amount',
+          'credit_settled_amount', 'cancellation_amount_refunded',
+          'cancellation_amount_forfeited',
+          'cancellation_amount_credit_voucher'),
+         ((1, 1, _ROOM_S, _ROOM_TYPE_ID,
+           '2026-10-04', '2026-10-05', 1, 'CheckedOut',
+           1000.00, 1000.00, 1000.00, 0.0, 'Walk-in', 'Regular', 'standard',
+           '2026-10-04 15:00:00.000000', '2026-10-04 15:00:00.000000',
+           'admin', '2026-10-05 10:05:00.000000', 'admin', '10:05',
+           'INV-2026-000001', 1050.00, 0.0, 1050.00,
+           0, 1, 0.0, 0.0, 0.0, 0.0, 0.0),)),
+
+        ('reservation_rooms',
+         ('id', 'reservation_id', 'room_id', 'is_primary', 'created_at'),
+         ((1, 1, _ROOM_S, 1, '2026-10-04 15:00:00.000000'),)),
+
+        ('folios',
+         ('id', 'reservation_id', 'folio_letter', 'label', 'is_closed',
+          'created_at'),
+         ((1, 1, 'A', 'Guest', 1, '2026-10-04 15:00:00.000000'),)),
+
+        ('reservation_night_rates',
+         ('id', 'reservation_id', 'stay_date', 'room_type_id', 'room_id',
+          'standard_rate', 'resolved_rate', 'final_rate', 'discount_amount',
+          'rate_source', 'pricing_mode', 'manual_override', 'tax_rate',
+          'is_posted', 'is_locked', 'created_at', 'updated_at'),
+         ((1, 1, '2026-10-04', _ROOM_TYPE_ID, _ROOM_S,
+           1000.00, 1000.00, 1000.00, 0.0, 'base_rate', 'standard', 0, 5,
+           0, 0, '2026-10-04 15:00:00.000000',
+           '2026-10-04 15:00:00.000000'),)),
+
+        ('tax_lines',
+         ('id', 'reservation_id', 'charge_source_type', 'charge_source_id',
+          'charge_date', 'taxable_amount', 'tax_type', 'tax_rate',
+          'tax_amount', 'is_interstate', 'is_exempted', 'sac_code',
+          'created_at'),
+         ((1, 1, 'room_night', 'night_2026-10-04', '2026-10-04',
+           1000.00, 'CGST', 2.5, 25.00, 0, 0, '996311',
+           '2026-10-04 15:00:00.000000'),
+          (2, 1, 'room_night', 'night_2026-10-04', '2026-10-04',
+           1000.00, 'SGST', 2.5, 25.00, 0, 0, '996311',
+           '2026-10-04 15:00:00.000000'),)),
+
+        # created_at 10:00 — INSIDE the 06:00-18:00 shift window. This is
+        # the timestamp calculate_expected_cash selects on, not
+        # payment_date, and getting it wrong would make Q21 diverge on a
+        # dataset defect rather than a system one.
+        ('payments',
+         ('id', 'reservation_id', 'folio_id', 'payment_mode_id', 'amount',
+          'payment_date', 'reference_number', 'created_at', 'is_voided',
+          'is_correction', 'is_reversal', 'payment_purpose'),
+         ((1, 1, 1, _CASH, 1050.00, '2026-10-05', '',
+           '2026-10-05 10:00:00.000000', 0, 0, 0, 'settlement'),)),
+
+        ('shifts',
+         ('id', 'user_id', 'shift_type', 'start_time', 'end_time',
+          'opening_cash', 'closing_cash', 'expected_cash',
+          'declared_closing_cash', 'variance', 'close_notes',
+          'closed_by_user_id', 'status', 'approval_status'),
+         ((1, _ADMIN, 'Morning',
+           '2026-10-05 06:00:00.000000', '2026-10-05 18:00:00.000000',
+           2000.00, 2850.00, 2850.00, 2850.00, 0.00,
+           'Drawer counted and balanced', _ADMIN, 'Closed', 'Approved'),)),
+
+        ('shift_adjustments',
+         ('id', 'shift_id', 'adjustment_type', 'amount', 'description',
+          'created_by_user_id', 'created_at'),
+         ((1, 1, 'petty_cash', 200.00, 'Stationery and supplies',
+           _ADMIN, '2026-10-05 12:00:00.000000'),)),
+    ),
+
+    business_date='2026-10-05',
+
+    #: None. Q21 is a D1 quantity, not an invariant, and
+    #: activates_invariants is checked against the D4 registry only.
+    #: The Q21 activation is declared in coverage_expectation below, where
+    #: the ledger can check it — which it could not do before D1 was added
+    #: to the ledger on 2026-08-08.
+    activates_invariants=(),
+
+    # -- the discrimination gate -----------------------------------------
+    #
+    # Move the petty-cash payout without touching the stored expected_cash.
+    # The drawer's declared figure, the variance and every financial probe
+    # are unchanged; only the recomputation moves, so `Q21` must report the
+    # stored expected_cash diverging from what the engine now computes.
+    #
+    # That is the failure this quantity exists to catch: a till that
+    # balances on paper because the expected figure was written down once
+    # and never recomputed.
+    perturbation=(
+        'UPDATE shift_adjustments SET amount = 500.00 WHERE id = 1',
+    ),
+    perturbation_breaks=(
+        'Q21',
+    ),
+
+    # -- the coverage ledger, declared BEFORE the dataset was built ------
+    # See evidence/20260808_ds_act_shift_prediction/prediction.md.
+    coverage_expectation={
+        'surfaces_added': (),
+        'surfaces_lost': (
+            'reports.night_audit_snapshot__night_audit_log',
+        ),
+        'invariants_activated': (),
+        # EIGHT, not the seven of the last three. INV-A03 is the
+        # differentiator: those datasets carry an extra charge and this one
+        # does not, so INV-A03 loses its population here. Copying the
+        # previous declaration would have got this wrong.
+        'invariants_deactivated': (
+            'INV-A03',
+            'INV-B01', 'INV-B02', 'INV-B03', 'INV-B05',
+            'INV-C01', 'INV-C05', 'INV-D07',
+        ),
+        'quantities_activated': ('Q21',),
+        'quantities_deactivated': ('Q15',),
+    },
+
+    principles=('P9', 'P10', 'P14'),
+    modes=(Mode.REGRESSION, Mode.INVARIANT_ACTIVATION,
+           Mode.CONTINUOUS_VERIFICATION),
+
+    # Six of six. ACTIVATION verifies 0 claims because Q21 is a D1
+    # quantity and that element checks D4 only — the Q21 activation is
+    # verified by the coverage ledger instead.
+    commissioning_status=Commissioning.COMMISSIONED,
+)
+def _shift():
+    pass
