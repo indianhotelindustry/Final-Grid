@@ -37,7 +37,7 @@ Live registry counts, 2026-08-08:
 | Invariants with an activating dataset | 2 of 25 — `INV-D02`, `INV-D05` |
 | Golden master surfaces (D2) | 158 — 6 UNRESOLVED on production; `groups.detail` now resolves on a dataset |
 | Replayed business dates (D3) | 28 |
-| Retained evidence packs | 145 |
+| Retained evidence packs | 147 |
 | Constitutional principles enforced | 14 — no principle uncovered |
 
 ---
@@ -353,6 +353,7 @@ documents were **not present in the repository** and remain unrecovered.
 | `D6_DS_ACT_VOIDCN.md` | Written 2026-08-08; `INV-D05` and `Q11`, the refund `corrects_id` defect, and the voids-reported-as-refunds divergence |
 | `D6_DS_ACT_GROUP.md` | Written 2026-08-08; the group dataset, and the absence of master-account routing |
 | `D6_DS_ACT_SHIFT.md` | Written 2026-08-08; `Q21`, and what five datasets settled about `Q18`/`Q20` |
+| `WAVE1_BLUEPRINT.md` | Written 2026-08-08; the Wave 1 readiness review, the silence census and the gate |
 | `D1`–`D5` completion reports | Pre-existing, retained |
 | `D5_5_REMEDIATION_APPLIED.md` | Written 2026-08-08; records R-1/R-2/R-3/R-6 and four errors found in the D5.5 documents |
 | `D6_STEP2_DS_ACT_INHOUSE.md` | Written 2026-08-08; the first commissioned dataset, and the D2 measurement behind it |
@@ -611,6 +612,63 @@ not master data a dataset *declares*. Until it is settled,
 **Beyond those two, D6 Step 2 has nothing left that engineering can
 unblock.** The next deliverables are D7–D10, and D9 remains blocked on its
 own schema exception.
+
+---
+
+## 7b. Wave 1 Readiness Review — the gate, 2026-08-08
+
+`WAVE1_BLUEPRINT.md`. **No production code was written and none may be
+until the gate in its §9 is passed.**
+
+**Verdict: Wave 0 is engineering-complete for diagnosis and for silent
+remediation; it is NOT complete as chartered.** D7, D8 and D10 do not
+exist and D9 is blocked, but they bite differently — D9 blocks material
+work because rollback of a data migration is an unproven restore; D7 and
+D10 block the *claim*, not the work; D8 blocks nothing but human error.
+
+**The silence census** (`evidence/20260808_wave1_silence_census/`) is the
+one new piece of analysis, and it reorders the backlog: **13 of 21 defects
+have no live population**, so a fix can be shipped and *proved* neutral.
+Silent work goes first and needs no deliverable Wave 0 has not built.
+
+**Three findings changed the original ordering:**
+
+- **The folio backfill moves no money total.** `folio_id` appears zero
+  times in the financial probes; it moves `Q14`, `INV-A02`, `INV-A03` and
+  nothing else. Its ₹40,374.14 headline reads like a large restatement
+  and it is not one — promoted from late to third.
+- **The ADR/RevPAR fix is not "add a date parameter".** The coverage
+  ledger established `Q18`/`Q20` diverge on **extra charges**, not
+  occupancy. Date-scoping alone would have left them DIVERGED.
+- **The night-audit fix must not be bundled with the folio fix.**
+  `INV-B03` is the sole invariant enforcing P4 **and has a demonstrated
+  detection gap** (`FLT-D03`). Shipping a closed-period change behind a
+  control known not to fire is the sequencing error most worth avoiding.
+
+**Three releases permanently change historical accounting** and need
+written management or auditor approval: the closed-period recomputation,
+the ₹7,977.92 OTA reclassification, and the double-sold room night. The
+other four explicitly do **not**, and should not be routed through an
+approval they do not need.
+
+**Four items are NOT ready** and are excluded from every release until
+they pass the six criteria: the `tax_lines` reversal schema gap, absent
+master-account routing, the negative-receivable judgement, and invoice
+number uniqueness — which needs a D4 invariant declared and commissioned
+**before** its fix, or the fix ships with nothing able to prove it worked.
+
+### The next piece of work
+
+**Not production code.** Either:
+
+1. **D9**, which unblocks everything material — and needs the recorded
+   schema exception for a `backup_logs` checksum column; or
+2. **W1-R1 / W1-R2**, the two silent releases, which need no further
+   deliverable and are gated by what Wave 0 already provides; or
+3. the two open decisions — **R-5**, and the master-data identity
+   question.
+
+Nothing else in the backlog can start.
 
 **Closed since:** the coverage ledger now measures **D1 as well as D2 and
 D4**. `DS-ACT-VOIDCN`'s `Q11` claim is mechanical rather than hand-measured.

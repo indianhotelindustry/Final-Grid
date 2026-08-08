@@ -1,0 +1,157 @@
+{
+ "purpose": "Silence census \u2014 does each known defect have a live population today?",
+ "production_sha256": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+ "production_byte_identical": true,
+ "census": [
+  {
+   "ref": "W1-01",
+   "defect": "Financial rows with no folio (INV-A02)",
+   "population": 40,
+   "source": "D4 \u00a711.1",
+   "classification": "MATERIAL"
+  },
+  {
+   "ref": "W1-02",
+   "defect": "Charges invisible to the folio view (INV-A03)",
+   "population": 5,
+   "source": "D4 \u00a711.2",
+   "classification": "MATERIAL"
+  },
+  {
+   "ref": "W1-03",
+   "defect": "Closed night audits that can be recomputed differently",
+   "population": 1,
+   "source": "D3 \u00a78.1 / D4 \u00a711.3",
+   "classification": "MATERIAL"
+  },
+  {
+   "ref": "W1-04",
+   "defect": "Walk-in payments on OTA receivable heads (INV-C01)",
+   "population": 5,
+   "source": "D4 \u00a711.4",
+   "classification": "MATERIAL"
+  },
+  {
+   "ref": "W1-05",
+   "defect": "OTA postings with no agent reference (INV-C05)",
+   "population": 5,
+   "source": "D4 \u00a711.5",
+   "classification": "MATERIAL"
+  },
+  {
+   "ref": "W1-06",
+   "defect": "Room-nights sold twice (INV-C04)",
+   "population": 1,
+   "source": "D4 \u00a711.6",
+   "classification": "MATERIAL"
+  },
+  {
+   "ref": "W1-07",
+   "defect": "Extra charges (the population Q18/Q20 diverge on)",
+   "population": 5,
+   "source": "coverage ledger, 5 datasets",
+   "classification": "MATERIAL"
+  },
+  {
+   "ref": "W1-08",
+   "defect": "Reservations with a credit approved after checkout date",
+   "population": 1,
+   "source": "D3 \u00a78.1",
+   "classification": "MATERIAL"
+  },
+  {
+   "ref": "W1-20",
+   "defect": "Room-rent charges posted into extra_charges",
+   "population": 0,
+   "source": "R-2 / D5.5 F-3",
+   "classification": "SILENT"
+  },
+  {
+   "ref": "W1-21",
+   "defect": "Correction or reversal rows",
+   "population": 0,
+   "source": "INV-D02 / R-7 / GST defect",
+   "classification": "SILENT"
+  },
+  {
+   "ref": "W1-22",
+   "defect": "Refund payments",
+   "population": 0,
+   "source": "DS-ACT-VOIDCN \u2014 refund corrects_id",
+   "classification": "SILENT"
+  },
+  {
+   "ref": "W1-23",
+   "defect": "Voided payments",
+   "population": 0,
+   "source": "DS-ACT-VOIDCN \u2014 voids reported as refunds",
+   "classification": "SILENT"
+  },
+  {
+   "ref": "W1-24",
+   "defect": "Credit notes",
+   "population": 0,
+   "source": "INV-D05",
+   "classification": "SILENT"
+  },
+  {
+   "ref": "W1-25",
+   "defect": "Void requests",
+   "population": 0,
+   "source": "INV-D05",
+   "classification": "SILENT"
+  },
+  {
+   "ref": "W1-26",
+   "defect": "Payments pointing at a non-existent payment mode",
+   "population": 0,
+   "source": "D3 \u00a78.4 / D4 \u00a711.8",
+   "classification": "SILENT"
+  },
+  {
+   "ref": "W1-27",
+   "defect": "Group blocks",
+   "population": 0,
+   "source": "DS-ACT-GROUP \u2014 no master-account routing",
+   "classification": "SILENT"
+  },
+  {
+   "ref": "W1-28",
+   "defect": "Companies / corporate bookings",
+   "population": 0,
+   "source": "INV-C06",
+   "classification": "SILENT"
+  },
+  {
+   "ref": "W1-29",
+   "defect": "Shifts",
+   "population": 0,
+   "source": "Q21",
+   "classification": "SILENT"
+  },
+  {
+   "ref": "W1-30",
+   "defect": "Reservations overpaid beyond the \u20b91.00 threshold",
+   "population": 0,
+   "source": "INV-A06 / R-5 \u2014 measured separately, engine-derived",
+   "classification": "SILENT"
+  },
+  {
+   "ref": "W1-31",
+   "defect": "Duplicate invoice numbers",
+   "population": 0,
+   "source": "FLT-B04 \u2014 no invariant exists",
+   "classification": "SILENT"
+  },
+  {
+   "ref": "W1-32",
+   "defect": "OTA payouts (can drive a negative receivable)",
+   "population": 0,
+   "source": "D1 \u00a77 new observation",
+   "classification": "SILENT"
+  }
+ ],
+ "silent_count": 13,
+ "material_count": 8,
+ "unmeasured_count": 0
+}

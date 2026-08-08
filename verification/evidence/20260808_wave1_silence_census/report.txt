@@ -1,0 +1,28 @@
+ref     defect                                                        pop  class
+--------------------------------------------------------------------------------------------
+W1-01   Financial rows with no folio (INV-A02)                         40  MATERIAL
+W1-02   Charges invisible to the folio view (INV-A03)                   5  MATERIAL
+W1-03   Closed night audits that can be recomputed differently          1  MATERIAL
+W1-04   Walk-in payments on OTA receivable heads (INV-C01)              5  MATERIAL
+W1-05   OTA postings with no agent reference (INV-C05)                  5  MATERIAL
+W1-06   Room-nights sold twice (INV-C04)                                1  MATERIAL
+W1-07   Extra charges (the population Q18/Q20 diverge on)               5  MATERIAL
+W1-08   Reservations with a credit approved after checkout date         1  MATERIAL
+W1-20   Room-rent charges posted into extra_charges                     0  SILENT
+W1-21   Correction or reversal rows                                     0  SILENT
+W1-22   Refund payments                                                 0  SILENT
+W1-23   Voided payments                                                 0  SILENT
+W1-24   Credit notes                                                    0  SILENT
+W1-25   Void requests                                                   0  SILENT
+W1-26   Payments pointing at a non-existent payment mode                0  SILENT
+W1-27   Group blocks                                                    0  SILENT
+W1-28   Companies / corporate bookings                                  0  SILENT
+W1-29   Shifts                                                          0  SILENT
+W1-30   Reservations overpaid beyond the ₹1.00 threshold                0  SILENT
+W1-31   Duplicate invoice numbers                                       0  SILENT
+W1-32   OTA payouts (can drive a negative receivable)                   0  SILENT
+
+SILENT   (no live population — a fix changes no existing figure): 13
+MATERIAL (live population — a fix restates existing figures)    : 8
+
+production byte-identical: True
