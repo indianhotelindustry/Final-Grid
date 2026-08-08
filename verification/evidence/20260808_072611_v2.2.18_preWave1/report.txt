@@ -1,0 +1,187 @@
+====================================================================================================
+DSBC FRONTLINE — FINANCIAL PARITY HARNESS
+Production Verification Framework, Wave 0 Deliverable 1
+====================================================================================================
+Mode            : compare
+Started         : 2026-08-08T07:26:11
+Finished        : 2026-08-08T07:26:12
+Duration        : 1.4s
+Application     : v2.2.18
+PVF             : v0.5.0
+
+----------------------------------------------------------------------------------------------------
+READ-ONLY GUARANTEE
+----------------------------------------------------------------------------------------------------
+Source database : C:\Users\SIPL Server\Downloads\DSS\SukoonPMS\SukoonPMS\instance\pms.db
+Size            : 733,184 bytes
+Copy method     : sqlite-backup-api
+SHA-256 before  : f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c
+SHA-256 after   : f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c
+Guarantee       : VERIFIED — production database byte-identical after run
+
+----------------------------------------------------------------------------------------------------
+SUMMARY
+----------------------------------------------------------------------------------------------------
+  AGREED              11
+  SINGLE_SOURCE        1
+  DIVERGED             8
+  VACUOUS              2
+  NOT_IMPLEMENTED      0
+  ERROR                0
+  TOTAL               22
+
+  OVERALL VERDICT  : FAIL
+  Blocking failures: 9
+
+----------------------------------------------------------------------------------------------------
+QUANTITY RESULTS
+----------------------------------------------------------------------------------------------------
+ID    QUANTITY                                     POLICY         SEV    VERDICT              ms
+----------------------------------------------------------------------------------------------------
+Q01   Reservation count and status distribution    EXACT          BLOCK  SINGLE_SOURCE         0
+Q02   Charge count and total by category           EXACT          BLOCK  AGREED                0
+Q03   Room revenue per reservation (3 definitions  EXACT          BLOCK  AGREED               13
+Q04   Room revenue per business date               EXACT          BLOCK  AGREED               73
+Q05   Ancillary revenue by category                EXACT          BLOCK  AGREED                1
+Q06   Taxable base (deduplicated vs raw)           RUPEE          BLOCK  DIVERGED              3
+Q07   Tax by component (CGST / SGST / IGST)        RUPEE          BLOCK  AGREED                5
+Q08   Discount applied per reservation             EXACT          BLOCK  AGREED               16
+Q09   Payments total (signed vs raw)               EXACT          BLOCK  AGREED               62
+Q10   Payments by mode and purpose                 EXACT          BLOCK  AGREED                1
+Q11   Refunds, separated from voids                EXACT          BLOCK  VACUOUS               4
+Q12   Outstanding per reservation (2 bases)        EXACT          BLOCK  DIVERGED             16
+Q13   Settlement status distribution               EXACT          BLOCK  DIVERGED             15
+Q14   Folio balances / partition integrity         EXACT          BLOCK  DIVERGED             46
+Q15   Night audit — stored vs recomputed sections  EXACT          BLOCK  AGREED               21
+Q16   Daily report totals vs canonical engines     RUPEE          BLOCK  AGREED               64
+Q17   MIS aggregates vs canonical engines and the  RUPEE          WARN   DIVERGED             76
+Q18   Executive dashboard tiles vs canonical engi  RUPEE          BLOCK  DIVERGED            126
+Q19   Occupancy and rooms sold                     EXACT          BLOCK  AGREED                4
+Q20   ADR and RevPAR (multiple definitions)        EXACT          BLOCK  DIVERGED              3
+Q21   Cash position and variance                   EXACT          BLOCK  VACUOUS               0
+Q22   Receivables — OTA, corporate, individual     EXACT          BLOCK  DIVERGED              8
+
+====================================================================================================
+DIVERGENCES
+====================================================================================================
+
+[Q06] Taxable base (deduplicated vs raw)   (BLOCK, policy RUPEE)
+----------------------------------------------------------------------------------------------------
+  CGST and SGST each carry the full taxable value of one supply. Summing both double-counts the base.
+  Implementations:
+    deduplicated by charge source                37946.67
+    raw sum of all tax lines                     75893.34
+  Attributed divergences:
+    2026-05-27               gst_service.get_gst_report = 17664.44  vs  NightAuditService.tax_snapshot = 35328.88   (delta -17664.44)
+    2026-05-28               gst_service.get_gst_report = 20282.23  vs  NightAuditService.tax_snapshot = 40564.46   (delta -20282.23)
+
+[Q12] Outstanding per reservation (2 bases)   (BLOCK, policy EXACT)
+----------------------------------------------------------------------------------------------------
+  Article IV §1 permits exactly one amount owed per reservation. 6 reservations currently carry two.
+  Implementations:
+    balance (unrounded grand total)              199.96
+    settlement_balance (invoiced total)          199.71
+  Attributed divergences:
+    reservation 7            balance (unrounded basis) = -0.5  vs  settlement_balance (invoiced basis) = 0.0   (delta -0.5)
+    reservation 10           balance (unrounded basis) = 0.15  vs  settlement_balance (invoiced basis) = -0.15   (delta 0.30)
+    reservation 11           balance (unrounded basis) = 0.0  vs  settlement_balance (invoiced basis) = 0.01   (delta -0.01)
+    reservation 12           balance (unrounded basis) = 0.01  vs  settlement_balance (invoiced basis) = 0.0   (delta 0.01)
+    reservation 17           balance (unrounded basis) = 0.15  vs  settlement_balance (invoiced basis) = -0.15   (delta 0.30)
+    reservation 28           balance (unrounded basis) = 0.15  vs  settlement_balance (invoiced basis) = 0.0   (delta 0.15)
+
+[Q13] Settlement status distribution   (BLOCK, policy EXACT)
+----------------------------------------------------------------------------------------------------
+  A reservation classified differently by the two bases can appear in two contradictory exception lists.
+  Implementations:
+    by balance basis                             {'overpaid': 1, 'owing': 4, 'settled': 23}
+    by settlement basis                          {'overpaid': 2, 'owing': 1, 'settled': 25}
+  Attributed divergences:
+    reservation 7            status by balance = overpaid  vs  status by settlement_balance = settled   (delta classification differs)
+    reservation 10           status by balance = owing  vs  status by settlement_balance = overpaid   (delta classification differs)
+    reservation 17           status by balance = owing  vs  status by settlement_balance = overpaid   (delta classification differs)
+    reservation 28           status by balance = owing  vs  status by settlement_balance = settled   (delta classification differs)
+
+[Q14] Folio balances / partition integrity   (BLOCK, policy EXACT)
+----------------------------------------------------------------------------------------------------
+  5 charges and 35 payments carry folio_id = NULL. Article V §3 requires every row to belong to a folio.
+  Implementations:
+    sum over folios (charges)                    0.0
+    sum over reservations (charges)              729.85
+  Attributed divergences:
+    charge partition         sum over folios (charges) = 0.0  vs  sum over reservations (charges) = 729.85   (delta -729.85)
+
+[Q17] MIS aggregates vs canonical engines and the flash report   (WARN, policy RUPEE)
+----------------------------------------------------------------------------------------------------
+  MIS is scoped to the single business date so it is directly comparable with the flash report and the daily engines. Where the two reports disagree about the same day, at least one of them is wrong on every day.
+  Implementations:
+    ADR::kpi_helpers.get_adr                     0.0
+    ADR::reports.mis.business.arr                1303.51
+    daily collections (report-to-report)::reports.flash.day_revenue 15565.87
+    daily collections (report-to-report)::reports.mis.billing.total_collected 18796.15
+    daily collections::kpi_helpers.get_daily_revenue 15565.87
+    daily collections::reports.mis.billing.total_collected 18796.15
+    departures completed::reports.flash.departures_done 12
+    departures completed::reports.mis.movement.departures_done 0
+    occupancy pct::kpi_helpers.get_occupancy     0.0
+    occupancy pct::reports.mis.business.occupancy_pct 38.5
+    occupied rooms::kpi_helpers.get_occupancy.occupied 0
+    occupied rooms::reports.mis.business.occupied_rooms 0
+  Attributed divergences:
+    daily collections        kpi_helpers.get_daily_revenue = 15565.87  vs  reports.mis.billing.total_collected = 18796.15   (delta -3230.28)
+    daily collections (report-to-report) reports.flash.day_revenue = 15565.87  vs  reports.mis.billing.total_collected = 18796.15   (delta -3230.28)
+    occupancy pct            kpi_helpers.get_occupancy = 0.0  vs  reports.mis.business.occupancy_pct = 38.5   (delta -38.5)
+    ADR                      kpi_helpers.get_adr = 0.0  vs  reports.mis.business.arr = 1303.51   (delta -1303.51)
+    departures completed     reports.flash.departures_done = 12  vs  reports.mis.movement.departures_done = 0   (delta 12.0)
+
+[Q18] Executive dashboard tiles vs canonical engines   (BLOCK, policy RUPEE)
+----------------------------------------------------------------------------------------------------
+  The dashboard is the surface management reads first. Each tile is compared against the engine that should own it and against the report that shows the same concept.
+  Implementations:
+    arrivals completed::dashboard.checked_in_today 0
+    arrivals completed::reports.flash.arrivals_done 0
+    daily collections (tile-to-report)::dashboard.cash_collected_today 15565.87
+    daily collections (tile-to-report)::reports.flash.day_revenue 15565.87
+    daily collections (tile-to-summary)::dashboard.cash_collected_today 15565.87
+    daily collections (tile-to-summary)::dashboard.daily_financial_summary.total_collected 15565.87
+    daily collections::dashboard.cash_collected_today 15565.87
+    daily collections::kpi_helpers.get_daily_revenue 15565.87
+    departures completed::dashboard.checked_out_today 0
+    departures completed::reports.flash.departures_done 12
+    rooms available::dashboard.available_rooms   39
+    rooms available::kpi_helpers.get_occupancy.sellable 39
+  Attributed divergences:
+    departures completed     dashboard.checked_out_today = 0  vs  reports.flash.departures_done = 12   (delta -12.0)
+
+[Q20] ADR and RevPAR (multiple definitions)   (BLOCK, policy EXACT)
+----------------------------------------------------------------------------------------------------
+  kpi_helpers.get_adr takes NO date parameter — it averages the tariffs of currently checked-in reservations, so any historical ADR is actually today's ADR.
+  Implementations:
+    kpi_helpers.get_adr (AVG rate_per_night, no date scope) 0.0
+    room revenue / occupied room-nights (date-scoped) 1283.35
+  Attributed divergences:
+    ADR                      kpi_helpers.get_adr (AVG rate_per_night, no date scope) = 0.0  vs  room revenue / occupied room-nights (date-scoped) = 1283.35   (delta -1283.35)
+
+[Q22] Receivables — OTA, corporate, individual   (BLOCK, policy EXACT)
+----------------------------------------------------------------------------------------------------
+  Gross and net agree only while zero payouts exist. 5 payments totalling 7977.92 sit on OTA receivable heads against non-OTA bookings (Article IV §6).
+  Implementations:
+    compute_ota_outstanding (gross)              7977.92
+    get_ota_pending (net of payouts)             0.0
+  Attributed divergences:
+    OTA receivable           compute_ota_outstanding (gross) = 7977.92  vs  get_ota_pending (net of payouts) = 0.0   (delta 7977.92)
+
+====================================================================================================
+VACUOUS — measured, but the population is empty
+====================================================================================================
+These implementations agreed only because there was nothing to
+disagree about. Per Principle 10 that is not evidence of
+correctness. Each requires a regression dataset (Wave 0 D6)
+before it can be reported as verified.
+  [Q11] Refunds, separated from voids
+         A void asserts an entry should not have existed; a refund asserts money left the business. The night audit reports voids as refunds (Article VIII §5).
+  [Q21] Cash position and variance
+         Cash control cannot be verified without shift data. 0 shifts exist.
+
+====================================================================================================
+END OF REPORT
+====================================================================================================

@@ -347,6 +347,22 @@ def unbacked_commissioning_claims() -> tuple:
     The same cross-check D4 and D5 apply, for the same reason: a status
     declared in code is a gate somebody can walk through without doing
     the work.
+
+    Pack naming, and why the match is a containment rather than a suffix
+    -------------------------------------------------------------------
+    ``ds-commission`` writes its pack as ``{timestamp}_ds_commission_{tag}``
+    and only writes one when ``--tag`` is given, so a commissioning pack
+    always carries a trailing tag. This function originally matched
+    ``name.endswith('_ds_commission')``, which no such name can satisfy —
+    the cross-check could never find evidence and every ``COMMISSIONED``
+    declaration would be reported as unbacked forever.
+
+    Step 1 could not have found that: with an empty registry there are no
+    claimants and the function returns before it looks. It surfaced on
+    ``DS-ACT-INHOUSE``, the first dataset to declare ``COMMISSIONED``.
+
+    The timestamp prefix is fixed-width, so a plain sort still puts the
+    most recent pack last.
     """
     import json
     import os
@@ -358,7 +374,7 @@ def unbacked_commissioning_claims() -> tuple:
     if not claimants:
         return [], ''
     packs = (sorted(name for name in os.listdir(EVIDENCE_DIR)
-                    if name.endswith('_ds_commission'))
+                    if '_ds_commission' in name)
              if os.path.isdir(EVIDENCE_DIR) else [])
     if not packs:
         return ([{'key': d.key,

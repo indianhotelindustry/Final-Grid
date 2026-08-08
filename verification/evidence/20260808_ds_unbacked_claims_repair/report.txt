@@ -1,0 +1,10 @@
+== the repaired check must give three different answers ==
+OK   no evidence on the machine reports the claim         got 1         want 1
+OK   a tagged pack that passed backs the claim            got 0         want 0
+OK     and it is the pack that was read                   got True      want True
+OK   a tagged pack that failed reports the claim          got 1         want 1
+OK   the latest pack decides, even when an older one passed got 1         want 1
+OK     and the same in the other direction                got 0         want 0
+OK   a ds_registry pack is not read as commissioning evidence got 1         want 1
+
+7 checks, 0 failed

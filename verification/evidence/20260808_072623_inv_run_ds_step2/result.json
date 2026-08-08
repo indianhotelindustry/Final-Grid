@@ -1,0 +1,1708 @@
+{
+  "app_version": "2.2.18",
+  "business_date": "2026-05-28",
+  "certification_blocking": [
+    "INV-A02",
+    "INV-A03",
+    "INV-B03",
+    "INV-C01",
+    "INV-C04"
+  ],
+  "commissioning_evidence_pack": "C:\\Users\\SIPL Server\\Downloads\\DSS\\SukoonPMS\\SukoonPMS\\verification\\evidence\\20260804_172142_inv_commission",
+  "commissioning_gaps": [],
+  "copy_method": "sqlite-backup-api",
+  "counts": {
+    "HOLDS": 14,
+    "VACUOUS": 4,
+    "VIOLATED": 6,
+    "evaluated": 24,
+    "registered": 24,
+    "uncommissioned": 0,
+    "violations": 57
+  },
+  "determinism_proven": true,
+  "duration_seconds": 2.05,
+  "financial_impact": {
+    "INV-A02": "40374.14",
+    "INV-A03": "729.85",
+    "INV-B03": "199.99",
+    "INV-C01": "7977.92",
+    "INV-C04": "0",
+    "INV-C05": "7977.92"
+  },
+  "finished_at": "2026-08-08T07:26:26",
+  "freeze_proven": true,
+  "frozen_at": "2026-05-28T12:00:00",
+  "mode": "ENTIRE_DATABASE",
+  "order_independence_proven": true,
+  "order_mismatches": [],
+  "overall": "FAIL",
+  "pvf_version": "0.5.0",
+  "read_only_verified": true,
+  "registry_size": 24,
+  "release_blocking": [
+    "INV-A03",
+    "INV-B03"
+  ],
+  "repeatability_mismatches": [],
+  "results": [
+    {
+      "blocking": "RELEASE_BLOCKING",
+      "category": "A-ACCOUNTING",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [],
+        "business_date": "2026-05-28",
+        "confidence": "PROVEN",
+        "evidence_files": [],
+        "expected_result": "balance = grand_total - paid - company_credit",
+        "inputs": {
+          "reservations": 28
+        },
+        "observed_result": "settlement identity: 28 row(s) examined, all satisfied",
+        "replay_context": {},
+        "root_cause_candidates": [],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": ""
+      },
+      "invariant_id": "INV-A01",
+      "metering": {
+        "db_reads": 169,
+        "db_writes": 0,
+        "duration_ms": 135,
+        "memory_peak_kb": 1300,
+        "rows_examined": 0
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 28,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "CRITICAL",
+      "status": "HOLDS",
+      "title": "Settlement identity: grand total - payments - company credit = balance",
+      "violation_count": 0,
+      "violations": []
+    },
+    {
+      "blocking": "CERTIFICATION_BLOCKING",
+      "category": "A-ACCOUNTING",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [
+          "extra_charge:1",
+          "extra_charge:2",
+          "extra_charge:3",
+          "extra_charge:4",
+          "extra_charge:5",
+          "payment:1",
+          "payment:10",
+          "payment:11",
+          "payment:12",
+          "payment:13",
+          "payment:14",
+          "payment:15",
+          "payment:16",
+          "payment:17",
+          "payment:18",
+          "payment:19",
+          "payment:2",
+          "payment:20",
+          "payment:21",
+          "payment:22",
+          "payment:23",
+          "payment:24",
+          "payment:25",
+          "payment:26",
+          "payment:27",
+          "payment:28",
+          "payment:29",
+          "payment:3",
+          "payment:30",
+          "payment:31",
+          "payment:32",
+          "payment:33",
+          "payment:34",
+          "payment:35",
+          "payment:4",
+          "payment:5",
+          "payment:6",
+          "payment:7",
+          "payment:8",
+          "payment:9"
+        ],
+        "business_date": "2026-05-28",
+        "confidence": "PROVEN",
+        "evidence_files": [],
+        "expected_result": "every payment and charge carries a folio_id",
+        "inputs": {
+          "charges_in_scope": 5,
+          "payments_in_scope": 35
+        },
+        "observed_result": "35/35 payments and 5/5 charges are unrouted, carrying 40374.14",
+        "replay_context": {},
+        "root_cause_candidates": [
+          "Posting paths that write a payment before a folio exists",
+          "A folio-creation step that runs only on the check-in route",
+          "Legacy rows predating the folio model, never backfilled"
+        ],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": "40374.14"
+      },
+      "invariant_id": "INV-A02",
+      "metering": {
+        "db_reads": 4,
+        "db_writes": 0,
+        "duration_ms": 1,
+        "memory_peak_kb": 18,
+        "rows_examined": 42
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 40,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "HIGH",
+      "status": "VIOLATED",
+      "title": "Every financial row belongs to a folio",
+      "violation_count": 40,
+      "violations": [
+        {
+          "amount": "2000",
+          "detail": {
+            "date": "2026-05-27"
+          },
+          "expected": "folio_id set",
+          "object_id": "1",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1200",
+          "detail": {
+            "date": "2026-05-27"
+          },
+          "expected": "folio_id set",
+          "object_id": "2",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1300",
+          "detail": {
+            "date": "2026-05-27"
+          },
+          "expected": "folio_id set",
+          "object_id": "3",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1200",
+          "detail": {
+            "date": "2026-05-27"
+          },
+          "expected": "folio_id set",
+          "object_id": "4",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1300",
+          "detail": {
+            "date": "2026-05-27"
+          },
+          "expected": "folio_id set",
+          "object_id": "5",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1500",
+          "detail": {
+            "date": "2026-05-27"
+          },
+          "expected": "folio_id set",
+          "object_id": "6",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1435.5",
+          "detail": {
+            "date": "2026-05-27"
+          },
+          "expected": "folio_id set",
+          "object_id": "7",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1200",
+          "detail": {
+            "date": "2026-05-27"
+          },
+          "expected": "folio_id set",
+          "object_id": "8",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1500",
+          "detail": {
+            "date": "2026-05-27"
+          },
+          "expected": "folio_id set",
+          "object_id": "9",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1700.15",
+          "detail": {
+            "date": "2026-05-27"
+          },
+          "expected": "folio_id set",
+          "object_id": "10",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1611.99",
+          "detail": {
+            "date": "2026-05-27"
+          },
+          "expected": "folio_id set",
+          "object_id": "11",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "2600",
+          "detail": {
+            "date": "2026-05-27"
+          },
+          "expected": "folio_id set",
+          "object_id": "12",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "300",
+          "detail": {
+            "date": "2026-05-27"
+          },
+          "expected": "folio_id set",
+          "object_id": "13",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "700",
+          "detail": {
+            "date": "2026-05-27"
+          },
+          "expected": "folio_id set",
+          "object_id": "14",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1300",
+          "detail": {
+            "date": "2026-05-27"
+          },
+          "expected": "folio_id set",
+          "object_id": "15",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "0.5",
+          "detail": {
+            "date": "2026-05-27"
+          },
+          "expected": "folio_id set",
+          "object_id": "16",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "800",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "17",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1200",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "18",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1700.15",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "19",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1200",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "20",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1000",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "21",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "200",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "22",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1200",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "23",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1300",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "24",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1000",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "25",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "300",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "26",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1500",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "27",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1200",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "28",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1300",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "29",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1000",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "30",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "300",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "31",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1500",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "32",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "1530.13",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "33",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "305.87",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "34",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "260",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "35",
+          "object_type": "payment",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "0.15",
+          "detail": {
+            "date": "2026-05-27"
+          },
+          "expected": "folio_id set",
+          "object_id": "1",
+          "object_type": "extra_charge",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "0.15",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "2",
+          "object_type": "extra_charge",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "291.45",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "3",
+          "object_type": "extra_charge",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "190.48",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "4",
+          "object_type": "extra_charge",
+          "observed": "folio_id NULL",
+          "variance": ""
+        },
+        {
+          "amount": "247.62",
+          "detail": {
+            "date": "2026-05-28"
+          },
+          "expected": "folio_id set",
+          "object_id": "5",
+          "object_type": "extra_charge",
+          "observed": "folio_id NULL",
+          "variance": ""
+        }
+      ]
+    },
+    {
+      "blocking": "RELEASE_BLOCKING",
+      "category": "A-ACCOUNTING",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [
+          "extra_charge:1",
+          "extra_charge:2",
+          "extra_charge:3",
+          "extra_charge:4",
+          "extra_charge:5"
+        ],
+        "business_date": "2026-05-28",
+        "confidence": "PROVEN",
+        "evidence_files": [],
+        "expected_result": "both views total the same money",
+        "inputs": {
+          "charge_rows": 5
+        },
+        "observed_result": "reservation view 729.85, folio view 0.00",
+        "replay_context": {},
+        "root_cause_candidates": [
+          "A charge whose folio belongs to a different reservation",
+          "Charges with folio_id NULL falling out of the folio view",
+          "A folio whose reservation_id was repointed"
+        ],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": "-729.85"
+      },
+      "invariant_id": "INV-A03",
+      "metering": {
+        "db_reads": 1,
+        "db_writes": 0,
+        "duration_ms": 0,
+        "memory_peak_kb": 2,
+        "rows_examined": 5
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 5,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "HIGH",
+      "status": "VIOLATED",
+      "title": "Charges summed over folios equal charges summed over reservations",
+      "violation_count": 5,
+      "violations": [
+        {
+          "amount": "0.15",
+          "detail": {},
+          "expected": "reachable through a folio",
+          "object_id": "1",
+          "object_type": "extra_charge",
+          "observed": "folio missing or unset",
+          "variance": ""
+        },
+        {
+          "amount": "0.15",
+          "detail": {},
+          "expected": "reachable through a folio",
+          "object_id": "2",
+          "object_type": "extra_charge",
+          "observed": "folio missing or unset",
+          "variance": ""
+        },
+        {
+          "amount": "291.45",
+          "detail": {},
+          "expected": "reachable through a folio",
+          "object_id": "3",
+          "object_type": "extra_charge",
+          "observed": "folio missing or unset",
+          "variance": ""
+        },
+        {
+          "amount": "190.48",
+          "detail": {},
+          "expected": "reachable through a folio",
+          "object_id": "4",
+          "object_type": "extra_charge",
+          "observed": "folio missing or unset",
+          "variance": ""
+        },
+        {
+          "amount": "247.62",
+          "detail": {},
+          "expected": "reachable through a folio",
+          "object_id": "5",
+          "object_type": "extra_charge",
+          "observed": "folio missing or unset",
+          "variance": ""
+        }
+      ]
+    },
+    {
+      "blocking": "RELEASE_BLOCKING",
+      "category": "A-ACCOUNTING",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [],
+        "business_date": "2026-05-28",
+        "confidence": "PROVEN",
+        "evidence_files": [],
+        "expected_result": "engine cash = \u03a3 direct non-voided payments, and nothing falls outside the classification",
+        "inputs": {
+          "dates_examined": 2,
+          "payment_rows": 35,
+          "unclassified_money": "0.00"
+        },
+        "observed_result": "daily collections: 35 row(s) examined, all satisfied",
+        "replay_context": {},
+        "root_cause_candidates": [],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": "0.00"
+      },
+      "invariant_id": "INV-A04",
+      "metering": {
+        "db_reads": 5,
+        "db_writes": 0,
+        "duration_ms": 3,
+        "memory_peak_kb": 79,
+        "rows_examined": 37
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 35,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "CRITICAL",
+      "status": "HOLDS",
+      "title": "Daily collections equal the direct payments recorded for the day",
+      "violation_count": 0,
+      "violations": []
+    },
+    {
+      "blocking": "CERTIFICATION_BLOCKING",
+      "category": "A-ACCOUNTING",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [],
+        "business_date": "2026-05-28",
+        "confidence": "PROVEN",
+        "evidence_files": [],
+        "expected_result": "tax_amount = taxable_amount x rate / 100 (\u00b10.01)",
+        "inputs": {
+          "non_exempt": 66,
+          "rows_in_scope": 66
+        },
+        "observed_result": "tax lines: 66 row(s) examined, all satisfied",
+        "replay_context": {},
+        "root_cause_candidates": [],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": ""
+      },
+      "invariant_id": "INV-A05",
+      "metering": {
+        "db_reads": 1,
+        "db_writes": 0,
+        "duration_ms": 0,
+        "memory_peak_kb": 20,
+        "rows_examined": 66
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 66,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "CRITICAL",
+      "status": "HOLDS",
+      "title": "Every stored tax line equals its taxable base times its rate",
+      "violation_count": 0,
+      "violations": []
+    },
+    {
+      "blocking": "CERTIFICATION_BLOCKING",
+      "category": "A-ACCOUNTING",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [],
+        "business_date": "2026-05-28",
+        "confidence": "NONE",
+        "evidence_files": [],
+        "expected_result": "every overpaid reservation is logged",
+        "inputs": {
+          "overpaid": 0,
+          "overpayment_log_rows": 2,
+          "reservations_examined": 28
+        },
+        "observed_result": "overpaid reservations: no rows in scope",
+        "replay_context": {},
+        "root_cause_candidates": [],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": ""
+      },
+      "invariant_id": "INV-A06",
+      "metering": {
+        "db_reads": 171,
+        "db_writes": 0,
+        "duration_ms": 104,
+        "memory_peak_kb": 417,
+        "rows_examined": 3
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 0,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "HIGH",
+      "status": "VACUOUS",
+      "title": "A guest who has paid more than they owe has an overpayment record",
+      "violation_count": 0,
+      "violations": []
+    },
+    {
+      "blocking": "RELEASE_BLOCKING",
+      "category": "B-TEMPORAL",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [],
+        "business_date": "2026-05-28",
+        "confidence": "PROVEN",
+        "evidence_files": [],
+        "expected_result": "no row created into a closed date after it closed",
+        "inputs": {
+          "closed_dates": 1,
+          "rows_examined": 17,
+          "rows_without_created_at": 0
+        },
+        "observed_result": "rows in closed periods: 17 row(s) examined, all satisfied",
+        "replay_context": {},
+        "root_cause_candidates": [],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": ""
+      },
+      "invariant_id": "INV-B01",
+      "metering": {
+        "db_reads": 3,
+        "db_writes": 0,
+        "duration_ms": 0,
+        "memory_peak_kb": 5,
+        "rows_examined": 18
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 17,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "CRITICAL",
+      "status": "HOLDS",
+      "title": "No financial row was created into a business date after that date closed",
+      "violation_count": 0,
+      "violations": []
+    },
+    {
+      "blocking": "RELEASE_BLOCKING",
+      "category": "B-TEMPORAL",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [],
+        "business_date": "2026-05-28",
+        "confidence": "PROVEN",
+        "evidence_files": [],
+        "expected_result": "every snapshot is hashed and the hash matches",
+        "inputs": {
+          "audit_logs": 1,
+          "with_snapshot": 1
+        },
+        "observed_result": "snapshots: 1 row(s) examined, all satisfied",
+        "replay_context": {},
+        "root_cause_candidates": [],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": ""
+      },
+      "invariant_id": "INV-B02",
+      "metering": {
+        "db_reads": 1,
+        "db_writes": 0,
+        "duration_ms": 4,
+        "memory_peak_kb": 138,
+        "rows_examined": 0
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 1,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "CRITICAL",
+      "status": "HOLDS",
+      "title": "Every frozen night-audit snapshot matches its stored hash",
+      "violation_count": 0,
+      "violations": []
+    },
+    {
+      "blocking": "RELEASE_BLOCKING",
+      "category": "B-TEMPORAL",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [
+          "night_audit:2026-05-27 / outstanding"
+        ],
+        "business_date": "2026-05-28",
+        "confidence": "PROVEN",
+        "evidence_files": [],
+        "expected_result": "a closed day recomputes to what it reported",
+        "inputs": {
+          "closed_dates": 1,
+          "fields_compared": 8,
+          "fields_not_in_snapshot": 0
+        },
+        "observed_result": "closed-day figures: 1 of 8 row(s) violate the rule",
+        "replay_context": {},
+        "root_cause_candidates": [
+          "A present-tense field \u2014 Reservation.status, Room.status, a credit balance \u2014 used inside a date-scoped report",
+          "Data posted into the period after it closed (see INV-B01)",
+          "A change to a canonical engine that was never replayed against history"
+        ],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": ""
+      },
+      "invariant_id": "INV-B03",
+      "metering": {
+        "db_reads": 83,
+        "db_writes": 0,
+        "duration_ms": 275,
+        "memory_peak_kb": 4645,
+        "rows_examined": 0
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 8,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "CRITICAL",
+      "status": "VIOLATED",
+      "title": "Recomputing a closed day reproduces the figures it reported",
+      "violation_count": 1,
+      "violations": [
+        {
+          "amount": "199.99",
+          "detail": {
+            "business_date": "2026-05-27"
+          },
+          "expected": "0.16 (frozen at close)",
+          "object_id": "2026-05-27 / outstanding",
+          "object_type": "night_audit",
+          "observed": "200.15 (recomputed today)",
+          "variance": "199.99"
+        }
+      ]
+    },
+    {
+      "blocking": "RELEASE_BLOCKING",
+      "category": "B-TEMPORAL",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [],
+        "business_date": "2026-05-28",
+        "confidence": "PROVEN",
+        "evidence_files": [],
+        "expected_result": "one business date, no money dated beyond it",
+        "inputs": {
+          "business_date_rows": 1,
+          "canonical_business_date": "2026-05-28",
+          "table_business_date": "2026-05-28"
+        },
+        "observed_result": "1 business_date row(s); canonical date 2026-05-28",
+        "replay_context": {},
+        "root_cause_candidates": [],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": ""
+      },
+      "invariant_id": "INV-B04",
+      "metering": {
+        "db_reads": 4,
+        "db_writes": 0,
+        "duration_ms": 0,
+        "memory_peak_kb": 11,
+        "rows_examined": 1
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 1,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "CRITICAL",
+      "status": "HOLDS",
+      "title": "Exactly one business date exists and no activity is dated beyond it",
+      "violation_count": 0,
+      "violations": []
+    },
+    {
+      "blocking": "CERTIFICATION_BLOCKING",
+      "category": "B-TEMPORAL",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [],
+        "business_date": "2026-05-28",
+        "confidence": "PROVEN",
+        "evidence_files": [],
+        "expected_result": "an audit for every day from the first to yesterday",
+        "inputs": {
+          "business_date": "2026-05-28",
+          "days_in_span": 1,
+          "first_audit": "2026-05-27"
+        },
+        "observed_result": "1 audited date(s) between 2026-05-27 and 2026-05-28; 0 problem(s)",
+        "replay_context": {},
+        "root_cause_candidates": [],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": ""
+      },
+      "invariant_id": "INV-B05",
+      "metering": {
+        "db_reads": 2,
+        "db_writes": 0,
+        "duration_ms": 0,
+        "memory_peak_kb": 1,
+        "rows_examined": 2
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 1,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "HIGH",
+      "status": "HOLDS",
+      "title": "Night audits form an unbroken sequence up to the business date",
+      "violation_count": 0,
+      "violations": []
+    },
+    {
+      "blocking": "OPERATIONAL_WARNING",
+      "category": "B-TEMPORAL",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [],
+        "business_date": "2026-05-28",
+        "confidence": "PROVEN",
+        "evidence_files": [],
+        "expected_result": "payment_date within the stay + 30 days",
+        "inputs": {
+          "declared_tail_days": 30,
+          "payments_examined": 35
+        },
+        "observed_result": "payments: 35 row(s) examined, all satisfied",
+        "replay_context": {},
+        "root_cause_candidates": [],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": ""
+      },
+      "invariant_id": "INV-B06",
+      "metering": {
+        "db_reads": 1,
+        "db_writes": 0,
+        "duration_ms": 0,
+        "memory_peak_kb": 11,
+        "rows_examined": 35
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 35,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "MEDIUM",
+      "status": "HOLDS",
+      "title": "A payment is never dated outside the stay it belongs to",
+      "violation_count": 0,
+      "violations": []
+    },
+    {
+      "blocking": "CERTIFICATION_BLOCKING",
+      "category": "C-DOMAIN",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [
+          "payment:10",
+          "payment:11",
+          "payment:19",
+          "payment:33",
+          "payment:7"
+        ],
+        "business_date": "2026-05-28",
+        "confidence": "PROVEN",
+        "evidence_files": [],
+        "expected_result": "no OTA receivable posting on a walk-in booking",
+        "inputs": {
+          "ota_postings_in_scope": 5,
+          "walk_in_spellings_matched": [
+            "walk-in",
+            "walk_in",
+            "walkin",
+            "walk in"
+          ]
+        },
+        "observed_result": "5 of 5 OTA posting(s) sit on walk-in bookings, carrying 7977.92",
+        "replay_context": {},
+        "root_cause_candidates": [
+          "The payment mode list is presented unfiltered at the desk, so an OTA head can be picked for any booking",
+          "A booking imported from an OTA whose source was overwritten to walk-in during check-in",
+          "Test or seed data that was never cleaned out"
+        ],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": "7977.92"
+      },
+      "invariant_id": "INV-C01",
+      "metering": {
+        "db_reads": 1,
+        "db_writes": 0,
+        "duration_ms": 0,
+        "memory_peak_kb": 4,
+        "rows_examined": 5
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 5,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "CRITICAL",
+      "status": "VIOLATED",
+      "title": "A walk-in reservation is never settled through an OTA receivable",
+      "violation_count": 5,
+      "violations": [
+        {
+          "amount": "1435.5",
+          "detail": {
+            "ota_booking_id": null,
+            "ota_channel": null,
+            "payment_date": "2026-05-27",
+            "reservation_id": 7
+          },
+          "expected": "an OTA head only on an OTA booking",
+          "object_id": "7",
+          "object_type": "payment",
+          "observed": "Other OTA Paid on reservation 7 with source 'Walk-in'",
+          "variance": ""
+        },
+        {
+          "amount": "1700.15",
+          "detail": {
+            "ota_booking_id": null,
+            "ota_channel": null,
+            "payment_date": "2026-05-27",
+            "reservation_id": 10
+          },
+          "expected": "an OTA head only on an OTA booking",
+          "object_id": "10",
+          "object_type": "payment",
+          "observed": "MMT Paid on reservation 10 with source 'Walk-in'",
+          "variance": ""
+        },
+        {
+          "amount": "1611.99",
+          "detail": {
+            "ota_booking_id": null,
+            "ota_channel": null,
+            "payment_date": "2026-05-27",
+            "reservation_id": 11
+          },
+          "expected": "an OTA head only on an OTA booking",
+          "object_id": "11",
+          "object_type": "payment",
+          "observed": "EaseMyTrip Paid on reservation 11 with source 'Walk-in'",
+          "variance": ""
+        },
+        {
+          "amount": "1700.15",
+          "detail": {
+            "ota_booking_id": null,
+            "ota_channel": null,
+            "payment_date": "2026-05-28",
+            "reservation_id": 17
+          },
+          "expected": "an OTA head only on an OTA booking",
+          "object_id": "19",
+          "object_type": "payment",
+          "observed": "Goibibo Paid on reservation 17 with source 'Walk-in'",
+          "variance": ""
+        },
+        {
+          "amount": "1530.13",
+          "detail": {
+            "ota_booking_id": null,
+            "ota_channel": null,
+            "payment_date": "2026-05-28",
+            "reservation_id": 28
+          },
+          "expected": "an OTA head only on an OTA booking",
+          "object_id": "33",
+          "object_type": "payment",
+          "observed": "MMT Paid on reservation 28 with source 'Walk-in'",
+          "variance": ""
+        }
+      ]
+    },
+    {
+      "blocking": "CERTIFICATION_BLOCKING",
+      "category": "C-DOMAIN",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [],
+        "business_date": "2026-05-28",
+        "confidence": "PROVEN",
+        "evidence_files": [],
+        "expected_result": "departed guests are settled or explained",
+        "inputs": {
+          "checked_out": 28,
+          "credit_notes_on_file": 0
+        },
+        "observed_result": "checked-out reservations: 28 row(s) examined, all satisfied",
+        "replay_context": {},
+        "root_cause_candidates": [],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": ""
+      },
+      "invariant_id": "INV-C02",
+      "metering": {
+        "db_reads": 129,
+        "db_writes": 0,
+        "duration_ms": 95,
+        "memory_peak_kb": 643,
+        "rows_examined": 1
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 28,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "HIGH",
+      "status": "HOLDS",
+      "title": "A checked-out reservation is settled, or its balance is explained",
+      "violation_count": 0,
+      "violations": []
+    },
+    {
+      "blocking": "RELEASE_BLOCKING",
+      "category": "C-DOMAIN",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [],
+        "business_date": "2026-05-28",
+        "confidence": "PROVEN",
+        "evidence_files": [],
+        "expected_result": "every financial row has a live reservation",
+        "inputs": {
+          "rows_examined": 106
+        },
+        "observed_result": "financial rows: 106 row(s) examined, all satisfied",
+        "replay_context": {},
+        "root_cause_candidates": [],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": ""
+      },
+      "invariant_id": "INV-C03",
+      "metering": {
+        "db_reads": 9,
+        "db_writes": 0,
+        "duration_ms": 0,
+        "memory_peak_kb": 4,
+        "rows_examined": 6
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 106,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "CRITICAL",
+      "status": "HOLDS",
+      "title": "Every financial event belongs to a reservation that exists",
+      "violation_count": 0,
+      "violations": []
+    },
+    {
+      "blocking": "CERTIFICATION_BLOCKING",
+      "category": "C-DOMAIN",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [
+          "room_night:room 21 / 2026-05-28"
+        ],
+        "business_date": "2026-05-28",
+        "confidence": "PROVEN",
+        "evidence_files": [],
+        "expected_result": "at most one reservation per room per night",
+        "inputs": {
+          "reservations_expanded": 28,
+          "room_nights": 30
+        },
+        "observed_result": "1 clash(es) across 30 occupied room-night(s)",
+        "replay_context": {},
+        "root_cause_candidates": [
+          "A room move that assigned the new room without releasing the old",
+          "An allocation route with no availability check",
+          "A group booking assigned to one room by default"
+        ],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": ""
+      },
+      "invariant_id": "INV-C04",
+      "metering": {
+        "db_reads": 1,
+        "db_writes": 0,
+        "duration_ms": 0,
+        "memory_peak_kb": 11,
+        "rows_examined": 28
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 30,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "HIGH",
+      "status": "VIOLATED",
+      "title": "No room is occupied by two reservations on the same night",
+      "violation_count": 1,
+      "violations": [
+        {
+          "amount": "0",
+          "detail": {
+            "night": "2026-05-28",
+            "reservations": [
+              20,
+              27
+            ],
+            "room_id": 21
+          },
+          "expected": "one reservation",
+          "object_id": "room 21 / 2026-05-28",
+          "object_type": "room_night",
+          "observed": "2 reservations: 20, 27",
+          "variance": ""
+        }
+      ]
+    },
+    {
+      "blocking": "OPERATIONAL_WARNING",
+      "category": "C-DOMAIN",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [
+          "reservation:10",
+          "reservation:11",
+          "reservation:17",
+          "reservation:28",
+          "reservation:7"
+        ],
+        "business_date": "2026-05-28",
+        "confidence": "PROVEN",
+        "evidence_files": [],
+        "expected_result": "every OTA receivable names its agent",
+        "inputs": {
+          "reservations_with_ota_postings": 5
+        },
+        "observed_result": "reservations with OTA postings: 5 of 5 row(s) violate the rule",
+        "replay_context": {},
+        "root_cause_candidates": [
+          "A manual OTA posting at the desk with no import behind it",
+          "An import that maps the amount but not the channel",
+          "A booking whose source was edited after import"
+        ],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": ""
+      },
+      "invariant_id": "INV-C05",
+      "metering": {
+        "db_reads": 1,
+        "db_writes": 0,
+        "duration_ms": 0,
+        "memory_peak_kb": 2,
+        "rows_examined": 5
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 5,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "MEDIUM",
+      "status": "VIOLATED",
+      "title": "An OTA settlement identifies the agent it will be collected from",
+      "violation_count": 5,
+      "violations": [
+        {
+          "amount": "1435.5",
+          "detail": {
+            "ota_postings": 1
+          },
+          "expected": "ota_channel and ota_booking_id set",
+          "object_id": "7",
+          "object_type": "reservation",
+          "observed": "missing ota_channel, ota_booking_id",
+          "variance": ""
+        },
+        {
+          "amount": "1700.15",
+          "detail": {
+            "ota_postings": 1
+          },
+          "expected": "ota_channel and ota_booking_id set",
+          "object_id": "10",
+          "object_type": "reservation",
+          "observed": "missing ota_channel, ota_booking_id",
+          "variance": ""
+        },
+        {
+          "amount": "1611.99",
+          "detail": {
+            "ota_postings": 1
+          },
+          "expected": "ota_channel and ota_booking_id set",
+          "object_id": "11",
+          "object_type": "reservation",
+          "observed": "missing ota_channel, ota_booking_id",
+          "variance": ""
+        },
+        {
+          "amount": "1700.15",
+          "detail": {
+            "ota_postings": 1
+          },
+          "expected": "ota_channel and ota_booking_id set",
+          "object_id": "17",
+          "object_type": "reservation",
+          "observed": "missing ota_channel, ota_booking_id",
+          "variance": ""
+        },
+        {
+          "amount": "1530.13",
+          "detail": {
+            "ota_postings": 1
+          },
+          "expected": "ota_channel and ota_booking_id set",
+          "object_id": "28",
+          "object_type": "reservation",
+          "observed": "missing ota_channel, ota_booking_id",
+          "variance": ""
+        }
+      ]
+    },
+    {
+      "blocking": "CERTIFICATION_BLOCKING",
+      "category": "C-DOMAIN",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [],
+        "business_date": "2026-05-28",
+        "confidence": "NONE",
+        "evidence_files": [],
+        "expected_result": "corporate credit is backed by a company",
+        "inputs": {
+          "company_folios": 0,
+          "corporate_reservations": 0,
+          "folios": 28
+        },
+        "observed_result": "no folio names a company and no reservation is flagged corporate; the rule was not exercised",
+        "replay_context": {},
+        "root_cause_candidates": [],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": ""
+      },
+      "invariant_id": "INV-C06",
+      "metering": {
+        "db_reads": 4,
+        "db_writes": 0,
+        "duration_ms": 0,
+        "memory_peak_kb": 1,
+        "rows_examined": 2
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 0,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "HIGH",
+      "status": "VACUOUS",
+      "title": "Corporate credit is backed by a company account that exists",
+      "violation_count": 0,
+      "violations": []
+    },
+    {
+      "blocking": "RELEASE_BLOCKING",
+      "category": "D-REFERENTIAL",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [],
+        "business_date": "2026-05-28",
+        "confidence": "PROVEN",
+        "evidence_files": [],
+        "expected_result": "every folio has a reservation",
+        "inputs": {
+          "folios": 28
+        },
+        "observed_result": "folios: 28 row(s) examined, all satisfied",
+        "replay_context": {},
+        "root_cause_candidates": [],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": ""
+      },
+      "invariant_id": "INV-D01",
+      "metering": {
+        "db_reads": 2,
+        "db_writes": 0,
+        "duration_ms": 0,
+        "memory_peak_kb": 1,
+        "rows_examined": 1
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 28,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "CRITICAL",
+      "status": "HOLDS",
+      "title": "Every folio references a reservation that exists",
+      "violation_count": 0,
+      "violations": []
+    },
+    {
+      "blocking": "RELEASE_BLOCKING",
+      "category": "D-REFERENTIAL",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [],
+        "business_date": "2026-05-28",
+        "confidence": "NONE",
+        "evidence_files": [],
+        "expected_result": "every correction points at its original",
+        "inputs": {
+          "correction_rows": 0
+        },
+        "observed_result": "no correction or reversal rows exist, so the rule was not exercised. The signing logic in signed_extra_charge_amount is therefore also untested by live data",
+        "replay_context": {},
+        "root_cause_candidates": [],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": ""
+      },
+      "invariant_id": "INV-D02",
+      "metering": {
+        "db_reads": 4,
+        "db_writes": 0,
+        "duration_ms": 0,
+        "memory_peak_kb": 2,
+        "rows_examined": 2
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 0,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "CRITICAL",
+      "status": "VACUOUS",
+      "title": "Every correction and reversal references the transaction it corrects",
+      "violation_count": 0,
+      "violations": []
+    },
+    {
+      "blocking": "RELEASE_BLOCKING",
+      "category": "D-REFERENTIAL",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [],
+        "business_date": "2026-05-28",
+        "confidence": "PROVEN",
+        "evidence_files": [],
+        "expected_result": "every payment has a mode with a known category",
+        "inputs": {
+          "known_categories": [
+            "direct_payment",
+            "ota_receivable"
+          ],
+          "payment_modes": 12,
+          "payments": 35
+        },
+        "observed_result": "payments: 35 row(s) examined, all satisfied",
+        "replay_context": {},
+        "root_cause_candidates": [],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": ""
+      },
+      "invariant_id": "INV-D03",
+      "metering": {
+        "db_reads": 3,
+        "db_writes": 0,
+        "duration_ms": 0,
+        "memory_peak_kb": 4,
+        "rows_examined": 13
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 35,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "CRITICAL",
+      "status": "HOLDS",
+      "title": "Every payment references a payment mode that exists",
+      "violation_count": 0,
+      "violations": []
+    },
+    {
+      "blocking": "CERTIFICATION_BLOCKING",
+      "category": "D-REFERENTIAL",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [],
+        "business_date": "2026-05-28",
+        "confidence": "PROVEN",
+        "evidence_files": [],
+        "expected_result": "every tax line resolves to its charge",
+        "inputs": {
+          "tax_lines": 66,
+          "unresolvable_source_types": {}
+        },
+        "observed_result": "tax lines: 66 row(s) examined, all satisfied",
+        "replay_context": {},
+        "root_cause_candidates": [],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": ""
+      },
+      "invariant_id": "INV-D04",
+      "metering": {
+        "db_reads": 67,
+        "db_writes": 0,
+        "duration_ms": 2,
+        "memory_peak_kb": 23,
+        "rows_examined": 132
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 66,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "HIGH",
+      "status": "HOLDS",
+      "title": "Every tax line names the charge it was raised on",
+      "violation_count": 0,
+      "violations": []
+    },
+    {
+      "blocking": "CERTIFICATION_BLOCKING",
+      "category": "D-REFERENTIAL",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [],
+        "business_date": "2026-05-28",
+        "confidence": "NONE",
+        "evidence_files": [],
+        "expected_result": "every cancellation names what it cancelled",
+        "inputs": {
+          "credit_notes": 0,
+          "void_requests": 0
+        },
+        "observed_result": "no void requests and no credit notes exist, so the rule was not exercised",
+        "replay_context": {},
+        "root_cause_candidates": [],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": ""
+      },
+      "invariant_id": "INV-D05",
+      "metering": {
+        "db_reads": 6,
+        "db_writes": 0,
+        "duration_ms": 0,
+        "memory_peak_kb": 3,
+        "rows_examined": 4
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 0,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "HIGH",
+      "status": "VACUOUS",
+      "title": "Every void request and credit note references what it cancels",
+      "violation_count": 0,
+      "violations": []
+    },
+    {
+      "blocking": "RELEASE_BLOCKING",
+      "category": "D-REFERENTIAL",
+      "commissioning_status": "COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [],
+        "business_date": "2026-05-28",
+        "confidence": "PROVEN",
+        "evidence_files": [],
+        "expected_result": "every priced night lies inside its stay",
+        "inputs": {
+          "night_rate_rows": 30
+        },
+        "observed_result": "nightly rate rows: 30 row(s) examined, all satisfied",
+        "replay_context": {},
+        "root_cause_candidates": [],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": ""
+      },
+      "invariant_id": "INV-D06",
+      "metering": {
+        "db_reads": 2,
+        "db_writes": 0,
+        "duration_ms": 0,
+        "memory_peak_kb": 9,
+        "rows_examined": 31
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 30,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "HIGH",
+      "status": "HOLDS",
+      "title": "Every priced room night belongs to a stay that covers that night",
+      "violation_count": 0,
+      "violations": []
+    }
+  ],
+  "scope": "ENTIRE_DATABASE",
+  "source_db": "C:\\Users\\SIPL Server\\Downloads\\DSS\\SukoonPMS\\SukoonPMS\\instance\\pms.db",
+  "source_hash_after": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+  "source_hash_before": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+  "started_at": "2026-08-08T07:26:23",
+  "total_writes": 0,
+  "unbacked_commissioning_claims": []
+}

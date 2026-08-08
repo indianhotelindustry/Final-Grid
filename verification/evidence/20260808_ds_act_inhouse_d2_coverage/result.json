@@ -1,0 +1,68 @@
+{
+ "purpose": "D2 golden-master coverage of DS-ACT-INHOUSE@1.0 vs production. Produced by hand: D6 cannot declare a D2 expectation (see D6_STEP2_DS_ACT_INHOUSE.md section 5).",
+ "method": "python -m verification _gm_capture_json --db verification/_work/datasets/DS-ACT-INHOUSE_1.0.db, compared against masters/production/index.json",
+ "dataset_content_hash": "061b19c2df20e765469de003edec696ac48dfee98e8e82b75249fd5da7b678da",
+ "production": {
+  "surfaces_captured": 158,
+  "unresolved": 6,
+  "unresolved_endpoints": [
+   "groups.detail",
+   "main.checkout",
+   "main.company_detail",
+   "main.get_company_credit",
+   "main.reservation_folio",
+   "pos.room_charges_api"
+  ]
+ },
+ "dataset": {
+  "surfaces_captured": 160,
+  "resolved_parameterised_endpoints": [
+   "billing.void_eligible",
+   "billing.void_history",
+   "folio.list_folios",
+   "grc.preview",
+   "loyalty.api_balance",
+   "main.advance_receipt",
+   "main.checkout",
+   "main.edit_reservation",
+   "main.get_reservation",
+   "main.get_room_tariff",
+   "main.guest_folio",
+   "main.guest_history",
+   "main.invoice",
+   "main.invoice_detail_api",
+   "main.load_dashboard_tab",
+   "main.load_tab",
+   "main.nightly_rate_inspector",
+   "main.reservation_folio",
+   "portal.view_submission",
+   "pos.room_charges_api",
+   "reports.daily_reconciliation",
+   "reports.flash_report",
+   "reports.front_office_mis",
+   "reports.occupancy",
+   "reports.payment_collection",
+   "reports.revenue"
+  ]
+ },
+ "gained": [
+  "main.checkout",
+  "main.reservation_folio",
+  "pos.room_charges_api"
+ ],
+ "still_unresolved_on_dataset": [
+  "groups.detail",
+  "main.company_detail",
+  "main.get_company_credit"
+ ],
+ "lost": [
+  "reports.night_audit_snapshot"
+ ],
+ "lost_reason": "production has one night_audit_logs row; this dataset declares no night audit. A hand-written snapshot would have to satisfy INV-B02 (snapshot_hash equals a recomputation of snapshot_json) and INV-B03 (recomputing the closed day reproduces the frozen figures). Recorded, not faked.",
+ "net": "+3 resolved, -1 lost, 4 still UNRESOLVED on the dataset vs 6 on production",
+ "document_corrections": {
+  "WAVE0_STATUS.md section 4.1": "said 4 UNRESOLVED",
+  "D2_COMPLETION_REPORT.md section 10": "said 5 UNRESOLVED",
+  "measured": 6
+ }
+}

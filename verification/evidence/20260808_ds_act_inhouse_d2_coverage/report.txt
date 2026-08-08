@@ -1,0 +1,31 @@
+D2 GOLDEN-MASTER COVERAGE - DS-ACT-INHOUSE@1.0 vs production
+==================================================================
+
+D2 golden-master coverage of DS-ACT-INHOUSE@1.0 vs production. Produced by hand: D6 cannot declare a D2 expectation (see D6_STEP2_DS_ACT_INHOUSE.md section 5).
+
+Method: python -m verification _gm_capture_json --db verification/_work/datasets/DS-ACT-INHOUSE_1.0.db, compared against masters/production/index.json
+Dataset content hash: 061b19c2df20e765
+
+  production          158 surfaces captured, 6 UNRESOLVED
+  DS-ACT-INHOUSE@1.0  160 surfaces captured, 4 UNRESOLVED
+
+GAINED (+3)
+   main.checkout
+   main.reservation_folio
+   pos.room_charges_api
+
+LOST (-1)
+   reports.night_audit_snapshot
+   reason: production has one night_audit_logs row; this dataset declares no night audit. A hand-written snapshot would have to satisfy INV-B02 (snapshot_hash equals a recomputation of snapshot_json) and INV-B03 (recomputing the closed day reproduces the frozen figures). Recorded, not faked.
+
+STILL UNRESOLVED ON THE DATASET
+   groups.detail
+   main.company_detail
+   main.get_company_credit
+
+NET: +3 resolved, -1 lost, 4 still UNRESOLVED on the dataset vs 6 on production
+
+DOCUMENT CORRECTIONS
+   WAVE0_STATUS.md section 4.1                said 4 UNRESOLVED
+   D2_COMPLETION_REPORT.md section 10         said 5 UNRESOLVED
+   measured                                   6

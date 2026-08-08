@@ -1,0 +1,409 @@
+====================================================================================================
+DSBC FRONTLINE — FINANCIAL INVARIANT ENGINE
+Production Verification Framework, Wave 0 Deliverable 4
+====================================================================================================
+Started           : 2026-08-08T07:26:23
+Duration          : 2.0s
+Application       : v2.2.18
+PVF               : v0.5.0
+Mode / scope      : ENTIRE_DATABASE
+Business date     : 2026-05-28
+Clock frozen at   : 2026-05-28T12:00:00
+
+----------------------------------------------------------------------------------------------------
+CONTROLS (Principle 11 — positive evidence, not silence)
+----------------------------------------------------------------------------------------------------
+Source database   : C:\Users\SIPL Server\Downloads\DSS\SukoonPMS\SukoonPMS\instance\pms.db
+Copy method       : sqlite-backup-api
+SHA-256 before    : f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c
+SHA-256 after     : f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c
+  read-only       : VERIFIED — production byte-identical after run
+  zero writes     : VERIFIED — 0 write statements counted across the whole registry
+  frozen clock    : proven
+  repeatable      : VERIFIED — a second evaluation produced identical findings
+  order independent: VERIFIED — reverse-order evaluation produced identical findings
+  commissioning   : VERIFIED — every COMMISSIONED claim is backed by 20260804_172142_inv_commission
+
+----------------------------------------------------------------------------------------------------
+SUMMARY
+----------------------------------------------------------------------------------------------------
+  Registered        : 24
+  HOLDS             : 14
+  VIOLATED          : 6
+  VACUOUS           : 4
+  NOT_APPLICABLE    : 0
+  ERROR             : 0
+  Violations found  : 57
+  Uncommissioned    : 0  (reported, but excluded from the verdict)
+
+  OVERALL VERDICT   : FAIL
+  Release blocking  : 2
+  Cert. blocking    : 5
+
+====================================================================================================
+FAILURE REPORT — 6 invariant(s) violated
+====================================================================================================
+
+----------------------------------------------------------------------------------------------------
+INV-B03  [CRITICAL / RELEASE_BLOCKING]  Recomputing a closed day reproduces the figures it reported
+----------------------------------------------------------------------------------------------------
+  What it means:
+      A closed day no longer computes the figures it reported. History has changed.
+  Why it matters:
+      This is the whole point of closing a day. If recomputing 27 May today gives a different
+      answer from the one reported on the night of 27 May, then the accounts and the system
+      disagree about a period that is supposed to be settled, and every downstream consumer of
+      that figure is now wrong.
+  Financial impact  : 199.99 (sum of the amounts carried by the violating rows)
+  Population        : 8
+  Violations        : 1
+  Confidence        : PROVEN
+  Observed          : closed-day figures: 1 of 8 row(s) violate the rule
+  Constitutional    : P2, P4, P7, P8, P12
+  Reports affected  :
+      - night audit
+      - reports.revenue
+      - reports.daily_reconciliation
+  Root cause candidates:
+      - A present-tense field — Reservation.status, Room.status, a credit balance — used inside a date-scoped report
+      - Data posted into the period after it closed (see INV-B01)
+      - A change to a canonical engine that was never replayed against history
+  Recommended investigation:
+      - Run the D3 replay for the date; it attributes the movement to a dotted path
+      - Check INV-B01 for the same date first — a back-dated posting explains this without any code being at fault
+      - Look for query filters that use the reservation status rather than the stay span
+  Affected objects:
+      night_audit 2026-05-27 / outstanding
+          expected 0.16 (frozen at close)
+          observed 200.15 (recomputed today)   (amount 199.99)
+
+----------------------------------------------------------------------------------------------------
+INV-C01  [CRITICAL / CERTIFICATION_BLOCKING]  A walk-in reservation is never settled through an OTA receivable
+----------------------------------------------------------------------------------------------------
+  What it means:
+      Walk-in reservations carry OTA receivable postings. Money is booked as owed by an agent
+      that was never involved.
+  Why it matters:
+      An OTA receivable posting says "a travel agent owes us this money and will remit it".
+      For a guest who walked in off the street there is no agent, so the posting creates a
+      receivable against nobody. The cash was either taken at the desk and is now missing from
+      the cash figure, or it was never taken at all.
+  Financial impact  : 7977.92 (sum of the amounts carried by the violating rows)
+  Population        : 5
+  Violations        : 5
+  Confidence        : PROVEN
+  Observed          : 5 of 5 OTA posting(s) sit on walk-in bookings, carrying 7977.92
+  Variance          : 7977.92
+  Constitutional    : P5, P11
+  Reports affected  :
+      - reports.ota_reconciliation
+      - reports.ar_aging
+      - reports.flash
+      - night audit payment summary
+  Root cause candidates:
+      - The payment mode list is presented unfiltered at the desk, so an OTA head can be picked for any booking
+      - A booking imported from an OTA whose source was overwritten to walk-in during check-in
+      - Test or seed data that was never cleaned out
+  Recommended investigation:
+      - Check whether ota_channel or ota_booking_id is set on the affected reservations — if not, the OTA head is certainly wrong
+      - Confirm whether the desk UI restricts payment modes by booking source
+      - Compare the total against the OTA receivable balance being chased
+  Affected objects:
+      payment 7
+          expected an OTA head only on an OTA booking
+          observed Other OTA Paid on reservation 7 with source 'Walk-in'   (amount 1435.5)
+      payment 10
+          expected an OTA head only on an OTA booking
+          observed MMT Paid on reservation 10 with source 'Walk-in'   (amount 1700.15)
+      payment 11
+          expected an OTA head only on an OTA booking
+          observed EaseMyTrip Paid on reservation 11 with source 'Walk-in'   (amount 1611.99)
+      payment 19
+          expected an OTA head only on an OTA booking
+          observed Goibibo Paid on reservation 17 with source 'Walk-in'   (amount 1700.15)
+      payment 33
+          expected an OTA head only on an OTA booking
+          observed MMT Paid on reservation 28 with source 'Walk-in'   (amount 1530.13)
+
+----------------------------------------------------------------------------------------------------
+INV-A02  [HIGH / CERTIFICATION_BLOCKING]  Every financial row belongs to a folio
+----------------------------------------------------------------------------------------------------
+  What it means:
+      Financial rows exist that belong to no folio. The money is real and its attribution is
+      not.
+  Why it matters:
+      A folio is the unit a bill is issued against and the unit a company or an OTA is
+      invoiced on. A payment or a charge that belongs to no folio still moves the hotel's
+      money, but it cannot be attributed to anything, cannot appear on a split bill, and
+      cannot be reconciled by anyone downstream.
+  Financial impact  : 40374.14 (sum of the amounts carried by the violating rows)
+  Population        : 40
+  Violations        : 40
+  Confidence        : PROVEN
+  Observed          : 35/35 payments and 5/5 charges are unrouted, carrying 40374.14
+  Variance          : 40374.14
+  Constitutional    : P1, P5
+  Reports affected  :
+      - main.reservation_folio
+      - billing.gst_report
+      - reports.daily_reconciliation
+      - night audit folio control
+  Root cause candidates:
+      - Posting paths that write a payment before a folio exists
+      - A folio-creation step that runs only on the check-in route
+      - Legacy rows predating the folio model, never backfilled
+  Recommended investigation:
+      - Group the unrouted rows by created_at to see whether they are legacy or still being produced today
+      - Trace the posting path for the most recent unrouted row
+      - Check whether folio creation is conditional on booking_type
+  Affected objects:
+      payment 1
+          expected folio_id set
+          observed folio_id NULL   (amount 2000)
+      payment 2
+          expected folio_id set
+          observed folio_id NULL   (amount 1200)
+      payment 3
+          expected folio_id set
+          observed folio_id NULL   (amount 1300)
+      payment 4
+          expected folio_id set
+          observed folio_id NULL   (amount 1200)
+      payment 5
+          expected folio_id set
+          observed folio_id NULL   (amount 1300)
+      payment 6
+          expected folio_id set
+          observed folio_id NULL   (amount 1500)
+      payment 7
+          expected folio_id set
+          observed folio_id NULL   (amount 1435.5)
+      payment 8
+          expected folio_id set
+          observed folio_id NULL   (amount 1200)
+      payment 9
+          expected folio_id set
+          observed folio_id NULL   (amount 1500)
+      payment 10
+          expected folio_id set
+          observed folio_id NULL   (amount 1700.15)
+      payment 11
+          expected folio_id set
+          observed folio_id NULL   (amount 1611.99)
+      payment 12
+          expected folio_id set
+          observed folio_id NULL   (amount 2600)
+      payment 13
+          expected folio_id set
+          observed folio_id NULL   (amount 300)
+      payment 14
+          expected folio_id set
+          observed folio_id NULL   (amount 700)
+      payment 15
+          expected folio_id set
+          observed folio_id NULL   (amount 1300)
+      payment 16
+          expected folio_id set
+          observed folio_id NULL   (amount 0.5)
+      payment 17
+          expected folio_id set
+          observed folio_id NULL   (amount 800)
+      payment 18
+          expected folio_id set
+          observed folio_id NULL   (amount 1200)
+      payment 19
+          expected folio_id set
+          observed folio_id NULL   (amount 1700.15)
+      payment 20
+          expected folio_id set
+          observed folio_id NULL   (amount 1200)
+      payment 21
+          expected folio_id set
+          observed folio_id NULL   (amount 1000)
+      payment 22
+          expected folio_id set
+          observed folio_id NULL   (amount 200)
+      payment 23
+          expected folio_id set
+          observed folio_id NULL   (amount 1200)
+      payment 24
+          expected folio_id set
+          observed folio_id NULL   (amount 1300)
+      payment 25
+          expected folio_id set
+          observed folio_id NULL   (amount 1000)
+      ... 15 more (see result.json)
+
+----------------------------------------------------------------------------------------------------
+INV-A03  [HIGH / RELEASE_BLOCKING]  Charges summed over folios equal charges summed over reservations
+----------------------------------------------------------------------------------------------------
+  What it means:
+      The folio and reservation views of the same charges disagree.
+  Why it matters:
+      The same money must total the same whichever way it is sliced. If the folio view and the
+      reservation view of the same charges differ, then at least one report in the system is
+      showing a number that does not exist.
+  Financial impact  : 729.85 (sum of the amounts carried by the violating rows)
+  Population        : 5
+  Violations        : 5
+  Confidence        : PROVEN
+  Observed          : reservation view 729.85, folio view 0.00
+  Variance          : -729.85
+  Constitutional    : P1, P5
+  Reports affected  :
+      - main.reservation_folio
+      - reports.revenue
+      - night audit folio control
+  Root cause candidates:
+      - A charge whose folio belongs to a different reservation
+      - Charges with folio_id NULL falling out of the folio view
+      - A folio whose reservation_id was repointed
+  Recommended investigation:
+      - List charges whose folio.reservation_id differs from their own reservation_id
+      - Check INV-A02 first — unrouted rows are the usual cause
+  Affected objects:
+      extra_charge 1
+          expected reachable through a folio
+          observed folio missing or unset   (amount 0.15)
+      extra_charge 2
+          expected reachable through a folio
+          observed folio missing or unset   (amount 0.15)
+      extra_charge 3
+          expected reachable through a folio
+          observed folio missing or unset   (amount 291.45)
+      extra_charge 4
+          expected reachable through a folio
+          observed folio missing or unset   (amount 190.48)
+      extra_charge 5
+          expected reachable through a folio
+          observed folio missing or unset   (amount 247.62)
+
+----------------------------------------------------------------------------------------------------
+INV-C04  [HIGH / CERTIFICATION_BLOCKING]  No room is occupied by two reservations on the same night
+----------------------------------------------------------------------------------------------------
+  What it means:
+      A room is recorded as occupied by more than one reservation on the same night. Occupancy
+      and rate metrics for that night are overstated.
+  Why it matters:
+      Two guests cannot sleep in one room. A double allocation means either a guest was moved
+      and the record not updated, or the same room night was sold twice — and if it was sold
+      twice, occupancy, ADR and RevPAR are all overstated for that night.
+  Financial impact  : 0 (sum of the amounts carried by the violating rows)
+  Population        : 30
+  Violations        : 1
+  Confidence        : PROVEN
+  Observed          : 1 clash(es) across 30 occupied room-night(s)
+  Constitutional    : P5, P11
+  Reports affected  :
+      - reports.room_status_report
+      - night audit occupancy
+      - main.dashboard
+      - reports.front_office_mis
+  Root cause candidates:
+      - A room move that assigned the new room without releasing the old
+      - An allocation route with no availability check
+      - A group booking assigned to one room by default
+  Recommended investigation:
+      - Read the reservation_rooms bridge rows for the affected stays — a split-room stay may be modelled there rather than on the reservation
+      - Check the created_at of the two reservations to see which was later
+      - Compare against the night audit occupancy for that date
+  Affected objects:
+      room_night room 21 / 2026-05-28
+          expected one reservation
+          observed 2 reservations: 20, 27
+
+----------------------------------------------------------------------------------------------------
+INV-C05  [MEDIUM / OPERATIONAL_WARNING]  An OTA settlement identifies the agent it will be collected from
+----------------------------------------------------------------------------------------------------
+  What it means:
+      OTA receivables exist that cannot be attributed to an agent.
+  Why it matters:
+      An OTA receivable is only collectable if the hotel knows which agent owes it and against
+      which booking reference. Without a channel and a booking id the receivable cannot be
+      reconciled against the agent's remittance, and it sits on the ledger indefinitely.
+  Financial impact  : 7977.92 (sum of the amounts carried by the violating rows)
+  Population        : 5
+  Violations        : 5
+  Confidence        : PROVEN
+  Observed          : reservations with OTA postings: 5 of 5 row(s) violate the rule
+  Constitutional    : P5, P10
+  Reports affected  :
+      - reports.ota_reconciliation
+      - reports.ota_settlement
+      - reports.ar_aging
+  Root cause candidates:
+      - A manual OTA posting at the desk with no import behind it
+      - An import that maps the amount but not the channel
+      - A booking whose source was edited after import
+  Recommended investigation:
+      - Check whether the affected reservations came through an import or were created at the desk
+      - Compare against the OTA settlement report to see whether these receivables have ever been collected
+  Affected objects:
+      reservation 7
+          expected ota_channel and ota_booking_id set
+          observed missing ota_channel, ota_booking_id   (amount 1435.5)
+      reservation 10
+          expected ota_channel and ota_booking_id set
+          observed missing ota_channel, ota_booking_id   (amount 1700.15)
+      reservation 11
+          expected ota_channel and ota_booking_id set
+          observed missing ota_channel, ota_booking_id   (amount 1611.99)
+      reservation 17
+          expected ota_channel and ota_booking_id set
+          observed missing ota_channel, ota_booking_id   (amount 1700.15)
+      reservation 28
+          expected ota_channel and ota_booking_id set
+          observed missing ota_channel, ota_booking_id   (amount 1530.13)
+
+====================================================================================================
+NOT PROVEN — evaluated but not exercised
+====================================================================================================
+These invariants did not fail. They also did not pass: the
+population was empty, or the mode does not apply. Under P10
+absence of data is not evidence of correctness, and reporting
+them as green would make the engine exactly the kind of control
+that cannot fail.
+  [VACUOUS        ] INV-A06  A guest who has paid more than they owe has an overpayment record
+      overpaid reservations: no rows in scope
+  [VACUOUS        ] INV-C06  Corporate credit is backed by a company account that exists
+      no folio names a company and no reservation is flagged corporate; the rule was not exercised
+  [VACUOUS        ] INV-D02  Every correction and reversal references the transaction it corrects
+      no correction or reversal rows exist, so the rule was not exercised. The signing logic in signed_extra_charge_amount is therefore also untested by live data
+  [VACUOUS        ] INV-D05  Every void request and credit note references what it cancels
+      no void requests and no credit notes exist, so the rule was not exercised
+
+====================================================================================================
+PERFORMANCE AND SAFETY
+====================================================================================================
+ID        STATUS              POP  VIOL     ms   reads  writes    rows  peak KB  TITLE
+----------------------------------------------------------------------------------------------------
+INV-A01   HOLDS                28     0    135     169       0       0     1300  Settlement identity: grand total -
+INV-A02   VIOLATED             40    40      1       4       0      42       18  Every financial row belongs to a f
+INV-A03   VIOLATED              5     5      0       1       0       5        2  Charges summed over folios equal c
+INV-A04   HOLDS                35     0      3       5       0      37       79  Daily collections equal the direct
+INV-A05   HOLDS                66     0      0       1       0      66       20  Every stored tax line equals its t
+INV-A06   VACUOUS               0     0    104     171       0       3      417  A guest who has paid more than the
+INV-B01   HOLDS                17     0      0       3       0      18        5  No financial row was created into 
+INV-B02   HOLDS                 1     0      4       1       0       0      138  Every frozen night-audit snapshot 
+INV-B03   VIOLATED              8     1    275      83       0       0     4645  Recomputing a closed day reproduce
+INV-B04   HOLDS                 1     0      0       4       0       1       11  Exactly one business date exists a
+INV-B05   HOLDS                 1     0      0       2       0       2        1  Night audits form an unbroken sequ
+INV-B06   HOLDS                35     0      0       1       0      35       11  A payment is never dated outside t
+INV-C01   VIOLATED              5     5      0       1       0       5        4  A walk-in reservation is never set
+INV-C02   HOLDS                28     0     95     129       0       1      643  A checked-out reservation is settl
+INV-C03   HOLDS               106     0      0       9       0       6        4  Every financial event belongs to a
+INV-C04   VIOLATED             30     1      0       1       0      28       11  No room is occupied by two reserva
+INV-C05   VIOLATED              5     5      0       1       0       5        2  An OTA settlement identifies the a
+INV-C06   VACUOUS               0     0      0       4       0       2        1  Corporate credit is backed by a co
+INV-D01   HOLDS                28     0      0       2       0       1        1  Every folio references a reservati
+INV-D02   VACUOUS               0     0      0       4       0       2        2  Every correction and reversal refe
+INV-D03   HOLDS                35     0      0       3       0      13        4  Every payment references a payment
+INV-D04   HOLDS                66     0      2      67       0     132       23  Every tax line names the charge it
+INV-D05   VACUOUS               0     0      0       6       0       4        3  Every void request and credit note
+INV-D06   HOLDS                30     0      0       2       0      31        9  Every priced room night belongs to
+----------------------------------------------------------------------------------------------------
+TOTAL                                57    619     674       0     439     4645
+
+====================================================================================================
+END OF REPORT
+====================================================================================================

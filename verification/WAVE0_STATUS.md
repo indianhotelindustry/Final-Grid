@@ -20,7 +20,7 @@ commissioned.** Five are. Wave 0 is half done.
 | D3 | Historical Replay Framework | Complete | 21 / 21 |
 | D4 | Financial Invariant Engine | Complete | 26 / 26 |
 | D5 | Fault Injection Platform | Complete | 37 / 37 |
-| D6 | Regression Dataset Framework | **Step 1 complete + probe remediation; no datasets declared** | — |
+| D6 | Regression Dataset Framework | **Step 2 begun — 1 dataset of 6 declared and commissioned** | 1 / 1 |
 | D7 | Certification Engine | Not started | — |
 | D8 | CI/CD Verification Pipeline | Not started | — |
 | D9 | Backup Restore Verification | **Blocked** | — |
@@ -33,7 +33,8 @@ Live registry counts, 2026-08-07:
 | Parity quantities (D1) | 22 — `Q01`–`Q22` |
 | Invariants (D4) | 24 — 6 each in classes A/B/C/D, **all 24 COMMISSIONED** |
 | Faults (D5) | 40 — 10 each in classes A/B/C/D; 36 COMMISSIONED, 4 UNCOVERED |
-| Golden master surfaces (D2) | 158 |
+| Regression datasets (D6) | 1 — `DS-ACT-INHOUSE@1.0`, COMMISSIONED (2026-08-08) |
+| Golden master surfaces (D2) | 158 — 6 UNRESOLVED |
 | Replayed business dates (D3) | 28 |
 | Retained evidence packs | 80 |
 | Constitutional principles enforced | 14 — no principle uncovered |
@@ -172,7 +173,7 @@ reads and reports; nothing repairs.
 | Corporate credit backing | D4 | VACUOUS |
 | Correction/reversal traceability | D4 | VACUOUS |
 | Void/credit-note traceability | D4 | VACUOUS |
-| 4 golden master surfaces | D2 | UNRESOLVED — no checked-in reservation to pin them to |
+| **6** golden master surfaces | D2 | UNRESOLVED — 3 need a checked-in reservation, 2 a company, 1 a group block. `DS-ACT-INHOUSE` closes the first 3 **on the dataset**; production is unchanged |
 
 A commissioned rule over an empty population still proves nothing about
 the data (P10).
@@ -241,7 +242,8 @@ Recorded in the completion reports and not rediscovered here:
 
 ## 5. Blockers on Wave 1
 
-1. **D6–D10 do not exist.** Wave 1 is gated on all ten.
+1. **D6 is partial; D7–D10 do not exist.** Wave 1 is gated on all ten. D6
+   has its platform and one commissioned dataset of six.
 2. **D9 is blocked at the schema.** `backup_logs` stores filename, size
    and status but **no checksum**. `FLT-D04`/`FLT-D05` are undetectable
    until that changes — which requires a production schema change that
@@ -254,7 +256,9 @@ Recorded in the completion reports and not rediscovered here:
    current deliverable set.
 4. **The dataset is thin.** 733 KB production database, one closed
    business day. Every framework built so far measures a near-empty
-   population. This is the argument for D6.
+   population. This is the argument for D6, and one dataset does not
+   answer it — the four VACUOUS invariants are still VACUOUS, because
+   `DS-ACT-INHOUSE` activates none of them and said so.
 5. **Evidence lives inside the application.** Phase 2.6 §10 requires
    certification evidence to be exported outside it. Not automated; a
    release-process responsibility.
@@ -274,6 +278,7 @@ documents were **not present in the repository** and remain unrecovered.
 | `README.md` | Pre-existing, authoritative for framework usage |
 | `D1`–`D5` completion reports | Pre-existing, retained |
 | `D5_5_REMEDIATION_APPLIED.md` | Written 2026-08-08; records R-1/R-2/R-3/R-6 and four errors found in the D5.5 documents |
+| `D6_STEP2_DS_ACT_INHOUSE.md` | Written 2026-08-08; the first commissioned dataset, and the D2 measurement behind it |
 | Phase 1 Architecture Audit | **Absent** |
 | Phase 2 Financial Truth Certification | **Absent** |
 | Phase 2.5 Migration Blueprint | **Absent** |
@@ -319,17 +324,45 @@ are recorded in `D5_5_REMEDIATION_APPLIED.md` §8. The audit's final
 authoritative table is confirmed in full and remains the truth to declare
 against.
 
+### D6 Step 2 has begun — one dataset of six
+
+**`DS-ACT-INHOUSE@1.0` is COMMISSIONED**, all six elements, 2026-08-08.
+19 rows, 41 expectations, content hash `061b19c2df20e765`, deterministic
+across three builds. `ds-run` and `ds-commission` now exit 0 rather than 2.
+
+Report: `D6_STEP2_DS_ACT_INHOUSE.md`.
+
+Three things it established that were not known before:
+
+- **The gate rejected the first declaration.** It claimed `INV-C01: HOLDS`
+  where the population is empty and the answer is `VACUOUS`. Fixed by
+  correcting the declaration, not by adding data to make the number come
+  out right.
+- **A dataset can lose D2 coverage as well as gain it.** The first version
+  resolved 3 in-house surfaces and un-resolved 4 checked-out ones, because
+  `builder.strip()` replaces the transactional layer rather than adding to
+  it. The narrative now carries a departed stay as well: measured, +3 / −1.
+- **D6 cannot declare a D2 outcome at all.** `Expectations` has no element
+  for it and `Layer.D2_GOLDEN` is dead vocabulary. The dataset's main
+  purpose is the one thing the registry cannot check.
+
 ### The next piece of work
 
-**D6 Step 2.** Cheapest dataset first: `DS-ACT-INHOUSE` (resolves D2's four
-UNRESOLVED surfaces and costs almost nothing), then `DS-ACT-OVERPAY`, then
-the rest. One dataset at a time, each commissioned before the next.
-**Do not write six datasets and then try to commission them** — the gate
-is the part most likely to reveal that a declaration was wrong.
+**`DS-ACT-OVERPAY`, and R-4 and R-5 must land first.** R-4 is a full Class
+D invariant declaration with a commissioning obligation — treat it as D4
+work, not a footnote. R-5 is the owner decision below, and it is genuinely
+blocking here rather than advisory: the ₹1.00 threshold determines what
+the dataset has to produce to enter `INV-A06`'s population at all.
 
-**R-4 must land before `DS-ACT-OVERPAY`,** not before `DS-ACT-INHOUSE`. It
-is a full Class D invariant declaration with a commissioning obligation —
-treat it as D4 work. `DS-ACT-OVERPAY` also needs the R-5 decision below.
+Then `DS-ACT-CORPCREDIT` (closes 2 more D2 surfaces), `DS-ACT-CORRECTION`,
+`DS-ACT-VOIDCN`, `DS-ACT-SHIFT`. One dataset at a time, each commissioned
+before the next. **Do not write five datasets and then try to commission
+them** — the gate is the part most likely to reveal that a declaration was
+wrong, and on the first dataset it was.
+
+**`DS-ACT-GROUP` is missing from the plan.** `groups.detail` is UNRESOLVED,
+`group_blocks` is empty, and no planned dataset covers it. Add one or
+record the surface as permanently unresolved.
 
 ### Decisions waiting on the project owner
 

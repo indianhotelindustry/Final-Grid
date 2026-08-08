@@ -1,0 +1,46 @@
+{
+ "change": "verification/datasets/registry.py unbacked_commissioning_claims(): match commissioning packs by containment, not suffix",
+ "defect": "ds-commission writes {timestamp}_ds_commission_{tag} and only writes a pack when --tag is given, so endswith('_ds_commission') could never match. Every COMMISSIONED dataset would be reported as an unbacked claim forever.",
+ "why_step1_missed_it": "with an empty registry there are no claimants and the function returns before reading the evidence directory. It surfaced on DS-ACT-INHOUSE, the first dataset to declare COMMISSIONED.",
+ "commissioning": "7 cases, EVIDENCE_DIR pointed at a throwaway directory each time. The repaired check must give different answers for different evidence states, not merely find something.",
+ "cases": [
+  {
+   "state": "no packs at all",
+   "required": "claim reported",
+   "result": "PASS"
+  },
+  {
+   "state": "tagged pack, dataset passed",
+   "required": "claim backed",
+   "result": "PASS"
+  },
+  {
+   "state": "tagged pack, dataset passed",
+   "required": "names the pack it read",
+   "result": "PASS"
+  },
+  {
+   "state": "tagged pack, dataset FAILED",
+   "required": "claim reported",
+   "result": "PASS"
+  },
+  {
+   "state": "older pack passed, latest failed",
+   "required": "claim reported",
+   "result": "PASS"
+  },
+  {
+   "state": "older pack failed, latest passed",
+   "required": "claim backed",
+   "result": "PASS"
+  },
+  {
+   "state": "only a ds_registry pack present",
+   "required": "claim reported",
+   "result": "PASS"
+  }
+ ],
+ "checks": 7,
+ "failed": 0,
+ "after": "ds-registry reports 0 unbacked claims and names evidence/20260808_072941_ds_commission_step2_inhouse"
+}
