@@ -377,6 +377,23 @@ class Dataset:
     perturbation: tuple = ()
     perturbation_breaks: tuple = ()   # expectation targets it must break
 
+    #: The coverage movement this dataset intends, against production.
+    #: Keys are ``coverage.EXPECTATION_KEYS``; values are tuples of
+    #: endpoint or invariant ids.
+    #:
+    #: Separate from ``expectations`` because it is a different kind of
+    #: claim. ``expectations`` says what each layer should CONCLUDE about
+    #: this data; this says what the dataset can EXERCISE at all. A
+    #: dataset can meet every expectation it declares while silently
+    #: covering less than production did — which is exactly what
+    #: ``DS-ACT-INHOUSE`` did in its first version, resolving three
+    #: golden-master surfaces and un-resolving four.
+    #:
+    #: Empty means "no movement declared", and then any movement at all is
+    #: reported as unexpected. That is the intended default for a dataset
+    #: nobody has thought about yet, not a way to opt out.
+    coverage_expectation: dict = field(default_factory=dict)
+
     commissioning_status: str = Commissioning.NOT_COMMISSIONED
     certification_status: str = Certification.UNCERTIFIED
 

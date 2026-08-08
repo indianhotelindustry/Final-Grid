@@ -1,0 +1,44 @@
+==============================================================================
+COVERAGE LEDGER — DS-ACT-INHOUSE@1.0
+baseline: production
+==============================================================================
+
+COVERAGE ADDED (3)
+  + surface    main.checkout__inhouse_reservation
+  + surface    main.reservation_folio__inhouse_reservation
+  + surface    pos.room_charges_api__inhouse_reservation
+
+COVERAGE LOST (9)
+  - surface    reports.night_audit_snapshot__night_audit_log
+  - invariant  INV-A03  (population fell to zero)
+  - invariant  INV-B01  (population fell to zero)
+  - invariant  INV-B02  (population fell to zero)
+  - invariant  INV-B03  (population fell to zero)
+  - invariant  INV-B05  (population fell to zero)
+  - invariant  INV-C01  (population fell to zero)
+  - invariant  INV-C05  (population fell to zero)
+  - invariant  INV-D07  (population fell to zero)
+
+COVERAGE CHANGED (12)
+    INV-A01    HOLDS over 28 -> HOLDS over 2
+  ! INV-A02    VIOLATED over 40 -> HOLDS over 2
+    INV-A04    HOLDS over 35 -> HOLDS over 2
+    INV-A05    HOLDS over 66 -> HOLDS over 6
+    INV-B06    HOLDS over 35 -> HOLDS over 2
+    INV-C02    HOLDS over 28 -> HOLDS over 1
+    INV-C03    HOLDS over 106 -> HOLDS over 8
+  ! INV-C04    VIOLATED over 30 -> HOLDS over 3
+    INV-D01    HOLDS over 28 -> HOLDS over 2
+    INV-D03    HOLDS over 35 -> HOLDS over 2
+    INV-D04    HOLDS over 66 -> HOLDS over 6
+    INV-D06    HOLDS over 30 -> HOLDS over 3
+
+EXPECTED vs UNEXPECTED
+  every movement was declared, and every declared movement happened
+
+VERDICT: AS_DECLARED
+
+Not measured: D1 parity and D3 replay. Both are per-quantity and
+per-date rather than per-entity, and a coverage delta over them
+needs a definition of "covered" this module would have to invent.
+==============================================================================

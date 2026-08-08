@@ -542,6 +542,51 @@ _CASH = 1                 # payment mode 1, category direct_payment.
         'INV-A02',
     ),
 
+    # -- the coverage ledger ---------------------------------------------
+    #
+    # BACKFILLED from measurement, 2026-08-08, and it is the only one that
+    # will be. This dataset was commissioned before the ledger existed, so
+    # its declaration was written against `ds-coverage` output rather than
+    # ahead of it. DS-ACT-GROUP onward declare first and are measured
+    # after, which is the only order in which the ledger can catch
+    # anything.
+    #
+    # Every entry below traces to the narrative, so the backfill is a
+    # record of consequences that were already implied rather than a
+    # transcription of whatever the tool happened to print:
+    coverage_expectation={
+        # The three surfaces that need a CheckedIn reservation. This is the
+        # dataset's stated purpose and the D2 claim the registry cannot
+        # check for itself.
+        'surfaces_added': (
+            'main.checkout__inhouse_reservation',
+            'main.reservation_folio__inhouse_reservation',
+            'pos.room_charges_api__inhouse_reservation',
+        ),
+        # The narrative declares no night audit, so there is no
+        # night_audit_logs row for the snapshot surface to pin to. Stated
+        # in the report as the one loss that is not worked around.
+        'surfaces_lost': (
+            'reports.night_audit_snapshot__night_audit_log',
+        ),
+        # Eight invariants lose their population. Each follows from
+        # something the narrative does not contain, and none of them was
+        # visible before the ledger existed:
+        'invariants_deactivated': (
+            'INV-A03',   # no extra_charges at all, so nothing to group
+            'INV-B01',   # no night audit
+            'INV-B02',   # no night audit -> no snapshot to hash
+            'INV-B03',   # no night audit -> no closed day to recompute
+            'INV-B05',   # no night audit -> no audit sequence
+            'INV-C01',   # both stays pay cash, so no OTA head is involved
+            'INV-C05',   # same population as INV-C01
+            'INV-D07',   # no overpayment_logs row
+        ),
+        # Nothing is activated. An in-house stay lifts none of the four
+        # VACUOUS invariants, which is why ACTIVATION reports 0 claims.
+        'invariants_activated': (),
+    },
+
     principles=('P9', 'P10', 'P14'),
     modes=(Mode.REGRESSION, Mode.CONTINUOUS_VERIFICATION),
 

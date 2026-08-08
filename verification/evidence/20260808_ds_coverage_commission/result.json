@@ -1,0 +1,44 @@
+{
+ "purpose": "Commission the coverage ledger classifier. It reported AS_DECLARED on the first dataset it was pointed at, which is the answer it was built to give - so it is not evidence until it has been shown to give different answers (P9).",
+ "method": "compare() driven against synthetic Snapshots. No database touched.",
+ "groups": [
+  {
+   "group": "four kinds of movement",
+   "cases": [
+    "identical snapshots are AS_DECLARED",
+    "undeclared addition is reported",
+    "undeclared loss is reported (the case the ledger exists for)",
+    "declared loss is clean",
+    "declared-but-absent fails, reported separately from unexpected"
+   ]
+  },
+  {
+   "group": "population, not status, decides coverage",
+   "cases": [
+    "HOLDS over 0 counts as deactivated even though the status did not move",
+    "a population appearing counts as activated"
+   ]
+  },
+  {
+   "group": "status change read against expectations.invariants",
+   "cases": [
+    "a declared status change is clean",
+    "an undeclared one is not",
+    "declaring the WRONG status does not excuse it"
+   ]
+  },
+  {
+   "group": "population movement without status movement",
+   "cases": [
+    "reported as Changed, not Lost, and does not by itself fail the ledger"
+   ]
+  }
+ ],
+ "checks": 21,
+ "failed": 0,
+ "design_notes": {
+  "surface_granularity": "keyed as endpoint__resolver, not collapsed to endpoint. The first version collapsed them and reported no gain for main.reservation_folio, whose inhouse_reservation variant had never resolved. Collapsing also hides an endpoint keeping one working variant while another stops resolving.",
+  "date_normalisation": "dates in surface keys are normalised to YYYY_MM_DD. Report surfaces are pinned to the business date, so comparing literally produced 6 spurious additions and 6 spurious losses on every dataset. A surface that does not resolve at all is still reported as lost.",
+  "declared_statuses": "expectations.invariants is consulted rather than duplicated in coverage_expectation, so one intent is not declared twice in two places that can drift."
+ }
+}

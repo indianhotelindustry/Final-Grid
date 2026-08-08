@@ -186,6 +186,26 @@ def _validate(d: Dataset) -> None:
                     f'{d.key}: expects quantity {quantity_id}, which is not '
                     f'in the D1 registry.')
 
+    # A misspelled coverage key would read as "expected nothing" and turn
+    # every real movement into an unexpected one, which is the failure mode
+    # that makes a ledger noisy enough to be ignored.
+    from verification.datasets.coverage import EXPECTATION_KEYS
+    unknown_coverage = sorted(set(d.coverage_expectation) -
+                              set(EXPECTATION_KEYS))
+    if unknown_coverage:
+        raise RegistrationError(
+            f'{d.key}: coverage_expectation has unknown key(s): '
+            f'{", ".join(unknown_coverage)}. Known: '
+            f'{", ".join(EXPECTATION_KEYS)}')
+
+    known_invariants_for_coverage = _known_invariant_ids()
+    for key in ('invariants_activated', 'invariants_deactivated'):
+        for invariant_id in d.coverage_expectation.get(key) or ():
+            if invariant_id not in known_invariants_for_coverage:
+                raise RegistrationError(
+                    f'{d.key}: coverage_expectation.{key} names '
+                    f'{invariant_id}, which is not in the D4 registry.')
+
     declared = set(d.perturbation_breaks)
     targets = (set(d.expectations.financial) | set(d.expectations.invariants)
                | set(d.expectations.replay) | set(d.expectations.parity)

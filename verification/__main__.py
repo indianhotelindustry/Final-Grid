@@ -533,6 +533,74 @@ def _cmd_ds_run(args) -> int:
     return 1 if failed else 0
 
 
+def _cmd_ds_coverage(args) -> int:
+    """Measure what a dataset adds, loses and changes against production.
+
+    Exit 0 when coverage moved exactly as the dataset declared, 1 when it
+    did not. An undeclared loss is a failure and not a warning: a dataset
+    that quietly stops covering something while still reporting PASS on
+    every expectation it declared is the specific failure this ledger was
+    built after.
+    """
+    import datetime as _dt
+
+    from verification.config import PRODUCTION_DB
+    from verification.datasets import builder, coverage, registry
+    from verification.datasets import report as dsreport
+    from verification.dbcopy import make_copy, production_fingerprint
+
+    started_at = _dt.datetime.utcnow().replace(microsecond=0).isoformat()
+    d = registry.get(args.id)
+
+    before, _size = production_fingerprint(PRODUCTION_DB)
+
+    # Production is measured through a copy, never the live file: the
+    # golden-master capture drives the application, and pointing that at
+    # production to establish a baseline would put the thing being
+    # protected in the path of the measurement.
+    print(f'[cov] measuring production baseline ...')
+    handle = make_copy(name='coverage_baseline.db', source=PRODUCTION_DB)
+    baseline = coverage.measure(handle.copy_path, 'production')
+
+    print(f'[cov] building and measuring {d.key} ...')
+    materialisation = builder.build(d, slot='_coverage')
+    if not materialisation.ok:
+        print(f'[cov] ERROR: {materialisation.error}')
+        return 3
+    try:
+        snapshot = coverage.measure(materialisation.db_path, d.key)
+    finally:
+        builder.discard(materialisation)
+
+    delta = coverage.compare(baseline, snapshot, d.coverage_expectation,
+                             d.expectations.invariants)
+    text = coverage.render(delta)
+    print()
+    print(text)
+
+    after, _size = production_fingerprint(PRODUCTION_DB)
+    if after != before:
+        print('[cov] PRODUCTION CHANGED during measurement. Result void.')
+        return 4
+
+    if args.tag:
+        payload = {'started_at': started_at,
+                   'dataset': d.key,
+                   'content_hash': materialisation.content_hash,
+                   'production_sha256': after,
+                   'production_unchanged': True,
+                   'baseline': baseline.as_dict(),
+                   'snapshot': snapshot.as_dict(),
+                   'declared': {k: list(v) for k, v in
+                                d.coverage_expectation.items()},
+                   'ledger': delta.as_dict()}
+        pack = dsreport.write_pack(payload, text, f'ds_coverage_{args.tag}',
+                                   started_at)
+        print(f'[cov] evidence pack: {pack}')
+
+    return 0 if delta.clean else 1
+
+
 def _cmd_ds_commission(args) -> int:
     """Prove every dataset can be made to fail."""
     from verification.datasets import commission
@@ -809,6 +877,13 @@ def main(argv=None) -> int:
     dk.add_argument('--tag', default='')
     dk.add_argument('--quiet', action='store_true')
     dk.set_defaults(fn=_cmd_ds_commission)
+
+    dv = sub.add_parser(
+        'ds-coverage',
+        help='what a dataset adds, loses and changes against production')
+    dv.add_argument('--id', required=True)
+    dv.add_argument('--tag', default='')
+    dv.set_defaults(fn=_cmd_ds_coverage)
 
     args = p.parse_args(argv)
     return args.fn(args)
