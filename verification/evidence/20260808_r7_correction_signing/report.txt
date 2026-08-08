@@ -1,0 +1,29 @@
+== neutral on production: no correction rows exist ==
+OK   payments_net                                         got 39644.29     want 39644.29
+OK   outstanding                                          got 199.92       want 199.92
+OK   extra_charges_net equals the gross                   got 729.85       want 729.85
+OK   charges_net                                          got 39844.21     want 39844.21
+OK   charges_net - payments_net == outstanding            got 199.92       want 199.92
+OK   correction rows on production                        got 0.00         want 0.00
+OK   reversal rows on production                          got 0.00         want 0.00
+
+== correct under an injected correction pair ==
+OK   extra_charges_total stays an unsigned gross          got 1929.85      want 1929.85
+OK   extra_charges_net nets the reversal out              got 929.85       want 929.85
+OK   payments_net nets the reversal out                   got 40244.29     want 40244.29
+OK   outstanding                                          got -200.08      want -200.08
+OK   charges_net - payments_net == outstanding            got -200.08      want -200.08
+
+== the pre-R-7 forms, on the same database ==
+OK   pre-R-7 payments_net overstates by 2x the reversal   got 2000.00      want 2000.00
+OK   pre-R-7 outstanding is wrong by                      got -1000.00     want -1000.00
+OK     and the probe now disagrees with it                got True         want True
+
+== the unsigned slices remain available ==
+OK   payments_reversals                                   got 1000.00      want 1000.00
+OK   payments_corrections (reversal + replacement)        got 1600.00      want 1600.00
+OK   extra_charges_reversals                              got 500.00       want 500.00
+
+OK   production byte-identical throughout                 got True         want True
+
+19 checks, 0 failed

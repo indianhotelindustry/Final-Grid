@@ -36,6 +36,41 @@ from decimal import Decimal, InvalidOperation
 
 TWO_PLACES = Decimal('0.01')
 
+# ---------------------------------------------------------------------------
+# Signing corrections and reversals — R-7
+# ---------------------------------------------------------------------------
+#
+# ``payments`` carries ``CHECK amount > 0`` and ``extra_charges`` carries
+# ``CHECK amount >= 0``, so a reversal cannot be stored as a negative
+# number. The application's answer, documented on both models and
+# implemented in ``services.signed_extra_charge_amount``, is to store the
+# reversal POSITIVE and require every caller to flip the sign:
+#
+#     REVERSAL     is_correction=1, is_reversal=1, amount = the original
+#     REPLACEMENT  is_correction=1, is_reversal=0, amount = the corrected
+#
+# A probe that sums ``amount`` unsigned therefore ADDS the reversed money
+# where the business meaning is to remove it, and is wrong by twice the
+# reversed amount on every correction.
+#
+# Measured before the fix, injecting one 500.00 charge correction and one
+# 1,000.00 payment correction into a copy of production:
+#
+#     extra_charges_total   1,929.85 against a truth of   929.85
+#     payments_net         42,244.29 against a truth of 40,244.29
+#     outstanding          -1,200.08 against a truth of  -200.08
+#
+# Production has zero correction rows, so this has never shown up — the
+# same way R-2's double count was invisible while zero night rates were
+# posted. ``DS-ACT-CORRECTION`` is the first thing that will produce this
+# shape, which is exactly why the probes had to be fixed before it declared
+# anything against them.
+SIGNED_AMOUNT = ('SUM(CASE WHEN COALESCE(is_reversal,0)=1 '
+                 'THEN -amount ELSE amount END)')
+SIGNED_PAYMENTS = f'SELECT {SIGNED_AMOUNT} FROM payments'
+SIGNED_CHARGES = f'SELECT {SIGNED_AMOUNT} FROM extra_charges'
+NOT_ROOM_RENT = "charge_type IS NULL OR charge_type <> 'room_rent'"
+
 
 def money(value) -> str:
     """Normalise any numeric to a two-place decimal string."""
@@ -78,9 +113,15 @@ PROBES = {
                        'SELECT SUM(amount) FROM payments'),
     'payments_voided': ('money',
                         'SELECT SUM(amount) FROM payments WHERE is_voided=1'),
-    'payments_net': ('money',
-                     'SELECT SUM(amount) FROM payments '
-                     'WHERE COALESCE(is_voided,0)=0'),
+    #: Net of voids AND of reversals. A reversal row carries the ORIGINAL
+    #: amount as a POSITIVE number — the ``CHECK amount > 0`` constraint
+    #: forbids anything else — and the application's rule is that "callers
+    #: that compute paid totals must SUBTRACT this row's amount"
+    #: (``services.post_payment_correction``). Summing it unsigned counts
+    #: the reversed money twice: once as collected and once as collected
+    #: again, when it should net to nothing.
+    'payments_net': ('money', SIGNED_PAYMENTS +
+                     ' WHERE COALESCE(is_voided,0)=0'),
     'payments_corrections': ('money',
                              'SELECT SUM(amount) FROM payments '
                              'WHERE COALESCE(is_correction,0)=1'),
@@ -107,6 +148,16 @@ PROBES = {
     'extra_charges_reversals': ('money',
                                 'SELECT SUM(amount) FROM extra_charges '
                                 'WHERE COALESCE(is_reversal,0)=1'),
+    #: The signed figures. ``extra_charges_total`` above stays an unsigned
+    #: gross on purpose — it answers "how much was raised", and a reversal
+    #: pair really did raise both rows. These answer "what is owed", which
+    #: is the question the balance is built from, and the two must not be
+    #: collapsed into one probe that silently means whichever the reader
+    #: assumed.
+    'extra_charges_net': ('money', SIGNED_CHARGES),
+    'extra_charges_non_room_rent_net': ('money',
+                                        f'{SIGNED_CHARGES} '
+                                        f'WHERE {NOT_ROOM_RENT}'),
     'room_revenue': ('money',
                      'SELECT SUM(final_rate) FROM reservation_night_rates'),
     'room_discount': ('money',
@@ -204,16 +255,25 @@ PROBES = {
     #: ``0 of 30`` night-rate rows are posted and the exclusion removes
     #: nothing; it is here so that the first night audit to post room rent
     #: does not silently double the balance.
+    #: Everything the hotel is owed, before anything it collected. Exposed
+    #: as its own probe so the balance is decomposable: when `outstanding`
+    #: moves, this says whether the charges or the collections moved.
+    'charges_net': ('money',
+                    'SELECT COALESCE((SELECT SUM(final_rate) '
+                    '                 FROM reservation_night_rates), 0) '
+                    f'     + COALESCE(({SIGNED_CHARGES} '
+                    f'                 WHERE {NOT_ROOM_RENT}), 0) '
+                    '     + COALESCE((SELECT SUM(tax_amount) '
+                    '                 FROM tax_lines), 0)'),
+
     'outstanding': ('money',
                     'SELECT COALESCE((SELECT SUM(final_rate) '
                     '                 FROM reservation_night_rates), 0) '
-                    '     + COALESCE((SELECT SUM(amount) '
-                    '                 FROM extra_charges '
-                    '                 WHERE charge_type IS NULL '
-                    "                    OR charge_type <> 'room_rent'), 0) "
+                    f'     + COALESCE(({SIGNED_CHARGES} '
+                    f'                 WHERE {NOT_ROOM_RENT}), 0) '
                     '     + COALESCE((SELECT SUM(tax_amount) '
                     '                 FROM tax_lines), 0) '
-                    '     - COALESCE((SELECT SUM(amount) FROM payments '
+                    f'     - COALESCE(({SIGNED_PAYMENTS} '
                     '                 WHERE COALESCE(is_voided,0)=0), 0)'),
 }
 

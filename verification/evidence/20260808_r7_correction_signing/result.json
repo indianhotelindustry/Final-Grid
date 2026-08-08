@@ -1,0 +1,22 @@
+{
+ "change": "R-7: verification/datasets/financials.py signs corrections and reversals",
+ "defect": "A reversal row carries the ORIGINAL amount POSITIVE - CHECK amount>0 on payments and amount>=0 on extra_charges forbid anything else - and the application requires every caller to flip the sign (app/models.py Payment and ExtraCharge, services.post_payment_correction, services.signed_extra_charge_amount). financials.py summed amount unsigned, so a reversal ADDED where it must SUBTRACT.",
+ "magnitude": "wrong by twice the reversed amount on every correction. Measured on a copy with one 500.00 charge correction and one 1000.00 payment correction: extra_charges_total 1929.85 vs truth 929.85; payments_net 42244.29 vs truth 40244.29; outstanding -1200.08 vs truth -200.08.",
+ "why_invisible": "production has zero correction and zero reversal rows, so INV-D02 is VACUOUS and the signing logic is untested by live data - INV-D02 says so in its own VACUOUS message. Same shape as R-2, which was harmless while zero night rates were posted.",
+ "why_now": "DS-ACT-CORRECTION is the first dataset that will produce this shape. Declaring its financial expectations against unsigned probes would bake the defect into the baseline permanently - the failure the D5.5 remediation existed to prevent.",
+ "changed": {
+  "payments_net": "now net of voids AND reversals",
+  "outstanding": "now uses signed charges and signed payments"
+ },
+ "added": {
+  "extra_charges_net": "signed sum of all extra charges",
+  "extra_charges_non_room_rent_net": "signed, excluding room rent",
+  "charges_net": "room revenue + signed non-room-rent extras + tax, so the balance is decomposable"
+ },
+ "unchanged_on_purpose": {
+  "extra_charges_total": "unsigned gross - answers how much was raised, and a reversal pair really did raise both rows",
+  "payments_gross, payments_reversals, payments_corrections, extra_charges_reversals": "unsigned descriptive slices"
+ },
+ "commissioning": "19 checks, 0 failed. NEUTRAL on production (every probe reads what it read before) AND CORRECT under injection (signed probes report business truth; the pre-R-7 forms are shown wrong by twice the reversed amount). A fix whose only evidence is nothing-changed is indistinguishable from no fix.",
+ "production_byte_identical": true
+}

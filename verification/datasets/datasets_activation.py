@@ -310,6 +310,11 @@ _CASH = 1                 # payment mode 1, category direct_payment.
             'extra_charges_room_rent': '0.00',
             'extra_charges_non_room_rent': '0.00',
             'extra_charges_reversals': '0.00',
+            # Added by R-7. Neither stay corrects anything, so the signed
+            # figures equal the unsigned ones — which is the assertion
+            # that this narrative contains no correction at all.
+            'extra_charges_net': '0.00',
+            'extra_charges_non_room_rent_net': '0.00',
             'room_revenue': '3000.00',
             'room_discount': '0.00',
 
@@ -337,6 +342,11 @@ _CASH = 1                 # payment mode 1, category direct_payment.
             'invoice_round_off_total': '0.00',
             'invoice_rounded_grand_total': '1050.00',
             'invoice_round_off_rows': '0',
+
+            # Room 3,000.00 + tax 150.00, nothing reversed. Added by R-7 so
+            # the balance is decomposable: if `outstanding` ever moves,
+            # this says whether the charges or the collections moved.
+            'charges_net': '3150.00',
 
             # Rohit's 1,100.00. Priya contributes nothing: she was settled
             # in full, so a non-zero figure here would mean the departed
