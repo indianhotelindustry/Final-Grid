@@ -1,0 +1,12 @@
+== the gate must distinguish five evidence states ==
+   datasets in the registry: 3
+OK   no ledgers on the machine flags every dataset              got ['DS-ACT-CORRECTION@1.0', 'DS-ACT-INHOUSE@1.0', 'DS-ACT-VOIDCN@1.0'] want ['DS-ACT-CORRECTION@1.0', 'DS-ACT-INHOUSE@1.0', 'DS-ACT-VOIDCN@1.0']
+OK   a passing ledger for each backs them all                   got []     want []
+OK   an UNDECLARED_MOVEMENT ledger flags its dataset            got ['DS-ACT-CORRECTION@1.0'] want ['DS-ACT-CORRECTION@1.0']
+OK   a later passing ledger supersedes an earlier failure       got []     want []
+OK     and a later failure supersedes an earlier pass           got ['DS-ACT-CORRECTION@1.0'] want ['DS-ACT-CORRECTION@1.0']
+OK   one dataset's ledger does not cover the others             got ['DS-ACT-INHOUSE@1.0', 'DS-ACT-VOIDCN@1.0'] want ['DS-ACT-INHOUSE@1.0', 'DS-ACT-VOIDCN@1.0']
+OK   a ds_commission pack is not read as a ledger               got ['DS-ACT-CORRECTION@1.0', 'DS-ACT-INHOUSE@1.0', 'DS-ACT-VOIDCN@1.0'] want ['DS-ACT-CORRECTION@1.0', 'DS-ACT-INHOUSE@1.0', 'DS-ACT-VOIDCN@1.0']
+OK   a pack with no result.json backs nothing                   got ['DS-ACT-CORRECTION@1.0', 'DS-ACT-INHOUSE@1.0', 'DS-ACT-VOIDCN@1.0'] want ['DS-ACT-CORRECTION@1.0', 'DS-ACT-INHOUSE@1.0', 'DS-ACT-VOIDCN@1.0']
+
+8 checks, 0 failed

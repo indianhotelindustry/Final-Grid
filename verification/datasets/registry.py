@@ -377,6 +377,76 @@ def commissioning_gaps() -> list:
             if d.commissioning_status != Commissioning.COMMISSIONED]
 
 
+def datasets_without_coverage_ledger() -> tuple:
+    """Datasets with no passing coverage ledger behind them.
+
+    The coverage ledger is a **mandatory verification artefact** for every
+    regression dataset, and this is what makes that a check rather than a
+    convention. It was made mandatory after the ledger twice found coverage
+    movement that careful reading of a narrative had not: four surfaces
+    silently un-resolved by ``DS-ACT-INHOUSE``, and ``INV-D02`` silently
+    activated by ``DS-ACT-VOIDCN`` on a dataset whose every expectation
+    passed.
+
+    A dataset can be COMMISSIONED — its expectations hold, its perturbation
+    discriminates — and still be quietly covering less than production did.
+    Commissioning asks whether the declared outcomes are right; only the
+    ledger asks what the dataset can exercise at all.
+
+    Returns ``(findings, evidence_pack_path)``. Pack naming follows the
+    same rule as ``unbacked_commissioning_claims`` — ``ds-coverage`` writes
+    ``{timestamp}_ds_coverage_{tag}`` and only when ``--tag`` is given, so
+    the match is containment, not suffix. That is not a guess: the suffix
+    form was the defect this registry shipped with, found on the first
+    dataset to declare COMMISSIONED.
+    """
+    import json
+    import os
+
+    from verification.config import EVIDENCE_DIR
+
+    datasets = all_datasets()
+    if not datasets:
+        return [], ''
+    packs = (sorted(name for name in os.listdir(EVIDENCE_DIR)
+                    if '_ds_coverage' in name)
+             if os.path.isdir(EVIDENCE_DIR) else [])
+    if not packs:
+        return ([{'key': d.key,
+                  'reason': 'no coverage ledger exists on this machine'}
+                 for d in datasets], '')
+
+    # Every retained pack is read, newest first, and the most recent one
+    # naming a dataset decides it. A ledger is per-dataset — unlike
+    # commissioning, which runs the whole registry at once — so "the latest
+    # pack" would condemn every dataset but the one measured last.
+    verdicts: dict = {}
+    for name in reversed(packs):
+        try:
+            with open(os.path.join(EVIDENCE_DIR, name, 'result.json'),
+                      encoding='utf-8') as fh:
+                payload = json.load(fh)
+        except Exception:                                    # noqa: BLE001
+            continue
+        key = payload.get('dataset')
+        if key and key not in verdicts:
+            verdicts[key] = ((payload.get('ledger') or {}).get('verdict', ''),
+                             name)
+
+    findings = []
+    for d in datasets:
+        verdict, pack = verdicts.get(d.key, ('', ''))
+        if not verdict:
+            findings.append({'key': d.key,
+                             'reason': 'no coverage ledger has been run for '
+                                       'this dataset'})
+        elif verdict != 'AS_DECLARED':
+            findings.append({'key': d.key,
+                             'reason': f'its most recent coverage ledger '
+                                       f'({pack}) reported {verdict}'})
+    return findings, (os.path.join(EVIDENCE_DIR, packs[-1]) if packs else '')
+
+
 def unbacked_commissioning_claims() -> tuple:
     """Datasets claiming COMMISSIONED that the evidence does not support.
 

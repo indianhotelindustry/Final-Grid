@@ -1,0 +1,20 @@
+{
+ "change": "the coverage ledger is now a mandatory verification artefact, enforced by registry.datasets_without_coverage_ledger() and reported by ds-registry",
+ "why": "the ledger has twice found coverage movement that careful reading of a narrative did not - four surfaces silently un-resolved by DS-ACT-INHOUSE, and INV-D02 silently activated by DS-ACT-VOIDCN on a dataset whose every expectation passed. A dataset can be COMMISSIONED and still cover less than production did: commissioning asks whether the declared outcomes are right, only the ledger asks what the dataset can exercise at all.",
+ "design": {
+  "per_dataset_recency": "every retained pack is read newest-first and the most recent one NAMING a dataset decides it. A ledger is per-dataset, unlike commissioning which runs the whole registry at once, so taking simply the latest pack would condemn every dataset but the one measured last.",
+  "pack_matching": "containment, not suffix - ds-coverage writes {timestamp}_ds_coverage_{tag} and only when --tag is given. Not a guess: the suffix form was the defect this registry shipped with, found on the first dataset to declare COMMISSIONED."
+ },
+ "commissioning": "8 checks, 0 failed, against fabricated evidence directories",
+ "cases": [
+  "no ledgers on the machine flags every dataset",
+  "a passing ledger for each backs them all",
+  "an UNDECLARED_MOVEMENT ledger flags its dataset - the case the gate exists for",
+  "a later passing ledger supersedes an earlier failure",
+  "a later failure supersedes an earlier pass",
+  "one dataset ledger does not cover the others",
+  "a ds_commission pack is not read as a ledger",
+  "a pack with no result.json backs nothing"
+ ],
+ "current_state": "Datasets without a passing ledger: 0, of 3 registered"
+}

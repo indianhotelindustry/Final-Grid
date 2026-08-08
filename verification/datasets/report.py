@@ -131,6 +131,22 @@ def render_registry() -> str:
             f'(tracked against {item["covered_by"]})')
     add('')
 
+    add('-' * W)
+    add('COVERAGE LEDGER — mandatory for every dataset')
+    add('-' * W)
+    no_ledger, _pack = registry.datasets_without_coverage_ledger()
+    add(f'  Datasets without a passing ledger : {len(no_ledger)}')
+    for item in sorted(no_ledger, key=lambda i: i['key']):
+        add(f'    {item["key"]:<24} {item["reason"]}')
+    if no_ledger:
+        add('')
+        add('    A dataset can be COMMISSIONED and still cover less than')
+        add('    production did. Commissioning asks whether the declared')
+        add('    outcomes are right; only the ledger asks what the dataset')
+        add('    can exercise at all. Twice now it has found movement that')
+        add('    careful reading of a narrative did not.')
+    add('')
+
     add('=' * W)
     add('END OF REGISTRY')
     add('=' * W)
@@ -152,6 +168,8 @@ def registry_payload() -> dict:
         'commissioning_gaps': registry.commissioning_gaps(),
         'unbacked_commissioning_claims': unbacked,
         'commissioning_evidence_pack': evidence_pack,
+        'datasets_without_coverage_ledger':
+            registry.datasets_without_coverage_ledger()[0],
     }
 
 
