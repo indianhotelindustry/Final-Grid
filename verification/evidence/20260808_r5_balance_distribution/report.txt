@@ -1,0 +1,16 @@
+reservations                                  : 28
+settled exactly (balance 0.00)                : 24
+owing money                                   : 2, totalling 200.01
+in credit at all                              : 2, totalling -0.30
+  overpaid by MORE than 1.00 (INV-A06 pop.)   : 0, totalling 0
+  overpaid by 0.01 to 1.00 (unmeasured band)  : 2, totalling -0.30
+
+every reservation in credit:
+   reservation 10     -0.15   unmeasured
+   reservation 17     -0.15   unmeasured
+
+reservations owing money:
+   reservation 1      200.0
+   reservation 11      0.01
+
+production byte-identical                     : True

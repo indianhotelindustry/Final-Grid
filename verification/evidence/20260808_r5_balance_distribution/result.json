@@ -1,0 +1,35 @@
+{
+ "purpose": "Settlement-balance distribution behind the R-5 materiality proposal. Measured through the canonical engine on a disposable copy.",
+ "method": "verification.dbcopy.make_copy + runner._build_app, then app.services.calculate_stay_amount per reservation",
+ "reservations": 28,
+ "settled_exactly": 24,
+ "owing": {
+  "count": 2,
+  "total": "200.01",
+  "detail": {
+   "reservation_1": "200.00",
+   "reservation_11": "0.01"
+  }
+ },
+ "in_credit": {
+  "count": 2,
+  "total": "-0.30",
+  "detail": {
+   "reservation_10": "-0.15",
+   "reservation_17": "-0.15"
+  }
+ },
+ "overpaid_beyond_threshold": {
+  "count": 0,
+  "total": "0.00",
+  "note": "INV-A06 population. Empty, which is why it reports VACUOUS."
+ },
+ "overpaid_within_unmeasured_band": {
+  "count": 2,
+  "total": "-0.30",
+  "note": "every overpayment this hotel has ever recorded"
+ },
+ "finding": "100 percent of recorded overpayments sit below the 1.00 threshold. The measured coverage of INV-A06 on real data is zero and always has been.",
+ "asymmetry": "the threshold is one-sided - reservation 11 is owed 0.01 and no control objects.",
+ "production_byte_identical": true
+}
