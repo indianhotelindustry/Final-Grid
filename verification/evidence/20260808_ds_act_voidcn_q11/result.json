@@ -1,0 +1,22 @@
+{
+ "purpose": "Confirm DS-ACT-VOIDCN lifts Q11. The coverage ledger cannot: coverage.py measures D2 surfaces and D4 invariants only, and D1 is a stated gap. Measured by hand, as predicted in advance.",
+ "method": "python -m verification _measure --db, against a copy of production and against the built dataset",
+ "production": {
+  "Q11": "VACUOUS",
+  "reason": "no voided payment and no refund payment has ever existed"
+ },
+ "dataset": {
+  "Q11": "DIVERGED",
+  "divergences": 1,
+  "implementations": {
+   "payment_purpose = refund (true refunds)": "236.00",
+   "voided payments (what night audit calls refunds)": "1286.00"
+  }
+ },
+ "finding": "THE NIGHT AUDIT REPORTS VOIDED PAYMENTS AS REFUNDS. A voided payment never left the bank; a refund did. Conflating them overstates refunds by the value of every void - here 1,286.00 against 236.00 of true refunds, a 5x overstatement on this narrative. Q11 exists to detect exactly this and had never fired, because production has neither voids nor refunds.",
+ "severity": "Q11 is declared Severity.BLOCK in the D1 registry",
+ "status": "reported and NOT repaired, per the standing Wave 0 instruction. No application code touched.",
+ "checks": 3,
+ "failed": 0,
+ "production_byte_identical": true
+}

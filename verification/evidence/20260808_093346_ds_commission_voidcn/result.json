@@ -1,0 +1,195 @@
+{
+  "duration_seconds": 10.45355710000149,
+  "elements": [
+    "BUILD",
+    "POSITIVE",
+    "PERTURBATION",
+    "DISCRIMINATION",
+    "ACTIVATION",
+    "ISOLATION"
+  ],
+  "outcomes": [
+    {
+      "checks": {
+        "ACTIVATION": true,
+        "BUILD": true,
+        "DISCRIMINATION": true,
+        "ISOLATION": true,
+        "PERTURBATION": true,
+        "POSITIVE": true
+      },
+      "key": "DS-ACT-INHOUSE@1.0"
+    },
+    {
+      "checks": {
+        "ACTIVATION": true,
+        "BUILD": true,
+        "DISCRIMINATION": true,
+        "ISOLATION": true,
+        "PERTURBATION": true,
+        "POSITIVE": true
+      },
+      "key": "DS-ACT-CORRECTION@1.0"
+    },
+    {
+      "checks": {
+        "ACTIVATION": true,
+        "BUILD": true,
+        "DISCRIMINATION": true,
+        "ISOLATION": true,
+        "PERTURBATION": true,
+        "POSITIVE": true
+      },
+      "key": "DS-ACT-VOIDCN@1.0"
+    }
+  ],
+  "registered": 3,
+  "results": [
+    {
+      "claim_is_backed": true,
+      "content_hash": "061b19c2df20e765469de003edec696ac48dfee98e8e82b75249fd5da7b678da",
+      "dataset": "DS-ACT-INHOUSE@1.0",
+      "declared_status": "COMMISSIONED",
+      "duration_seconds": 3.378155299986247,
+      "elements": [
+        {
+          "detail": "19 rows into 8 tables, content hash 061b19c2df20",
+          "element": "BUILD",
+          "passed": true,
+          "skipped": false
+        },
+        {
+          "detail": "all 44 declared expectation(s) met",
+          "element": "POSITIVE",
+          "passed": true,
+          "skipped": false
+        },
+        {
+          "detail": "2 row(s) changed by 2 statement(s)",
+          "element": "PERTURBATION",
+          "passed": true,
+          "skipped": false
+        },
+        {
+          "detail": "all 4 declared target(s) broke",
+          "element": "DISCRIMINATION",
+          "passed": true,
+          "skipped": false
+        },
+        {
+          "detail": "0 claim(s) verified",
+          "element": "ACTIVATION",
+          "passed": true,
+          "skipped": false
+        },
+        {
+          "detail": "production byte-identical across both builds",
+          "element": "ISOLATION",
+          "passed": true,
+          "skipped": false
+        }
+      ],
+      "error": "",
+      "status": "COMMISSIONED",
+      "title": "One guest in house part paid, one departed and settled"
+    },
+    {
+      "claim_is_backed": true,
+      "content_hash": "aa36f32d073b8924f8079fdb79abb445f5d543990541ac1e6eac042adeb9a89a",
+      "dataset": "DS-ACT-CORRECTION@1.0",
+      "declared_status": "COMMISSIONED",
+      "duration_seconds": 3.527898299973458,
+      "elements": [
+        {
+          "detail": "15 rows into 8 tables, content hash aa36f32d073b",
+          "element": "BUILD",
+          "passed": true,
+          "skipped": false
+        },
+        {
+          "detail": "all 46 declared expectation(s) met",
+          "element": "POSITIVE",
+          "passed": true,
+          "skipped": false
+        },
+        {
+          "detail": "1 row(s) changed by 1 statement(s)",
+          "element": "PERTURBATION",
+          "passed": true,
+          "skipped": false
+        },
+        {
+          "detail": "all 1 declared target(s) broke",
+          "element": "DISCRIMINATION",
+          "passed": true,
+          "skipped": false
+        },
+        {
+          "detail": "1 claim(s) verified",
+          "element": "ACTIVATION",
+          "passed": true,
+          "skipped": false
+        },
+        {
+          "detail": "production byte-identical across both builds",
+          "element": "ISOLATION",
+          "passed": true,
+          "skipped": false
+        }
+      ],
+      "error": "",
+      "status": "COMMISSIONED",
+      "title": "A charge and a payment, each corrected the way the audit requires"
+    },
+    {
+      "claim_is_backed": true,
+      "content_hash": "20d069cfa2bb4b4df623498edce5013c8683cc5e5bbeccc5d95c367d5b564fb3",
+      "dataset": "DS-ACT-VOIDCN@1.0",
+      "declared_status": "COMMISSIONED",
+      "duration_seconds": 3.5322966999956407,
+      "elements": [
+        {
+          "detail": "15 rows into 10 tables, content hash 20d069cfa2bb",
+          "element": "BUILD",
+          "passed": true,
+          "skipped": false
+        },
+        {
+          "detail": "all 46 declared expectation(s) met",
+          "element": "POSITIVE",
+          "passed": true,
+          "skipped": false
+        },
+        {
+          "detail": "1 row(s) changed by 1 statement(s)",
+          "element": "PERTURBATION",
+          "passed": true,
+          "skipped": false
+        },
+        {
+          "detail": "all 1 declared target(s) broke",
+          "element": "DISCRIMINATION",
+          "passed": true,
+          "skipped": false
+        },
+        {
+          "detail": "2 claim(s) verified",
+          "element": "ACTIVATION",
+          "passed": true,
+          "skipped": false
+        },
+        {
+          "detail": "production byte-identical across both builds",
+          "element": "ISOLATION",
+          "passed": true,
+          "skipped": false
+        }
+      ],
+      "error": "",
+      "status": "COMMISSIONED",
+      "title": "A duplicate payment voided, and a disputed charge credited"
+    }
+  ],
+  "started_at": "2026-08-08T09:33:46",
+  "verdict": "PASS"
+}

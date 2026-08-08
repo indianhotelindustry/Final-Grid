@@ -1101,3 +1101,412 @@ _ROOM_CORR = 3            # 103, Deluxe.
 )
 def _correction():
     pass
+
+
+# ---------------------------------------------------------------------------
+# DS-ACT-VOIDCN
+# ---------------------------------------------------------------------------
+#
+# Activates INV-D05 — void requests and credit notes must reference what
+# they cancel — and lifts Q11, the parity quantity separating refunds from
+# voids. Two layers from one narrative, which is why it was taken ahead of
+# DS-ACT-GROUP; the evidence is in
+# evidence/20260808_ds_act_voidcn_prediction/.
+#
+# THE PRODUCTION DEFECT THIS DATASET DECLARES
+# --------------------------------------------
+# `services.post_cancellation_disposition` builds a refund like this:
+#
+#     refund_payment = Payment(
+#         ...
+#         payment_purpose   = 'refund',
+#         is_reversal       = True,
+#         correction_reason = f'Cancellation refund | {reason_clean}',
+#     )
+#
+# **`corrects_id` is never set.** The only four assignments of it in
+# `services.py` are inside `post_payment_correction` and
+# `post_extra_charge_correction`; the refund path is not one of them.
+#
+# INV-D02 requires every row flagged `is_correction` OR `is_reversal` to
+# carry a resolving `corrects_id`. So **every cancellation refund the
+# application issues violates INV-D02** — CRITICAL, RELEASE_BLOCKING.
+#
+# Never seen because production has issued no refund — the same fact that
+# kept INV-D02 VACUOUS until DS-ACT-CORRECTION.
+#
+# The refund below is modelled EXACTLY as the application builds it, and
+# INV-D02 is declared VIOLATED. Giving it a corrects_id would produce a
+# green dataset describing an application that does not exist. Reported
+# and not repaired: no application code is touched.
+#
+# The money:
+#
+#   room, 1 night x 1,000.00                     room revenue   1,000.00
+#   GST 5% on the room                           tax               50.00
+#   minibar                                      charges          200.00
+#   GST 18% on the minibar                       tax               36.00
+#                                                ------------------------
+#                                                raised         1,286.00
+#   guest settles in full                      +1,286.00
+#   the desk takes it twice; the duplicate is VOIDED and a void_requests
+#   row records who asked and why                    0.00 (excluded)
+#   minibar disputed: a credit note is issued
+#   for 236.00 and the money refunded            - 236.00
+#                                                collected      1,050.00
+#                                                ------------------------
+#                                                OUTSTANDING      236.00
+#
+# CREDIT NOTES ARE NOT NETTED BY ANY PROBE — a gap, not a defect
+# ----------------------------------------------------------------
+# `outstanding` reports 236.00 and that is what the probe measures:
+# charges raised, less what was collected. The minibar WAS raised, and a
+# credit note is the instrument that writes it off rather than a reversal
+# row that removes it.
+#
+# The true receivable is `outstanding - credit_note_total` = 0.00, and no
+# probe computes that. Recorded as a candidate R-8 rather than fixed:
+# unlike R-7 this is a MISSING quantity rather than a WRONG one, so it
+# bakes no error into the baseline — `outstanding` means what it says.
+# Both figures are declared below so the relationship is measurable today.
+
+_ROOM_VOID = 4            # 104, Deluxe.
+_ADMIN = 1                # the only user on this installation.
+
+
+@dataset(
+    dataset_id='DS-ACT-VOIDCN',
+    version='1.0',
+    title='A duplicate payment voided, and a disputed charge credited',
+    purpose=Purpose.ACTIVATE_INVARIANT,
+
+    business_narrative=(
+        'Vikram Rao stays one night in room 104 on 2 August. The bill is '
+        '1,286.00 — 1,050.00 for the room including 5% GST, and 236.00 of '
+        'minibar including 18%. He settles in full on the 3rd.\n\n'
+        'The desk takes the payment twice. The duplicate is voided rather '
+        'than deleted, and a void request records who asked for it and '
+        'why, so a reversal of 1,286.00 that never reached the bank is '
+        'accounted for rather than silently absent.\n\n'
+        'Later that day he disputes the minibar. It is not reversed on the '
+        'folio — the charge was raised and the folio says so — instead a '
+        'credit note is issued against the invoice for 236.00 and the '
+        'money is refunded to him.\n\n'
+        'Two cancellation instruments, each naming what it cancels: the '
+        'void request names its payment, the credit note names its '
+        'reservation and the invoice it credits. That is INV-D05, and this '
+        'is the first data of that shape the framework has held.\n\n'
+        'One thing here is wrong and it is not the hotel doing it. The '
+        'refund row is built the way the application builds every refund — '
+        'is_reversal set, corrects_id left null — and INV-D02 forbids '
+        'exactly that. The invariant is declared VIOLATED rather than '
+        'worked around. See the note above this declaration.'
+    ),
+
+    timeline=(
+        Event(date='2026-08-02',
+              description='Vikram Rao checks into room 104 for one night '
+                          'at 1,050.00 inclusive.',
+              tables=('guests', 'reservations', 'reservation_rooms',
+                      'folios', 'reservation_night_rates', 'tax_lines'),
+              amount='1050.00'),
+        Event(date='2026-08-02',
+              description='236.00 of minibar is posted to his folio, '
+                          'including 18% GST.',
+              tables=('extra_charges', 'tax_lines'),
+              amount='236.00'),
+        Event(date='2026-08-03',
+              description='He settles 1,286.00 in cash and checks out.',
+              tables=('payments', 'reservations'),
+              amount='1286.00'),
+        Event(date='2026-08-03',
+              description='The desk takes the same 1,286.00 a second time. '
+                          'It is voided, and a void request records who '
+                          'asked and why.',
+              tables=('payments', 'void_requests'),
+              amount='1286.00'),
+        Event(date='2026-08-03',
+              description='He disputes the minibar. A credit note for '
+                          '236.00 is issued against the invoice and the '
+                          'money is refunded.',
+              tables=('credit_notes', 'payments'),
+              amount='236.00'),
+    ),
+
+    provenance=Provenance(
+        origin=Origin.SYNTHETIC,
+        author='Wave 0.7 / D6 Step 2',
+        created='2026-08-08',
+        derivation=(
+            'Written by hand from the narrative above. The refund row '
+            'follows app.services.post_cancellation_disposition field for '
+            'field, including the missing corrects_id, because what the '
+            'application actually produces is the point of the row. No '
+            'production row was copied: production holds no void, no '
+            'credit note and no refund.'),
+        contains_real_guest_data=False,
+        disclosure='Publishable. Contains no real guest and no real stay.',
+        rationale=(
+            'SYNTHETIC by necessity — all three populations are empty in '
+            'production, so there is nothing to derive from.'),
+    ),
+
+    expectations=Expectations(
+        financial={
+            'reservations_count': '1',
+            'guests_count': '1',
+            'folios_count': '1',
+            'payments_count': '3',
+
+            'payments_gross': '2808.00',
+            'payments_voided': '1286.00',
+            # 1,286.00 settled less 236.00 refunded. The voided duplicate
+            # is excluded; the refund subtracts because the application
+            # flags it is_reversal.
+            'payments_net': '1050.00',
+            # The refund carries is_reversal but NOT is_correction, so it
+            # counts below and not here. The asymmetry is the
+            # application's, not this dataset's.
+            'payments_corrections': '0.00',
+            'payments_reversals': '236.00',
+
+            'extra_charges_total': '200.00',
+            'extra_charges_room_rent': '0.00',
+            'extra_charges_non_room_rent': '200.00',
+            'extra_charges_reversals': '0.00',
+            # Nothing on the folio was reversed. The minibar was credited,
+            # which is a different instrument living in credit_notes.
+            'extra_charges_net': '200.00',
+            'extra_charges_non_room_rent_net': '200.00',
+
+            'room_revenue': '1000.00',
+            'room_discount': '0.00',
+
+            'tax_total': '86.00',
+            'taxable_total': '1200.00',
+            'tax_lines_count': '4',
+            'tax_base_count': '2',
+
+            'overpayment_total': '0.00',
+            'overpayment_count': '0',
+            # The activation targets on the financial side.
+            'credit_note_total': '236.00',
+            'credit_note_count': '1',
+            'void_request_count': '1',
+            'corporate_credit_used': '0.00',
+            'corporate_bookings': '0',
+
+            'invoice_unrounded_grand_total': '1286.00',
+            'invoice_round_off_total': '0.00',
+            'invoice_rounded_grand_total': '1286.00',
+            'invoice_round_off_rows': '0',
+
+            'charges_net': '1286.00',
+            # 1,286.00 raised less 1,050.00 net collected. The credit note
+            # is NOT netted here — no probe does that. The true receivable
+            # is outstanding - credit_note_total = 0.00.
+            'outstanding': '236.00',
+        },
+
+        invariants={
+            # THE TARGET. Population 2: one void_requests row naming its
+            # payment, one credit_notes row naming its reservation.
+            'INV-D05': 'HOLDS',
+
+            # VIOLATED, and it is the application's doing. The refund row
+            # carries is_reversal with no corrects_id because that is how
+            # post_cancellation_disposition builds every refund. When the
+            # refund path is fixed this must be re-declared with evidence.
+            'INV-D02': 'VIOLATED',
+
+            'INV-A02': 'HOLDS',
+            'INV-A03': 'HOLDS',
+            'INV-A05': 'HOLDS',
+            'INV-C03': 'HOLDS',
+            'INV-C04': 'HOLDS',
+            'INV-D01': 'HOLDS',
+            'INV-D03': 'HOLDS',
+            'INV-D04': 'HOLDS',
+            'INV-D06': 'HOLDS',
+            'INV-C01': 'VACUOUS',
+        },
+    ),
+
+    rows=(
+        ('guests',
+         ('id', 'name', 'phone'),
+         ((1, 'Vikram Rao', '9800000004'),)),
+
+        ('reservations',
+         ('id', 'guest_id', 'room_id', 'room_type_id',
+          'arrival_date', 'departure_date', 'adults', 'status',
+          'rate_per_night', 'standard_tariff', 'expected_tariff',
+          'advance_payment', 'source', 'booking_type', 'pricing_mode',
+          'created_at', 'checked_in_at', 'checkin_by',
+          'checked_out_at', 'checkout_by', 'checkout_time',
+          'invoice_number', 'invoice_unrounded_grand_total',
+          'invoice_round_off_amount', 'invoice_rounded_grand_total',
+          'noshow_exempt', 'checkout_initiated', 'credit_amount',
+          'credit_settled_amount', 'cancellation_amount_refunded',
+          'cancellation_amount_forfeited',
+          'cancellation_amount_credit_voucher'),
+         ((1, 1, _ROOM_VOID, _ROOM_TYPE_ID,
+           '2026-08-02', '2026-08-03', 1, 'CheckedOut',
+           1000.00, 1000.00, 1000.00,
+           0.0, 'Walk-in', 'Regular', 'standard',
+           '2026-08-02 14:00:00.000000', '2026-08-02 14:00:00.000000',
+           'admin',
+           '2026-08-03 10:00:00.000000', 'admin', '10:00',
+           'INV-2026-000001', 1286.00, 0.0, 1286.00,
+           0, 1, 0.0, 0.0, 0.0, 0.0, 0.0),)),
+
+        ('reservation_rooms',
+         ('id', 'reservation_id', 'room_id', 'is_primary', 'created_at'),
+         ((1, 1, _ROOM_VOID, 1, '2026-08-02 14:00:00.000000'),)),
+
+        ('folios',
+         ('id', 'reservation_id', 'folio_letter', 'label', 'is_closed',
+          'created_at'),
+         ((1, 1, 'A', 'Guest', 1, '2026-08-02 14:00:00.000000'),)),
+
+        ('reservation_night_rates',
+         ('id', 'reservation_id', 'stay_date', 'room_type_id', 'room_id',
+          'standard_rate', 'resolved_rate', 'final_rate', 'discount_amount',
+          'rate_source', 'pricing_mode', 'manual_override', 'tax_rate',
+          'is_posted', 'is_locked', 'created_at', 'updated_at'),
+         ((1, 1, '2026-08-02', _ROOM_TYPE_ID, _ROOM_VOID,
+           1000.00, 1000.00, 1000.00, 0.0,
+           'base_rate', 'standard', 0, 5, 0, 0,
+           '2026-08-02 14:00:00.000000', '2026-08-02 14:00:00.000000'),)),
+
+        ('extra_charges',
+         ('id', 'reservation_id', 'folio_id', 'description', 'amount',
+          'charge_date', 'charge_type', 'charge_category',
+          'is_correction', 'is_reversal', 'corrects_id',
+          'correction_reason', 'created_at'),
+         ((1, 1, 1, 'Minibar', 200.00, '2026-08-02',
+           'minibar', 'Minibar', 0, 0, None, None,
+           '2026-08-02 21:00:00.000000'),)),
+
+        ('tax_lines',
+         ('id', 'reservation_id', 'charge_source_type', 'charge_source_id',
+          'charge_date', 'taxable_amount', 'tax_type', 'tax_rate',
+          'tax_amount', 'is_interstate', 'is_exempted', 'sac_code',
+          'created_at'),
+         ((1, 1, 'room_night', 'night_2026-08-02', '2026-08-02',
+           1000.00, 'CGST', 2.5, 25.00, 0, 0, '996311',
+           '2026-08-02 14:00:00.000000'),
+          (2, 1, 'room_night', 'night_2026-08-02', '2026-08-02',
+           1000.00, 'SGST', 2.5, 25.00, 0, 0, '996311',
+           '2026-08-02 14:00:00.000000'),
+          (3, 1, 'extra_charge', '1', '2026-08-02',
+           200.00, 'CGST', 9.0, 18.00, 0, 0, '996311',
+           '2026-08-02 21:00:00.000000'),
+          (4, 1, 'extra_charge', '1', '2026-08-02',
+           200.00, 'SGST', 9.0, 18.00, 0, 0, '996311',
+           '2026-08-02 21:00:00.000000'),)),
+
+        ('payments',
+         ('id', 'reservation_id', 'folio_id', 'payment_mode_id', 'amount',
+          'payment_date', 'reference_number', 'created_at', 'is_voided',
+          'voided_at', 'voided_by_user_id', 'void_reason',
+          'is_correction', 'is_reversal', 'corrects_id',
+          'correction_reason', 'payment_purpose'),
+         # The settlement.
+         ((1, 1, 1, _CASH, 1286.00, '2026-08-03', '',
+           '2026-08-03 09:50:00.000000', 0, None, None, None,
+           0, 0, None, None, 'settlement'),
+          # The duplicate, voided rather than deleted. is_voided excludes
+          # it from every net figure while the row survives, which is the
+          # whole point of voiding instead of deleting.
+          (2, 1, 1, _CASH, 1286.00, '2026-08-03', '',
+           '2026-08-03 09:52:00.000000', 1,
+           '2026-08-03 09:55:00.000000', _ADMIN,
+           'Duplicate capture at the desk',
+           0, 0, None, None, 'settlement'),
+          # The refund, field for field as post_cancellation_disposition
+          # builds it: payment_purpose refund, is_reversal set,
+          # is_correction NOT set, corrects_id NULL. That last omission is
+          # the INV-D02 violation, and it is the application's.
+          (3, 1, 1, _CASH, 236.00, '2026-08-03', '',
+           '2026-08-03 16:00:00.000000', 0, None, None, None,
+           0, 1, None, 'Cancellation refund | Minibar disputed',
+           'refund'),)),
+
+        # The two cancellation instruments INV-D05 exists for.
+        ('void_requests',
+         ('id', 'payment_id', 'requested_by_user_id', 'requested_at',
+          'reason', 'status', 'decided_by_user_id', 'decided_at'),
+         ((1, 2, _ADMIN, '2026-08-03 09:54:00.000000',
+           'Duplicate capture at the desk', 'approved', _ADMIN,
+           '2026-08-03 09:55:00.000000'),)),
+
+        ('credit_notes',
+         ('id', 'credit_note_number', 'reservation_id',
+          'original_invoice_number', 'reason', 'taxable_amount',
+          'cgst_amount', 'sgst_amount', 'igst_amount', 'total_amount',
+          'issued_by_user_id', 'issued_at', 'notes'),
+         ((1, 'CN-2026-000001', 1, 'INV-2026-000001',
+           'Minibar disputed by guest', 200.00, 18.00, 18.00, 0.0, 236.00,
+           _ADMIN, '2026-08-03 15:55:00.000000',
+           'Refunded in cash the same day'),)),
+    ),
+
+    business_date='2026-08-03',
+
+    # INV-D02 as well as the target. The refund row is flagged
+    # is_reversal, which puts it in INV-D02's population — so this dataset
+    # lifts that invariant out of VACUOUS too, and reports it VIOLATED
+    # because of the missing corrects_id.
+    #
+    # It was NOT in the first draft of this claim, or of the coverage
+    # expectation below. The declaration reasoned correctly that INV-D02
+    # would be violated and declared it, and then failed to notice that
+    # giving an invariant a population IS an activation. Every expectation
+    # passed; only the coverage ledger caught it. Recorded rather than
+    # quietly added — it is the second time the ledger has found movement
+    # that careful reading of the narrative did not.
+    activates_invariants=('INV-D05', 'INV-D02'),
+
+    # -- the discrimination gate -----------------------------------------
+    #
+    # Point the void request at a payment that does not exist. Every
+    # figure in the dataset is untouched — no amount, count or balance
+    # moves — and the cancellation record stops naming anything real,
+    # which is exactly what INV-D05 forbids.
+    perturbation=(
+        'UPDATE void_requests SET payment_id = 99999 WHERE id = 1',
+    ),
+    perturbation_breaks=(
+        'INV-D05',
+    ),
+
+    # -- the coverage ledger, declared BEFORE the dataset was built ------
+    # See evidence/20260808_ds_act_voidcn_prediction/prediction.md.
+    coverage_expectation={
+        'surfaces_added': (),
+        'surfaces_lost': (
+            'reports.night_audit_snapshot__night_audit_log',
+        ),
+        # INV-D02 was missed by the prediction and found by the ledger —
+        # see the note on activates_invariants above.
+        'invariants_activated': (
+            'INV-D05', 'INV-D02',
+        ),
+        # Seven, the same set DS-ACT-CORRECTION lost. INV-A03 survives
+        # here too, because there is an extra charge on the folio.
+        'invariants_deactivated': (
+            'INV-B01', 'INV-B02', 'INV-B03', 'INV-B05',
+            'INV-C01', 'INV-C05', 'INV-D07',
+        ),
+    },
+
+    principles=('P9', 'P10', 'P11', 'P14'),
+    modes=(Mode.REGRESSION, Mode.INVARIANT_ACTIVATION,
+           Mode.CONTINUOUS_VERIFICATION),
+
+    # Six of six, ACTIVATION included: INV-D05 is no longer VACUOUS.
+    commissioning_status=Commissioning.COMMISSIONED,
+)
+def _voidcn():
+    pass

@@ -1,0 +1,10 @@
+== Q11 on production ==
+OK   production verdict                                   got VACUOUS          want VACUOUS
+
+== Q11 on DS-ACT-VOIDCN ==
+   raw entry: {"divergences": 1, "implementations": {"payment_purpose = refund (true refunds)": "236.00", "voided payments (what night audit calls refunds)": "1286.00"}, "verdict": "DIVERGED"}
+OK   dataset verdict is no longer VACUOUS                 got True             want True
+
+OK   production byte-identical throughout                 got True             want True
+
+3 checks, 0 failed
