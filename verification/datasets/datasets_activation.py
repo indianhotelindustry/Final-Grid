@@ -419,6 +419,27 @@ _CASH = 1                 # payment mode 1, category direct_payment.
             'Q17': 'AGREED', 'Q18': 'AGREED', 'Q20': 'AGREED',
             'Q22': 'AGREED',
         },
+
+        # D2 — the claim this dataset was written to make, and until
+        # 2026-08-08 the one thing about it the registry could not check.
+        # `Expectations` had no element for D2, so `Layer.D2_GOLDEN` was
+        # dead vocabulary and this had to be verified by hand.
+        #
+        # The three RESOLVED entries are the surfaces that had never had a
+        # CheckedIn reservation to pin to. The four UNRESOLVED are declared
+        # deliberately: they say which populations this dataset does NOT
+        # carry, so quietly acquiring a company or a group block later
+        # would be a failure rather than an unnoticed change.
+        golden={
+            'main.checkout__inhouse_reservation': 'RESOLVED',
+            'main.reservation_folio__inhouse_reservation': 'RESOLVED',
+            'pos.room_charges_api__inhouse_reservation': 'RESOLVED',
+            # Still absent, and the dataset says so.
+            'main.get_company_credit__any_company': 'UNRESOLVED',
+            'main.company_detail__any_company': 'UNRESOLVED',
+            'groups.detail__any_group': 'UNRESOLVED',
+            'reports.night_audit_snapshot__night_audit_log': 'UNRESOLVED',
+        },
     ),
 
     # -- the rows, parents before children -------------------------------

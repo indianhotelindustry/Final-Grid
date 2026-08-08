@@ -178,6 +178,13 @@ def _validate(d: Dataset) -> None:
                 f'{d.key}: expects fault {fault_id}, which is not in the D5 '
                 f'registry.')
 
+    for surface, state in d.expectations.golden.items():
+        if state not in ('RESOLVED', 'UNRESOLVED'):
+            raise RegistrationError(
+                f'{d.key}: golden expectation for {surface} is {state!r}. A '
+                f'surface either resolved to an entity or it did not, so the '
+                f'only declarable states are RESOLVED and UNRESOLVED.')
+
     known_quantities = _known_quantity_ids()
     if known_quantities:
         for quantity_id in d.expectations.parity:

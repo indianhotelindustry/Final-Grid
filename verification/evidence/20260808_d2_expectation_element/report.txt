@@ -1,0 +1,13 @@
+== the declaration as it stands ==
+OK   all seven surfaces MET                                   got 7              want 7
+
+== falsified four ways, each must be caught ==
+OK   claiming an UNRESOLVED surface resolves                  got UNMET          want UNMET
+OK     and the observation says what it really is             got UNRESOLVED     want UNRESOLVED
+OK   claiming a RESOLVED surface does not                     got UNMET          want UNMET
+OK   an unknown surface is UNRESOLVED, not an error           got MET            want MET
+OK     and claiming it resolves is caught                     got UNMET          want UNMET
+OK   D2_GOLDEN is in declared_layers                          got True           want True
+OK     and absent when nothing is declared                    got False          want False
+
+8 checks, 0 failed

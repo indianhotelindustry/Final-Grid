@@ -272,6 +272,25 @@ def evaluate(d, materialisation, layers: tuple = (),
             _compare('replay', rule_id, expected, observed_replay, replay_ran,
                      'the replay engine could not be run on this dataset'))
 
+    # -- D2: which golden-master surfaces resolve -------------------------
+    #
+    # The capture is keyed by surface, and a surface that resolved is a key
+    # in it. A surface whose resolver found no entity is simply absent —
+    # which is why the observation is membership rather than a status
+    # field, and why UNRESOLVED is a declarable expectation rather than an
+    # omission.
+    golden_probe = probe_for(Layer.D2_GOLDEN)
+    golden_ran = bool(golden_probe and golden_probe.ran)
+    captured = set(golden_probe.raw or {}) if golden_ran else set()
+    observed_golden = {surface: ('RESOLVED' if surface in captured
+                                 else 'UNRESOLVED')
+                       for surface in d.expectations.golden}
+    for surface, expected in sorted(d.expectations.golden.items()):
+        result.outcomes.append(
+            _compare('golden', surface, expected, observed_golden, golden_ran,
+                     'the golden master framework could not be run on this '
+                     'dataset'))
+
     # -- element 6: parity -----------------------------------------------
     parity_probe = probe_for(Layer.D1_PARITY)
     parity_ran = bool(parity_probe and parity_probe.ran)

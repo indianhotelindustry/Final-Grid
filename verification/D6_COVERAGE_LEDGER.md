@@ -67,6 +67,39 @@ dataset could show that, and only the ledger could notice.
 
 ---
 
+## 2a. D2 is now declarable too
+
+Separate from the ledger, and closing the gap it exposed. `Expectations`
+carried charter elements 3 to 7 and **had no element for D2**, so
+`Layer.D2_GOLDEN` was mapped in `evaluate.PROBE_FOR` and never returned by
+`declared_layers()` — dead vocabulary since Step 1.
+
+The cost was specific: `DS-ACT-INHOUSE` exists mainly to supply an in-house
+reservation for three surfaces that had none, and that was the one thing
+about it the registry could not check.
+
+```python
+golden={
+    'main.checkout__inhouse_reservation': 'RESOLVED',
+    'groups.detail__any_group':           'UNRESOLVED',
+}
+```
+
+A surface is RESOLVED when the capture produced it, UNRESOLVED when the
+resolver found no entity — so the observation is membership in the capture,
+not a status field. **Declaring UNRESOLVED matters as much as RESOLVED**:
+it is how a dataset states which populations it deliberately does not
+carry, so quietly acquiring one later is a failure rather than an
+unnoticed change.
+
+Commissioned by falsification, 8 checks: claiming an UNRESOLVED surface
+resolves, claiming a RESOLVED one does not, an unknown surface, and that
+`D2_GOLDEN` actually reaches `declared_layers()` — without which every
+expectation would silently be NOT_RUN rather than compared, which was the
+original defect. Evidence: `evidence/20260808_d2_expectation_element/`.
+
+---
+
 ## 3. How a dataset declares
 
 `coverage_expectation` on the `Dataset`, validated at registration —

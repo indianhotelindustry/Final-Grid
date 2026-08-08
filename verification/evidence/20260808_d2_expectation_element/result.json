@@ -1,0 +1,12 @@
+{
+ "change": "Expectations gains a golden element, so a dataset can declare a D2 outcome",
+ "defect_closed": "Layer.D2_GOLDEN existed in the vocabulary and was mapped in evaluate.PROBE_FOR, but declared_layers() was computed from parity, replay, invariants and faults alone - so it was never returned and never swept. Dead vocabulary since Step 1.",
+ "cost_while_open": "DS-ACT-INHOUSE exists mainly to supply an in-house reservation for three golden-master surfaces that had none, and that was the one thing about it the registry could not check. It had to be verified by hand.",
+ "design": {
+  "observation": "membership in the capture. A surface that resolved is a key in it; one whose resolver found no entity is simply absent - which is why the state is derived from membership rather than a status field.",
+  "declarable_states": "RESOLVED and UNRESOLVED only, refused at registration otherwise.",
+  "why_UNRESOLVED_matters": "it is how a dataset states which populations it deliberately does NOT carry, so quietly acquiring one later is a failure rather than an unnoticed change."
+ },
+ "commissioning": "8 checks, 0 failed. The declaration is falsified four ways and each is caught: claiming an UNRESOLVED surface resolves, claiming a RESOLVED one does not, an unknown surface, and the sweep itself - D2_GOLDEN must appear in declared_layers or every expectation would silently be NOT_RUN rather than compared, which was the original defect.",
+ "first_use": "DS-ACT-INHOUSE declares 7 surfaces - the 3 it was written to resolve, plus 4 it deliberately does not carry. 59 expectations, all met."
+}

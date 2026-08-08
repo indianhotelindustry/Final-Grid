@@ -228,6 +228,23 @@ class Expectations:
     #: Charter element 6. Quantity id -> expected verdict.
     parity: dict = field(default_factory=dict)
 
+    #: D2. Surface key (``endpoint__resolver``, as captured) -> ``RESOLVED``
+    #: or ``UNRESOLVED``.
+    #:
+    #: The charter numbered elements 3 to 7 and gave D2 none of them, so
+    #: for the whole of Step 1 and most of Step 2 ``Layer.D2_GOLDEN``
+    #: existed in the vocabulary, was mapped in ``evaluate.PROBE_FOR``, and
+    #: was never returned by ``declared_layers()`` — dead vocabulary. The
+    #: cost was specific: ``DS-ACT-INHOUSE`` exists mainly to supply an
+    #: in-house reservation for three surfaces that had none, and that was
+    #: the one thing about it the registry could not check.
+    #:
+    #: A surface is RESOLVED when the capture produced it and UNRESOLVED
+    #: when the resolver found no entity to pin it to. Declaring
+    #: UNRESOLVED is as useful as declaring RESOLVED: it is how a dataset
+    #: states which populations it deliberately does not carry.
+    golden: dict = field(default_factory=dict)
+
     #: Charter element 7. Fault id -> whether the fault should still be
     #: detected when injected into THIS dataset. A fault that is detected
     #: on production data and missed here has found a population the
@@ -238,6 +255,8 @@ class Expectations:
         out = []
         if self.parity:
             out.append(Layer.D1_PARITY)
+        if self.golden:
+            out.append(Layer.D2_GOLDEN)
         if self.replay:
             out.append(Layer.D3_REPLAY)
         if self.invariants:
@@ -248,7 +267,8 @@ class Expectations:
 
     def total(self) -> int:
         return (len(self.financial) + len(self.invariants) +
-                len(self.replay) + len(self.parity) + len(self.faults))
+                len(self.replay) + len(self.parity) + len(self.faults) +
+                len(self.golden))
 
 
 # ---------------------------------------------------------------------------
