@@ -1,6 +1,6 @@
 # Wave 0 — Deliverable Status
 
-DSBC Frontline v2.2.18. Last verified 2026-08-08 (Wave 0.7).
+DSBC Frontline v2.2.18. Last verified 2026-08-08 (Wave 0.8).
 
 Counts in this document are read from the live registries, not
 transcribed from the completion reports. Where a report and the
@@ -20,7 +20,7 @@ commissioned.** Five are. Wave 0 is half done.
 | D3 | Historical Replay Framework | Complete | 21 / 21 |
 | D4 | Financial Invariant Engine | Complete | 27 / 27 |
 | D5 | Fault Injection Platform | Complete | 37 / 37 |
-| D6 | Regression Dataset Framework | **Step 2 — 3 datasets commissioned; `INV-D02` and `INV-D05` activated** | 3 / 3 |
+| D6 | Regression Dataset Framework | **Step 2 — 4 datasets commissioned; every non-blocked one is done** | 4 / 4 |
 | D7 | Certification Engine | Not started | — |
 | D8 | CI/CD Verification Pipeline | Not started | — |
 | D9 | Backup Restore Verification | **Blocked** | — |
@@ -33,11 +33,11 @@ Live registry counts, 2026-08-08:
 | Parity quantities (D1) | 22 — `Q01`–`Q22` |
 | Invariants (D4) | **25** — `INV-D07` added by R-4, 2026-08-08; **all 25 COMMISSIONED** |
 | Faults (D5) | 40 — 10 each in classes A/B/C/D; 36 COMMISSIONED, 4 UNCOVERED |
-| Regression datasets (D6) | 3 — `DS-ACT-INHOUSE`, `DS-ACT-CORRECTION`, `DS-ACT-VOIDCN`, all COMMISSIONED |
+| Regression datasets (D6) | 4 — `DS-ACT-INHOUSE`, `DS-ACT-CORRECTION`, `DS-ACT-VOIDCN`, `DS-ACT-GROUP`, all COMMISSIONED, all with a passing coverage ledger |
 | Invariants with an activating dataset | 2 of 25 — `INV-D02`, `INV-D05` |
-| Golden master surfaces (D2) | 158 — 6 UNRESOLVED |
+| Golden master surfaces (D2) | 158 — 6 UNRESOLVED on production; `groups.detail` now resolves on a dataset |
 | Replayed business dates (D3) | 28 |
-| Retained evidence packs | 125 |
+| Retained evidence packs | 140 |
 | Constitutional principles enforced | 14 — no principle uncovered |
 
 ---
@@ -285,10 +285,21 @@ Added 2026-08-08, found by `DS-ACT-VOIDCN` and **not repaired**:
   overstates refunds by the value of every void. `Q11` is `Severity.BLOCK`
   and exists to detect this; it had never fired.
   Evidence: `evidence/20260808_ds_act_voidcn_q11/`.
-- **No probe nets credit notes against the balance** (candidate **R-8**).
-  `outstanding − credit_note_total` is the true receivable and nothing
-  computes it. A *missing* quantity rather than a *wrong* one, so unlike
-  R-7 it bakes no error into the baseline and was not treated as blocking.
+- ~~No probe nets credit notes against the balance~~ — **closed by R-8**,
+  `net_receivable`. Recorded here because it was found by `DS-ACT-VOIDCN`
+  before it was fixed.
+- **The application has no master-account routing.**
+  `group_blocks.billing_instructions` is free text and nothing implements
+  it; `services_group_stay` only links reservations to rooms. Billing a
+  real group to a master account would leave every non-master reservation
+  reported by `INV-C02` as checked out and unsettled. Found by
+  `DS-ACT-GROUP`.
+- **Three parity quantities agree on production and prove nothing.**
+  `Q09` (payments total, signed vs raw), `Q02` (charge count by category)
+  and `Q07` (tax by component) all read AGREED on production and DIVERGE
+  the moment a correction or reversal exists. `Q09` measures exactly the
+  defect class R-7 fixed and had never been able to fire. Found by
+  extending the coverage ledger to D1.
 
 ---
 
@@ -334,6 +345,7 @@ documents were **not present in the repository** and remain unrecovered.
 | `D6_COVERAGE_LEDGER.md` | Written 2026-08-08; the Added/Lost/Changed obligation |
 | `D6_DS_ACT_CORRECTION.md` | Written 2026-08-08; the first activating dataset, and the GST-on-reversed-money defect |
 | `D6_DS_ACT_VOIDCN.md` | Written 2026-08-08; `INV-D05` and `Q11`, the refund `corrects_id` defect, and the voids-reported-as-refunds divergence |
+| `D6_DS_ACT_GROUP.md` | Written 2026-08-08; the last non-blocked dataset, and the absence of master-account routing |
 | `D1`–`D5` completion reports | Pre-existing, retained |
 | `D5_5_REMEDIATION_APPLIED.md` | Written 2026-08-08; records R-1/R-2/R-3/R-6 and four errors found in the D5.5 documents |
 | `D6_STEP2_DS_ACT_INHOUSE.md` | Written 2026-08-08; the first commissioned dataset, and the D2 measurement behind it |
@@ -494,19 +506,47 @@ deliberate but was reasoned about master data *inherited* from production,
 not master data a dataset *declares*. **`DS-ACT-CORPCREDIT` cannot be
 written until this is decided**, and it was not started.
 
+### Wave 0.8 — verification enhancements, then the last non-blocked dataset
+
+| | Commit | State |
+|---|---|---|
+| **R-8** — `net_receivable` | `e1438a0` | `outstanding` less credit notes. Verification layer only |
+| Ledger measures **D1** | `afe4088` | And corrected my own record: it already measured D2 |
+| **D2 declarable** | `570561e` | `Expectations.golden`. `Layer.D2_GOLDEN` was dead vocabulary since Step 1 |
+| Ledger **mandatory** | `1117e33` | `datasets_without_coverage_ledger()`, a check rather than a convention |
+| **`DS-ACT-GROUP@1.0`** | `b7290f7` | COMMISSIONED. The last non-blocked dataset |
+
+**Extending the ledger to D1 immediately found five movements nobody had
+recorded** — and three of them matter:
+
+- **`Q09`, `Q02`, `Q07` read AGREED on production and their agreement
+  proves nothing.** All three diverge the moment a correction or reversal
+  exists, and production has neither. `Q09` is *Payments total (signed vs
+  raw)* — the D1 quantity measuring exactly the defect class R-7 fixed in
+  the probes, and it had never been able to fire.
+- `Q15` falls to VACUOUS on all four datasets; none declares a night audit.
+- `Q11` is now confirmed mechanically instead of by hand.
+
+### `DS-ACT-GROUP` found two things
+
+- **The application has no master-account routing.**
+  `group_blocks.billing_instructions` is free text, `services_group_stay`
+  only links reservations to rooms, and nothing moves one reservation's
+  charges onto another's folio. Billing a real group to a master account
+  would have every non-master reservation reported by `INV-C02`.
+- A group block has its own status vocabulary; the builder named the
+  constraint rather than surfacing an opaque `IntegrityError` — the
+  failure mode it was written after (`FLT-A10`), working.
+
 ### The next piece of work
 
-**`DS-ACT-GROUP`** — now the only unblocked dataset, and the last route to
-`groups.detail`, the one UNRESOLVED D2 surface with no other owner.
-`group_blocks` is empty and trivially materialisable: 5 required columns
-(`group_name`, `group_code`, `arrival_date`, `departure_date`,
-`total_rooms`).
+**`DS-ACT-SHIFT` is the only genuinely unblocked item left.** It lifts
+`Q21` (shift cash and variance, VACUOUS) — a D1 quantity, no invariant. It
+was not started here because the instruction was to implement
+`DS-ACT-GROUP` *before returning to governance-dependent work*, and that is
+where the queue now points.
 
-It **activates nothing**, and is next only because everything with higher
-verification value is waiting on someone. Under the owner's own principle
-that is the right reason to do it and the wrong reason to expect much of
-it — its record must say so rather than let the `DS-ACT-` prefix imply
-otherwise.
+Everything else waits on a decision, not on engineering.
 
 **Closed since:** the coverage ledger now measures **D1 as well as D2 and
 D4**. `DS-ACT-VOIDCN`'s `Q11` claim is mechanical rather than hand-measured.
