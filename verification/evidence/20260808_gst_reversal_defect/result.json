@@ -1,0 +1,24 @@
+{
+ "finding": "gst_service.compute_stay_gst taxes reversed money",
+ "severity": "production defect, reported and NOT repaired per the standing Wave 0 instruction. No application code was modified.",
+ "location": "app/gst_service.py:492 - the extras loop reads ec.amount unsigned and never calls services.signed_extra_charge_amount",
+ "mechanism": "a reversal row carries the ORIGINAL amount positive (CHECK amount >= 0 forbids negatives) and every caller is required to subtract it. The GST loop does not, so a reversed charge is taxed instead of untaxed.",
+ "measured_on": "DS-ACT-CORRECTION@1.0",
+ "arithmetic": {
+  "laundry_raised": "500.00 x 18% = 90.00",
+  "laundry_reversed": "500.00 x 18% = 90.00 (should be -90.00)",
+  "laundry_corrected": "200.00 x 18% = 36.00",
+  "extras_gst_reported": "216.00",
+  "extras_gst_truth": "36.00",
+  "room_gst": "50.00",
+  "compute_stay_gst_reports": "266.00",
+  "truth": "86.00",
+  "gst_charged_on_reversed_money": "180.00"
+ },
+ "blast_radius": "calculate_stay_amount, and therefore checkout, the invoice, settlement_balance and every report downstream of it. Compounds with each further correction of the same charge.",
+ "why_never_seen": "production holds no correction or reversal row of any kind - the same fact that makes INV-D02 VACUOUS. This is the first instance anybody has been able to point at.",
+ "class": "already on the register as multiple independent definitions of a financial quantity: tax_lines says one thing, compute_stay_gst computes another. First identified instance.",
+ "declared_consequence": "DS-ACT-CORRECTION declares INV-C02 VIOLATED by exactly 180.00. When the defect is fixed that expectation must be re-declared with evidence.",
+ "schema_gap": "tax_lines has no is_reversal and no corrects_id, so the correction pattern that exists for money has no counterpart for tax. A reversed taxed charge has no declared way to unwind its tax line.",
+ "referred_to": "Wave 1"
+}

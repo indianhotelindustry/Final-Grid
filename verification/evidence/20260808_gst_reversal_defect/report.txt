@@ -1,0 +1,10 @@
+room GST rate      : 5.00%
+laundry GST rate   : 18%
+
+room GST           : 50.00
+extras GST as computed (unsigned, 1200): 216.00
+extras GST if signed   (net, 200)     : 36.00
+
+compute_stay_gst reports : 266.00
+it should report         : 86.00
+GST charged on reversed money: 180.00

@@ -25,25 +25,36 @@ Target                       Layer  Evidence it is empty
 4 golden master surfaces     D2     UNRESOLVED — no checked-in reservation
 ===========================  =====  ====================================
 
-Planned. **Re-sequenced 2026-08-08** — see `D6_SEQUENCING_DECISION.md` for
-the evidence behind the swap::
+Planned. **Re-sequenced twice.** First on 2026-08-08 to put
+``DS-ACT-GROUP`` ahead of ``DS-ACT-OVERPAY``
+(``D6_SEQUENCING_DECISION.md``), then again by the project owner to put
+``DS-ACT-CORRECTION`` ahead of both::
 
     1 DS-ACT-INHOUSE    COMMISSIONED. A checked-in reservation, plus a
                         departed one so the trade is not a net loss.
                         Activates 0 invariants; D2 +3 / -1.
-    2 DS-ACT-GROUP      NEXT. A group block. Closes groups.detail, the only
+    2 DS-ACT-CORRECTION COMMISSIONED. Lifts INV-D02, the only VACUOUS
+                        invariant that is RELEASE_BLOCKING. The first
+                        dataset to activate anything.
+    3 DS-ACT-GROUP      NEXT. A group block. Closes groups.detail, the only
                         UNRESOLVED D2 surface with no planned owner.
                         Activates 0 invariants — no invariant, fault or
                         quantity references group_blocks anywhere.
-    3 DS-ACT-OVERPAY    BLOCKED on R-5. A reservation overpaid by more than
+    4 DS-ACT-OVERPAY    BLOCKED on R-5. A reservation overpaid by more than
                         the materiality threshold — and what that threshold
                         is, is the open decision. Lifts INV-A06 and gives
                         INV-D07 its first real population.
-    4 DS-ACT-CORPCREDIT lifts INV-C06; closes the 2 company D2 surfaces.
-    5 DS-ACT-CORRECTION lifts INV-D02 — the only RELEASE_BLOCKING one of
-                        the four VACUOUS invariants.
+    5 DS-ACT-CORPCREDIT lifts INV-C06; closes the 2 company D2 surfaces.
     6 DS-ACT-VOIDCN     lifts INV-D05. Also lifts Q11.
     7 DS-ACT-SHIFT      lifts Q21.
+
+The owner's reason for the second re-sequencing, recorded because it is
+the governing principle rather than a one-off preference: **a regression
+dataset should activate the highest-risk verification before extending
+ordinary business coverage, because Wave 0's objective is verification
+completeness rather than business-feature completeness.** On that
+principle ``INV-D02`` outranks everything — it is the only VACUOUS
+invariant that blocks a release rather than a certificate.
 
 Overpayment was not demoted because group coverage is worth more; it is
 not. It was demoted because ``DS-ACT-OVERPAY`` cannot be declared
@@ -609,4 +620,484 @@ _CASH = 1                 # payment mode 1, category direct_payment.
     commissioning_status=Commissioning.COMMISSIONED,
 )
 def _inhouse():
+    pass
+
+
+# ---------------------------------------------------------------------------
+# DS-ACT-CORRECTION
+# ---------------------------------------------------------------------------
+#
+# The first dataset written to activate a VACUOUS invariant, and it targets
+# the only one of the four that is RELEASE_BLOCKING.
+#
+# THE CORRECTION PATTERN, WHICH IS THE WHOLE POINT
+# ------------------------------------------------
+# Neither table can hold a negative amount — `payments` carries
+# `CHECK amount > 0`, `extra_charges` carries `CHECK amount >= 0`. The
+# application's answer, documented on both models and implemented in
+# `services.post_payment_correction`, is to never mutate the original and
+# to post up to two new rows instead:
+#
+#   REVERSAL     is_correction=1, is_reversal=1, amount = THE ORIGINAL
+#   REPLACEMENT  is_correction=1, is_reversal=0, amount = the corrected
+#
+# both carrying `corrects_id` back to the original. The reversal's amount
+# is positive and every caller is required to subtract it.
+#
+# That requirement is why R-7 had to land before this dataset could declare
+# a single figure: the probes summed unsigned and were wrong by twice the
+# reversed amount. On production the defect was invisible, because
+# production has no correction rows at all — which is the same sentence as
+# "INV-D02 is VACUOUS".
+#
+# The money:
+#
+#   room, 1 night x 1,000.00                        room revenue  1,000.00
+#   GST 5% on the room                              tax              50.00
+#   laundry raised in error                +500.00
+#   laundry reversal                       -500.00
+#   laundry, corrected                     +200.00  charges net     200.00
+#   GST on the net laundry, 18%                     tax              36.00
+#                                                   ------------------------
+#                                                   owed          1,286.00
+#   payment taken in error               +1,000.00
+#   payment reversal                     -1,000.00
+#   payment, corrected                   +1,286.00  collected     1,286.00
+#                                                   ------------------------
+#                                                   OUTSTANDING       0.00
+#
+# Settled exactly — but only once the reversals are signed. Measured with
+# the pre-R-7 probes the same rows read `outstanding = -3,072.00`.
+#
+# THE PRODUCTION DEFECT THIS DATASET FOUND
+# -----------------------------------------
+# `gst_service.compute_stay_gst` — the GST behind `calculate_stay_amount`,
+# and therefore behind checkout, the invoice and every report — loops over
+# a reservation's extra charges and reads `ec.amount` **unsigned**
+# (`gst_service.py:492`). It never calls `signed_extra_charge_amount`,
+# which is the very function the codebase provides for this.
+#
+# So a reversed charge is taxed instead of untaxed. On this narrative:
+#
+#     laundry raised    500.00 x 18%  =  90.00
+#     laundry reversed  500.00 x 18%  =  90.00   <- should be -90.00
+#     laundry corrected 200.00 x 18%  =  36.00
+#                                       216.00   against a truth of 36.00
+#     room            1,000.00 x  5%  =  50.00
+#                                       ------
+#     compute_stay_gst reports          266.00   against a truth of 86.00
+#
+# **The guest is charged 180.00 of GST on money that was reversed**, and
+# the more times a charge is corrected the further it compounds. Every
+# layer downstream of `calculate_stay_amount` inherits it.
+#
+# Per the standing Wave 0 instruction this is REPORTED AND NOT FIXED. No
+# application code is touched. The consequence is declared instead:
+# `INV-C02` is expected **VIOLATED**, by exactly 180.00, and the dataset
+# is the regression test that will notice when the defect is repaired —
+# at which point this expectation must be re-declared with evidence.
+#
+# It is a new instance of a class already on the register (multiple
+# independent definitions of a financial quantity: `tax_lines` says one
+# thing, `compute_stay_gst` computes another), and the first one anybody
+# has been able to point at, because production has never held a
+# correction.
+#
+# WHAT THIS DATASET DELIBERATELY DOES NOT MODEL
+# ----------------------------------------------
+# **A tax line for the reversal.** `tax_lines` has no `is_reversal` and no
+# `corrects_id` column, so the correction pattern that exists for money
+# has **no counterpart for tax**. The declared tax lines therefore cover
+# the net taxable supply — the room, and the corrected 200.00 laundry —
+# because that is what was actually supplied. How a reversed taxed charge
+# is meant to unwind its tax line is a question the schema cannot express,
+# and inventing a convention here would mean testing the invention.
+#
+# Recorded as a schema gap alongside the defect above.
+#
+# **The closed-audit trigger.** The pattern is called "post-audit
+# corrections" and exists because a closed night audit must not be
+# mutated. This dataset declares no night audit, so it exercises the
+# correction shape without the condition that provokes it. Adding one
+# would drag in INV-B02's snapshot hash and INV-B03's recomputation, and a
+# hand-written snapshot would either fail both or be tuned until it
+# passed.
+
+_ROOM_CORR = 3            # 103, Deluxe.
+
+
+@dataset(
+    dataset_id='DS-ACT-CORRECTION',
+    version='1.0',
+    title='A charge and a payment, each corrected the way the audit requires',
+    purpose=Purpose.ACTIVATE_INVARIANT,
+
+    business_narrative=(
+        'Anita Desai stays one night in room 103 on 10 July at 1,050.00 '
+        'inclusive of 5% GST. A 500.00 laundry charge is posted to her '
+        'folio the same evening.\n\n'
+        'On the morning of the 11th, as she checks out, two errors come to '
+        'light. The laundry was somebody else\'s and only 200.00 of it was '
+        'hers, and the 1,000.00 she was asked for at the desk was short of '
+        'what she owed. Neither original row is edited. The laundry charge '
+        'is reversed in full and re-posted at 200.00; the payment is '
+        'reversed in full and re-posted at 1,286.00. All four new rows name '
+        'the row they correct and carry the reason.\n\n'
+        'She leaves settled to the rupee, owing nothing, and the folio '
+        'shows every step: what was charged, what was wrong with it, and '
+        'what replaced it.\n\n'
+        'Nothing the hotel DID here is wrong. The correction path worked, '
+        'which is the only way to give INV-D02 a population it can hold '
+        'over — a dataset that activated it with a broken correction would '
+        'prove the rule fires but never that a correct correction passes '
+        'it.\n\n'
+        'What is wrong is what the system then calculates. '
+        'compute_stay_gst reads extra charges unsigned, so it taxes the '
+        'reversed 500.00 as well as the corrected 200.00 and reports GST '
+        'of 266.00 where the truth is 86.00 — 180.00 of tax on money that '
+        'was taken back. INV-C02 is therefore declared VIOLATED, by '
+        'exactly that amount. The guest paid what she owed; the engine '
+        'believes she still owes 180.00. See the note above the '
+        'declaration.\n\n'
+        'INV-D02 is the only VACUOUS invariant that is RELEASE_BLOCKING, '
+        'and until now the only thing exercising it was a D5 fault '
+        'injection. Its own VACUOUS message records the consequence: the '
+        'signing logic in signed_extra_charge_amount is untested by live '
+        'data. This dataset is the first data of that shape the framework '
+        'has ever held.'
+    ),
+
+    timeline=(
+        Event(date='2026-07-10',
+              description='Anita Desai checks into room 103 for one night '
+                          'at 1,050.00 inclusive.',
+              tables=('guests', 'reservations', 'reservation_rooms',
+                      'folios', 'reservation_night_rates', 'tax_lines'),
+              amount='1050.00'),
+        Event(date='2026-07-10',
+              description='A 500.00 laundry charge is posted to her folio.',
+              tables=('extra_charges',),
+              amount='500.00'),
+        Event(date='2026-07-10',
+              description='She pays 1,000.00 in cash at the desk.',
+              tables=('payments',),
+              amount='1000.00'),
+        Event(date='2026-07-11',
+              description='The laundry is found to be wrong. The original '
+                          'row is left untouched; a reversal of 500.00 and '
+                          'a replacement of 200.00 are posted, both naming '
+                          'the charge they correct.',
+              tables=('extra_charges',),
+              amount='200.00'),
+        Event(date='2026-07-11',
+              description='The payment is found to be short. It is reversed '
+                          'in full and re-posted at 1,286.00, both rows '
+                          'naming the payment they correct.',
+              tables=('payments',),
+              amount='1286.00'),
+        Event(date='2026-07-11',
+              description='She checks out settled, is invoiced 1,286.00, '
+                          'and the hotel is owed nothing.',
+              tables=('reservations',),
+              amount='0.00'),
+    ),
+
+    provenance=Provenance(
+        origin=Origin.SYNTHETIC,
+        author='Wave 0.6 / D6 Step 2',
+        created='2026-08-08',
+        derivation=(
+            'Written by hand from the narrative above, following the '
+            'correction pattern documented on app.models.Payment and '
+            'app.models.ExtraCharge and implemented in '
+            'app.services.post_payment_correction. No production row was '
+            'copied, transformed or sampled — production contains no '
+            'correction of any kind, which is why this dataset exists.'),
+        contains_real_guest_data=False,
+        disclosure='Publishable. Contains no real guest and no real stay.',
+        rationale=(
+            'SYNTHETIC by necessity rather than choice: the population is '
+            'empty in production, so there is nothing to derive from.'),
+    ),
+
+    expectations=Expectations(
+        financial={
+            'reservations_count': '1',
+            'guests_count': '1',
+            'folios_count': '1',
+            # The original, its reversal and its replacement.
+            'payments_count': '3',
+
+            # Gross counts every row that was written, including the two
+            # that cancel each other.
+            'payments_gross': '3286.00',
+            'payments_voided': '0.00',
+            # 1,000.00 - 1,000.00 + 1,286.00. This figure is the reason R-7
+            # exists: unsigned it reads 3,286.00.
+            'payments_net': '1286.00',
+            # Both the reversal and the replacement are flagged
+            # is_correction, so this is 1,000 + 1,286.
+            'payments_corrections': '2286.00',
+            'payments_reversals': '1000.00',
+
+            'extra_charges_total': '1200.00',
+            'extra_charges_room_rent': '0.00',
+            'extra_charges_non_room_rent': '1200.00',
+            'extra_charges_reversals': '500.00',
+            # 500.00 - 500.00 + 200.00. Unsigned it reads 1,200.00.
+            'extra_charges_net': '200.00',
+            'extra_charges_non_room_rent_net': '200.00',
+
+            'room_revenue': '1000.00',
+            'room_discount': '0.00',
+
+            # The room at 5% and the NET laundry at 18%: 50.00 + 36.00.
+            # The reversal has no tax line because `tax_lines` cannot
+            # express one — the schema has no is_reversal. What was
+            # supplied is the room and 200.00 of laundry, and that is what
+            # is taxed.
+            #
+            # This is the figure the engine disagrees with: it computes
+            # 266.00 by taxing the reversed 500.00 as well.
+            'tax_total': '86.00',
+            # 1,000.00 room + 200.00 laundry.
+            'taxable_total': '1200.00',
+            'tax_lines_count': '4',
+            'tax_base_count': '2',
+
+            'overpayment_total': '0.00',
+            'overpayment_count': '0',
+            'credit_note_total': '0.00',
+            'credit_note_count': '0',
+            'void_request_count': '0',
+            'corporate_credit_used': '0.00',
+            'corporate_bookings': '0',
+
+            'invoice_unrounded_grand_total': '1286.00',
+            'invoice_round_off_total': '0.00',
+            'invoice_rounded_grand_total': '1286.00',
+            'invoice_round_off_rows': '0',
+
+            # 1,000 room + 200 net laundry + 86 tax.
+            'charges_net': '1286.00',
+            # Settled exactly. With the pre-R-7 probes the same rows read
+            # -3,072.00, which is what makes this the sharpest single
+            # assertion in the dataset.
+            'outstanding': '0.00',
+        },
+
+        invariants={
+            # THE TARGET. Population 4 — a reversal and a replacement in
+            # each table — every one carrying a corrects_id that resolves
+            # inside its own table.
+            'INV-D02': 'HOLDS',
+
+            # Three charges on one folio and one reservation, so the two
+            # groupings cannot disagree. Note this is a population
+            # DS-ACT-INHOUSE did not have.
+            'INV-A03': 'HOLDS',
+            # Every payment and every charge carries a folio_id.
+            'INV-A02': 'HOLDS',
+            # 1,000.00 x 2.5% = 25.00, twice, exactly.
+            'INV-A05': 'HOLDS',
+            'INV-C03': 'HOLDS',
+            'INV-C04': 'HOLDS',
+            'INV-D01': 'HOLDS',
+            'INV-D03': 'HOLDS',
+            'INV-D04': 'HOLDS',
+            'INV-D06': 'HOLDS',
+
+            # VIOLATED, and this is the finding rather than a defect in
+            # the data. The guest paid 1,286.00 against charges of
+            # 1,286.00 and owes nothing; `calculate_stay_amount` believes
+            # she owes 180.00, because `compute_stay_gst` taxed the
+            # reversed 500.00 (see THE PRODUCTION DEFECT above).
+            #
+            # Declared rather than dodged. Making it HOLD would mean
+            # either charging the guest tax on reversed money or dropping
+            # the tax from the narrative, and both would hide a live
+            # production defect behind a green dataset.
+            #
+            # When the defect is repaired this expectation MUST be
+            # re-declared with evidence — that is the dataset doing its
+            # job, not the dataset breaking.
+            'INV-C02': 'VIOLATED',
+
+            # Cash only, so the OTA population is empty (P10).
+            'INV-C01': 'VACUOUS',
+        },
+    ),
+
+    rows=(
+        ('guests',
+         ('id', 'name', 'phone'),
+         ((1, 'Anita Desai', '9800000003'),)),
+
+        ('reservations',
+         ('id', 'guest_id', 'room_id', 'room_type_id',
+          'arrival_date', 'departure_date', 'adults', 'status',
+          'rate_per_night', 'standard_tariff', 'expected_tariff',
+          'advance_payment', 'source', 'booking_type', 'pricing_mode',
+          'created_at', 'checked_in_at', 'checkin_by',
+          'checked_out_at', 'checkout_by', 'checkout_time',
+          'invoice_number', 'invoice_unrounded_grand_total',
+          'invoice_round_off_amount', 'invoice_rounded_grand_total',
+          'noshow_exempt', 'checkout_initiated', 'credit_amount',
+          'credit_settled_amount', 'cancellation_amount_refunded',
+          'cancellation_amount_forfeited',
+          'cancellation_amount_credit_voucher'),
+         ((1, 1, _ROOM_CORR, _ROOM_TYPE_ID,
+           '2026-07-10', '2026-07-11', 1, 'CheckedOut',
+           1000.00, 1000.00, 1000.00,
+           0.0, 'Walk-in', 'Regular', 'standard',
+           '2026-07-10 13:00:00.000000', '2026-07-10 13:00:00.000000',
+           'admin',
+           '2026-07-11 09:15:00.000000', 'admin', '09:15',
+           # The invoice the guest was actually given: 1,000 room + 200
+           # laundry + 86 tax. NOT the 1,466.00 compute_stay_gst would
+           # produce, because that figure includes tax on money the hotel
+           # took back.
+           'INV-2026-000001', 1286.00, 0.0, 1286.00,
+           0, 1, 0.0, 0.0, 0.0, 0.0, 0.0),)),
+
+        ('reservation_rooms',
+         ('id', 'reservation_id', 'room_id', 'is_primary', 'created_at'),
+         ((1, 1, _ROOM_CORR, 1, '2026-07-10 13:00:00.000000'),)),
+
+        ('folios',
+         ('id', 'reservation_id', 'folio_letter', 'label', 'is_closed',
+          'created_at'),
+         ((1, 1, 'A', 'Guest', 1, '2026-07-10 13:00:00.000000'),)),
+
+        ('reservation_night_rates',
+         ('id', 'reservation_id', 'stay_date', 'room_type_id', 'room_id',
+          'standard_rate', 'resolved_rate', 'final_rate', 'discount_amount',
+          'rate_source', 'pricing_mode', 'manual_override', 'tax_rate',
+          'is_posted', 'is_locked', 'created_at', 'updated_at'),
+         ((1, 1, '2026-07-10', _ROOM_TYPE_ID, _ROOM_CORR,
+           1000.00, 1000.00, 1000.00, 0.0,
+           'base_rate', 'standard', 0, 5, 0, 0,
+           '2026-07-10 13:00:00.000000', '2026-07-10 13:00:00.000000'),)),
+
+        ('tax_lines',
+         ('id', 'reservation_id', 'charge_source_type', 'charge_source_id',
+          'charge_date', 'taxable_amount', 'tax_type', 'tax_rate',
+          'tax_amount', 'is_interstate', 'is_exempted', 'sac_code',
+          'created_at'),
+         ((1, 1, 'room_night', 'night_2026-07-10', '2026-07-10',
+           1000.00, 'CGST', 2.5, 25.00, 0, 0, '996311',
+           '2026-07-10 13:00:00.000000'),
+          (2, 1, 'room_night', 'night_2026-07-10', '2026-07-10',
+           1000.00, 'SGST', 2.5, 25.00, 0, 0, '996311',
+           '2026-07-10 13:00:00.000000'),
+          # The laundry that was actually supplied — charge 3, the
+          # corrected 200.00 — at the 18% category rate, split 9 + 9.
+          # Charges 1 and 2 cancel and carry no tax line between them,
+          # because `tax_lines` has no way to express a reversal.
+          (3, 1, 'extra_charge', '3', '2026-07-11',
+           200.00, 'CGST', 9.0, 18.00, 0, 0, '999719',
+           '2026-07-11 09:05:00.000000'),
+          (4, 1, 'extra_charge', '3', '2026-07-11',
+           200.00, 'SGST', 9.0, 18.00, 0, 0, '999719',
+           '2026-07-11 09:05:00.000000'),)),
+
+        # The correction pair, in the order the desk raised them. The
+        # original is row 1 and is never edited — that is the property the
+        # whole pattern exists to preserve, and a dataset that mutated it
+        # would be modelling the defect rather than the control.
+        ('extra_charges',
+         ('id', 'reservation_id', 'folio_id', 'description', 'amount',
+          'charge_date', 'charge_type', 'charge_category',
+          'is_correction', 'is_reversal', 'corrects_id',
+          'correction_reason', 'created_at'),
+         ((1, 1, 1, 'Laundry', 500.00, '2026-07-10',
+           'laundry', 'Laundry', 0, 0, None, None,
+           '2026-07-10 19:30:00.000000'),
+          (2, 1, 1, 'Laundry - reversal', 500.00, '2026-07-11',
+           'laundry', 'Laundry', 1, 1, 1,
+           'Charge belonged to another room', '2026-07-11 09:05:00.000000'),
+          (3, 1, 1, 'Laundry - corrected', 200.00, '2026-07-11',
+           'laundry', 'Laundry', 1, 0, 1,
+           'Charge belonged to another room', '2026-07-11 09:05:00.000000'),)),
+
+        ('payments',
+         ('id', 'reservation_id', 'folio_id', 'payment_mode_id', 'amount',
+          'payment_date', 'reference_number', 'created_at', 'is_voided',
+          'is_correction', 'is_reversal', 'corrects_id',
+          'correction_reason', 'payment_purpose'),
+         ((1, 1, 1, _CASH, 1000.00, '2026-07-10', '',
+           '2026-07-10 13:05:00.000000', 0, 0, 0, None, None, 'settlement'),
+          (2, 1, 1, _CASH, 1000.00, '2026-07-11', '',
+           '2026-07-11 09:10:00.000000', 0, 1, 1, 1,
+           'Collected short of the folio total', 'settlement'),
+          (3, 1, 1, _CASH, 1286.00, '2026-07-11', '',
+           '2026-07-11 09:10:00.000000', 0, 1, 0, 1,
+           'Collected short of the folio total', 'settlement'),)),
+    ),
+
+    business_date='2026-07-11',
+
+    #: The claim this dataset exists to make. Commissioning checks it
+    #: against reality: if INV-D02 were still VACUOUS after building, the
+    #: ACTIVATION element fails and the dataset is not commissioned.
+    activates_invariants=('INV-D02',),
+
+    # -- the discrimination gate -----------------------------------------
+    #
+    # Break the link, not the money. Nulling `corrects_id` on the payment
+    # reversal leaves every figure in the dataset untouched — the amounts,
+    # the balance and the counts are all identical — and turns a traceable
+    # correction into exactly what INV-D02 forbids: a negative-signed entry
+    # with no original.
+    #
+    # That is the perturbation worth having. One that moved money would
+    # break the financial probes and prove nothing about whether the
+    # traceability rule can fail.
+    perturbation=(
+        'UPDATE payments SET corrects_id = NULL WHERE id = 2',
+    ),
+    perturbation_breaks=(
+        'INV-D02',
+    ),
+
+    # -- the coverage ledger, declared BEFORE the dataset was built ------
+    #
+    # Reasoned from the narrative and the production registries, recorded
+    # in evidence/20260808_ds_act_correction_prediction/ before this
+    # declaration was written. Any discrepancy against `ds-coverage` is a
+    # finding, not a transcription error.
+    coverage_expectation={
+        # None. Every resolver this dataset satisfies already resolves on
+        # production, and it has no CheckedIn reservation, no company and
+        # no group block. This is an invariant-activation dataset and the
+        # declaration says so rather than implying D2 value it does not
+        # have.
+        'surfaces_added': (),
+        'surfaces_lost': (
+            'reports.night_audit_snapshot__night_audit_log',
+        ),
+        'invariants_activated': (
+            'INV-D02',
+        ),
+        # Seven, not the eight DS-ACT-INHOUSE lost. INV-A03 is the
+        # difference: that dataset had no extra_charges at all, this one
+        # has three, so INV-A03 keeps a population and should merely
+        # change. It is the one entry that cannot be got right by copying
+        # the previous ledger.
+        'invariants_deactivated': (
+            'INV-B01', 'INV-B02', 'INV-B03', 'INV-B05',
+            'INV-C01', 'INV-C05', 'INV-D07',
+        ),
+    },
+
+    principles=('P9', 'P10', 'P11', 'P14'),
+    modes=(Mode.REGRESSION, Mode.INVARIANT_ACTIVATION,
+           Mode.CONTINUOUS_VERIFICATION),
+
+    # Six of six, ACTIVATION included: INV-D02 is no longer VACUOUS, and
+    # the claim is cross-checked against the evidence on every registry
+    # call.
+    commissioning_status=Commissioning.COMMISSIONED,
+)
+def _correction():
     pass
