@@ -1,0 +1,85 @@
+{
+  "commissioned": true,
+  "elements": [
+    "positive_case",
+    "negative_case",
+    "fault_injection",
+    "detection",
+    "evidence",
+    "repeatability",
+    "determinism",
+    "order_independence"
+  ],
+  "outcomes": [
+    {
+      "baseline_status": "HOLDS",
+      "baseline_violations": 0,
+      "blast_radius": [],
+      "checks": {
+        "detection": true,
+        "determinism": true,
+        "evidence": true,
+        "fault_injection": true,
+        "negative_case": true,
+        "order_independence": true,
+        "positive_case": true,
+        "repeatability": true
+      },
+      "invariant_id": "INV-D07",
+      "not_seedable_reason": "",
+      "notes": {
+        "detection": "the declared invariant fired",
+        "determinism": "two independent processes agreed",
+        "evidence": "evidence complete",
+        "fault_injection": "1 row(s) changed by the declared seed",
+        "negative_case": "status HOLDS -> VIOLATED",
+        "order_independence": "unchanged when the registry was evaluated in reverse order",
+        "positive_case": "baseline status HOLDS over 2 row(s), 0 violation(s)",
+        "repeatability": "identical on re-evaluation in the same process"
+      },
+      "route": "data seed",
+      "rows_changed": 1,
+      "seeded_status": "VIOLATED",
+      "seeded_violations": 1,
+      "title": "Every overpayment record corresponds to a real overpayment"
+    },
+    {
+      "baseline_status": "",
+      "baseline_violations": 0,
+      "blast_radius": [],
+      "checks": {
+        "determinism": true
+      },
+      "invariant_id": "NULL-CONTROL",
+      "not_seedable_reason": "",
+      "notes": {
+        "determinism": "no invariant moved on unmutated data"
+      },
+      "route": "none",
+      "rows_changed": 0,
+      "seeded_status": "",
+      "seeded_violations": 0,
+      "title": "Identical data must produce identical results"
+    },
+    {
+      "baseline_status": "",
+      "baseline_violations": 0,
+      "blast_radius": [],
+      "checks": {
+        "evidence": true
+      },
+      "invariant_id": "WRITE-CONTROL",
+      "not_seedable_reason": "",
+      "notes": {
+        "evidence": "0 write statement(s) counted across the whole registry"
+      },
+      "route": "none",
+      "rows_changed": 0,
+      "seeded_status": "",
+      "seeded_violations": 0,
+      "title": "The engine performs zero database writes"
+    }
+  ],
+  "passed": 3,
+  "total": 3
+}

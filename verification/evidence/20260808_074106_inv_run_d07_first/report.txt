@@ -1,0 +1,63 @@
+====================================================================================================
+DSBC FRONTLINE — FINANCIAL INVARIANT ENGINE
+Production Verification Framework, Wave 0 Deliverable 4
+====================================================================================================
+Started           : 2026-08-08T07:41:06
+Duration          : 0.9s
+Application       : v2.2.18
+PVF               : v0.5.0
+Mode / scope      : ENTIRE_DATABASE
+Business date     : 2026-05-28
+Clock frozen at   : 2026-05-28T12:00:00
+
+----------------------------------------------------------------------------------------------------
+CONTROLS (Principle 11 — positive evidence, not silence)
+----------------------------------------------------------------------------------------------------
+Source database   : C:\Users\SIPL Server\Downloads\DSS\SukoonPMS\SukoonPMS\instance\pms.db
+Copy method       : sqlite-backup-api
+SHA-256 before    : f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c
+SHA-256 after     : f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c
+  read-only       : VERIFIED — production byte-identical after run
+  zero writes     : VERIFIED — 0 write statements counted across the whole registry
+  frozen clock    : proven
+  repeatable      : VERIFIED — a second evaluation produced identical findings
+  order independent: VERIFIED — reverse-order evaluation produced identical findings
+  commissioning   : VERIFIED — every COMMISSIONED claim is backed by 20260804_172142_inv_commission
+
+----------------------------------------------------------------------------------------------------
+SUMMARY
+----------------------------------------------------------------------------------------------------
+  Registered        : 1
+  HOLDS             : 1
+  VIOLATED          : 0
+  VACUOUS           : 0
+  NOT_APPLICABLE    : 0
+  ERROR             : 0
+  Violations found  : 0
+  Uncommissioned    : 1  (reported, but excluded from the verdict)
+
+  OVERALL VERDICT   : INCOMPLETE
+  Release blocking  : 0
+  Cert. blocking    : 0
+
+====================================================================================================
+PERFORMANCE AND SAFETY
+====================================================================================================
+ID        STATUS              POP  VIOL     ms   reads  writes    rows  peak KB  TITLE
+----------------------------------------------------------------------------------------------------
+INV-D07   HOLDS                 2     0     42      16       0       3      973  Every overpayment record correspon
+----------------------------------------------------------------------------------------------------
+TOTAL                                 0     42      16       0       3      973
+
+====================================================================================================
+COMMISSIONING GAPS (1)
+====================================================================================================
+An invariant that has never been shown to fail is not yet a
+control. These are reported by the engine and excluded from its
+verdict until commissioning demonstrates the failure.
+  INV-D07    NOT_COMMISSIONED
+      declared but not yet commissioned
+
+====================================================================================================
+END OF REPORT
+====================================================================================================

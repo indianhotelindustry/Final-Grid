@@ -13,6 +13,8 @@ why they belong in the engine rather than in the schema.
 """
 from __future__ import annotations
 
+from decimal import Decimal
+
 from verification.invariants.helpers import (
     dec, money, row_violation, summarise, verdict,
 )
@@ -625,3 +627,204 @@ def _d06(ctx):
             {'expected': 'every priced night lies inside its stay',
              'observed': summarise('nightly rate rows', len(rows), violations),
              'inputs': {'night_rate_rows': len(rows)}})
+
+
+# ---------------------------------------------------------------------------
+# INV-D07 — every overpayment record corresponds to a real overpayment
+# ---------------------------------------------------------------------------
+#
+# R-4 of D5_5_REMEDIATION.md, closing blind spot BS-1.
+#
+# THE MATERIALITY THRESHOLD IS DECLARED TWICE — see R-5
+# ------------------------------------------------------
+# The constant below is the same policy value INV-A06 carries inline as
+# ``Decimal('-1.00')`` (``rules_a.py``). Two independent definitions of one
+# business policy is exactly the defect P1 forbids for financial
+# quantities, and it will not stay in step by itself: change the threshold
+# in one place and this rule and its converse begin disagreeing about who
+# is overpaid.
+#
+# It is stated here rather than silently shared because R-5 — whether
+# 1.00 is the right threshold at all — is an open decision for the project
+# owner, and collapsing the two definitions before the policy is settled
+# would bake today's answer into the structure. The duplication is
+# deliberate, recorded, and should be removed by whichever way R-5 is
+# decided. See D5_5_R5_MATERIALITY_PROPOSAL.md.
+#
+# AND THE THRESHOLD MAKES THE TWO RULES DISAGREE BELOW IT
+# -------------------------------------------------------
+# Measured, not argued (evidence/20260808_inv_d07_branches): a reservation
+# overpaid by 0.50 with an unresolved log row is reported VIOLATED here,
+# because 0.50 does not clear the threshold and this rule therefore reads
+# the reservation as "not overpaid". INV-A06 reads the same reservation as
+# outside its population entirely.
+#
+# So below 1.00 the two rules do not merely stay silent — they disagree
+# about whether an overpayment exists, and this one calls a truthful record
+# baseless. Production escapes it only because both live rows carry
+# ``resolution = 'income'``; an unresolved sub-rupee overpayment would be
+# reported as an orphan liability when it is a real one.
+#
+# This is NOT worked around. Suppressing it would hide the consequence of a
+# policy nobody has decided yet, and the behaviour is the strongest
+# available argument that R-5 needs an answer rather than a default.
+MATERIALITY_THRESHOLD = Decimal('1.00')
+
+
+@invariant(
+    invariant_id='INV-D07',
+    title='Every overpayment record corresponds to a real overpayment',
+    category=Category.REFERENTIAL,
+    business_purpose=(
+        'An overpayment record is the hotel acknowledging it holds money it '
+        'does not own. A record with no overpayment behind it is a declared '
+        'liability against a guest who was never in credit: it invites a '
+        'refund of money the guest never overpaid, and it makes the refund '
+        'ledger unreconcilable against the folios it claims to describe.'),
+    business_rule=(
+        'Every overpayment_logs row references an existing reservation, and '
+        'either that reservation is still overpaid by more than the '
+        'materiality threshold, or the row carries a non-empty resolution '
+        'explaining why it is not.'),
+    severity=Severity.HIGH,
+    blocking=Blocking.CERTIFICATION,
+    data_sources=('overpayment_logs', 'reservations', 'payments'),
+    canonical_engine='app.services.calculate_stay_amount',
+    validation_method=(
+        'Take every overpayment_logs row as the population. Resolve its '
+        'reservation, compute that reservation\'s settlement balance '
+        'through the canonical engine, and require either a live '
+        'overpayment beyond the threshold or a stated resolution.'),
+    evidence_produced=(
+        'Per log row: reservation, amount logged, current settlement '
+        'balance, resolution recorded.'),
+    failure_message=(
+        'An overpayment record exists against a reservation that is not '
+        'overpaid and carries no explanation of why not.'),
+    likely_root_causes=(
+        'An overpayment resolved by refund or posting without the log row '
+        'being given a resolution',
+        'A log row written against the wrong reservation id',
+        'A payment later voided or corrected, removing the overpayment and '
+        'leaving the record behind',
+        'A reservation deleted or re-keyed without cascading its logs'),
+    suggested_investigation=(
+        'Compare the log row\'s created_at against the reservation\'s last '
+        'payment and any void or correction posted after it',
+        'Check whether the refund and write-off paths set a resolution or '
+        'only delete the overpayment',
+        'For an orphan, look for the reservation id in audit_logs — the '
+        'row it pointed at may have been re-keyed rather than removed'),
+    applicable_releases='all',
+    applicable_business_dates='all',
+
+    # Set only after the eight elements passed, and cross-checked against
+    # the evidence on every registry call. Status HOLDS -> VIOLATED under
+    # the declared seed; 0 writes; agreed across two independent processes
+    # and under reverse registry order.
+    commissioning_status=Commissioning.COMMISSIONED,
+    modes=WHOLE_DB + (Mode.SINGLE_RESERVATION,),
+
+    # P14 is the point of the rule: provenance runs both ways, and a
+    # financial record that names something which does not exist has none.
+    principles=('P1', 'P10', 'P14'),
+    affected_reports=('reports.refund_report', 'main.reservation_folio',
+                      'night audit folio control'),
+
+    # R-4's proposed seed: a log row against a reservation that is not
+    # overpaid. The resolution is empty rather than omitted because the
+    # column is NOT NULL — an omitted one would fail to insert and the seed
+    # would report a broken control instead of a detected defect, the
+    # confusion SeedDidNotApply exists to prevent.
+    negative_seed=(
+        "INSERT INTO overpayment_logs "
+        "(reservation_id, guest_id, overpaid_amount, reason, resolution, "
+        " created_at) "
+        "SELECT r.id, r.guest_id, 500.00, 'seeded', '', "
+        "       '2026-01-01 00:00:00.000000' "
+        "FROM reservations r ORDER BY r.id LIMIT 1",
+    ),
+    negative_seed_reason=(
+        'A 500.00 overpayment recorded against a reservation that is not in '
+        'credit, with no resolution stating why, is precisely the orphan '
+        'liability BS-1 found nothing anywhere was asking about.'),
+)
+def _d07(ctx):
+    from app.models import Reservation
+    from app.services import calculate_stay_amount
+
+    if not ctx.table_exists('overpayment_logs'):
+        return (Status.NOT_APPLICABLE, 0, [],
+                {'expected': 'every overpayment record has an overpayment',
+                 'observed': 'overpayment_logs does not exist in this schema '
+                             'version',
+                 'inputs': {}})
+
+    ctx.require_app('INV-D07')
+
+    where = ''
+    if ctx.reservation_id:
+        where = f' WHERE reservation_id = {int(ctx.reservation_id)}'
+    rows = ctx.sql(
+        'SELECT id, reservation_id, overpaid_amount, reason, resolution, '
+        '       created_at '
+        f'FROM overpayment_logs{where} ORDER BY id')
+
+    # One engine call per reservation, not per log row: two records against
+    # the same stay must not be able to disagree about its balance.
+    balances: dict = {}
+
+    def balance_of(reservation_id):
+        if reservation_id not in balances:
+            reservation = Reservation.query.get(reservation_id)
+            balances[reservation_id] = (
+                None if reservation is None
+                else dec(calculate_stay_amount(
+                    reservation)['settlement_balance']))
+        return balances[reservation_id]
+
+    violations = []
+    orphaned = 0
+    live = 0
+    resolved = 0
+    for row in rows:
+        logged_amount = dec(row['overpaid_amount'])
+        balance = balance_of(row['reservation_id'])
+
+        if balance is None:
+            orphaned += 1
+            violations.append(row_violation(
+                'overpayment_log', row['id'],
+                expected='an existing reservation',
+                observed=f'reservation_id {row["reservation_id"]} not found',
+                amount=logged_amount))
+            continue
+
+        # Overpaid means the guest is in credit, so the balance is negative.
+        if balance < -MATERIALITY_THRESHOLD:
+            live += 1
+            continue
+
+        if (row['resolution'] or '').strip():
+            resolved += 1
+            continue
+
+        violations.append(row_violation(
+            'overpayment_log', row['id'],
+            expected=(f'a settlement balance below '
+                      f'-{money(MATERIALITY_THRESHOLD)}, or a resolution'),
+            observed=f'balance {money(balance)}, resolution empty',
+            amount=logged_amount, reservation_id=row['reservation_id'],
+            variance=money(balance)))
+
+    return (verdict(len(rows), violations), len(rows), violations,
+            {'expected': 'every overpayment record has an overpayment behind '
+                         'it or an explanation of why it no longer does',
+             'observed': summarise('overpayment log rows', len(rows),
+                                   violations),
+             'inputs': {'overpayment_log_rows': len(rows),
+                        'still_overpaid': live,
+                        'resolved': resolved,
+                        'orphaned_reservation': orphaned,
+                        'materiality_threshold': money(
+                            MATERIALITY_THRESHOLD)}})

@@ -1,0 +1,23 @@
+== branch 2: resolved (unmodified copy of production) ==
+OK   production status                                        got HOLDS     want HOLDS
+OK     population is the log table, not the overpaid set      got 2         want 2
+
+== branch 1: reservation still overpaid, resolution empty ==
+OK   a live overpayment does not violate                      got HOLDS     want HOLDS
+OK     population grew by the seeded row                      got 3         want 3
+OK     and it is counted as still overpaid                    got 1         want 1
+
+== branch 4: log row whose reservation does not exist ==
+OK   an orphan violates                                       got VIOLATED  want VIOLATED
+OK     even though it carries a resolution                    got 1         want 1
+
+== branch 3: not overpaid, resolution empty (the declared seed) ==
+OK   an unexplained record violates                           got VIOLATED  want VIOLATED
+
+== the materiality boundary ==
+OK   overpaid by 0.50 (threshold 1.00)                        got VIOLATED  want VIOLATED
+OK   overpaid by 2.00 (threshold 1.00)                        got HOLDS     want HOLDS
+
+OK   production byte-identical throughout                     got True      want True
+
+11 checks, 0 failed

@@ -1,0 +1,255 @@
+{
+  "baseline_app_version": "2.2.18",
+  "baseline_captured_at": "2026-08-03T10:00:24",
+  "baseline_name": "v2.2.18_preWave1",
+  "change_count": 41,
+  "changes": [
+    {
+      "implementation": "ADR::kpi_helpers.get_adr",
+      "kind": "IMPL_ADDED",
+      "now": "0.0",
+      "quantity": "Q16"
+    },
+    {
+      "implementation": "ADR::reports.flash.arr",
+      "kind": "IMPL_ADDED",
+      "now": "0.0",
+      "quantity": "Q16"
+    },
+    {
+      "implementation": "RevPAR::kpi_helpers.get_revpar",
+      "kind": "IMPL_ADDED",
+      "now": "0.0",
+      "quantity": "Q16"
+    },
+    {
+      "implementation": "RevPAR::reports.flash.revpar",
+      "kind": "IMPL_ADDED",
+      "now": "0.0",
+      "quantity": "Q16"
+    },
+    {
+      "implementation": "accrual revenue::kpi_helpers.get_accrual_revenue",
+      "kind": "IMPL_ADDED",
+      "now": "20282.38",
+      "quantity": "Q16"
+    },
+    {
+      "implementation": "accrual revenue::reports.flash.accrual_net",
+      "kind": "IMPL_ADDED",
+      "now": "20282.38",
+      "quantity": "Q16"
+    },
+    {
+      "implementation": "daily collections::kpi_helpers.get_daily_revenue",
+      "kind": "IMPL_ADDED",
+      "now": "15565.87",
+      "quantity": "Q16"
+    },
+    {
+      "implementation": "daily collections::reports.flash.day_revenue",
+      "kind": "IMPL_ADDED",
+      "now": "15565.87",
+      "quantity": "Q16"
+    },
+    {
+      "implementation": "month-to-date collections::kpi_helpers.get_monthly_revenue",
+      "kind": "IMPL_ADDED",
+      "now": "31666.37",
+      "quantity": "Q16"
+    },
+    {
+      "implementation": "month-to-date collections::reports.flash.mtd_revenue",
+      "kind": "IMPL_ADDED",
+      "now": "31666.37",
+      "quantity": "Q16"
+    },
+    {
+      "implementation": "occupancy pct::kpi_helpers.get_occupancy",
+      "kind": "IMPL_ADDED",
+      "now": "0.0",
+      "quantity": "Q16"
+    },
+    {
+      "implementation": "occupancy pct::reports.flash.occ_pct",
+      "kind": "IMPL_ADDED",
+      "now": "0.0",
+      "quantity": "Q16"
+    },
+    {
+      "implementation": "sellable rooms::kpi_helpers.get_occupancy.total",
+      "kind": "IMPL_ADDED",
+      "now": "39",
+      "quantity": "Q16"
+    },
+    {
+      "implementation": "sellable rooms::reports.flash.total_rooms",
+      "kind": "IMPL_ADDED",
+      "now": "39",
+      "quantity": "Q16"
+    },
+    {
+      "baseline": "NOT_IMPLEMENTED",
+      "kind": "VERDICT_CHANGED",
+      "now": "AGREED",
+      "quantity": "Q16"
+    },
+    {
+      "implementation": "ADR::kpi_helpers.get_adr",
+      "kind": "IMPL_ADDED",
+      "now": "0.0",
+      "quantity": "Q17"
+    },
+    {
+      "implementation": "ADR::reports.mis.business.arr",
+      "kind": "IMPL_ADDED",
+      "now": "1303.51",
+      "quantity": "Q17"
+    },
+    {
+      "implementation": "daily collections (report-to-report)::reports.flash.day_revenue",
+      "kind": "IMPL_ADDED",
+      "now": "15565.87",
+      "quantity": "Q17"
+    },
+    {
+      "implementation": "daily collections (report-to-report)::reports.mis.billing.total_collected",
+      "kind": "IMPL_ADDED",
+      "now": "18796.15",
+      "quantity": "Q17"
+    },
+    {
+      "implementation": "daily collections::kpi_helpers.get_daily_revenue",
+      "kind": "IMPL_ADDED",
+      "now": "15565.87",
+      "quantity": "Q17"
+    },
+    {
+      "implementation": "daily collections::reports.mis.billing.total_collected",
+      "kind": "IMPL_ADDED",
+      "now": "18796.15",
+      "quantity": "Q17"
+    },
+    {
+      "implementation": "departures completed::reports.flash.departures_done",
+      "kind": "IMPL_ADDED",
+      "now": "12",
+      "quantity": "Q17"
+    },
+    {
+      "implementation": "departures completed::reports.mis.movement.departures_done",
+      "kind": "IMPL_ADDED",
+      "now": "0",
+      "quantity": "Q17"
+    },
+    {
+      "implementation": "occupancy pct::kpi_helpers.get_occupancy",
+      "kind": "IMPL_ADDED",
+      "now": "0.0",
+      "quantity": "Q17"
+    },
+    {
+      "implementation": "occupancy pct::reports.mis.business.occupancy_pct",
+      "kind": "IMPL_ADDED",
+      "now": "38.5",
+      "quantity": "Q17"
+    },
+    {
+      "implementation": "occupied rooms::kpi_helpers.get_occupancy.occupied",
+      "kind": "IMPL_ADDED",
+      "now": "0",
+      "quantity": "Q17"
+    },
+    {
+      "implementation": "occupied rooms::reports.mis.business.occupied_rooms",
+      "kind": "IMPL_ADDED",
+      "now": "0",
+      "quantity": "Q17"
+    },
+    {
+      "baseline": "NOT_IMPLEMENTED",
+      "kind": "VERDICT_CHANGED",
+      "now": "DIVERGED",
+      "quantity": "Q17"
+    },
+    {
+      "implementation": "arrivals completed::dashboard.checked_in_today",
+      "kind": "IMPL_ADDED",
+      "now": "0",
+      "quantity": "Q18"
+    },
+    {
+      "implementation": "arrivals completed::reports.flash.arrivals_done",
+      "kind": "IMPL_ADDED",
+      "now": "0",
+      "quantity": "Q18"
+    },
+    {
+      "implementation": "daily collections (tile-to-report)::dashboard.cash_collected_today",
+      "kind": "IMPL_ADDED",
+      "now": "15565.87",
+      "quantity": "Q18"
+    },
+    {
+      "implementation": "daily collections (tile-to-report)::reports.flash.day_revenue",
+      "kind": "IMPL_ADDED",
+      "now": "15565.87",
+      "quantity": "Q18"
+    },
+    {
+      "implementation": "daily collections (tile-to-summary)::dashboard.cash_collected_today",
+      "kind": "IMPL_ADDED",
+      "now": "15565.87",
+      "quantity": "Q18"
+    },
+    {
+      "implementation": "daily collections (tile-to-summary)::dashboard.daily_financial_summary.total_collected",
+      "kind": "IMPL_ADDED",
+      "now": "15565.87",
+      "quantity": "Q18"
+    },
+    {
+      "implementation": "daily collections::dashboard.cash_collected_today",
+      "kind": "IMPL_ADDED",
+      "now": "15565.87",
+      "quantity": "Q18"
+    },
+    {
+      "implementation": "daily collections::kpi_helpers.get_daily_revenue",
+      "kind": "IMPL_ADDED",
+      "now": "15565.87",
+      "quantity": "Q18"
+    },
+    {
+      "implementation": "departures completed::dashboard.checked_out_today",
+      "kind": "IMPL_ADDED",
+      "now": "0",
+      "quantity": "Q18"
+    },
+    {
+      "implementation": "departures completed::reports.flash.departures_done",
+      "kind": "IMPL_ADDED",
+      "now": "12",
+      "quantity": "Q18"
+    },
+    {
+      "implementation": "rooms available::dashboard.available_rooms",
+      "kind": "IMPL_ADDED",
+      "now": "39",
+      "quantity": "Q18"
+    },
+    {
+      "implementation": "rooms available::kpi_helpers.get_occupancy.sellable",
+      "kind": "IMPL_ADDED",
+      "now": "39",
+      "quantity": "Q18"
+    },
+    {
+      "baseline": "NOT_IMPLEMENTED",
+      "kind": "VERDICT_CHANGED",
+      "now": "DIVERGED",
+      "quantity": "Q18"
+    }
+  ],
+  "current_app_version": "2.2.18"
+}

@@ -1,0 +1,25 @@
+====================================================================================================
+DSBC FRONTLINE — FINANCIAL INVARIANT ENGINE COMMISSIONING
+Wave 0 Deliverable 4 — Principle 9 / Principle 11
+====================================================================================================
+Result: 3/3 COMMISSIONED
+
+[PASS] INV-D07  (data seed)
+    Every overpayment record corresponds to a real overpayment
+      ok   positive_case        baseline status HOLDS over 2 row(s), 0 violation(s)
+      ok   negative_case        status HOLDS -> VIOLATED
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+
+[PASS] NULL-CONTROL  (none)
+    Identical data must produce identical results
+      ok   determinism          no invariant moved on unmutated data
+
+[PASS] WRITE-CONTROL  (none)
+    The engine performs zero database writes
+      ok   evidence             0 write statement(s) counted across the whole registry
+

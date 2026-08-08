@@ -1,0 +1,86 @@
+{
+  "app_version": "2.2.18",
+  "business_date": "2026-05-28",
+  "certification_blocking": [],
+  "commissioning_evidence_pack": "C:\\Users\\SIPL Server\\Downloads\\DSS\\SukoonPMS\\SukoonPMS\\verification\\evidence\\20260804_172142_inv_commission",
+  "commissioning_gaps": [
+    {
+      "invariant_id": "INV-D07",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    }
+  ],
+  "copy_method": "sqlite-backup-api",
+  "counts": {
+    "HOLDS": 1,
+    "evaluated": 1,
+    "registered": 1,
+    "uncommissioned": 1,
+    "violations": 0
+  },
+  "determinism_proven": true,
+  "duration_seconds": 0.87,
+  "financial_impact": {},
+  "finished_at": "2026-08-08T07:41:07",
+  "freeze_proven": true,
+  "frozen_at": "2026-05-28T12:00:00",
+  "mode": "ENTIRE_DATABASE",
+  "order_independence_proven": true,
+  "order_mismatches": [],
+  "overall": "INCOMPLETE",
+  "pvf_version": "0.5.0",
+  "read_only_verified": true,
+  "registry_size": 1,
+  "release_blocking": [],
+  "repeatability_mismatches": [],
+  "results": [
+    {
+      "blocking": "CERTIFICATION_BLOCKING",
+      "category": "D-REFERENTIAL",
+      "commissioning_status": "NOT_COMMISSIONED",
+      "error": "",
+      "evidence": {
+        "affected_objects": [],
+        "business_date": "2026-05-28",
+        "confidence": "PROVEN",
+        "evidence_files": [],
+        "expected_result": "every overpayment record has an overpayment behind it or an explanation of why it no longer does",
+        "inputs": {
+          "materiality_threshold": "1.00",
+          "orphaned_reservation": 0,
+          "overpayment_log_rows": 2,
+          "resolved": 2,
+          "still_overpaid": 0
+        },
+        "observed_result": "overpayment log rows: 2 row(s) examined, all satisfied",
+        "replay_context": {},
+        "root_cause_candidates": [],
+        "timestamp": "2026-05-28T12:00:00",
+        "variance": ""
+      },
+      "invariant_id": "INV-D07",
+      "metering": {
+        "db_reads": 16,
+        "db_writes": 0,
+        "duration_ms": 42,
+        "memory_peak_kb": 973,
+        "rows_examined": 3
+      },
+      "mode": "ENTIRE_DATABASE",
+      "population": 2,
+      "scope": "ENTIRE_DATABASE",
+      "severity": "HIGH",
+      "status": "HOLDS",
+      "title": "Every overpayment record corresponds to a real overpayment",
+      "violation_count": 0,
+      "violations": []
+    }
+  ],
+  "scope": "ENTIRE_DATABASE",
+  "source_db": "C:\\Users\\SIPL Server\\Downloads\\DSS\\SukoonPMS\\SukoonPMS\\instance\\pms.db",
+  "source_hash_after": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+  "source_hash_before": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+  "started_at": "2026-08-08T07:41:06",
+  "total_writes": 0,
+  "unbacked_commissioning_claims": []
+}

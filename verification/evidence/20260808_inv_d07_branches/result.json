@@ -1,0 +1,52 @@
+{
+ "purpose": "Exercise every branch of INV-D07. The declared negative seed reaches one of four; the other three would otherwise be asserted rather than demonstrated (P9).",
+ "invariant": "INV-D07",
+ "method": "each case built on its own disposable copy of production, evaluated through the framework probe (python -m verification _inv_json --db)",
+ "branches": [
+  {
+   "branch": "live",
+   "condition": "reservation still overpaid beyond the threshold, resolution empty",
+   "required": "HOLDS",
+   "result": "HOLDS",
+   "note": "the balance is what decides, not the resolution field"
+  },
+  {
+   "branch": "resolved",
+   "condition": "not overpaid, resolution recorded",
+   "required": "HOLDS",
+   "result": "HOLDS",
+   "note": "production as it stands, 2 rows, both resolution=income"
+  },
+  {
+   "branch": "unexplained",
+   "condition": "not overpaid, resolution empty",
+   "required": "VIOLATED",
+   "result": "VIOLATED",
+   "note": "the declared negative seed"
+  },
+  {
+   "branch": "orphan",
+   "condition": "reservation does not exist",
+   "required": "VIOLATED",
+   "result": "VIOLATED",
+   "note": "violates even when a resolution is present - referential failure is not excusable by explanation"
+  }
+ ],
+ "materiality_boundary": [
+  {
+   "overpaid_by": "0.50",
+   "result": "VIOLATED",
+   "reading": "below the 1.00 threshold this rule reads the reservation as not overpaid and calls a truthful record baseless"
+  },
+  {
+   "overpaid_by": "2.00",
+   "result": "HOLDS",
+   "reading": "above the threshold the record matches a live overpayment"
+  }
+ ],
+ "r5_consequence": "Below 1.00 INV-A06 and INV-D07 disagree about whether an overpayment exists. INV-A06 excludes the reservation from its population; INV-D07 reports its log row as unbacked. Production escapes only because both live rows carry resolution=income. This is the measured argument that R-5 needs a decision rather than a default.",
+ "population_note": "population is the overpayment_logs table, which is what makes this the converse of INV-A06 rather than a restatement of it. On production it is 2, so the rule is NOT VACUOUS.",
+ "checks": 11,
+ "failed": 0,
+ "production_byte_identical": true
+}
