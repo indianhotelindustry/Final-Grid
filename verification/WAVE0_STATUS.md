@@ -20,7 +20,7 @@ commissioned.** Five are. Wave 0 is half done.
 | D3 | Historical Replay Framework | Complete | 21 / 21 |
 | D4 | Financial Invariant Engine | Complete | 27 / 27 |
 | D5 | Fault Injection Platform | Complete | 37 / 37 |
-| D6 | Regression Dataset Framework | **Step 2 — 2 datasets of 7 commissioned; `INV-D02` activated** | 2 / 2 |
+| D6 | Regression Dataset Framework | **Step 2 — 3 datasets commissioned; `INV-D02` and `INV-D05` activated** | 3 / 3 |
 | D7 | Certification Engine | Not started | — |
 | D8 | CI/CD Verification Pipeline | Not started | — |
 | D9 | Backup Restore Verification | **Blocked** | — |
@@ -33,11 +33,11 @@ Live registry counts, 2026-08-08:
 | Parity quantities (D1) | 22 — `Q01`–`Q22` |
 | Invariants (D4) | **25** — `INV-D07` added by R-4, 2026-08-08; **all 25 COMMISSIONED** |
 | Faults (D5) | 40 — 10 each in classes A/B/C/D; 36 COMMISSIONED, 4 UNCOVERED |
-| Regression datasets (D6) | 2 — `DS-ACT-INHOUSE@1.0`, `DS-ACT-CORRECTION@1.0`, both COMMISSIONED |
-| Invariants with an activating dataset | 1 of 25 — `INV-D02` |
+| Regression datasets (D6) | 3 — `DS-ACT-INHOUSE`, `DS-ACT-CORRECTION`, `DS-ACT-VOIDCN`, all COMMISSIONED |
+| Invariants with an activating dataset | 2 of 25 — `INV-D02`, `INV-D05` |
 | Golden master surfaces (D2) | 158 — 6 UNRESOLVED |
 | Replayed business dates (D3) | 28 |
-| Retained evidence packs | 117 |
+| Retained evidence packs | 125 |
 | Constitutional principles enforced | 14 — no principle uncovered |
 
 ---
@@ -178,13 +178,13 @@ reads and reports; nothing repairs.
 
 | Item | Layer | Why it proves nothing |
 |---|---|---|
-| `Q11` refunds/voids | D1 | VACUOUS — no production rows |
+| `Q11` refunds/voids | D1 | **CLOSED 2026-08-08** — lifted to DIVERGED by `DS-ACT-VOIDCN`, and it found the night audit reporting voided payments as refunds |
 | `Q21` shift cash and variance | D1 | VACUOUS — no shifts |
 | Overpayment recording (`INV-A06`) | D4 | VACUOUS — commissioned, never exercised. **Every overpayment this hotel has recorded is below its ₹1.00 threshold**, so its real coverage is zero; see the R-5 proposal |
 | Orphan overpayment records (`INV-D07`) | D4 | **Not vacuous** — population 2, HOLDS. Added by R-4 |
 | Corporate credit backing | D4 | VACUOUS |
 | Correction/reversal traceability (`INV-D02`) | D4 | **CLOSED 2026-08-08** — activated by `DS-ACT-CORRECTION@1.0`, population 4, HOLDS. Still VACUOUS on production, correctly: production holds no correction |
-| Void/credit-note traceability | D4 | VACUOUS |
+| Void/credit-note traceability (`INV-D05`) | D4 | **CLOSED 2026-08-08** — activated by `DS-ACT-VOIDCN@1.0`, population 2, HOLDS. Still VACUOUS on production, correctly |
 | **6** golden master surfaces | D2 | UNRESOLVED — 3 need a checked-in reservation, 2 a company, 1 a group block. `DS-ACT-INHOUSE` closes the first 3 **on the dataset**; production is unchanged |
 
 A commissioned rule over an empty population still proves nothing about
@@ -268,6 +268,28 @@ Added 2026-08-08, found by `DS-ACT-CORRECTION` and **not repaired**:
   counterpart for tax, so a reversed taxed charge has no declared way to
   unwind its tax line. Schema gap; belongs with whoever owns the GST path.
 
+Added 2026-08-08, found by `DS-ACT-VOIDCN` and **not repaired**:
+
+- **Every cancellation refund violates `INV-D02`.**
+  `services.post_cancellation_disposition` builds the refund row with
+  `is_reversal=True` and **never sets `corrects_id`** — the only four
+  assignments of it in `services.py` are inside `post_payment_correction`
+  and `post_extra_charge_correction`. `INV-D02` is CRITICAL and
+  RELEASE_BLOCKING and forbids exactly that. Derived from source before
+  the dataset was written, then confirmed by building it.
+  `DS-ACT-VOIDCN` declares `INV-D02` VIOLATED.
+- **The night audit reports voided payments as refunds.** `Q11` went
+  VACUOUS → DIVERGED on its first exposure to real data: **₹1,286.00 of
+  voided payments counted as refunds against ₹236.00 of true refunds.** A
+  voided payment never left the bank; a refund did, so conflating them
+  overstates refunds by the value of every void. `Q11` is `Severity.BLOCK`
+  and exists to detect this; it had never fired.
+  Evidence: `evidence/20260808_ds_act_voidcn_q11/`.
+- **No probe nets credit notes against the balance** (candidate **R-8**).
+  `outstanding − credit_note_total` is the true receivable and nothing
+  computes it. A *missing* quantity rather than a *wrong* one, so unlike
+  R-7 it bakes no error into the baseline and was not treated as blocking.
+
 ---
 
 ## 5. Blockers on Wave 1
@@ -311,6 +333,7 @@ documents were **not present in the repository** and remain unrecovered.
 | `D6_SEQUENCING_DECISION.md` | Written 2026-08-08; the group/overpay re-sequencing and its evidence |
 | `D6_COVERAGE_LEDGER.md` | Written 2026-08-08; the Added/Lost/Changed obligation |
 | `D6_DS_ACT_CORRECTION.md` | Written 2026-08-08; the first activating dataset, and the GST-on-reversed-money defect |
+| `D6_DS_ACT_VOIDCN.md` | Written 2026-08-08; `INV-D05` and `Q11`, the refund `corrects_id` defect, and the voids-reported-as-refunds divergence |
 | `D1`–`D5` completion reports | Pre-existing, retained |
 | `D5_5_REMEDIATION_APPLIED.md` | Written 2026-08-08; records R-1/R-2/R-3/R-6 and four errors found in the D5.5 documents |
 | `D6_STEP2_DS_ACT_INHOUSE.md` | Written 2026-08-08; the first commissioned dataset, and the D2 measurement behind it |
@@ -433,13 +456,63 @@ Two things it found:
   exactly that amount. First identified instance of a class already on the
   register. See `D6_DS_ACT_CORRECTION.md` §4.
 
+### `DS-ACT-VOIDCN` — `INV-D05` activated, `Q11` lifted (`7da7740`)
+
+Taken ahead of `DS-ACT-GROUP` on the owner's activation-first principle and
+on evidence gathered before writing: it activates `INV-D05`
+(certification-blocking) **and** lifts `Q11` (D1, severity BLOCK), while
+`DS-ACT-GROUP` activates nothing at all.
+
+**Two more production findings, both reported and not repaired:**
+
+- **Every cancellation refund violates `INV-D02`.**
+  `post_cancellation_disposition` sets `is_reversal=True` and never sets
+  `corrects_id`; the only four assignments in `services.py` are inside the
+  two correction functions. `INV-D02` is CRITICAL and RELEASE_BLOCKING.
+  Derived from source before the dataset was written, then confirmed.
+- **The night audit reports voided payments as refunds.** `Q11` went
+  VACUOUS → DIVERGED on first exposure: ₹1,286.00 of voided payments
+  counted as refunds against ₹236.00 of true refunds. A voided payment
+  never left the bank; a refund did.
+
+**Candidate R-8, recorded not fixed:** no probe nets credit notes against
+the balance. `outstanding − credit_note_total` is the true receivable and
+nothing computes it. A *missing* quantity rather than a *wrong* one, so it
+bakes no error into the baseline.
+
+### Two of four VACUOUS invariants are closed. Both that remain are blocked on a decision
+
+| | Blocked on |
+|---|---|
+| `INV-A06` | **R-5** — governance, awaiting approval |
+| `INV-C06` | **the `companies` / `content_hash` question**, below |
+
+`companies` is a PRESERVED master table and `builder.content_hash` covers
+only the transactional and guest tables. A dataset declaring a company
+would carry master data **not part of its own identity**. The exclusion is
+deliberate but was reasoned about master data *inherited* from production,
+not master data a dataset *declares*. **`DS-ACT-CORPCREDIT` cannot be
+written until this is decided**, and it was not started.
+
 ### The next piece of work
 
-**`DS-ACT-GROUP`.** It is the only unblocked dataset, and the only route to
-`groups.detail` — the one UNRESOLVED D2 surface with no planned owner.
+**`DS-ACT-GROUP`** — now the only unblocked dataset, and the last route to
+`groups.detail`, the one UNRESOLVED D2 surface with no other owner.
 `group_blocks` is empty and trivially materialisable: 5 required columns
 (`group_name`, `group_code`, `arrival_date`, `departure_date`,
 `total_rooms`).
+
+It **activates nothing**, and is next only because everything with higher
+verification value is waiting on someone. Under the owner's own principle
+that is the right reason to do it and the wrong reason to expect much of
+it — its record must say so rather than let the `DS-ACT-` prefix imply
+otherwise.
+
+**Also outstanding:** the coverage ledger does not measure D1 or D2, and
+two of the three datasets now carry a headline claim it cannot check
+(`DS-ACT-INHOUSE`'s D2 surfaces, `DS-ACT-VOIDCN`'s `Q11`). Both were
+measured by hand. That is an argument for extending the ledger, not for
+trusting it further than it goes.
 
 In this order, and the order is the point:
 
