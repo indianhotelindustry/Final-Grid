@@ -1618,3 +1618,399 @@ _ADMIN = 1                # the only user on this installation.
 )
 def _voidcn():
     pass
+
+
+# ---------------------------------------------------------------------------
+# DS-ACT-GROUP
+# ---------------------------------------------------------------------------
+#
+# The last non-blocked dataset, and the one that activates nothing.
+#
+# WHAT IT DOES AND DOES NOT DO
+# -----------------------------
+# `groups.detail__any_group` is the only golden-master surface UNRESOLVED
+# on production with no other dataset that could ever close it, because
+# `group_blocks` is empty and nothing else in the plan creates one. This
+# dataset closes it.
+#
+# It activates **no invariant, no fault and no parity quantity** — nothing
+# in D1, D4 or D5 references a group table. Re-measured after the coverage
+# ledger was extended to D1, on the reasoning that if any quantity touched
+# groups, that extension was the moment it would surface. Nothing did.
+#
+# So the DS-ACT- prefix is wrong here, as it is for DS-ACT-INHOUSE. It
+# means "activates a VACUOUS D4 control" and this does not. Not renamed,
+# because `dataset_id@version` is a dataset's identity and editing it in
+# place is what the versioning rule exists to prevent — but the record says
+# so plainly rather than letting the name imply value it has not got.
+#
+# It is being written now for a specific reason: everything with higher
+# verification value is blocked on a decision rather than on engineering.
+# INV-A06 waits on R-5; INV-C06 waits on the `companies` / `content_hash`
+# question. This is what remains.
+#
+# The money, kept to the same exact arithmetic as its predecessors:
+#
+#   2 rooms x 1 night x 1,000.00                 room revenue   2,000.00
+#   GST 5%                                       tax              100.00
+#   one banqueting charge                        charges          500.00
+#   GST 18% on it                                tax               90.00
+#                                                ------------------------
+#                                                raised         2,690.00
+#   each room settles its own folio             - 2,690.00
+#                                                OUTSTANDING        0.00
+
+_ROOM_G1 = 5              # 105, Deluxe.
+_ROOM_G2 = 6              # 106, Deluxe.
+
+
+@dataset(
+    dataset_id='DS-ACT-GROUP',
+    version='1.0',
+    title='A two-room group block settling room by room',
+    purpose=Purpose.BASELINE,
+
+    business_narrative=(
+        'The Nair wedding party books two rooms for the night of 20 '
+        'September under one group block, GRP-2026-0001. Both rooms are '
+        'taken at the group rate of 1,050.00 inclusive, and a 590.00 '
+        'banqueting charge for the reception is posted to the first room, '
+        'which carries the reception. On departure each room settles its '
+        'own folio — 1,640.00 and 1,050.00 — and the block closes owing '
+        'nothing.\n\n'
+        'It settles room by room rather than to one master account '
+        'because **the application has no master-account routing**: '
+        'group_blocks.billing_instructions is free text, '
+        'services_group_stay only links reservations to rooms, and '
+        'nothing anywhere moves one reservation\'s charges onto '
+        'another\'s folio. The first draft of this dataset assumed '
+        'otherwise, and INV-C02 correctly reported the second room as a '
+        'checked-out reservation that was never settled.\n\n'
+        'Nothing here is wrong, and nothing here is clever. It is an '
+        'ordinary group stay, which is what the framework has never had.\n\n'
+        'This dataset **activates no invariant, no fault and no parity '
+        'quantity** — nothing in D1, D4 or D5 references a group table. '
+        'What it does is resolve groups.detail, the last golden-master '
+        'surface UNRESOLVED on production that no other planned dataset '
+        'could ever close, because group_blocks is empty and nothing else '
+        'creates one.\n\n'
+        'It is written now because everything with more verification value '
+        'is blocked on a decision rather than on engineering: INV-A06 on '
+        'R-5, INV-C06 on the companies / content_hash question. This is '
+        'the last non-blocked business coverage there is.'
+    ),
+
+    timeline=(
+        Event(date='2026-09-20',
+              description='The Nair wedding party checks into rooms 105 and '
+                          '106 under group block GRP-2026-0001, both at '
+                          '1,050.00 inclusive.',
+              tables=('group_blocks', 'guests', 'reservations',
+                      'reservation_rooms', 'folios',
+                      'reservation_night_rates', 'tax_lines'),
+              amount='2100.00'),
+        Event(date='2026-09-20',
+              description='A 590.00 banqueting charge for the reception is '
+                          'posted to the master account on room 105.',
+              tables=('extra_charges', 'tax_lines'),
+              amount='590.00'),
+        Event(date='2026-09-21',
+              description='Each room settles its own folio - 1,640.00 and '
+                          '1,050.00 - and both check out owing nothing.',
+              tables=('payments', 'reservations'),
+              amount='2690.00'),
+    ),
+
+    provenance=Provenance(
+        origin=Origin.SYNTHETIC,
+        author='Wave 0.7 / D6 Step 2',
+        created='2026-08-08',
+        derivation=(
+            'Written by hand from the narrative above. No production row '
+            'was copied: production has never held a group block, which '
+            'is why groups.detail has never resolved.'),
+        contains_real_guest_data=False,
+        disclosure='Publishable. Contains no real guest and no real stay.',
+        rationale=(
+            'SYNTHETIC by necessity — group_blocks is empty in production, '
+            'so there is nothing to derive from.'),
+    ),
+
+    expectations=Expectations(
+        financial={
+            'reservations_count': '2',
+            'guests_count': '2',
+            'folios_count': '2',
+            'payments_count': '2',
+
+            'payments_gross': '2690.00',
+            'payments_voided': '0.00',
+            'payments_net': '2690.00',
+            'payments_corrections': '0.00',
+            'payments_reversals': '0.00',
+
+            'extra_charges_total': '500.00',
+            'extra_charges_room_rent': '0.00',
+            'extra_charges_non_room_rent': '500.00',
+            'extra_charges_reversals': '0.00',
+            'extra_charges_net': '500.00',
+            'extra_charges_non_room_rent_net': '500.00',
+
+            'room_revenue': '2000.00',
+            'room_discount': '0.00',
+
+            # 2 rooms x 50.00 at 5%, plus 90.00 on the banqueting at 18%.
+            'tax_total': '190.00',
+            'taxable_total': '2500.00',
+            'tax_lines_count': '6',
+            'tax_base_count': '3',
+
+            'overpayment_total': '0.00',
+            'overpayment_count': '0',
+            'credit_note_total': '0.00',
+            'credit_note_count': '0',
+            'void_request_count': '0',
+            'corporate_credit_used': '0.00',
+            # The block is billed to a master ROOM, not to a company
+            # account. No folio carries a company_id, which is what keeps
+            # INV-C06 VACUOUS here — closing that needs
+            # DS-ACT-CORPCREDIT, and that is blocked.
+            'corporate_bookings': '0',
+
+            'invoice_unrounded_grand_total': '2690.00',
+            'invoice_round_off_total': '0.00',
+            'invoice_rounded_grand_total': '2690.00',
+            'invoice_round_off_rows': '0',
+
+            'charges_net': '2690.00',
+            'outstanding': '0.00',
+            'net_receivable': '0.00',
+        },
+
+        invariants={
+            'INV-A02': 'HOLDS',
+            'INV-A03': 'HOLDS',
+            'INV-A05': 'HOLDS',
+            'INV-C02': 'HOLDS',
+            'INV-C03': 'HOLDS',
+            # Two reservations, two different rooms, one night. The
+            # populated case of a rule production violates.
+            'INV-C04': 'HOLDS',
+            'INV-D01': 'HOLDS',
+            'INV-D03': 'HOLDS',
+            'INV-D04': 'HOLDS',
+            'INV-D06': 'HOLDS',
+            'INV-C01': 'VACUOUS',
+        },
+
+        # Predicted before building. Q09, Q02 and Q07 are deliberately
+        # ABSENT: they diverge only where a correction or a reversal
+        # exists, and this narrative has neither. Copying the previous
+        # dataset's declaration would have got that wrong.
+        parity={
+            'Q12': 'AGREED', 'Q13': 'AGREED', 'Q14': 'AGREED',
+            'Q22': 'AGREED',
+            # PREDICTED AGREED, MEASURED DIVERGED. The prediction named
+            # Q20 as its weakest point and Q20 held; Q17 is the one it got
+            # wrong. Two occupied rooms on one night is the first dataset
+            # to give the MIS aggregates more than a single room to add
+            # up, and they disagree with the flash report over it.
+            'Q17': 'DIVERGED',
+        },
+
+        # The claim this dataset exists to make — declarable at all only
+        # since the D2 element landed. Written a day earlier it would have
+        # been unverifiable, which is where DS-ACT-INHOUSE was left.
+        golden={
+            'groups.detail__any_group': 'RESOLVED',
+            # Deliberately still absent, and said out loud.
+            'main.get_company_credit__any_company': 'UNRESOLVED',
+            'main.company_detail__any_company': 'UNRESOLVED',
+            'main.checkout__inhouse_reservation': 'UNRESOLVED',
+            'reports.night_audit_snapshot__night_audit_log': 'UNRESOLVED',
+        },
+    ),
+
+    rows=(
+        # The block first: the reservations reference it.
+        ('group_blocks',
+         ('id', 'group_name', 'group_code', 'contact_name', 'contact_phone',
+          'arrival_date', 'departure_date', 'total_rooms', 'group_rate',
+          'status', 'billing_instructions', 'created_by_user_id',
+          'created_at'),
+         ((1, 'Nair Wedding Party', 'GRP-2026-0001', 'Meera Nair',
+           '9800000005', '2026-09-20', '2026-09-21', 2, 1000.00,
+           # 'Completed', not 'CheckedOut'. A group block has its own
+           # status vocabulary — CHECK ck_group_status allows only
+           # Tentative, Confirmed, Cancelled and Completed — and it is not
+           # the reservation vocabulary. The first draft assumed it was.
+           # The builder named the constraint instead of surfacing an
+           # opaque IntegrityError, which is the failure mode it was
+           # written after (FLT-A10).
+           'Completed', 'Reception billed to room 105',
+           _ADMIN, '2026-09-15 11:00:00.000000'),)),
+
+        ('guests',
+         ('id', 'name', 'phone'),
+         ((1, 'Meera Nair', '9800000005'),
+          (2, 'Arun Nair', '9800000006'),)),
+
+        ('reservations',
+         ('id', 'guest_id', 'room_id', 'room_type_id', 'group_block_id',
+          'arrival_date', 'departure_date', 'adults', 'status',
+          'rate_per_night', 'standard_tariff', 'expected_tariff',
+          'advance_payment', 'source', 'booking_type', 'pricing_mode',
+          'created_at', 'checked_in_at', 'checkin_by',
+          'checked_out_at', 'checkout_by', 'checkout_time',
+          'invoice_number', 'invoice_unrounded_grand_total',
+          'invoice_round_off_amount', 'invoice_rounded_grand_total',
+          'noshow_exempt', 'checkout_initiated', 'credit_amount',
+          'credit_settled_amount', 'cancellation_amount_refunded',
+          'cancellation_amount_forfeited',
+          'cancellation_amount_credit_voucher'),
+         # Room 105 carries the master account and therefore the whole
+         # invoice; room 106's own invoice is the room and its tax.
+         ((1, 1, _ROOM_G1, _ROOM_TYPE_ID, 1,
+           '2026-09-20', '2026-09-21', 2, 'CheckedOut',
+           1000.00, 1000.00, 1000.00, 0.0, 'Walk-in', 'Group', 'standard',
+           '2026-09-15 11:00:00.000000', '2026-09-20 14:00:00.000000',
+           'admin', '2026-09-21 10:00:00.000000', 'admin', '10:00',
+           'INV-2026-000001', 1640.00, 0.0, 1640.00,
+           0, 1, 0.0, 0.0, 0.0, 0.0, 0.0),
+          (2, 2, _ROOM_G2, _ROOM_TYPE_ID, 1,
+           '2026-09-20', '2026-09-21', 2, 'CheckedOut',
+           1000.00, 1000.00, 1000.00, 0.0, 'Walk-in', 'Group', 'standard',
+           '2026-09-15 11:00:00.000000', '2026-09-20 14:00:00.000000',
+           'admin', '2026-09-21 10:00:00.000000', 'admin', '10:00',
+           'INV-2026-000002', 1050.00, 0.0, 1050.00,
+           0, 1, 0.0, 0.0, 0.0, 0.0, 0.0),)),
+
+        ('reservation_rooms',
+         ('id', 'reservation_id', 'room_id', 'is_primary', 'created_at'),
+         ((1, 1, _ROOM_G1, 1, '2026-09-20 14:00:00.000000'),
+          (2, 2, _ROOM_G2, 1, '2026-09-20 14:00:00.000000'),)),
+
+        ('folios',
+         ('id', 'reservation_id', 'folio_letter', 'label', 'is_closed',
+          'created_at'),
+         ((1, 1, 'A', 'Guest', 1, '2026-09-20 14:00:00.000000'),
+          (2, 2, 'A', 'Guest', 1, '2026-09-20 14:00:00.000000'),)),
+
+        ('reservation_night_rates',
+         ('id', 'reservation_id', 'stay_date', 'room_type_id', 'room_id',
+          'standard_rate', 'resolved_rate', 'final_rate', 'discount_amount',
+          'rate_source', 'pricing_mode', 'manual_override', 'tax_rate',
+          'is_posted', 'is_locked', 'created_at', 'updated_at'),
+         ((1, 1, '2026-09-20', _ROOM_TYPE_ID, _ROOM_G1,
+           1000.00, 1000.00, 1000.00, 0.0, 'base_rate', 'standard', 0, 5,
+           0, 0, '2026-09-20 14:00:00.000000',
+           '2026-09-20 14:00:00.000000'),
+          (2, 2, '2026-09-20', _ROOM_TYPE_ID, _ROOM_G2,
+           1000.00, 1000.00, 1000.00, 0.0, 'base_rate', 'standard', 0, 5,
+           0, 0, '2026-09-20 14:00:00.000000',
+           '2026-09-20 14:00:00.000000'),)),
+
+        ('extra_charges',
+         ('id', 'reservation_id', 'folio_id', 'description', 'amount',
+          'charge_date', 'charge_type', 'charge_category',
+          'is_correction', 'is_reversal', 'corrects_id',
+          'correction_reason', 'created_at'),
+         ((1, 1, 1, 'Reception banqueting', 500.00, '2026-09-20',
+           'banquet', 'Other', 0, 0, None, None,
+           '2026-09-20 20:00:00.000000'),)),
+
+        ('tax_lines',
+         ('id', 'reservation_id', 'charge_source_type', 'charge_source_id',
+          'charge_date', 'taxable_amount', 'tax_type', 'tax_rate',
+          'tax_amount', 'is_interstate', 'is_exempted', 'sac_code',
+          'created_at'),
+         ((1, 1, 'room_night', 'night_2026-09-20', '2026-09-20',
+           1000.00, 'CGST', 2.5, 25.00, 0, 0, '996311',
+           '2026-09-20 14:00:00.000000'),
+          (2, 1, 'room_night', 'night_2026-09-20', '2026-09-20',
+           1000.00, 'SGST', 2.5, 25.00, 0, 0, '996311',
+           '2026-09-20 14:00:00.000000'),
+          (3, 2, 'room_night', 'night_2026-09-20', '2026-09-20',
+           1000.00, 'CGST', 2.5, 25.00, 0, 0, '996311',
+           '2026-09-20 14:00:00.000000'),
+          (4, 2, 'room_night', 'night_2026-09-20', '2026-09-20',
+           1000.00, 'SGST', 2.5, 25.00, 0, 0, '996311',
+           '2026-09-20 14:00:00.000000'),
+          (5, 1, 'extra_charge', '1', '2026-09-20',
+           500.00, 'CGST', 9.0, 45.00, 0, 0, '996311',
+           '2026-09-20 20:00:00.000000'),
+          (6, 1, 'extra_charge', '1', '2026-09-20',
+           500.00, 'SGST', 9.0, 45.00, 0, 0, '996311',
+           '2026-09-20 20:00:00.000000'),)),
+
+        # One payment per folio, NOT one for the block.
+        #
+        # The first draft settled the whole 2,690.00 on the master folio,
+        # which is what "billed to one master account" ought to mean — and
+        # INV-C02 reported room 106 as a checked-out reservation that was
+        # never settled. It was right to. **The application has no
+        # master-account routing.** `group_blocks.billing_instructions` is
+        # free text, `services_group_stay` only links reservations to
+        # rooms, and nothing anywhere moves one reservation's charges onto
+        # another's folio.
+        #
+        # So the narrative was describing something the system cannot do.
+        # Modelled as the system actually works instead, and the gap is
+        # recorded rather than papered over.
+        ('payments',
+         ('id', 'reservation_id', 'folio_id', 'payment_mode_id', 'amount',
+          'payment_date', 'reference_number', 'created_at', 'is_voided',
+          'is_correction', 'is_reversal', 'payment_purpose'),
+         ((1, 1, 1, _CASH, 1640.00, '2026-09-21', '',
+           '2026-09-21 09:50:00.000000', 0, 0, 0, 'settlement'),
+          (2, 2, 2, _CASH, 1050.00, '2026-09-21', '',
+           '2026-09-21 09:50:00.000000', 0, 0, 0, 'settlement'),)),
+    ),
+
+    business_date='2026-09-21',
+
+    #: None, and the declaration says so. Claiming otherwise would fail
+    #: the ACTIVATION element, and correctly.
+    activates_invariants=(),
+
+    # -- the discrimination gate -----------------------------------------
+    #
+    # Move the banqueting charge off the master folio. The money is
+    # untouched — the same 500.00 on the same reservation — but the charge
+    # no longer belongs to a folio, which is the production defect INV-A02
+    # reports 40 times over.
+    perturbation=(
+        'UPDATE extra_charges SET folio_id = NULL WHERE id = 1',
+    ),
+    perturbation_breaks=(
+        'INV-A02',
+    ),
+
+    # -- the coverage ledger, declared BEFORE the dataset was built ------
+    # See evidence/20260808_ds_act_group_prediction/prediction.md.
+    coverage_expectation={
+        'surfaces_added': (
+            'groups.detail__any_group',
+        ),
+        'surfaces_lost': (
+            'reports.night_audit_snapshot__night_audit_log',
+        ),
+        # None. Nothing in D1, D4 or D5 references a group table.
+        'invariants_activated': (),
+        'invariants_deactivated': (
+            'INV-B01', 'INV-B02', 'INV-B03', 'INV-B05',
+            'INV-C01', 'INV-C05', 'INV-D07',
+        ),
+        'quantities_activated': (),
+        'quantities_deactivated': ('Q15',),
+    },
+
+    principles=('P9', 'P10', 'P14'),
+    modes=(Mode.REGRESSION, Mode.CONTINUOUS_VERIFICATION),
+
+    # Six of six. ACTIVATION verifies 0 claims, which is the honest
+    # result for a dataset that activates nothing.
+    commissioning_status=Commissioning.COMMISSIONED,
+)
+def _group():
+    pass

@@ -1,0 +1,52 @@
+====================================================================================================
+DSBC FRONTLINE — REGRESSION DATASET REGISTRY
+Production Verification Framework, Wave 0 Deliverable 6
+====================================================================================================
+Registered datasets : 4
+
+----------------------------------------------------------------------------------------------------
+PURPOSE MATRIX
+----------------------------------------------------------------------------------------------------
+  ACTIVATE_INVARIANT             2  DS-ACT-CORRECTION@1.0, DS-ACT-VOIDCN@1.0
+  BASELINE                       2  DS-ACT-INHOUSE@1.0, DS-ACT-GROUP@1.0
+  NEGATIVE                       0
+  DEGENERATE                     0
+  EXPLORATORY                    0
+
+----------------------------------------------------------------------------------------------------
+ORIGIN MATRIX
+----------------------------------------------------------------------------------------------------
+  SYNTHETIC                      4  DS-ACT-INHOUSE@1.0, DS-ACT-CORRECTION@1.0, DS-ACT-VOIDCN@1.0, DS-ACT-GROUP@1.0
+  DERIVED_FROM_PRODUCTION        0
+  ANONYMISED_PRODUCTION          0
+
+----------------------------------------------------------------------------------------------------
+INVARIANT ACTIVATION — the reason this deliverable exists
+----------------------------------------------------------------------------------------------------
+  Invariants with an activating dataset : 2 of 25
+    INV-D02      activated by DS-ACT-CORRECTION@1.0, DS-ACT-VOIDCN@1.0
+    INV-D05      activated by DS-ACT-VOIDCN@1.0
+
+  Invariants with no activating dataset : 23
+  INV-A01, INV-A02, INV-A03, INV-A04, INV-A05, INV-A06, INV-B01, INV-B02, INV-B03, INV-B04, INV-B05, INV-B06, INV-C01, INV-C02, INV-C03, INV-C04, INV-C05, INV-C06, INV-D01, INV-D03, INV-D04, INV-D06, INV-D07
+
+  These are reported so the gap is tracked. An invariant with no
+  dataset behind it is exercised only by whatever production
+  happens to contain, which for a VACUOUS invariant is nothing.
+
+----------------------------------------------------------------------------------------------------
+COMMISSIONING
+----------------------------------------------------------------------------------------------------
+  Datasets not commissioned    : 0
+  Unbacked COMMISSIONED claims : 0
+  Checked against              : C:\Users\SIPL Server\Downloads\DSS\SukoonPMS\SukoonPMS\verification\evidence\20260808_101648_ds_commission_group
+  Declared not materialisable  : 0
+
+----------------------------------------------------------------------------------------------------
+COVERAGE LEDGER — mandatory for every dataset
+----------------------------------------------------------------------------------------------------
+  Datasets without a passing ledger : 0
+
+====================================================================================================
+END OF REGISTRY
+====================================================================================================

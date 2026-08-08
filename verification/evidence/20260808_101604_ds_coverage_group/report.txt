@@ -1,0 +1,49 @@
+==============================================================================
+COVERAGE LEDGER — DS-ACT-GROUP@1.0
+baseline: production
+==============================================================================
+
+COVERAGE ADDED (1)
+  + surface    groups.detail__any_group
+
+COVERAGE LOST (9)
+  - surface    reports.night_audit_snapshot__night_audit_log
+  - invariant  INV-B01  (population fell to zero)
+  - invariant  INV-B02  (population fell to zero)
+  - invariant  INV-B03  (population fell to zero)
+  - invariant  INV-B05  (population fell to zero)
+  - invariant  INV-C01  (population fell to zero)
+  - invariant  INV-C05  (population fell to zero)
+  - invariant  INV-D07  (population fell to zero)
+  - quantity   Q15  (nothing left to compare)
+
+COVERAGE CHANGED (17)
+    INV-A01    HOLDS over 28 -> HOLDS over 2
+  ! INV-A02    VIOLATED over 40 -> HOLDS over 3
+  ! INV-A03    VIOLATED over 5 -> HOLDS over 1
+    INV-A04    HOLDS over 35 -> HOLDS over 2
+    INV-A05    HOLDS over 66 -> HOLDS over 6
+    INV-B06    HOLDS over 35 -> HOLDS over 2
+    INV-C02    HOLDS over 28 -> HOLDS over 2
+    INV-C03    HOLDS over 106 -> HOLDS over 9
+  ! INV-C04    VIOLATED over 30 -> HOLDS over 2
+    INV-D01    HOLDS over 28 -> HOLDS over 2
+    INV-D03    HOLDS over 35 -> HOLDS over 2
+    INV-D04    HOLDS over 66 -> HOLDS over 6
+    INV-D06    HOLDS over 30 -> HOLDS over 2
+  ! Q12        DIVERGED -> AGREED
+  ! Q13        DIVERGED -> AGREED
+  ! Q14        DIVERGED -> AGREED
+  ! Q22        DIVERGED -> AGREED
+
+EXPECTED vs UNEXPECTED
+  every movement was declared, and every declared movement happened
+
+VERDICT: AS_DECLARED
+
+Measured: D1 parity quantities, D2 golden-master surfaces,
+D4 invariants. Not measured: D3 replay — its unit is a business
+date rather than an entity, and a dataset declares one date, so a
+delta over it would compare a single day against 28 and read as a
+catastrophic loss on every dataset.
+==============================================================================

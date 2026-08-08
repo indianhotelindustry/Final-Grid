@@ -1,0 +1,748 @@
+{
+  "baseline": {
+    "invariants": {
+      "INV-A01": {
+        "population": 28,
+        "status": "HOLDS"
+      },
+      "INV-A02": {
+        "population": 40,
+        "status": "VIOLATED"
+      },
+      "INV-A03": {
+        "population": 5,
+        "status": "VIOLATED"
+      },
+      "INV-A04": {
+        "population": 35,
+        "status": "HOLDS"
+      },
+      "INV-A05": {
+        "population": 66,
+        "status": "HOLDS"
+      },
+      "INV-A06": {
+        "population": 0,
+        "status": "VACUOUS"
+      },
+      "INV-B01": {
+        "population": 17,
+        "status": "HOLDS"
+      },
+      "INV-B02": {
+        "population": 1,
+        "status": "HOLDS"
+      },
+      "INV-B03": {
+        "population": 8,
+        "status": "VIOLATED"
+      },
+      "INV-B04": {
+        "population": 1,
+        "status": "HOLDS"
+      },
+      "INV-B05": {
+        "population": 1,
+        "status": "HOLDS"
+      },
+      "INV-B06": {
+        "population": 35,
+        "status": "HOLDS"
+      },
+      "INV-C01": {
+        "population": 5,
+        "status": "VIOLATED"
+      },
+      "INV-C02": {
+        "population": 28,
+        "status": "HOLDS"
+      },
+      "INV-C03": {
+        "population": 106,
+        "status": "HOLDS"
+      },
+      "INV-C04": {
+        "population": 30,
+        "status": "VIOLATED"
+      },
+      "INV-C05": {
+        "population": 5,
+        "status": "VIOLATED"
+      },
+      "INV-C06": {
+        "population": 0,
+        "status": "VACUOUS"
+      },
+      "INV-D01": {
+        "population": 28,
+        "status": "HOLDS"
+      },
+      "INV-D02": {
+        "population": 0,
+        "status": "VACUOUS"
+      },
+      "INV-D03": {
+        "population": 35,
+        "status": "HOLDS"
+      },
+      "INV-D04": {
+        "population": 66,
+        "status": "HOLDS"
+      },
+      "INV-D05": {
+        "population": 0,
+        "status": "VACUOUS"
+      },
+      "INV-D06": {
+        "population": 30,
+        "status": "HOLDS"
+      },
+      "INV-D07": {
+        "population": 2,
+        "status": "HOLDS"
+      }
+    },
+    "label": "production",
+    "measured_quantity_count": 20,
+    "populated_invariant_count": 21,
+    "quantities": {
+      "Q01": "SINGLE_SOURCE",
+      "Q02": "AGREED",
+      "Q03": "AGREED",
+      "Q04": "AGREED",
+      "Q05": "AGREED",
+      "Q06": "DIVERGED",
+      "Q07": "AGREED",
+      "Q08": "AGREED",
+      "Q09": "AGREED",
+      "Q10": "AGREED",
+      "Q11": "VACUOUS",
+      "Q12": "DIVERGED",
+      "Q13": "DIVERGED",
+      "Q14": "DIVERGED",
+      "Q15": "AGREED",
+      "Q16": "AGREED",
+      "Q17": "DIVERGED",
+      "Q18": "DIVERGED",
+      "Q19": "AGREED",
+      "Q20": "DIVERGED",
+      "Q21": "VACUOUS",
+      "Q22": "DIVERGED"
+    },
+    "surface_count": 158,
+    "surfaces": [
+      "ai.anomaly_dashboard",
+      "ai.api_ai_insights",
+      "ai.api_anomalies",
+      "ai.api_ceo_kpi_pack",
+      "ai.api_demand_calendar",
+      "ai.api_demand_spikes",
+      "ai.api_forecast",
+      "ai.api_forecast_monthly",
+      "ai.api_pm_categories",
+      "ai.api_pm_equipment",
+      "ai.api_pm_health",
+      "ai.api_pm_predictions",
+      "ai.api_pm_schedules",
+      "ai.api_predictive_maintenance",
+      "ai.api_sentiment",
+      "ai.demand_calendar_page",
+      "ai.forecast_dashboard",
+      "ai.predictive_maintenance_dashboard",
+      "ai.sentiment_dashboard",
+      "ai_pricing.dashboard",
+      "ai_pricing.get_settings",
+      "ai_pricing.recommendations_api",
+      "auth.change_password",
+      "auth.login",
+      "auth.shift_pending_approvals",
+      "auth.shifts",
+      "auth.users",
+      "backup.index",
+      "billing.credit_notes_list",
+      "billing.gst_report",
+      "billing.invoice_register",
+      "billing.void_eligible__any_payment",
+      "billing.void_history__any_reservation",
+      "billing.void_pending",
+      "booking.availability_api",
+      "booking.index",
+      "booking.rates_api",
+      "feedback.complete",
+      "feedback.dashboard",
+      "folio.list_folios__checked_out_reservation",
+      "grc.preview__any_reservation",
+      "groups.index",
+      "groups.new_group",
+      "loyalty.api_balance__any_guest",
+      "loyalty.config",
+      "loyalty.dashboard",
+      "loyalty.members",
+      "loyalty.milestones",
+      "loyalty.transactions",
+      "main.admin_duplicate_checkins",
+      "main.admin_lan_access",
+      "main.advance_receipt__any_reservation",
+      "main.ai_housekeeping_schedule",
+      "main.analytics_data",
+      "main.api_alerts_live",
+      "main.api_cico_preview",
+      "main.api_staff_performance_today",
+      "main.app_branding",
+      "main.ceo_dashboard",
+      "main.command_center_data",
+      "main.dashboard",
+      "main.dashboard_alerts_summary",
+      "main.edit_reservation__any_reservation",
+      "main.find_duplicate_guests",
+      "main.get_reservation__any_reservation",
+      "main.get_room_tariff__any_room",
+      "main.get_vacant_rooms",
+      "main.guest_database",
+      "main.guest_folio__any_guest",
+      "main.guest_history__any_guest",
+      "main.guests_list",
+      "main.handle_companies",
+      "main.health",
+      "main.health_check",
+      "main.hk_mobile",
+      "main.housekeeping",
+      "main.index",
+      "main.invoice__checked_out_reservation",
+      "main.invoice_detail_api__checked_out_reservation",
+      "main.invoice_manager",
+      "main.load_dashboard_tab__analytics",
+      "main.load_dashboard_tab__command_center",
+      "main.load_tab__booking",
+      "main.load_tab__overview",
+      "main.load_tab__reservations",
+      "main.masters",
+      "main.new_reservation",
+      "main.night_audit",
+      "main.nightly_rate_inspector__any_reservation",
+      "main.reservation_folio__checked_out_reservation",
+      "main.reservations",
+      "main.room_grid",
+      "main.rooms",
+      "main.search_guests",
+      "main.setup_wizard",
+      "main.voucher_lookup",
+      "main.walkin_checkin_new",
+      "maintenance.index",
+      "noshow.pending",
+      "noshow.report",
+      "ota.bookings",
+      "ota.dashboard",
+      "ota.settings",
+      "ota.webhook_logs",
+      "portal.view_submission__any_reservation",
+      "pos.index",
+      "pos.items",
+      "rates.index",
+      "rates.notification_logs",
+      "reports.api_ota_reconciliation_summary",
+      "reports.ar_aging",
+      "reports.arrivals",
+      "reports.cancellation_report",
+      "reports.company_billing_report",
+      "reports.credit_aging",
+      "reports.credit_ledger",
+      "reports.daily_profit_snapshot",
+      "reports.daily_reconciliation",
+      "reports.daily_reconciliation__date_YYYY_MM_DD",
+      "reports.departures",
+      "reports.flash_report",
+      "reports.flash_report__date_YYYY_MM_DD",
+      "reports.front_office_mis",
+      "reports.front_office_mis__from_date_YYYY_MM_DD_to_date_YYYY_MM_DD",
+      "reports.future_bookings_report",
+      "reports.gstr1_export",
+      "reports.guest_history",
+      "reports.guest_report",
+      "reports.housekeeping_report",
+      "reports.index",
+      "reports.inhouse",
+      "reports.leakage",
+      "reports.maintenance_report",
+      "reports.money_at_risk",
+      "reports.night_audit",
+      "reports.night_audit_history",
+      "reports.night_audit_snapshot__night_audit_log",
+      "reports.occupancy",
+      "reports.occupancy__start_date_YYYY_MM_DD_end_date_YYYY_MM_DD",
+      "reports.ota_receivables",
+      "reports.ota_reconciliation",
+      "reports.other_income_report",
+      "reports.overstay_control",
+      "reports.payment_collection",
+      "reports.payment_collection__start_date_YYYY_MM_DD_end_date_YYYY_MM_DD",
+      "reports.pending_payments_report",
+      "reports.refund_report",
+      "reports.revenue",
+      "reports.revenue__start_date_YYYY_MM_DD_end_date_YYYY_MM_DD",
+      "reports.room_revenue",
+      "reports.room_status_report",
+      "reports.shift_reconciliation",
+      "reports.source_analysis_report",
+      "reports.tip_report",
+      "reports.void_adjustments_report",
+      "reports.voucher_ledger",
+      "reports.walkin_report",
+      "webhook.webhook_logs"
+    ]
+  },
+  "content_hash": "c03c512e6592c38e8e7f2d044431f69fe014c788f50035169c69c6097b0b4564",
+  "dataset": "DS-ACT-GROUP@1.0",
+  "declared": {
+    "invariants_activated": [],
+    "invariants_deactivated": [
+      "INV-B01",
+      "INV-B02",
+      "INV-B03",
+      "INV-B05",
+      "INV-C01",
+      "INV-C05",
+      "INV-D07"
+    ],
+    "quantities_activated": [],
+    "quantities_deactivated": [
+      "Q15"
+    ],
+    "surfaces_added": [
+      "groups.detail__any_group"
+    ],
+    "surfaces_lost": [
+      "reports.night_audit_snapshot__night_audit_log"
+    ]
+  },
+  "ledger": {
+    "baseline": "production",
+    "coverage_added": {
+      "invariants": [],
+      "quantities": [],
+      "surfaces": [
+        "groups.detail__any_group"
+      ]
+    },
+    "coverage_changed": {
+      "invariants": [
+        {
+          "invariant": "INV-A01",
+          "now": "HOLDS over 2",
+          "status_moved": false,
+          "was": "HOLDS over 28"
+        },
+        {
+          "invariant": "INV-A02",
+          "now": "HOLDS over 3",
+          "status_moved": true,
+          "was": "VIOLATED over 40"
+        },
+        {
+          "invariant": "INV-A03",
+          "now": "HOLDS over 1",
+          "status_moved": true,
+          "was": "VIOLATED over 5"
+        },
+        {
+          "invariant": "INV-A04",
+          "now": "HOLDS over 2",
+          "status_moved": false,
+          "was": "HOLDS over 35"
+        },
+        {
+          "invariant": "INV-A05",
+          "now": "HOLDS over 6",
+          "status_moved": false,
+          "was": "HOLDS over 66"
+        },
+        {
+          "invariant": "INV-B06",
+          "now": "HOLDS over 2",
+          "status_moved": false,
+          "was": "HOLDS over 35"
+        },
+        {
+          "invariant": "INV-C02",
+          "now": "HOLDS over 2",
+          "status_moved": false,
+          "was": "HOLDS over 28"
+        },
+        {
+          "invariant": "INV-C03",
+          "now": "HOLDS over 9",
+          "status_moved": false,
+          "was": "HOLDS over 106"
+        },
+        {
+          "invariant": "INV-C04",
+          "now": "HOLDS over 2",
+          "status_moved": true,
+          "was": "VIOLATED over 30"
+        },
+        {
+          "invariant": "INV-D01",
+          "now": "HOLDS over 2",
+          "status_moved": false,
+          "was": "HOLDS over 28"
+        },
+        {
+          "invariant": "INV-D03",
+          "now": "HOLDS over 2",
+          "status_moved": false,
+          "was": "HOLDS over 35"
+        },
+        {
+          "invariant": "INV-D04",
+          "now": "HOLDS over 6",
+          "status_moved": false,
+          "was": "HOLDS over 66"
+        },
+        {
+          "invariant": "INV-D06",
+          "now": "HOLDS over 2",
+          "status_moved": false,
+          "was": "HOLDS over 30"
+        }
+      ],
+      "quantities": [
+        {
+          "now": "AGREED",
+          "quantity": "Q12",
+          "was": "DIVERGED"
+        },
+        {
+          "now": "AGREED",
+          "quantity": "Q13",
+          "was": "DIVERGED"
+        },
+        {
+          "now": "AGREED",
+          "quantity": "Q14",
+          "was": "DIVERGED"
+        },
+        {
+          "now": "AGREED",
+          "quantity": "Q22",
+          "was": "DIVERGED"
+        }
+      ]
+    },
+    "coverage_lost": {
+      "invariants": [
+        "INV-B01",
+        "INV-B02",
+        "INV-B03",
+        "INV-B05",
+        "INV-C01",
+        "INV-C05",
+        "INV-D07"
+      ],
+      "quantities": [
+        "Q15"
+      ],
+      "surfaces": [
+        "reports.night_audit_snapshot__night_audit_log"
+      ]
+    },
+    "dataset": "DS-ACT-GROUP@1.0",
+    "declared_but_not_observed": [],
+    "unexpected_movement": [],
+    "verdict": "AS_DECLARED"
+  },
+  "production_sha256": "f07b090a40452453392ee14996ee9ccb93c454e9e26ffaad6c6d2a86a85aeb2c",
+  "production_unchanged": true,
+  "snapshot": {
+    "invariants": {
+      "INV-A01": {
+        "population": 2,
+        "status": "HOLDS"
+      },
+      "INV-A02": {
+        "population": 3,
+        "status": "HOLDS"
+      },
+      "INV-A03": {
+        "population": 1,
+        "status": "HOLDS"
+      },
+      "INV-A04": {
+        "population": 2,
+        "status": "HOLDS"
+      },
+      "INV-A05": {
+        "population": 6,
+        "status": "HOLDS"
+      },
+      "INV-A06": {
+        "population": 0,
+        "status": "VACUOUS"
+      },
+      "INV-B01": {
+        "population": 0,
+        "status": "VACUOUS"
+      },
+      "INV-B02": {
+        "population": 0,
+        "status": "VACUOUS"
+      },
+      "INV-B03": {
+        "population": 0,
+        "status": "VACUOUS"
+      },
+      "INV-B04": {
+        "population": 1,
+        "status": "HOLDS"
+      },
+      "INV-B05": {
+        "population": 0,
+        "status": "VACUOUS"
+      },
+      "INV-B06": {
+        "population": 2,
+        "status": "HOLDS"
+      },
+      "INV-C01": {
+        "population": 0,
+        "status": "VACUOUS"
+      },
+      "INV-C02": {
+        "population": 2,
+        "status": "HOLDS"
+      },
+      "INV-C03": {
+        "population": 9,
+        "status": "HOLDS"
+      },
+      "INV-C04": {
+        "population": 2,
+        "status": "HOLDS"
+      },
+      "INV-C05": {
+        "population": 0,
+        "status": "VACUOUS"
+      },
+      "INV-C06": {
+        "population": 0,
+        "status": "VACUOUS"
+      },
+      "INV-D01": {
+        "population": 2,
+        "status": "HOLDS"
+      },
+      "INV-D02": {
+        "population": 0,
+        "status": "VACUOUS"
+      },
+      "INV-D03": {
+        "population": 2,
+        "status": "HOLDS"
+      },
+      "INV-D04": {
+        "population": 6,
+        "status": "HOLDS"
+      },
+      "INV-D05": {
+        "population": 0,
+        "status": "VACUOUS"
+      },
+      "INV-D06": {
+        "population": 2,
+        "status": "HOLDS"
+      },
+      "INV-D07": {
+        "population": 0,
+        "status": "VACUOUS"
+      }
+    },
+    "label": "DS-ACT-GROUP@1.0",
+    "measured_quantity_count": 19,
+    "populated_invariant_count": 14,
+    "quantities": {
+      "Q01": "SINGLE_SOURCE",
+      "Q02": "AGREED",
+      "Q03": "AGREED",
+      "Q04": "AGREED",
+      "Q05": "AGREED",
+      "Q06": "DIVERGED",
+      "Q07": "AGREED",
+      "Q08": "AGREED",
+      "Q09": "AGREED",
+      "Q10": "AGREED",
+      "Q11": "VACUOUS",
+      "Q12": "AGREED",
+      "Q13": "AGREED",
+      "Q14": "AGREED",
+      "Q15": "VACUOUS",
+      "Q16": "AGREED",
+      "Q17": "DIVERGED",
+      "Q18": "DIVERGED",
+      "Q19": "AGREED",
+      "Q20": "DIVERGED",
+      "Q21": "VACUOUS",
+      "Q22": "AGREED"
+    },
+    "surface_count": 158,
+    "surfaces": [
+      "ai.anomaly_dashboard",
+      "ai.api_ai_insights",
+      "ai.api_anomalies",
+      "ai.api_ceo_kpi_pack",
+      "ai.api_demand_calendar",
+      "ai.api_demand_spikes",
+      "ai.api_forecast",
+      "ai.api_forecast_monthly",
+      "ai.api_pm_categories",
+      "ai.api_pm_equipment",
+      "ai.api_pm_health",
+      "ai.api_pm_predictions",
+      "ai.api_pm_schedules",
+      "ai.api_predictive_maintenance",
+      "ai.api_sentiment",
+      "ai.demand_calendar_page",
+      "ai.forecast_dashboard",
+      "ai.predictive_maintenance_dashboard",
+      "ai.sentiment_dashboard",
+      "ai_pricing.dashboard",
+      "ai_pricing.get_settings",
+      "ai_pricing.recommendations_api",
+      "auth.change_password",
+      "auth.login",
+      "auth.shift_pending_approvals",
+      "auth.shifts",
+      "auth.users",
+      "backup.index",
+      "billing.credit_notes_list",
+      "billing.gst_report",
+      "billing.invoice_register",
+      "billing.void_eligible__any_payment",
+      "billing.void_history__any_reservation",
+      "billing.void_pending",
+      "booking.availability_api",
+      "booking.index",
+      "booking.rates_api",
+      "feedback.complete",
+      "feedback.dashboard",
+      "folio.list_folios__checked_out_reservation",
+      "grc.preview__any_reservation",
+      "groups.detail__any_group",
+      "groups.index",
+      "groups.new_group",
+      "loyalty.api_balance__any_guest",
+      "loyalty.config",
+      "loyalty.dashboard",
+      "loyalty.members",
+      "loyalty.milestones",
+      "loyalty.transactions",
+      "main.admin_duplicate_checkins",
+      "main.admin_lan_access",
+      "main.advance_receipt__any_reservation",
+      "main.ai_housekeeping_schedule",
+      "main.analytics_data",
+      "main.api_alerts_live",
+      "main.api_cico_preview",
+      "main.api_staff_performance_today",
+      "main.app_branding",
+      "main.ceo_dashboard",
+      "main.command_center_data",
+      "main.dashboard",
+      "main.dashboard_alerts_summary",
+      "main.edit_reservation__any_reservation",
+      "main.find_duplicate_guests",
+      "main.get_reservation__any_reservation",
+      "main.get_room_tariff__any_room",
+      "main.get_vacant_rooms",
+      "main.guest_database",
+      "main.guest_folio__any_guest",
+      "main.guest_history__any_guest",
+      "main.guests_list",
+      "main.handle_companies",
+      "main.health",
+      "main.health_check",
+      "main.hk_mobile",
+      "main.housekeeping",
+      "main.index",
+      "main.invoice__checked_out_reservation",
+      "main.invoice_detail_api__checked_out_reservation",
+      "main.invoice_manager",
+      "main.load_dashboard_tab__analytics",
+      "main.load_dashboard_tab__command_center",
+      "main.load_tab__booking",
+      "main.load_tab__overview",
+      "main.load_tab__reservations",
+      "main.masters",
+      "main.new_reservation",
+      "main.night_audit",
+      "main.nightly_rate_inspector__any_reservation",
+      "main.reservation_folio__checked_out_reservation",
+      "main.reservations",
+      "main.room_grid",
+      "main.rooms",
+      "main.search_guests",
+      "main.setup_wizard",
+      "main.voucher_lookup",
+      "main.walkin_checkin_new",
+      "maintenance.index",
+      "noshow.pending",
+      "noshow.report",
+      "ota.bookings",
+      "ota.dashboard",
+      "ota.settings",
+      "ota.webhook_logs",
+      "portal.view_submission__any_reservation",
+      "pos.index",
+      "pos.items",
+      "rates.index",
+      "rates.notification_logs",
+      "reports.api_ota_reconciliation_summary",
+      "reports.ar_aging",
+      "reports.arrivals",
+      "reports.cancellation_report",
+      "reports.company_billing_report",
+      "reports.credit_aging",
+      "reports.credit_ledger",
+      "reports.daily_profit_snapshot",
+      "reports.daily_reconciliation",
+      "reports.daily_reconciliation__date_YYYY_MM_DD",
+      "reports.departures",
+      "reports.flash_report",
+      "reports.flash_report__date_YYYY_MM_DD",
+      "reports.front_office_mis",
+      "reports.front_office_mis__from_date_YYYY_MM_DD_to_date_YYYY_MM_DD",
+      "reports.future_bookings_report",
+      "reports.gstr1_export",
+      "reports.guest_history",
+      "reports.guest_report",
+      "reports.housekeeping_report",
+      "reports.index",
+      "reports.inhouse",
+      "reports.leakage",
+      "reports.maintenance_report",
+      "reports.money_at_risk",
+      "reports.night_audit",
+      "reports.night_audit_history",
+      "reports.occupancy",
+      "reports.occupancy__start_date_YYYY_MM_DD_end_date_YYYY_MM_DD",
+      "reports.ota_receivables",
+      "reports.ota_reconciliation",
+      "reports.other_income_report",
+      "reports.overstay_control",
+      "reports.payment_collection",
+      "reports.payment_collection__start_date_YYYY_MM_DD_end_date_YYYY_MM_DD",
+      "reports.pending_payments_report",
+      "reports.refund_report",
+      "reports.revenue",
+      "reports.revenue__start_date_YYYY_MM_DD_end_date_YYYY_MM_DD",
+      "reports.room_revenue",
+      "reports.room_status_report",
+      "reports.shift_reconciliation",
+      "reports.source_analysis_report",
+      "reports.tip_report",
+      "reports.void_adjustments_report",
+      "reports.voucher_ledger",
+      "reports.walkin_report",
+      "webhook.webhook_logs"
+    ]
+  },
+  "started_at": "2026-08-08T10:16:04"
+}
