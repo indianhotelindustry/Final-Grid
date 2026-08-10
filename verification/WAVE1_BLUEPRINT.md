@@ -488,6 +488,183 @@ page is reachable.
 
 ---
 
+### W1-R9 — Night Audit reconciliation basis correction
+
+**Specification only. No code changed under this heading.**
+
+**Objective.** Correct the accounting basis used when Night Audit compares
+revenue against payments. Not a pricing change, not a CI/CO change, not a
+revenue calculation change.
+
+| | |
+|---|---|
+| Canonical implementation | `revenue_summary()['accrual_gross']` — already computed at `night_audit_service.py:477`, already exposed at `:500`. Nothing new is calculated |
+| Obsolete implementations to retire | none. Two operands change basis; no code is removed |
+| Affected reports | Night Audit reconciliation block and `can_close` only |
+| Affected services | `NightAuditService.final_control()` — **nothing else** |
+| Migration requirements | **none.** Historical `NightAuditLog` rows keep the old basis. Migration is out of scope |
+| Rollback | `git revert`. Two operands; no data written |
+| Expected invariant movement | none of the 25 asserts reconciliation today. **A new invariant must be registered before implementation** (D4 standing rule) |
+| Expected D1 movement | `quantities.py:853` compares stored vs recomputed `reconciliation_difference`. Historical closed days will **DIVERGE** after the cutover. That divergence is correct and must be declared in advance |
+| Datasets required | one new: a fully-settled GST-bearing day. No existing dataset covers this |
+| Fault injections required | none new |
+| Historical replay | D3 unchanged — no engine touched |
+| Certification evidence | the before/after table below, reproduced on the target build |
+
+#### Root cause
+
+`final_control()` compares a pre-tax accrual against tax-inclusive cash:
+
+```
+night_audit_service.py:1021   accrual_net    = rev['accrual_net']      # pre-tax
+night_audit_service.py:1022   total_payments = pay['total_collected']  # tax-inclusive
+night_audit_service.py:1027   today_outstanding = max(0, accrual_net - total_payments)
+night_audit_service.py:1032   recon_diff = accrual_net - total_payments - today_outstanding
+```
+
+The residual is the GST. Every fully-settled GST-bearing day reports a
+reconciliation gap equal to that day's tax.
+
+#### Exact lines to change
+
+Two operands, both in `final_control()`. `accrual_net` → `accrual_gross`:
+
+```python
+# add beside the existing reads at :1021-1022
+accrual_gross = rev['accrual_gross']
+
+# :1027
+today_outstanding = max(0, accrual_gross - total_payments)
+
+# :1032
+recon_diff = accrual_gross - total_payments - today_outstanding
+```
+
+**Both lines must change together.** Changing only `:1032` and leaving
+`:1027` on the net basis produces, on any partially-settled day,
+`recon_diff = accrual_gross - accrual_net = tax`, i.e. a *positive* false
+gap on exactly the days that are currently clean. A half-applied fix is
+worse than no fix.
+
+`total_posted_revenue` stays `accrual_net` at `:1045` — revenue reporting
+remains net of tax. Only the cash comparison moves to gross.
+
+#### Before vs after — measured, not projected
+
+Business date 2026-08-09, reservation 1, reproduced against a copy of
+`instance/pms.db` by recomputing both formulas from the same
+`revenue_summary()` / `payment_summary()` the service itself returns.
+
+| Input | Value |
+|---|---|
+| `accrual_net` (pre-tax) | 1142.85 |
+| `tax_amount` | 57.14 |
+| `accrual_gross` (incl tax) | 1199.99 |
+| `total_collected` (cash) | 1200.00 |
+
+| | `today_outstanding` | `recon_diff` | blocks close at 1.00? |
+|---|---|---|---|
+| **Old** | 0.00 | **−57.15** | **yes** |
+| **New** | 0.00 | **−0.01** | no |
+
+The old value is confirmed against the live service, which returns
+`-57.15000000000009` for this date. The residual −0.01 is per-line tax
+rounding, not a basis error.
+
+#### Tolerance — the evidence says leave it at 1.00
+
+The brief asked whether `:1041` should move from `1.00` to `2.00`. **It
+should not.** `tax_amount` sums `TaxLine` rows each quantised to 0.01, so
+worst-case drift is `n × 0.005` for `n` lines in the day. Breaching 1.00
+requires **200 tax lines on one date**. The property has 39 rooms; the
+busiest date on record carries 4 tax lines, a worst case of 0.02 — a factor
+of fifty of headroom. Raising the tolerance would widen the blind spot for
+no measured benefit.
+
+Revisit only if a single date ever exceeds ~150 tax lines. Record the count
+alongside the reconciliation figure so the question is answerable from
+evidence rather than re-derived.
+
+#### Deliberately NOT fixed in this release
+
+`today_outstanding = max(0, accrual - payments)` makes the subtraction at
+`:1032` collapse: when `accrual ≥ payments` the result is identically 0, and
+otherwise it is negative. **`recon_diff` can never be positive**, so the
+comment at `:1030` — *"Positive = unposted revenue or missing payments for
+today"* — describes a state the arithmetic cannot produce. The control
+cannot fire in the one direction that would indicate missing revenue.
+
+This is a **semantic** change, not a basis change: letting the sign carry
+meaning changes what `total_outstanding` reports. It is a different risk
+class and is **out of scope for W1-R9 by decision, not by oversight**.
+
+Mitigating fact established during investigation: `today_outstanding` is
+**not persisted**. `NightAuditLog.outstanding_amount` is written from
+`folio['total_outstanding']` (the lifetime figure) at `reports.py:2824` and
+`:2960`. The only control value persisted from this block is
+`reconciliation_difference` at `reports.py:2961`. W1-R9 therefore changes
+exactly one stored column.
+
+#### Regression requirements
+
+| Case | Expected |
+|---|---|
+| Fully-settled GST booking | recon ≈ 0 within tolerance |
+| Manual tariff override (res 1) | Rate Mismatch **380.96, unchanged** |
+| CI/CO surcharge | late checkout **380.95, unchanged** |
+| Revenue reports | byte identical |
+| ADR / RevPAR / Occupancy | no movement |
+| Night audit closure | not blocked by GST alone |
+| Partially-settled day | recon ≈ 0 — guards the half-applied-fix failure above |
+
+The last row is not in the original brief and is the one that catches the
+most likely implementation error.
+
+#### Confirmed unchanged
+
+`apply_tariff_adjustment()`, `sync_reservation_nightly_rates()`, leakage
+detection, rate-override detection and CI/CO surcharge posting are **not
+touched**. The ₹381 Rate Mismatch on res 1 is correct: room type 2 "Deluxe"
+carries `base_rate` 1142.86 (₹1200 inclusive at 5%) and the guest was
+checked in at 761.90 (₹800 inclusive) under `pricing_mode='total_stay'`
+with `tariff_modified_manually=1`. The stored `leakage_reason` reads
+*"Rate ₹762 below standard ₹1,143"*. That the ₹400 discount and the ₹400
+late-checkout fee are both 380.9x pre-tax is a numeric coincidence, not a
+shared cause.
+
+**Open master-data question, not code:** if the property actually sells that
+room at ₹800, `room_types.base_rate` for Deluxe is stale and every booking
+will flag as leakage indefinitely. Room type 1 "Standard" also looks
+misconfigured — `base_rate` 1000 with `gst_rate` 0.
+
+#### Financial impact
+
+No guest was misbilled and no revenue was lost. The stay settled correctly
+at ₹1200 (761.90 + 380.95 + 57.15 GST) against payments of ₹800 + ₹400.
+
+The impact is operational: `:1041` appends a close reason when
+`abs(recon_diff) > 1.0`, driving `can_close = False`. Night Audit reports a
+false reconciliation gap, equal to that day's GST, on any day where settled
+cash exceeds pre-tax accrual — that is, any ordinary trading day. The
+durable cost is that operators learn to override a control that is wrong by
+construction.
+
+#### Risks
+
+1. Historical `NightAuditLog` rows remain on the previous basis; migration
+   is out of scope and the cutover applies to newly generated records only.
+2. D1 `quantities.py:853` will DIVERGE on historical rows. Declare before
+   implementing, as `DS-ACT-CORRECTION` declares its own expected failure.
+3. `can_close` becomes stricter in the other direction — a day currently
+   passing at a coincidental 0 may surface a genuine gap. That is the
+   control starting to work, but it will read as a new failure.
+4. GST-exempt configurations see no change, so a green run in an exempt
+   environment is not evidence. State this in the test plan.
+5. Wave 0 forbids Night Audit modification. W1-R9 cannot begin until Wave 1
+   is formally entered and its invariant is registered.
+
+---
+
 ## 5. Re-evaluated ordering, and where it differs from the original
 
 The original Wave 1 ordering followed discovery: D1's findings, then D2's,
@@ -514,7 +691,14 @@ W1-R5  closed-period integrity              HISTORICAL — approval required
 W1-R6  OTA receivable restatement           HISTORICAL — approval required
 W1-R7  operational data remediation         approval required
 W1-R8  night audit HTML, steps 5-6          deletion — one release after step 3
+W1-R9  night audit reconciliation basis     SILENT to the guest — see below
 ```
+
+**W1-R9 sits with W1-R5, not with the silent releases.** It moves no guest
+figure and no revenue report, so it is silent in the accounting sense. But
+it changes a persisted `NightAuditLog` column and makes historical D1
+quantity checks diverge, which is closed-period behaviour and belongs
+behind the same D9 gate as W1-R5.
 
 **W1-R8 appears twice deliberately.** Its first four steps are silent and
 belong beside W1-R1: both are surfaces the hotel cannot reach, and neither
