@@ -996,6 +996,23 @@ class NightAuditService:
     # 11. Final Audit Control Block
     # -----------------------------------------------------------------------
     def final_control(self) -> dict:
+        """Daily audit control block: does today's cash tie to today's charges?
+
+        FINANCIAL INVARIANT (W1-R9)
+            For a fully settled day, the reconciliation calculation MUST
+            compare gross accrual with gross payments. Where both represent
+            the same financial obligation, ``reconciliation_difference``
+            shall be within the configured rounding tolerance (currently
+            ₹1.00, the literal in the ``close_reasons`` check below).
+
+        The invariant exists because the two operands are quoted on
+        different bases elsewhere in the system: revenue is reported net of
+        tax, cash is received gross of it. Any future edit that reintroduces
+        a net-vs-gross comparison here will make every taxable day fail to
+        close, and the failure amount will be that day's GST. If you are
+        reading this because reconciliation is off by exactly the tax, that
+        is the bug.
+        """
         rev = self._get('revenue_summary')
         pay = self._get('payment_summary')
         folio = self._get('folio_control')
@@ -1022,14 +1039,38 @@ class NightAuditService:
         total_payments = pay['total_collected']
         tax_liability = rev['tax_amount']
 
+        # ── W1-R9: reconciliation basis ──────────────────────────────────
+        # Cash received is GST-inclusive; accrual_net is pre-tax by
+        # definition (see revenue_summary: accrual_gross = accrual_net +
+        # tax_total). Comparing them mixed the bases, so the residual was
+        # always the day's GST and every fully-settled taxable day reported
+        # a reconciliation gap it could not close. accrual_gross is the
+        # like-for-like comparand and is already computed upstream — no GST
+        # is recalculated here.
+        #
+        # Both uses below must stay on the gross basis. Moving only the
+        # recon_diff line would leave today_outstanding on the net basis and
+        # yield recon_diff = accrual_gross - accrual_net = tax on every
+        # PARTIALLY settled day — a positive false gap on days that are
+        # currently clean. They are one correction, not two.
+        #
+        # Revenue reporting is unaffected: total_posted_revenue below stays
+        # accrual_net, because revenue is reported net of tax.
+        accrual_gross = rev['accrual_gross']
+
         # Today's outstanding = what was earned today but not paid today.
         # This is the DAILY delta, not the cumulative lifetime outstanding.
-        today_outstanding = max(0, accrual_net - total_payments)
+        today_outstanding = max(0, accrual_gross - total_payments)
 
         # Reconciliation difference: should be zero if balanced.
-        # Positive = unposted revenue or missing payments for today
         # Negative = excess payments beyond today's revenue (settling old dues — OK)
-        recon_diff = accrual_net - total_payments - today_outstanding
+        #
+        # Known limitation, deliberately NOT addressed in W1-R9: because
+        # today_outstanding is max(0, ...), this expression is identically 0
+        # whenever accrual >= payments and negative otherwise, so it can
+        # never report a positive value. Making the sign meaningful changes
+        # what today_outstanding reports and is a separate semantic change.
+        recon_diff = accrual_gross - total_payments - today_outstanding
 
         # Lifetime outstanding (for management reporting, NOT reconciliation)
         lifetime_outstanding = folio['total_outstanding']

@@ -490,11 +490,28 @@ page is reachable.
 
 ### W1-R9 — Night Audit reconciliation basis correction
 
-**Specification only. No code changed under this heading.**
+**Status: IMPLEMENTED.** One file, three functional lines, six regression
+cases passing with zero unexpected field movements. Evidence below.
 
 **Objective.** Correct the accounting basis used when Night Audit compares
 revenue against payments. Not a pricing change, not a CI/CO change, not a
 revenue calculation change.
+
+#### Financial invariant (W1-R9)
+
+> For a fully settled day, the reconciliation calculation must compare
+> **gross accrual with gross payments**. Where both represent the same
+> financial obligation, `reconciliation_difference` shall be within the
+> configured rounding tolerance (currently ₹1.00).
+
+This is the one sentence a future reviewer needs. It is stated again as the
+docstring of `NightAuditService.final_control()` so it is read at the point
+of implementation rather than rediscovered from it, together with the
+diagnostic that follows from it: **if reconciliation is ever off by exactly
+the day's tax, a net-vs-gross comparison has been reintroduced.**
+
+Not yet registered as an executable `INV-` rule in the D4 engine. Doing so
+is the natural next step and is listed under follow-ups.
 
 | | |
 |---|---|
@@ -605,20 +622,67 @@ Mitigating fact established during investigation: `today_outstanding` is
 `reconciliation_difference` at `reports.py:2961`. W1-R9 therefore changes
 exactly one stored column.
 
-#### Regression requirements
+#### Regression results — measured
 
-| Case | Expected |
-|---|---|
-| Fully-settled GST booking | recon ≈ 0 within tolerance |
-| Manual tariff override (res 1) | Rate Mismatch **380.96, unchanged** |
-| CI/CO surcharge | late checkout **380.95, unchanged** |
-| Revenue reports | byte identical |
-| ADR / RevPAR / Occupancy | no movement |
-| Night audit closure | not blocked by GST alone |
-| Partially-settled day | recon ≈ 0 — guards the half-applied-fix failure above |
+Each case ran in its own process against a pristine copy of
+`instance/pms.db`. `gst_service` commits internally, so savepoint isolation
+does not hold and per-scenario database copies are required.
 
-The last row is not in the original brief and is the one that catches the
-most likely implementation error.
+| Case | recon before | recon after | close before | close after |
+|---|---|---|---|---|
+| T1 fully settled GST | **−57.14** | **0.00** | blocked | **closable** |
+| T2 partially settled | 0.00 | 0.00 | ok | ok |
+| T3 GST-exempt | 0.00 | 0.00 | ok | ok |
+| T4 multi, mixed GST | **−351.42** | **0.00** | blocked | **closable** |
+| T5 production 2026-08-09 | **−57.15** | **−0.01** | blocked | **closable** |
+| T6 leakage | no change in any field | | | |
+
+T5's residual −0.01 is per-line tax rounding (`accrual_gross` 1199.99 vs
+cash 1200.00), two orders of magnitude inside the ₹1.00 tolerance.
+
+Asserted programmatically across every scenario for `leakage_total`,
+`leakage_count`, `leakage_rows`, `late_checkout_total`, `room_revenue`,
+`extra_charges_total`, `accrual_net`, `tax_amount`, `accrual_gross`,
+`total_collected` and `total_posted_revenue`:
+
+```
+All non-reconciliation fields identical : True
+Unexpected field movements              : 0
+```
+
+Only `recon_diff`, `today_outstanding`, `can_close` and `close_reasons`
+moved. `total_posted_revenue` is unchanged everywhere, so revenue reporting,
+ADR, RevPAR and occupancy are untouched — they read that field and the
+summaries feeding it, none of which this change writes.
+
+**The T2 guard was validated against the failure it exists to catch.** The
+fix was deliberately half-applied (only `today_outstanding` reverted to the
+net basis) and T2 re-run:
+
+```
+accrual_net 1142.86   accrual_gross 1200.00   collected 500.00
+today_outstanding 642.86   recon_diff +57.14   can_close False
+```
+
+A positive false gap equal to the GST, on a day that was clean before —
+exactly the predicted failure mode. The correct version was then restored
+and re-verified byte-for-byte against the passing run.
+
+`today_outstanding` moves to the gross basis as a necessary consequence of
+the atomicity requirement (T2 642.86 → 700.00, T4 0.00 → 0.02). That is the
+correct figure — an outstanding balance owed by a guest is tax-inclusive —
+and it is not persisted.
+
+#### Two harness findings worth carrying forward
+
+Neither is an application defect, but both will bite the next person writing
+tests against this service:
+
+- `Payment.payment_date` is a `DATE` compared with `==`. A `datetime` never
+  matches, and the payment silently vanishes from the audit.
+- `PaymentMode.query.first()` is unordered and can return an
+  `ota_receivable` mode, which is correctly excluded from cash collected.
+  Fixtures must pin a `direct_payment` mode explicitly.
 
 #### Confirmed unchanged
 
@@ -660,8 +724,31 @@ construction.
    control starting to work, but it will read as a new failure.
 4. GST-exempt configurations see no change, so a green run in an exempt
    environment is not evidence. State this in the test plan.
-5. Wave 0 forbids Night Audit modification. W1-R9 cannot begin until Wave 1
-   is formally entered and its invariant is registered.
+5. Wave 0 forbids Night Audit modification. W1-R9 was authorised explicitly
+   as a scoped exception; the invariant above is stated but not yet
+   registered as an executable rule.
+
+#### Follow-ups — deliberately NOT in W1-R9
+
+Each is independent work with its own risk profile. None is a prerequisite
+for W1-R9 and none should be folded into it retrospectively.
+
+1. **Reconciliation semantic redesign.** `max(0, …)` and support for a
+   genuinely positive reconciliation difference. Changes what
+   `today_outstanding` means; a semantic change, not a basis change.
+2. **Scheduled invariant execution.** See the platform note under W1-R8.
+   The largest single gap in the programme.
+3. **Historical D1 migration strategy**, if reconciliation semantics ever
+   change again. Out of scope here: W1-R9 applies to newly generated
+   records and historical `NightAuditLog` rows keep the old basis.
+4. **Master data review.** Whether Deluxe's ₹1200 `base_rate` is the current
+   selling price, and the Standard room type's `gst_rate` of 0 against a
+   `base_rate` of 1000. If Deluxe's tariff is stale, every booking will flag
+   as leakage indefinitely — a reporting problem no code change will fix.
+5. **Name the reconciliation tolerance.** It is a bare `1.00` literal in the
+   close check. The invariant calls it "configured"; it is not. A named
+   constant would make it greppable and reviewable, and was left out of
+   W1-R9 only to hold the diff to the sanctioned scope.
 
 ---
 
