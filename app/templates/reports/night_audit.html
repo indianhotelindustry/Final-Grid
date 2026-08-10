@@ -905,7 +905,14 @@
                     daily_financial_summary.revenue_source == 'audit') %}
 {% if _dfs_safe %}
 {% from "_partials/daily_financial_summary.html" import daily_financial_summary as render_dfs %}
+{# The partial carries no inline styling of its own (Aug 2026) — its .dfs-*
+   classes live in css/dashboard-corporate.css, which is scoped to .dash-corp.
+   This is the second render site after the dashboard, so it needs the same
+   wrapper or the panel renders as a bare Bootstrap card with no figure
+   sizing and no direction-of-money colour. Scope contains only the panel. #}
+<div class="dash-corp">
 {{ render_dfs(daily_financial_summary) }}
+</div>
 {% elif audit_mode == 'snapshot' %}
 <div class="alert alert-light border d-flex align-items-center gap-2 mb-3">
   <i class="bi bi-archive text-muted"></i>

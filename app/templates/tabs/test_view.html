@@ -44,29 +44,6 @@
 }
 .kpi-info:hover { color: #4b5563; }
 
-/* ── Accounting-basis explainer banner — sits above the cashier-
-       settlement row so staff understand why a ₹3 test payment moves
-       Cash In but does not move Direct Revenue. */
-.acct-basis-note {
-    grid-column: 1 / -1;
-    background: #f0f9ff;
-    border: 1px dashed #bae6fd;
-    border-radius: 6px;
-    padding: 6px 12px;
-    font-size: 0.75rem;
-    color: #075985;
-    line-height: 1.45;
-}
-.acct-basis-note strong { color: #0369a1; }
-.acct-basis-note .lbl {
-    display: inline-block;
-    font-weight: 700; font-size: 0.66rem; text-transform: uppercase;
-    letter-spacing: 0.04em;
-    background: #0369a1; color: #fff;
-    padding: 1px 6px; border-radius: 8px;
-    margin-right: 6px; vertical-align: 1px;
-}
-
 /* ── Card base ───────────────────────────────────────────────────────── */
 .kpi-card {
     height: 100%;
@@ -164,11 +141,8 @@ a.kpi-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,.13); transform: translateY
 /* ── AI Insights panel (Module 7 — Gemini) ───────────────────────── */
 .ai-insights {
     margin: 10px 0;
-    background: linear-gradient(135deg, #f0f9ff 0%, #ede9fe 100%);
-    border: 1px solid #c7d2fe;
-    border-radius: 10px;
+    /* Surface, border and radius are set by dashboard-corporate.css. */
     padding: 14px 16px;
-    box-shadow: 0 1px 3px rgba(0,0,0,.06);
 }
 .ai-insights-head {
     display: flex; align-items: center; justify-content: space-between;
@@ -234,9 +208,12 @@ a.kpi-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,.13); transform: translateY
 .kpi-card[data-card-modal]:hover .kpi-card-eye { opacity: 1; }
 </style>
 
-{# ── Training: vocabulary cheat-sheet (dismissable, no persistence) ──── #}
-{% from "_partials/training_glossary.html" import accounting_glossary %}
-{{ accounting_glossary() }}
+{# ── Training glossary banner removed (Aug 2026) ─────────────────────────
+    The same vocabulary was being explained four times on one screen. The
+    single surviving reference is the compact legend inside Daily Financial
+    Summary, which sits directly under the figures it defines. Per-tile ⓘ
+    tooltips are unaffected. Partial retained at
+    _partials/training_glossary.html should it be wanted elsewhere. #}
 
 {# ── Daily Financial Summary — owner panel ──────────────────────────── #}
 {# Alias the macro to avoid shadowing the context variable of the same name. #}
@@ -513,17 +490,11 @@ a.kpi-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,.13); transform: translateY
     <div class="kpi-subtitle">Avg length of stay</div>
 </div></div>
 
-{# ── Accounting-basis explainer — spans the full kpi-grid row above
-     the revenue/settlement tiles so staff understand why "Cash In"
-     and "Direct Revenue" can show different numbers. #}
-<div class="acct-basis-note">
-    <span class="lbl">Note</span>
-    <strong>Revenue is recognised per night, not when payment is received.</strong>
-    Tiles below: <strong>Revenue</strong> = earned from stay (accrual basis,
-    rate × nights) — sourced from the closed Night Audit. <strong>Settlement</strong>
-    (Cash In, UPI In, Cards In) = money received today (cash basis). They
-    are independent measures and routinely differ.
-</div>
+{# ── Accounting-basis explainer banner removed (Aug 2026) ────────────────
+     Duplicated the Daily Financial Summary legend. The accrual-vs-cash
+     distinction is still carried per tile by the REVENUE / SETTLEMENT /
+     RECEIVABLE scope tags and the ⓘ tooltips, which is where an operator
+     reads it in context rather than as a wall of prose. #}
 
 {# Row 4 position 2A: Cash Collected Today — direct payment cash basis
    v2.2.11 semantic split: this replaces the prior "Total Settled Today"
@@ -901,7 +872,7 @@ a.kpi-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,.13); transform: translateY
         <div class="intel-title"><i class="bi bi-calendar-week text-primary"></i>7-Day Occupancy Forecast</div>
         <div class="fc-wrap">
             {% for day in forecast_days %}
-            {% set bar_color = '#198754' if day.pct >= 80 else ('#fd7e14' if day.pct >= 60 else '#0dcaf0') %}
+            {% set bar_color = '#15704b' if day.pct >= 80 else ('#8a6100' if day.pct >= 60 else '#0dcaf0') %}
             <div class="fc-col">
                 <span class="fc-pct" style="color:{{ bar_color }}">{{ day.pct }}%</span>
                 <div class="fc-bar-track">
@@ -1349,7 +1320,7 @@ a.kpi-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,.13); transform: translateY
             {# Occupancy #}
             <div style="display:flex;justify-content:space-between;align-items:center;">
                 <span style="font-size:0.7rem;color:#6c757d;font-weight:600;">Occupancy</span>
-                <span style="font-size:0.95rem;font-weight:800;color:#0d6efd;">
+                <span style="font-size:0.95rem;font-weight:800;color:#1e3a5f;">
                     {{ occupancy_pct }}%
                     {% if occ_change_pts > 0 %}<span class="kpi-trend up"><i class="bi bi-arrow-up-short"></i>{{ occ_change_pts }}pt</span>
                     {% elif occ_change_pts < 0 %}<span class="kpi-trend down"><i class="bi bi-arrow-down-short"></i>{{ (occ_change_pts * -1)|round(1) }}pt</span>
@@ -1373,7 +1344,7 @@ a.kpi-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,.13); transform: translateY
             {# Today Revenue #}
             <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #f3f4f6;padding-top:4px;">
                 <span style="font-size:0.7rem;color:#6c757d;font-weight:600;">Cash Revenue</span>
-                <span style="font-size:0.95rem;font-weight:800;color:#198754;">
+                <span style="font-size:0.95rem;font-weight:800;color:#15704b;">
                     ₹{{ "{:,.0f}".format(today_revenue) }}
                     {% if revenue_change_pct > 0 %}<span class="kpi-trend up"><i class="bi bi-arrow-up-short"></i>{{ revenue_change_pct }}%</span>
                     {% elif revenue_change_pct < 0 %}<span class="kpi-trend down"><i class="bi bi-arrow-down-short"></i>{{ (revenue_change_pct * -1)|round(1) }}%</span>
@@ -1397,13 +1368,13 @@ a.kpi-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,.13); transform: translateY
             </div>
             <div class="src-row">
                 <span class="src-label">Walk-in</span>
-                <div class="src-bar-track"><div class="src-bar-fill" style="width:{{ walkin_pct }}%;background:#198754;"></div></div>
+                <div class="src-bar-track"><div class="src-bar-fill" style="width:{{ walkin_pct }}%;background:#15704b;"></div></div>
                 <span class="src-pct text-success">{{ walkin_pct }}%</span>
             </div>
             <div class="src-row">
                 <span class="src-label">Calling</span>
-                <div class="src-bar-track"><div class="src-bar-fill" style="width:{{ calling_pct }}%;background:#6f42c1;"></div></div>
-                <span class="src-pct" style="color:#6f42c1;">{{ calling_pct }}%</span>
+                <div class="src-bar-track"><div class="src-bar-fill" style="width:{{ calling_pct }}%;background:#4b4a72;"></div></div>
+                <span class="src-pct" style="color:#4b4a72;">{{ calling_pct }}%</span>
             </div>
             {% if source_mismatch %}
             <div style="font-size:0.62rem;color:#92400e;background:#fef3c7;padding:3px 6px;border-radius:5px;margin-top:4px;">
@@ -1419,7 +1390,7 @@ a.kpi-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,.13); transform: translateY
     </div>
 
     {# Leakage Tracker #}
-    <div class="ri-card" style="border-left: 4px solid {% if (pending_payments + waived_today_dash + discount_amount) > 0 %}#dc3545{% else %}#198754{% endif %};">
+    <div class="ri-card" style="border-left: 4px solid {% if (pending_payments + waived_today_dash + discount_amount) > 0 %}#a32b23{% else %}#15704b{% endif %};">
         <div class="ri-card-title">
             <i class="bi bi-droplet-fill text-danger"></i>Leakage Tracker
         </div>
@@ -1491,7 +1462,7 @@ a.kpi-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,.13); transform: translateY
         <div class="ri-card-title"><i class="bi bi-calendar-week text-primary"></i>Occupancy Forecast</div>
         <div>
             {# Tonight #}
-            {% set tn_color = '#198754' if tonight_pct >= 80 else ('#fd7e14' if tonight_pct >= 60 else '#0dcaf0') %}
+            {% set tn_color = '#15704b' if tonight_pct >= 80 else ('#8a6100' if tonight_pct >= 60 else '#0dcaf0') %}
             <div class="fc-mini-row">
                 <span class="fc-mini-label">Tonight</span>
                 <div class="fc-mini-bar-track"><div class="fc-mini-bar-fill" style="width:{{ tonight_pct }}%;background:{{ tn_color }};"></div></div>
@@ -1499,7 +1470,7 @@ a.kpi-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,.13); transform: translateY
                 <span class="fc-mini-badge" style="background:{{ tn_color }}20;color:{{ tn_color }};">Live</span>
             </div>
             {# Tomorrow #}
-            {% set tm_color = '#dc3545' if tomorrow_pct >= 85 else ('#fd7e14' if tomorrow_pct >= 60 else '#198754') %}
+            {% set tm_color = '#a32b23' if tomorrow_pct >= 85 else ('#8a6100' if tomorrow_pct >= 60 else '#15704b') %}
             <div class="fc-mini-row">
                 <span class="fc-mini-label">Tomorrow<br><span style="font-size:0.55rem;color:#9ca3af;">{{ tomorrow_date }}</span></span>
                 <div class="fc-mini-bar-track"><div class="fc-mini-bar-fill" style="width:{{ tomorrow_pct }}%;background:{{ tm_color }};"></div></div>
@@ -1511,7 +1482,7 @@ a.kpi-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,.13); transform: translateY
                 <div style="font-size:0.58rem;color:#9ca3af;margin-bottom:3px;">NEXT 7 DAYS</div>
                 <div style="display:flex;gap:3px;align-items:flex-end;height:30px;">
                     {% for day in forecast_days %}
-                    {% set dc = '#198754' if day.pct >= 80 else ('#fd7e14' if day.pct >= 60 else '#0dcaf0') %}
+                    {% set dc = '#15704b' if day.pct >= 80 else ('#8a6100' if day.pct >= 60 else '#0dcaf0') %}
                     <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;height:100%;justify-content:flex-end;" title="{{ day.date }}: {{ day.pct }}%">
                         <div style="width:100%;background:{{ dc }};border-radius:2px 2px 0 0;height:{{ [day.pct * 30 // 100, 2]|max }}px;min-height:2px;"></div>
                         <span style="font-size:0.5rem;color:#9ca3af;">{{ day.label[:1] }}</span>
@@ -1539,13 +1510,13 @@ a.kpi-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,.13); transform: translateY
 <div class="row g-2 mb-2" id="overstayAlertRow">
     <div class="col-6 col-md-3">
         <a href="{{ url_for('main.reservations') }}" class="text-decoration-none">
-            <div class="card shadow-sm h-100 border-0" id="alertCard-hourly" style="border-left:3px solid #1D6FA4!important;transition:box-shadow .15s;">
+            <div class="card shadow-sm h-100 border-0" id="alertCard-hourly" style="border-left:3px solid #1e3a5f!important;transition:box-shadow .15s;">
                 <div class="card-body p-2">
                     <div class="d-flex justify-content-between align-items-start">
                         <div class="text-muted" style="font-size:0.65rem;">Hourly Rooms Active</div>
-                        <i class="bi bi-clock-fill" style="color:#1D6FA4;font-size:0.9rem;"></i>
+                        <i class="bi bi-clock-fill" style="color:#1e3a5f;font-size:0.9rem;"></i>
                     </div>
-                    <h3 class="mb-0 fw-bold" id="alertVal-hourly" style="color:#1D6FA4;">—</h3>
+                    <h3 class="mb-0 fw-bold" id="alertVal-hourly" style="color:#1e3a5f;">—</h3>
                     <div class="mt-1" style="font-size:0.68rem;color:#6c757d;" id="alertSub-hourly">loading…</div>
                 </div>
             </div>
@@ -1553,13 +1524,13 @@ a.kpi-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,.13); transform: translateY
     </div>
     <div class="col-6 col-md-3">
         <a href="{{ url_for('main.reservations') }}" class="text-decoration-none">
-            <div class="card shadow-sm h-100 border-0" id="alertCard-due" style="border-left:3px solid #fd7e14!important;transition:box-shadow .15s;">
+            <div class="card shadow-sm h-100 border-0" id="alertCard-due" style="border-left:3px solid #8a6100!important;transition:box-shadow .15s;">
                 <div class="card-body p-2">
                     <div class="d-flex justify-content-between align-items-start">
                         <div class="text-muted" style="font-size:0.65rem;">Checkouts Due Soon</div>
-                        <i class="bi bi-hourglass-split" style="color:#fd7e14;font-size:0.9rem;"></i>
+                        <i class="bi bi-hourglass-split" style="color:#8a6100;font-size:0.9rem;"></i>
                     </div>
-                    <h3 class="mb-0 fw-bold" id="alertVal-due" style="color:#fd7e14;">—</h3>
+                    <h3 class="mb-0 fw-bold" id="alertVal-due" style="color:#8a6100;">—</h3>
                     <div class="mt-1" style="font-size:0.68rem;color:#6c757d;" id="alertSub-due">loading…</div>
                 </div>
             </div>
@@ -1581,7 +1552,7 @@ a.kpi-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,.13); transform: translateY
     </div>
     <div class="col-6 col-md-3">
         <a href="{{ url_for('reports.overstay_control') }}" class="text-decoration-none">
-            <div class="card shadow-sm h-100 border-0" style="border-left:3px solid #198754!important;transition:box-shadow .15s;">
+            <div class="card shadow-sm h-100 border-0" style="border-left:3px solid #15704b!important;transition:box-shadow .15s;">
                 <div class="card-body p-2">
                     <div class="d-flex justify-content-between align-items-start">
                         <div class="text-muted" style="font-size:0.65rem;">Overstay Revenue Today</div>
@@ -1614,7 +1585,7 @@ a.kpi-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,.13); transform: translateY
         if (d.overdue_critical > 0) {
             borderColor = '#7f0000'; iconColor = '#7f0000'; numColor = '#7f0000'; subText = d.overdue_critical + ' critical (>60\u200amin)';
         } else if (d.overdue_total > 0) {
-            borderColor = '#dc3545'; iconColor = '#dc3545'; numColor = '#dc3545'; subText = 'Action required';
+            borderColor = '#a32b23'; iconColor = '#a32b23'; numColor = '#a32b23'; subText = 'Action required';
         } else {
             borderColor = '#dee2e6'; iconColor = '#dee2e6'; numColor = '#6c757d'; subText = 'None overdue';
         }

@@ -17,19 +17,18 @@
 {% macro daily_financial_summary(summary) %}
 {% if summary %}
 {% set _delta = summary.cash_minus_revenue|default(0)|float %}
-<div class="card border-primary shadow-sm mb-3">
-  <div class="card-header py-2 d-flex align-items-center gap-2"
-       style="background:linear-gradient(135deg,#1e3a5f,#2d6a9f);color:#fff;">
+<div class="card dfs-card mb-3">
+  <div class="card-header dfs-header py-2 d-flex align-items-center gap-2">
     <i class="bi bi-clipboard2-pulse"></i>
     <strong>Daily Financial Summary</strong>
-    <span class="text-light opacity-75 small ms-2">
+    <span class="opacity-75 small ms-2">
       {{ summary.business_date.strftime('%a, %d %b %Y') if summary.business_date else '' }}
     </span>
-    <span class="badge bg-light text-dark ms-auto small">
+    <span class="dfs-status ms-auto small px-2 py-1">
       {% if summary.revenue_source == 'audit' %}
-        <i class="bi bi-lock-fill text-success me-1"></i>Audit Closed
+        <i class="bi bi-lock-fill me-1"></i>Audit Closed
       {% else %}
-        <i class="bi bi-broadcast text-warning me-1"></i>Live
+        <i class="bi bi-broadcast me-1"></i>Live
       {% endif %}
     </span>
   </div>
@@ -38,31 +37,28 @@
     {# ── Headline: Cash Flow vs Revenue ── #}
     <div class="row g-2 mb-3 text-center">
       <div class="col-md-4">
-        <div class="p-3 rounded h-100" style="background:#dcfce7;border:1px solid #86efac;">
-          <div class="small text-muted text-uppercase fw-semibold">Earned (Revenue)</div>
-          <div class="fw-bold fs-3 text-success">₹{{ '{:,.0f}'.format(summary.revenue_accrual|default(0)) }}</div>
-          <div class="small text-muted">Accrual basis · room + extras</div>
+        <div class="dfs-headline is-earned p-3 h-100">
+          <div class="dfs-label">Earned (Revenue)</div>
+          <div class="dfs-figure pos">₹{{ '{:,.0f}'.format(summary.revenue_accrual|default(0)) }}</div>
+          <div class="dfs-caption">Accrual basis · room + extras</div>
         </div>
       </div>
       <div class="col-md-4">
-        <div class="p-3 rounded h-100" style="background:#dbeafe;border:1px solid #93c5fd;">
-          <div class="small text-muted text-uppercase fw-semibold">Collected (Cash Flow)</div>
-          <div class="fw-bold fs-3 text-primary">₹{{ '{:,.0f}'.format(summary.total_collected|default(0)) }}</div>
-          <div class="small text-muted">Net of refunds · direct payments only</div>
+        <div class="dfs-headline is-collected p-3 h-100">
+          <div class="dfs-label">Collected (Cash Flow)</div>
+          <div class="dfs-figure acc">₹{{ '{:,.0f}'.format(summary.total_collected|default(0)) }}</div>
+          <div class="dfs-caption">Net of refunds · direct payments only</div>
         </div>
       </div>
       <div class="col-md-4">
-        <div class="p-3 rounded h-100"
-             style="background:{{ '#fef3c7' if _delta > 0.005 else '#fee2e2' if _delta < -0.005 else '#f3f4f6' }};
-                    border:1px solid {{ '#f59e0b' if _delta > 0.005 else '#fca5a5' if _delta < -0.005 else '#d1d5db' }};">
-          <div class="small text-muted text-uppercase fw-semibold">Cash Flow vs Revenue</div>
-          <div class="fw-bold fs-3"
-               style="color:{{ '#92400e' if _delta > 0.005 else '#991b1b' if _delta < -0.005 else '#374151' }};">
+        <div class="dfs-headline is-delta p-3 h-100 {{ 'pos' if _delta > 0.005 else 'neg' if _delta < -0.005 else '' }}">
+          <div class="dfs-label">Cash Flow vs Revenue</div>
+          <div class="dfs-figure {{ 'wrn' if _delta > 0.005 else 'neg' if _delta < -0.005 else '' }}">
             {% if _delta > 0.005 %}+₹{{ '{:,.0f}'.format(_delta) }}
             {% elif _delta < -0.005 %}−₹{{ '{:,.0f}'.format(-_delta) }}
             {% else %}₹0{% endif %}
           </div>
-          <div class="small text-muted">
+          <div class="dfs-caption">
             {% if _delta > 0.005 %}
               Collected more than earned — extra cash is <strong>liability</strong> (advance/voucher).
             {% elif _delta < -0.005 %}
@@ -78,65 +74,63 @@
     {# ── Detailed bucket strip ── #}
     <div class="row g-2 small">
       <div class="col-6 col-md">
-        <div class="p-2 rounded text-center" style="background:#fffbeb;">
-          <div class="text-muted">Advance Received</div>
-          <div class="fw-bold text-warning">₹{{ '{:,.0f}'.format(summary.advance_received|default(0)) }}</div>
-          <div class="small text-muted" title="Liability — booked for a future stay">Liability</div>
+        <div class="dfs-bucket text-center h-100">
+          <div class="dfs-bucket-label">Advance Received</div>
+          <div class="dfs-bucket-val wrn">₹{{ '{:,.0f}'.format(summary.advance_received|default(0)) }}</div>
+          <div class="dfs-bucket-note" title="Liability — booked for a future stay">Liability</div>
         </div>
       </div>
       <div class="col-6 col-md">
-        <div class="p-2 rounded text-center" style="background:#fee2e2;">
-          <div class="text-muted">Refund Issued</div>
-          <div class="fw-bold text-danger">−₹{{ '{:,.0f}'.format(summary.refund_issued|default(0)) }}</div>
-          <div class="small text-muted">Cancellation refunds</div>
+        <div class="dfs-bucket text-center h-100">
+          <div class="dfs-bucket-label">Refund Issued</div>
+          <div class="dfs-bucket-val neg">−₹{{ '{:,.0f}'.format(summary.refund_issued|default(0)) }}</div>
+          <div class="dfs-bucket-note">Cancellation refunds</div>
         </div>
       </div>
       <div class="col-6 col-md">
-        <div class="p-2 rounded text-center" style="background:#f3f4f6;">
-          <div class="text-muted">Net Advance</div>
-          <div class="fw-bold">₹{{ '{:,.0f}'.format(summary.net_advance|default(0)) }}</div>
-          <div class="small text-muted">Received − Refunded</div>
+        <div class="dfs-bucket text-center h-100">
+          <div class="dfs-bucket-label">Net Advance</div>
+          <div class="dfs-bucket-val">₹{{ '{:,.0f}'.format(summary.net_advance|default(0)) }}</div>
+          <div class="dfs-bucket-note">Received − Refunded</div>
         </div>
       </div>
       <div class="col-6 col-md">
-        <div class="p-2 rounded text-center" style="background:#fef3c7;">
-          <div class="text-muted">Forfeit Income</div>
-          <div class="fw-bold" style="color:#92400e;">₹{{ '{:,.0f}'.format(summary.forfeit_income|default(0)) }}</div>
-          <div class="small text-muted" title="Recognised separately from room revenue">Other Income</div>
+        <div class="dfs-bucket text-center h-100">
+          <div class="dfs-bucket-label">Forfeit Income</div>
+          <div class="dfs-bucket-val wrn">₹{{ '{:,.0f}'.format(summary.forfeit_income|default(0)) }}</div>
+          <div class="dfs-bucket-note" title="Recognised separately from room revenue">Other Income</div>
         </div>
       </div>
       <div class="col-6 col-md">
-        <div class="p-2 rounded text-center" style="background:#dcfce7;">
-          <div class="text-muted">Settlement</div>
-          <div class="fw-bold text-success">₹{{ '{:,.0f}'.format(summary.settlement_collected|default(0)) }}</div>
-          <div class="small text-muted">Cash for stay revenue</div>
+        <div class="dfs-bucket text-center h-100">
+          <div class="dfs-bucket-label">Settlement</div>
+          <div class="dfs-bucket-val pos">₹{{ '{:,.0f}'.format(summary.settlement_collected|default(0)) }}</div>
+          <div class="dfs-bucket-note">Cash for stay revenue</div>
         </div>
       </div>
       <div class="col-6 col-md">
-        <div class="p-2 rounded text-center" style="background:#fff7ed;">
-          <div class="text-muted">Credit Recovery</div>
-          <div class="fw-bold" style="color:#9a3412;">₹{{ '{:,.0f}'.format(summary.credit_recovered|default(0)) }}</div>
-          <div class="small text-muted">Today's recoveries</div>
+        <div class="dfs-bucket text-center h-100">
+          <div class="dfs-bucket-label">Credit Recovery</div>
+          <div class="dfs-bucket-val pos">₹{{ '{:,.0f}'.format(summary.credit_recovered|default(0)) }}</div>
+          <div class="dfs-bucket-note">Today's recoveries</div>
         </div>
       </div>
       <div class="col-6 col-md">
-        <div class="p-2 rounded text-center" style="background:#fef3c7;border:1px dashed #f59e0b;">
-          <div class="text-muted">Credit Outstanding</div>
-          <div class="fw-bold" style="color:#92400e;">₹{{ '{:,.0f}'.format(summary.credit_outstanding|default(0)) }}</div>
-          <div class="small text-muted">Receivable (live)</div>
+        <div class="dfs-bucket is-receivable text-center h-100">
+          <div class="dfs-bucket-label">Credit Outstanding</div>
+          <div class="dfs-bucket-val wrn">₹{{ '{:,.0f}'.format(summary.credit_outstanding|default(0)) }}</div>
+          <div class="dfs-bucket-note">Receivable (live)</div>
         </div>
       </div>
     </div>
 
     {# ── Glossary footer (compact) ── #}
-    <div class="mt-2 pt-2 border-top small text-muted d-flex flex-wrap gap-3">
-      <span><strong class="text-success">Revenue</strong> = earned</span>
-      <span><strong class="text-primary">Collected</strong> = cash in hand</span>
-      <span><strong class="text-warning">Liability</strong> = owed by hotel (advance / voucher)</span>
-      <span><strong style="color:#92400e;">Receivable</strong> = owed to hotel (credit)</span>
-      <span class="ms-auto">
-        <i class="bi bi-info-circle me-1"></i>Owner view — drill into Reports for line detail.
-      </span>
+    <div class="dfs-legend mt-2 pt-2 d-flex flex-wrap gap-3">
+      <span><strong class="lg-rev">Revenue</strong> = earned</span>
+      <span><strong class="lg-col">Collected</strong> = cash in hand</span>
+      <span><strong class="lg-lia">Liability</strong> = owed by hotel (advance / voucher)</span>
+      <span><strong class="lg-rec">Receivable</strong> = owed to hotel (credit)</span>
+      <span class="ms-auto">Owner view — drill into Reports for line detail.</span>
     </div>
   </div>
 </div>

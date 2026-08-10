@@ -1,0 +1,552 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   DASHBOARD — CORPORATE LAYER
+   Loaded AFTER design-system.css. Additive and fully scoped to `.dash-corp`,
+   so nothing here can leak into Front Desk, POS, Reports or any other page.
+
+   Intent: one neutral surface, one navy accent, muted semantic colours.
+   Colour carries meaning only where meaning exists (exceptions, direction of
+   money); it is never decoration. No gradients, no pastel fills, no lift-on-
+   hover theatrics.
+
+   Rollback: remove the <link> in base.html and the `dash-corp` wrapper class
+   in dashboard.html. No other file depends on this.
+   ═════════════════════════════════════════════════════════════════════════ */
+
+.dash-corp {
+    /* ── Neutral ramp ── */
+    --corp-ink:       #1f2937;   /* figures, headline text */
+    --corp-ink-soft:  #374151;   /* body text */
+    --corp-muted:     #6b7280;   /* labels */
+    --corp-faint:     #98a1ad;   /* captions, sub-labels */
+    --corp-line:      #e3e6ea;   /* card borders, rules */
+    --corp-line-soft: #eef0f3;   /* internal dividers */
+    --corp-surface:   #ffffff;
+    --corp-canvas:    #f7f8fa;   /* recessed / header fills */
+
+    /* ── Single accent ── */
+    --corp-accent:      #1e3a5f;
+    --corp-accent-mid:  #2f5a86;
+    --corp-accent-soft: #eef2f7;
+
+    /* ── Muted semantics (professional, not primary-bright) ── */
+    --corp-pos:   #15704b;
+    --corp-warn:  #8a6100;
+    --corp-neg:   #a32b23;
+    --corp-info:  #2b5a86;
+
+    --corp-radius: 6px;
+
+    /* ── Bootstrap theme colours, retuned for this scope only ────────────
+       Several panels set colour inline as `var(--bs-success)` etc. Rather
+       than fight inline styles with !important, we redefine the tokens they
+       resolve against, so those accents inherit the muted palette here and
+       stay untouched everywhere else in the app.
+
+       Deliberately NOT redefining the `--bs-*-rgb` triplets: Bootstrap's
+       solid `.bg-*` utilities build on those, and darkening them would break
+       contrast against the `.text-dark` labels Bootstrap pairs them with.
+       Those badges are restyled explicitly further down. */
+    --bs-success:   #15704b;
+    --bs-danger:    #a32b23;
+    --bs-warning:   #8a6100;
+    --bs-info:      #2b5a86;
+    --bs-primary:   #1e3a5f;
+    --bs-secondary: #6b7280;
+}
+
+/* ── Typography baseline ─────────────────────────────────────────────────── */
+.dash-corp {
+    color: var(--corp-ink-soft);
+}
+
+/* Lining tabular numerals so every figure column aligns on the decimal. */
+.dash-corp .kpi-val,
+.dash-corp .kpi-target-vals,
+.dash-corp .kpi-target-pct,
+.dash-corp .dfs-figure,
+.dash-corp .dfs-bucket-val,
+.dash-corp .intel-figure,
+.dash-corp .fc-pct {
+    font-variant-numeric: tabular-nums lining-nums;
+    font-feature-settings: "tnum" 1, "lnum" 1;
+}
+
+/* ── KPI grid: no ragged last row ────────────────────────────────────────
+   The tile count is 44 for Admin and lower for restricted roles, so no fixed
+   column count can divide evenly at every breakpoint (44 has no divisor
+   between 5 and 10). Rather than tune a magic number that breaks the moment
+   a card is added or a role hides one, the row itself absorbs the remainder:
+
+   flex-wrap fills each row to capacity; `flex-grow: 1` then makes whichever
+   tiles land on the final row expand to consume the leftover track. Every
+   row is flush at every width, for any card count, with no filler elements.
+
+   Column counts are chosen to minimise the remainder, since the remainder
+   decides how far the final row stretches. For the Admin set of 44 tiles:
+       cols  2 -> 0 left (exact)     cols  6 -> 2 left, 3.0x stretch
+       cols  4 -> 0 left (exact)     cols  7 -> 2 left, 3.5x stretch
+       cols  5 -> 4 left, 1.25x      cols  8 -> 4 left, 2.0x stretch
+   6 and 7 are therefore avoided — they orphan only two tiles, which then
+   balloon to 3x width. The ladder below keeps any stretch at or under 2x:
+       <768px    2 per row   22 rows, exact
+       >=768px   4 per row   11 rows, exact
+       >=1200px  5 per row    9 rows, last row 1.25x (visually flush)
+       >=1800px  8 per row    6 rows, last row 2.0x
+   Below 1800px we stay at 5 columns: 8 columns narrows tiles to ~180px,
+   which truncates the longer labels ("Expected Arrivals Today") and clips
+   the Occupancy scope tag. */
+.dash-corp .kpi-grid {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 8px;
+}
+.dash-corp .kpi-grid > * {
+    /* basis = one column minus its share of the gaps; grow absorbs the tail */
+    flex: 1 1 calc((100% - 1 * 8px) / 2);
+    min-width: 0;      /* lets ellipsis work instead of forcing overflow */
+    height: 96px;      /* replaces the old grid-auto-rows */
+}
+@media (min-width: 768px) {
+    .dash-corp .kpi-grid > * { flex-basis: calc((100% - 3 * 8px) / 4); }
+}
+@media (min-width: 1200px) {
+    .dash-corp .kpi-grid > * { flex-basis: calc((100% - 4 * 8px) / 5); }
+}
+@media (min-width: 1800px) {
+    .dash-corp .kpi-grid > * { flex-basis: calc((100% - 7 * 8px) / 8); }
+}
+
+/* ── Card surfaces ───────────────────────────────────────────────────────── */
+.dash-corp .kpi-card,
+.dash-corp .intel-card {
+    background: var(--corp-surface);
+    border: 1px solid var(--corp-line);
+    border-radius: var(--corp-radius);
+    box-shadow: none;
+}
+
+/* Neutralise the Bootstrap shadow utility inside the dashboard only. */
+.dash-corp .kpi-card.shadow-sm {
+    box-shadow: none;
+}
+
+/* Hover: a restrained border/tint shift. No translate, no drop shadow. */
+.dash-corp a.kpi-card:hover,
+.dash-corp .kpi-card[data-card-modal]:hover {
+    border-color: var(--corp-accent);
+    background: var(--corp-accent-soft);
+    box-shadow: none;
+    transform: none;
+    transition: background .12s ease, border-color .12s ease;
+}
+
+/* Decorative hover affordance — removed. The pointer cursor is the cue. */
+.dash-corp .kpi-card-eye {
+    display: none !important;
+}
+
+/* ── Exception states ─────────────────────────────────────────────────────
+   Bootstrap's border-*-2 utilities ring the whole tile in a heavy colour.
+   Corporate convention: a single left rule marks the exception instead. */
+.dash-corp .kpi-card.border-2 {
+    border-width: 1px !important;
+    border-left-width: 3px !important;
+}
+.dash-corp .kpi-card.border-danger  { border-left-color: var(--corp-neg) !important; }
+.dash-corp .kpi-card.border-warning { border-left-color: var(--corp-warn) !important; }
+
+/* ── Card internals ──────────────────────────────────────────────────────── */
+.dash-corp .kpi-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--corp-muted);
+    letter-spacing: 0.005em;
+}
+.dash-corp .kpi-val {
+    font-size: 1.35rem;
+    font-weight: 650;
+    color: var(--corp-ink);
+    letter-spacing: -0.015em;
+}
+.dash-corp .kpi-subtitle,
+.dash-corp .kpi-secondary-line {
+    font-size: 0.65rem;
+    color: var(--corp-faint);
+    font-weight: 500;
+}
+.dash-corp .kpi-icon {
+    font-size: 0.8rem;
+    color: var(--corp-faint) !important;
+    opacity: 0.85;
+}
+
+/* Muted semantic values. Scoped to .kpi-val so Bootstrap's text utilities
+   keep their normal meaning everywhere else in the app. */
+.dash-corp .kpi-val.text-success   { color: var(--corp-pos)  !important; }
+.dash-corp .kpi-val.text-danger    { color: var(--corp-neg)  !important; }
+.dash-corp .kpi-val.text-warning   { color: var(--corp-warn) !important; }
+.dash-corp .kpi-val.text-info      { color: var(--corp-info) !important; }
+.dash-corp .kpi-val.text-primary   { color: var(--corp-accent) !important; }
+.dash-corp .kpi-val.text-secondary { color: var(--corp-muted) !important; }
+.dash-corp .kpi-val.text-muted     { color: var(--corp-faint) !important; }
+
+/* ── Scope + status tags ─────────────────────────────────────────────────── */
+.dash-corp .scope-tag {
+    font-size: 0.58rem;
+    font-weight: 600;
+    border-radius: 3px;
+    letter-spacing: 0.05em;
+    padding: 1px 5px;
+    border: 1px solid transparent;
+}
+.dash-corp .scope-tag.closed { background: #eef4f0; color: var(--corp-pos);  border-color: #d3e3da; }
+.dash-corp .scope-tag.live   { background: #faf5e8; color: var(--corp-warn); border-color: #ebdfc4; }
+.dash-corp .scope-tag.none   { background: var(--corp-canvas); color: var(--corp-faint); border-color: var(--corp-line); }
+
+/* ── Trend pills ─────────────────────────────────────────────────────────── */
+.dash-corp .kpi-trend {
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: 0.58rem;
+    border: 1px solid transparent;
+}
+.dash-corp .kpi-trend.up   { background: #eef4f0; color: var(--corp-pos);   border-color: #d3e3da; }
+.dash-corp .kpi-trend.down { background: #f9eeed; color: var(--corp-neg);   border-color: #ecd8d6; }
+.dash-corp .kpi-trend.flat { background: var(--corp-canvas); color: var(--corp-muted); border-color: var(--corp-line); }
+
+/* ── Section headers ─────────────────────────────────────────────────────── */
+.dash-corp .layer-header,
+.dash-corp .intel-title {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--corp-faint);
+}
+.dash-corp .layer-header::after {
+    background: var(--corp-line);
+}
+.dash-corp .intel-title i {
+    color: var(--corp-faint);
+}
+
+/* ── Scope banner (date context strip) ───────────────────────────────────── */
+.dash-corp .scope-banner {
+    background: var(--corp-canvas);
+    border: 1px solid var(--corp-line);
+    border-radius: var(--corp-radius);
+    font-size: 0.78rem;
+}
+.dash-corp .scope-banner.stale {
+    background: #fbf1f0;
+    border-color: #e5cbc8;
+}
+.dash-corp .scope-pill {
+    background: var(--corp-surface);
+    border: 1px solid var(--corp-line);
+    border-radius: 4px;
+    font-weight: 600;
+    color: var(--corp-ink-soft);
+}
+.dash-corp .scope-pill .label {
+    font-size: 0.62rem;
+    color: var(--corp-faint);
+    letter-spacing: 0.07em;
+}
+.dash-corp .scope-pill.business { border-left: 2px solid var(--corp-accent); }
+.dash-corp .scope-pill.live     { border-left: 2px solid var(--corp-warn); }
+.dash-corp .scope-pill.closed   { border-left: 2px solid var(--corp-pos); }
+.dash-corp .scope-pill.closed.missing { border-left-color: var(--corp-faint); color: var(--corp-muted); }
+.dash-corp .scope-pill.business.stale {
+    border-left-color: var(--corp-neg);
+    background: #fbf1f0;
+    color: var(--corp-neg);
+}
+
+/* ── Alert pills in the tab row ──────────────────────────────────────────── */
+.dash-corp .dap {
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.7rem;
+    padding: 3px 9px;
+}
+.dash-corp .dap.danger  { background: #f9eeed; color: var(--corp-neg);   border-color: #ecd8d6; }
+.dash-corp .dap.warning { background: #faf5e8; color: var(--corp-warn);  border-color: #ebdfc4; }
+.dash-corp .dap.info    { background: var(--corp-accent-soft); color: var(--corp-accent); border-color: #d5dfea; }
+.dash-corp .dap:hover   { filter: none; background: var(--corp-canvas); }
+
+/* ── Intelligence / forecast panels ──────────────────────────────────────── */
+.dash-corp .intel-card {
+    padding: 12px 14px;
+}
+.dash-corp .intel-row {
+    border-bottom: 1px solid var(--corp-line-soft);
+    font-size: 0.74rem;
+    color: var(--corp-ink-soft);
+}
+.dash-corp .fc-bar-track { background: var(--corp-line-soft); border-radius: 2px 2px 0 0; }
+.dash-corp .fc-bar-fill  { background: var(--corp-accent) !important; border-radius: 2px 2px 0 0; }
+.dash-corp .fc-day { color: var(--corp-faint); font-weight: 500; }
+.dash-corp .fc-pct { color: var(--corp-muted); font-weight: 600; }
+
+/* ── AI Insights — gradient panel flattened to a standard card ───────────── */
+.dash-corp .ai-insights {
+    background: var(--corp-surface);
+    border: 1px solid var(--corp-line);
+    border-left: 3px solid var(--corp-accent);
+    border-radius: var(--corp-radius);
+    box-shadow: none;
+    padding: 13px 15px;
+}
+.dash-corp .ai-insights-title {
+    color: var(--corp-muted);
+    font-weight: 700;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+}
+.dash-corp .ai-insights-title i { color: var(--corp-faint); }
+.dash-corp .ai-insights-summary {
+    color: var(--corp-ink-soft);
+    font-size: 0.82rem;
+}
+.dash-corp .ai-insights-col {
+    background: var(--corp-canvas);
+    border: 1px solid var(--corp-line);
+    border-radius: 4px;
+}
+.dash-corp .ai-insights-col-title { color: var(--corp-faint); letter-spacing: 0.09em; }
+.dash-corp .ai-insights-item { border-bottom-color: var(--corp-line-soft); }
+.dash-corp .ai-insights-item .bullet { color: var(--corp-faint); }
+.dash-corp .ai-insights-item .issue-title { color: var(--corp-ink); font-weight: 600; }
+.dash-corp .ai-insights-meta .ai-source-badge {
+    background: var(--corp-accent-soft);
+    color: var(--corp-accent);
+    border-radius: 3px;
+    font-weight: 600;
+}
+.dash-corp .ai-insights-meta .ai-source-badge.heuristic {
+    background: var(--corp-canvas);
+    color: var(--corp-muted);
+}
+.dash-corp .ai-insights-refresh {
+    border-color: var(--corp-line);
+    color: var(--corp-muted);
+    border-radius: 4px;
+    font-weight: 600;
+}
+.dash-corp .ai-insights-refresh:hover {
+    background: var(--corp-accent);
+    border-color: var(--corp-accent);
+    color: #fff;
+}
+
+/* ── Daily Financial Summary ─────────────────────────────────────────────── */
+.dash-corp .dfs-card {
+    border: 1px solid var(--corp-line) !important;
+    border-radius: var(--corp-radius);
+    box-shadow: none !important;
+}
+.dash-corp .dfs-header {
+    background: var(--corp-accent);
+    color: #fff;
+    border-bottom: none;
+}
+.dash-corp .dfs-header .dfs-status {
+    background: rgba(255,255,255,.14);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.28);
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: 0.68rem;
+}
+
+/* Headline trio — recessed neutral panels, one accent rule each. */
+.dash-corp .dfs-headline {
+    background: var(--corp-canvas);
+    border: 1px solid var(--corp-line);
+    border-top: 2px solid var(--corp-line);
+    border-radius: 4px;
+}
+.dash-corp .dfs-headline.is-earned    { border-top-color: var(--corp-pos); }
+.dash-corp .dfs-headline.is-collected { border-top-color: var(--corp-accent); }
+.dash-corp .dfs-headline.is-delta     { border-top-color: var(--corp-line); }
+.dash-corp .dfs-headline.is-delta.pos { border-top-color: var(--corp-warn); }
+.dash-corp .dfs-headline.is-delta.neg { border-top-color: var(--corp-neg); }
+
+.dash-corp .dfs-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--corp-faint);
+}
+.dash-corp .dfs-figure {
+    font-size: 1.6rem;
+    font-weight: 650;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--corp-ink);
+}
+.dash-corp .dfs-figure.pos { color: var(--corp-pos); }
+.dash-corp .dfs-figure.neg { color: var(--corp-neg); }
+.dash-corp .dfs-figure.acc { color: var(--corp-accent); }
+.dash-corp .dfs-figure.wrn { color: var(--corp-warn); }
+.dash-corp .dfs-caption { font-size: 0.7rem; color: var(--corp-faint); line-height: 1.35; }
+
+/* Bucket strip — flat cells separated by rules, not by seven fill colours. */
+.dash-corp .dfs-bucket {
+    background: var(--corp-surface);
+    border: 1px solid var(--corp-line);
+    border-radius: 4px;
+    padding: 8px 6px;
+}
+.dash-corp .dfs-bucket.is-receivable { border-style: dashed; border-color: #d9c9a3; }
+.dash-corp .dfs-bucket-label { font-size: 0.68rem; color: var(--corp-muted); font-weight: 500; }
+.dash-corp .dfs-bucket-val {
+    font-size: 0.95rem; font-weight: 650; color: var(--corp-ink);
+    letter-spacing: -0.01em; margin: 1px 0;
+}
+.dash-corp .dfs-bucket-val.pos { color: var(--corp-pos); }
+.dash-corp .dfs-bucket-val.neg { color: var(--corp-neg); }
+.dash-corp .dfs-bucket-val.wrn { color: var(--corp-warn); }
+.dash-corp .dfs-bucket-note { font-size: 0.63rem; color: var(--corp-faint); }
+
+.dash-corp .dfs-legend {
+    border-top: 1px solid var(--corp-line);
+    font-size: 0.7rem;
+    color: var(--corp-faint);
+}
+.dash-corp .dfs-legend strong { font-weight: 600; }
+.dash-corp .dfs-legend .lg-rev { color: var(--corp-pos); }
+.dash-corp .dfs-legend .lg-col { color: var(--corp-accent); }
+.dash-corp .dfs-legend .lg-lia { color: var(--corp-warn); }
+.dash-corp .dfs-legend .lg-rec { color: var(--corp-neg); }
+
+/* ── Generic panels (Room Status, Revenue Trend, Booking Sources, …) ─────── */
+.dash-corp .card {
+    border-color: var(--corp-line);
+    border-radius: var(--corp-radius);
+}
+.dash-corp .card.shadow-sm { box-shadow: none; }
+/* :not(.dfs-header) — the Daily Financial Summary header is the one inverted
+   navy bar on the page; without this exclusion it would inherit the pale
+   canvas fill and render white-on-white. */
+.dash-corp .card-header:not(.dfs-header) {
+    background: var(--corp-canvas);
+    border-bottom: 1px solid var(--corp-line);
+}
+
+/* ── Revenue Intelligence cards ──────────────────────────────────────────
+   Signal accent kept (it encodes demand / pricing / inventory state) but
+   thinned from 4px to 3px and desaturated via the token override above. */
+.dash-corp .ri-card {
+    border: 1px solid var(--corp-line);
+    border-radius: var(--corp-radius);
+    border-left-width: 3px !important;
+    box-shadow: none;
+}
+.dash-corp .ri-card-title {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    color: var(--corp-faint);
+}
+.dash-corp .ri-main-val {
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    color: var(--corp-ink);
+    font-variant-numeric: tabular-nums lining-nums;
+}
+.dash-corp .ri-signal-badge {
+    border-radius: 3px;
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+.dash-corp .ri-signal-badge.success   { background: #eef4f0; color: var(--corp-pos);  border-color: #d3e3da; }
+.dash-corp .ri-signal-badge.warning   { background: #faf5e8; color: var(--corp-warn); border-color: #ebdfc4; }
+.dash-corp .ri-signal-badge.danger    { background: #f9eeed; color: var(--corp-neg);  border-color: #ecd8d6; }
+.dash-corp .ri-signal-badge.info      { background: var(--corp-accent-soft); color: var(--corp-accent); border-color: #d5dfea; }
+.dash-corp .ri-signal-badge.secondary { background: var(--corp-canvas); color: var(--corp-muted); border-color: var(--corp-line); }
+.dash-corp .src-bar-track,
+.dash-corp .lk-row { border-color: var(--corp-line-soft); }
+.dash-corp .ri-rule-title { color: var(--corp-ink); font-weight: 600; }
+
+/* ── Solid badges → tonal chips ──────────────────────────────────────────
+   Bootstrap's saturated fills (HIGH / MED / LOW counters, room-status
+   counts) are the loudest thing on the page and outrank the figures they
+   annotate. Same information, tonal treatment. */
+.dash-corp .badge.bg-danger {
+    background: #f9eeed !important; color: var(--corp-neg) !important;
+    border: 1px solid #ecd8d6;
+}
+.dash-corp .badge.bg-warning {
+    background: #faf5e8 !important; color: var(--corp-warn) !important;
+    border: 1px solid #ebdfc4;
+}
+.dash-corp .badge.bg-success {
+    background: #eef4f0 !important; color: var(--corp-pos) !important;
+    border: 1px solid #d3e3da;
+}
+.dash-corp .badge.bg-secondary,
+.dash-corp .badge.bg-light {
+    background: var(--corp-canvas) !important; color: var(--corp-muted) !important;
+    border: 1px solid var(--corp-line);
+}
+.dash-corp .badge.bg-primary,
+.dash-corp .badge.bg-info {
+    background: var(--corp-accent-soft) !important; color: var(--corp-accent) !important;
+    border: 1px solid #d5dfea;
+}
+
+/* ── Local tab pills ─────────────────────────────────────────────────────── */
+.dash-corp #dashboardTabs .nav-link {
+    border-radius: 4px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--corp-muted);
+    padding: 5px 12px;
+}
+.dash-corp #dashboardTabs .nav-link.active {
+    background: var(--corp-accent);
+    color: #fff;
+}
+
+/* ── Badges: square off Bootstrap's pills inside the dashboard ───────────── */
+.dash-corp .badge { border-radius: 3px; font-weight: 600; }
+
+/* ── Status dots (Room Status legend, inventory signal) ──────────────────
+   These use Bootstrap's .text-* utilities, which resolve against the
+   `--bs-*-rgb` triplets we deliberately left alone. Targeted here so the
+   legend matches the muted palette without disturbing those triplets. */
+.dash-corp .bi-circle-fill.text-danger  { color: var(--corp-neg)  !important; }
+.dash-corp .bi-circle-fill.text-success { color: var(--corp-pos)  !important; }
+.dash-corp .bi-circle-fill.text-warning { color: var(--corp-warn) !important; }
+.dash-corp .bi-circle-fill.text-primary { color: var(--corp-accent) !important; }
+
+/* ── Motion ──────────────────────────────────────────────────────────────
+   style.css runs `fadeInUp` on every .card. Across ~50 dashboard tiles that
+   reads as flutter on each page load rather than polish, and it delays the
+   moment the numbers are legible. Removed inside the dashboard only; other
+   pages keep the original entrance animation. */
+.dash-corp .card,
+.dash-corp .alert {
+    animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dash-corp *,
+    .dash-corp *::before,
+    .dash-corp *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* ── Print ───────────────────────────────────────────────────────────────── */
+@media print {
+    .dash-corp .dap,
+    .dash-corp .ai-insights-refresh { display: none !important; }
+    .dash-corp .kpi-card,
+    .dash-corp .intel-card { break-inside: avoid; }
+}

@@ -34,6 +34,12 @@
     {% endif %}
 </ul>
 
+<!-- ── Corporate presentation scope ──────────────────────────────────────
+     Everything below is styled by css/dashboard-corporate.css. The class is
+     the single opt-in switch: remove it and the dashboard reverts to the
+     previous look with no other change. -->
+<div class="dash-corp">
+
 <!-- Local Dashboard Tabs + Compact Alert Strip -->
 <style>
 .dash-tab-row {
@@ -141,10 +147,9 @@
         <span class="label">Live Today</span>
         <span>{{ dashboard_scopes.today_real_human }}</span>
     </span>
-    <span class="scope-explain">
-        Revenue / Occupancy / ADR default to <strong>Last Closed</strong>.
-        Tiles labelled <em>Live (Unsettled)</em> reflect today's in-progress activity.
-    </span>
+    {# Trailing explainer sentence removed (Aug 2026) — the per-tile scope
+       tags (CLOSED / LIVE) already state each tile's basis at the point of
+       reading, and the pill tooltips carry the long-form detail. #}
 </div>
 {% endif %}
 
@@ -206,6 +211,8 @@
 </div>
 <div id="dashboardAnalytics" style="display:none;"></div>
 <div id="dashboardCommandCenter" style="display:none;"></div>
+
+</div><!-- /.dash-corp -->
 
 <!-- ── Dashboard Card Preview Modal ──────────────────────────────── -->
 <div class="modal fade" id="cardPreviewModal" tabindex="-1" aria-labelledby="cardPreviewTitle" aria-modal="true">
