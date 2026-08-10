@@ -459,6 +459,14 @@
         display: flex; align-items: center; justify-content: center;
     }
     .voice-mic-btn:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(13,110,253,0.5); }
+    /* The button is fixed at z-index 9990, far above Bootstrap's 1055, so it
+       floats over any open modal and covers whatever sits in the modal's
+       bottom-right corner. Harmless while the check-in modal was 1140px wide
+       (its footer ended ~45px clear of the button); once that modal widened
+       to 96vw the footer's primary submit landed underneath it. The assistant
+       only drives page-level navigation — it has no modal-aware commands — so
+       there is nothing to give up by hiding it while a modal is open. */
+    body.modal-open .voice-mic-btn { display: none; }
     .voice-mic-btn.listening {
         background: linear-gradient(135deg, #dc3545, #fd7e14);
         animation: pulse-mic 1.5s ease-in-out infinite;

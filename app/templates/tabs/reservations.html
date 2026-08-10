@@ -53,6 +53,172 @@ tr.status-cancelled .status-badge {
   margin-left: 4px; vertical-align: 1px;
   white-space: nowrap;
 }
+
+/* ── Check-in modal: live Balance to Pay counter ──────────────────────────
+   Moved out of the dark panel at the foot of the column and onto the
+   Payment Mode(s) header row, so it stays on screen while amounts are keyed
+   in. The old panel set `color:#fff` inline, which silently beat the
+   `.text-warning` class updateBalance() toggles for an over-collection —
+   the warning never rendered. Colour is class-driven here so it works. */
+.ci-pay-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.ci-balance-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 5px;
+  background: #f7f8fa;
+  border: 1px solid #e3e6ea;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+.ci-balance-label {
+  font-size: 0.66rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+}
+.ci-balance-val {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #1f2937;
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;   /* digits stop jittering as it updates */
+}
+/* Over-collected (balance < 0): updateBalance() adds .text-warning. Bootstrap's
+   #ffc107 is unreadable on this light chip, so it is restated at AA contrast. */
+.ci-balance-val.text-warning {
+  color: #8a6100 !important;
+}
+.ci-balance-chip:has(.ci-balance-val.text-warning) {
+  background: #faf5e8;
+  border-color: #ebdfc4;
+}
+
+/* ══ Check-in modal: fit-to-screen pass ═══════════════════════════════════
+   Target is a 1366x768 front-desk laptop, which leaves roughly 330px of
+   modal body (about 490px in F11 fullscreen). The form carries 68 controls
+   across 10 sections and measured 2265px tall, so the work here is:
+     1. three visual columns instead of two   (ci-multicol)
+     2. optional sections collapsed by default (ci-fold)
+     3. a tighter density scale throughout
+   Everything is scoped to #expressCheckinModal so no other screen shifts. */
+
+/* ── 1. Three columns ──────────────────────────────────────────────────── */
+@media (min-width: 1200px) {
+  #expressCheckinModal .ci-multicol {
+    column-count: 2;
+    column-gap: 0.75rem;
+  }
+  /* A section must never be split down the middle by a column break. */
+  #expressCheckinModal .ci-multicol > .card {
+    break-inside: avoid;
+    page-break-inside: avoid;   /* Safari still wants the legacy property */
+    display: inline-block;      /* belt and braces for break-inside in Blink */
+    width: 100%;
+  }
+}
+/* modal-xl caps at 1140px; widen so three columns get real room. */
+@media (min-width: 1200px) {
+  #expressCheckinModal .modal-dialog.modal-xl { max-width: min(96vw, 1600px); }
+}
+
+/* ── 2. Collapsible optional sections ──────────────────────────────────── */
+#expressCheckinModal .ci-fold-toggle {
+  cursor: pointer;
+  user-select: none;
+}
+#expressCheckinModal .ci-fold-toggle .ci-fold-chevron {
+  transition: transform .15s ease;
+  font-size: 0.75rem;
+}
+#expressCheckinModal .ci-fold-toggle[aria-expanded="true"] .ci-fold-chevron {
+  transform: rotate(90deg);
+}
+/* Badge showing the section holds data, so a collapsed section is never
+   mistaken for an empty one. Populated by ciUpdateFoldBadges(). */
+#expressCheckinModal .ci-fold-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 3px;
+  background: #eef4f0;
+  color: #15704b;
+  border: 1px solid #d3e3da;
+}
+#expressCheckinModal .ci-fold-badge.is-empty {
+  background: #f7f8fa;
+  color: #98a1ad;
+  border-color: #e3e6ea;
+  font-weight: 600;
+}
+
+/* ── 3. Density ────────────────────────────────────────────────────────── */
+#expressCheckinModal .card { margin-bottom: 0.5rem !important; }
+#expressCheckinModal .card-header { padding: 0.3rem 0.6rem !important; }
+#expressCheckinModal .card-header h6 { font-size: 0.8rem; }
+#expressCheckinModal .card-body { padding: 0.5rem 0.6rem !important; }
+#expressCheckinModal .form-label {
+  font-size: 0.72rem;
+  margin-bottom: 0.1rem;
+  font-weight: 600;
+  color: #4b5563;
+}
+#expressCheckinModal .form-control,
+#expressCheckinModal .form-select {
+  font-size: 0.82rem;
+  padding: 0.25rem 0.5rem;
+  min-height: 0;
+}
+#expressCheckinModal .form-control-sm,
+#expressCheckinModal .form-select-sm { padding: 0.2rem 0.45rem; }
+#expressCheckinModal textarea.form-control { min-height: 48px; }
+/* Apply (tariff) — faded once the typed total has been committed, so "applied"
+   reads differently from "typed but not yet live". Bootstrap already dims a
+   disabled button; this deepens it and keeps the transition visible. */
+#expressCheckinModal #ciApplyTariffBtn { transition: opacity .15s ease, background-color .15s ease; }
+#expressCheckinModal #ciApplyTariffBtn.is-applied {
+  opacity: 0.45;
+  color: #6b7280;
+  border-color: #d7dbe0;
+  background: #f7f8fa;
+}
+#expressCheckinModal #ciApplyTariffBtn.is-applied:disabled { opacity: 0.45; }
+
+/* Special Requests sits beside Booking Source, so it matches the select's
+   height rather than the default two-row textarea. Still drag-resizable. */
+#expressCheckinModal textarea.ci-compact-textarea {
+  min-height: 0;
+  height: calc(1.5em + 0.4rem + 2px);
+  resize: vertical;
+  overflow-y: auto;
+}
+#expressCheckinModal .row.g-2 { --bs-gutter-y: 0.35rem; }
+#expressCheckinModal .btn-sm { padding: 0.2rem 0.5rem; font-size: 0.76rem; }
+#expressCheckinModal .alert { padding: 0.3rem 0.6rem; font-size: 0.75rem; margin-bottom: 0.4rem; }
+
+/* ── 4. Compact modal header ───────────────────────────────────────────── */
+/* Title and the Full/Express toggle sat on separate rows, costing ~145px of
+   a ~330px budget. One row returns that space to the form. */
+#expressCheckinModal .modal-header { padding: 0.4rem 0.75rem !important; }
+#expressCheckinModal .modal-title { font-size: 1rem; margin-bottom: 0 !important; }
+#expressCheckinModal .modal-footer { padding: 0.4rem 0.75rem; }
+@media (min-width: 992px) {
+  #expressCheckinModal .modal-header { align-items: center; }
+  #expressCheckinModal .modal-header .flex-fill { display: flex; align-items: center; gap: 0.75rem; }
+  #expressCheckinModal .modal-header .modal-title { margin-bottom: 0 !important; white-space: nowrap; }
+}
+/* Scrollable body should use the full window on a short laptop screen. */
+#expressCheckinModal .modal-dialog-scrollable { max-height: calc(100vh - 1rem); }
+#expressCheckinModal .modal-dialog-scrollable .modal-content { max-height: calc(100vh - 1rem); }
+#expressCheckinModal .modal-dialog { margin: 0.5rem auto; }
 </style>
 
 <!-- Action Buttons and Filter Tabs in Single Row -->
@@ -800,10 +966,15 @@ tr.status-cancelled .status-badge {
                     <small class="text-muted">Not found? Fill in the details below to create a new guest profile.</small>
                 </div>
 
-                <div class="row g-3">
+                <div class="row g-2 ci-body-grid">
 
-                    <!-- ═══════════ LEFT COLUMN ═══════════ -->
-                    <div class="col-lg-7">
+                    <!-- ═══════════ LEFT COLUMN ═══════════
+                         `ci-multicol` flows this column's sections into two CSS
+                         columns at >=1200px, giving three visual columns overall
+                         without physically moving any section between wrappers.
+                         Each .card carries break-inside:avoid so sections never
+                         split across a column boundary. -->
+                    <div class="col-lg-8 ci-multicol">
 
                         <!-- Guest Basic Info (always shown) -->
                         <div class="card border-0 shadow-sm mb-3">
@@ -839,13 +1010,18 @@ tr.status-cancelled .status-badge {
                         <!-- ── SECTION 6: Additional Passengers (Full mode only) ──────────── -->
                         <div class="card border-0 shadow-sm mb-3 ci-full-only">
                             <div class="card-header py-2 d-flex justify-content-between align-items-center" style="background:#FFF7ED; border-bottom:1px solid #E8D5C4;">
-                                <h6 class="mb-0 fw-bold" style="color:#C2410C;">
-                                    <i class="bi bi-people-fill me-1"></i> Other Guests
+                                <h6 class="mb-0 fw-bold ci-fold-toggle d-flex align-items-center gap-2" style="color:#C2410C;"
+                                    data-bs-toggle="collapse" data-bs-target="#ciFoldGuests"
+                                    aria-expanded="false" aria-controls="ciFoldGuests" role="button" tabindex="0">
+                                    <i class="bi bi-chevron-right ci-fold-chevron"></i>
+                                    <i class="bi bi-people-fill"></i> Other Guests
+                                    <span class="ci-fold-badge is-empty" data-fold-badge="ciFoldGuests">none</span>
                                 </h6>
                                 <button type="button" class="btn btn-sm btn-outline-secondary" id="btnAddPassenger" style="font-size:0.78rem;">
                                     <i class="bi bi-plus-lg"></i> Add Other Guest
                                 </button>
                             </div>
+                            <div class="collapse" id="ciFoldGuests">
                             <div class="card-body p-2">
                                 <p class="text-muted mb-2" style="font-size:0.78rem;">
                                     <i class="bi bi-info-circle me-1"></i>Add accompanying guests if more than one person is staying.
@@ -855,6 +1031,7 @@ tr.status-cancelled .status-badge {
                                 </div>
                                 <input type="hidden" id="passengers_json" value="[]">
                             </div>
+                            </div><!-- /#ciFoldGuests -->
                         </div>
 
                         <!-- ── SECTION 2: Room Assignment * ── -->
@@ -977,17 +1154,24 @@ tr.status-cancelled .status-badge {
                                             <option value="Agent">Agent</option>
                                         </select>
                                     </div>
-                                </div>
-                                <div class="mt-2">
-                                    <label class="form-label" style="font-size:0.82rem;">Special Requests</label>
-                                    <textarea class="form-control form-control-sm" id="expressSpecialRequests" rows="2" placeholder="Any special requests or notes…"></textarea>
+                                    {# Special Requests moved onto this row and reduced to a single
+                                       line — it shares the row with Booking Source instead of taking
+                                       a full-width block of its own. Still a textarea (multi-line
+                                       paste keeps working) and drag-resizable when more room is
+                                       wanted; the id stays `expressSpecialRequests` for the submit
+                                       handler. #}
+                                    <div class="col-sm-6">
+                                        <label class="form-label" style="font-size:0.82rem;">Special Requests</label>
+                                        <textarea class="form-control form-control-sm ci-compact-textarea"
+                                                  id="expressSpecialRequests" rows="1"
+                                                  placeholder="Notes / requests…"></textarea>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- ── SECTION 4: ID Verification (Full mode only) ─────────────────── -->
-                        <!-- PROOF MARKER: yellow outline = ID Verification moved to position 4 -->
-                        <div class="card border-0 shadow-sm mb-3 ci-full-only" style="outline:3px solid #f59e0b;outline-offset:2px;">
+                        <div class="card border-0 shadow-sm mb-3 ci-full-only">
                             <div class="card-header py-2" style="background:#FFF7ED; border-bottom:1px solid #E8D5C4;">
                                 <h6 class="mb-0 fw-bold" style="color:#C2410C;">
                                     <i class="bi bi-card-text me-1"></i> ID Verification
@@ -1012,16 +1196,18 @@ tr.status-cancelled .status-badge {
                                 </div>
                                 <!-- Front Side -->
                                 <div class="mb-2">
-                                    <div class="fw-semibold mb-1" style="font-size:0.78rem;"><i class="bi bi-credit-card me-1"></i>Front Side</div>
-                                    <button type="button" class="btn btn-primary btn-sm w-100 mb-1" id="idFrontScanBtn">
-                                        <i class="bi bi-upc-scan me-1"></i>Scan Document
-                                    </button>
-                                    <div class="d-flex gap-1 mb-1">
+                                    {# Three capture actions on one row instead of three stacked rows —
+                                       same actions, ~60px shorter per side. #}
+                                    <div class="d-flex align-items-center gap-1 mb-1">
+                                        <span class="fw-semibold flex-shrink-0" style="font-size:0.72rem;min-width:62px;"><i class="bi bi-credit-card me-1"></i>Front</span>
+                                        <button type="button" class="btn btn-primary btn-sm flex-fill" id="idFrontScanBtn" style="font-size:.74rem;">
+                                            <i class="bi bi-upc-scan me-1"></i>Scan
+                                        </button>
                                         <label class="btn btn-outline-secondary btn-sm flex-fill mb-0 d-flex align-items-center justify-content-center gap-1" for="idFront" style="cursor:pointer;font-size:.74rem;">
                                             <i class="bi bi-upload"></i>Upload
                                         </label>
-                                        <button type="button" class="btn btn-outline-secondary btn-sm" id="idFrontPhotoBtn" style="font-size:.74rem;">
-                                            <i class="bi bi-camera me-1"></i>Quick Photo
+                                        <button type="button" class="btn btn-outline-secondary btn-sm flex-fill" id="idFrontPhotoBtn" style="font-size:.74rem;">
+                                            <i class="bi bi-camera me-1"></i>Photo
                                         </button>
                                     </div>
                                     <input type="file" id="idFront" name="id_front" class="d-none" accept="image/*">
@@ -1039,16 +1225,16 @@ tr.status-cancelled .status-badge {
                                 </div>
                                 <!-- Back Side -->
                                 <div class="mb-0">
-                                    <div class="fw-semibold mb-1" style="font-size:0.78rem;"><i class="bi bi-credit-card-2-back me-1"></i>Back Side</div>
-                                    <button type="button" class="btn btn-primary btn-sm w-100 mb-1" id="idBackScanBtn">
-                                        <i class="bi bi-upc-scan me-1"></i>Scan Document
-                                    </button>
-                                    <div class="d-flex gap-1 mb-1">
+                                    <div class="d-flex align-items-center gap-1 mb-1">
+                                        <span class="fw-semibold flex-shrink-0" style="font-size:0.72rem;min-width:62px;"><i class="bi bi-credit-card-2-back me-1"></i>Back</span>
+                                        <button type="button" class="btn btn-primary btn-sm flex-fill" id="idBackScanBtn" style="font-size:.74rem;">
+                                            <i class="bi bi-upc-scan me-1"></i>Scan
+                                        </button>
                                         <label class="btn btn-outline-secondary btn-sm flex-fill mb-0 d-flex align-items-center justify-content-center gap-1" for="idBack" style="cursor:pointer;font-size:.74rem;">
                                             <i class="bi bi-upload"></i>Upload
                                         </label>
-                                        <button type="button" class="btn btn-outline-secondary btn-sm" id="idBackPhotoBtn" style="font-size:.74rem;">
-                                            <i class="bi bi-camera me-1"></i>Quick Photo
+                                        <button type="button" class="btn btn-outline-secondary btn-sm flex-fill" id="idBackPhotoBtn" style="font-size:.74rem;">
+                                            <i class="bi bi-camera me-1"></i>Photo
                                         </button>
                                     </div>
                                     <input type="file" id="idBack" name="id_back" class="d-none" accept="image/*">
@@ -1070,10 +1256,15 @@ tr.status-cancelled .status-badge {
                         <!-- ── SECTION 5: Additional Details / Address (Full mode only) ──── -->
                         <div class="card border-0 shadow-sm mb-3 ci-full-only">
                             <div class="card-header py-2" style="background:#FFF7ED; border-bottom:1px solid #E8D5C4;">
-                                <h6 class="mb-0 fw-bold" style="color:#C2410C;">
-                                    <i class="bi bi-person-lines-fill me-1"></i> Additional Details
+                                <h6 class="mb-0 fw-bold ci-fold-toggle d-flex align-items-center gap-2" style="color:#C2410C;"
+                                    data-bs-toggle="collapse" data-bs-target="#ciFoldAddress"
+                                    aria-expanded="false" aria-controls="ciFoldAddress" role="button" tabindex="0">
+                                    <i class="bi bi-chevron-right ci-fold-chevron"></i>
+                                    <i class="bi bi-person-lines-fill"></i> Additional Details
+                                    <span class="ci-fold-badge is-empty" data-fold-badge="ciFoldAddress">none</span>
                                 </h6>
                             </div>
+                            <div class="collapse" id="ciFoldAddress">
                             <div class="card-body">
                                 <div class="row g-2 mb-2">
                                     <div class="col-sm-6">
@@ -1113,15 +1304,21 @@ tr.status-cancelled .status-badge {
                                     <textarea class="form-control form-control-sm" id="expressAddress" rows="2" placeholder="Guest address"></textarea>
                                 </div>
                             </div>
+                            </div><!-- /#ciFoldAddress -->
                         </div>
 
                         <!-- ── SECTION 7: Company / Corporate Billing (always shown) ──────── -->
                         <div class="card border-0 shadow-sm mb-3">
                             <div class="card-header py-2" style="background:#FFF7ED; border-bottom:1px solid #E8D5C4;">
-                                <h6 class="mb-0 fw-bold" style="color:#C2410C;">
-                                    <i class="bi bi-building-fill me-1"></i> Company / Corporate Billing
+                                <h6 class="mb-0 fw-bold ci-fold-toggle d-flex align-items-center gap-2" style="color:#C2410C;"
+                                    data-bs-toggle="collapse" data-bs-target="#ciFoldCompany"
+                                    aria-expanded="false" aria-controls="ciFoldCompany" role="button" tabindex="0">
+                                    <i class="bi bi-chevron-right ci-fold-chevron"></i>
+                                    <i class="bi bi-building-fill"></i> Company / Corporate Billing
+                                    <span class="ci-fold-badge is-empty" data-fold-badge="ciFoldCompany">none</span>
                                 </h6>
                             </div>
+                            <div class="collapse" id="ciFoldCompany">
                             <div class="card-body">
                                 <label class="form-label" style="font-size:0.82rem;">Company</label>
                                 <div class="input-group input-group-sm mb-2">
@@ -1141,20 +1338,26 @@ tr.status-cancelled .status-badge {
                                 </div>
                                 <div id="ciCreditAlert" class="alert alert-info py-2 mt-2 d-none" style="font-size:0.8rem;"></div>
                             </div>
+                            </div><!-- /#ciFoldCompany -->
                         </div>
 
                     </div><!-- /left col -->
 
                     <!-- ═══════════ RIGHT COLUMN ═══════════ -->
-                    <div class="col-lg-5">
+                    <div class="col-lg-4">
 
                         <!-- Profile Picture (Full mode only) -->
                         <div class="card border-0 shadow-sm mb-3 ci-full-only">
                             <div class="card-header py-2" style="background:#FFF7ED; border-bottom:1px solid #E8D5C4;">
-                                <h6 class="mb-0 fw-bold" style="color:#C2410C;">
-                                    <i class="bi bi-camera-fill me-1"></i> Profile Picture
+                                <h6 class="mb-0 fw-bold ci-fold-toggle d-flex align-items-center gap-2" style="color:#C2410C;"
+                                    data-bs-toggle="collapse" data-bs-target="#ciFoldPhoto"
+                                    aria-expanded="false" aria-controls="ciFoldPhoto" role="button" tabindex="0">
+                                    <i class="bi bi-chevron-right ci-fold-chevron"></i>
+                                    <i class="bi bi-camera-fill"></i> Profile Picture
+                                    <span class="ci-fold-badge is-empty" data-fold-badge="ciFoldPhoto">none</span>
                                 </h6>
                             </div>
+                            <div class="collapse" id="ciFoldPhoto">
                             <div class="card-body text-center">
 
                                 <!-- Model loading indicator -->
@@ -1283,6 +1486,7 @@ tr.status-cancelled .status-badge {
                                 </div>
                                 <input type="hidden" id="expressPhotoData">
                             </div>
+                            </div><!-- /#ciFoldPhoto -->
                         </div>
 
                         <!-- Billing & Payment (always shown) -->
@@ -1295,9 +1499,17 @@ tr.status-cancelled .status-badge {
                             <div class="card-body">
                                 <!-- Modify Tariff toggle -->
                                 <div class="d-flex justify-content-between align-items-center mb-2 pb-2" style="border-bottom:1px solid #E8D5C4;">
-                                    <span style="font-size:0.85rem; font-weight:600;">Modify Tariff</span>
-                                    <div class="form-check form-switch mb-0">
-                                        <input class="form-check-input" type="checkbox" id="ciModifyTariff" role="switch">
+                                    <span style="font-size:0.85rem; font-weight:600;">
+                                        Modify Tariff
+                                        {# Shown while no room is assigned — the tariff is derived from
+                                           the room's type, so there is nothing to override yet. #}
+                                        <span id="ciModifyTariffHint" class="text-muted fw-normal ms-1" style="font-size:0.7rem;">
+                                            — assign a room first
+                                        </span>
+                                    </span>
+                                    <div class="form-check form-switch mb-0" id="ciModifyTariffWrap"
+                                         title="Assign a room before changing the tariff.">
+                                        <input class="form-check-input" type="checkbox" id="ciModifyTariff" role="switch" disabled>
                                     </div>
                                 </div>
                                 <!-- Tariff breakdown -->
@@ -1336,7 +1548,16 @@ tr.status-cancelled .status-badge {
                                             <td class="fw-bold" style="font-size:0.88rem;">Total Tariff with GST (₹)</td>
                                             <td class="text-end fw-bold">
                                                 <span id="ciTotalWithGSTDisplay" style="font-size:1rem;">—</span>
-                                                <input type="number" id="ciTotalWithGSTInput" class="form-control form-control-sm text-end d-none" style="max-width:120px; margin-left:auto;" placeholder="Enter total" min="0">
+                                                {# Manual tariff override. The value is committed only
+                                                   on Apply / Enter / leaving the field — never on each
+                                                   keystroke — so a half-typed figure can't be treated
+                                                   as the total. #}
+                                                <div id="ciTotalWithGSTEditor" class="input-group input-group-sm d-none" style="max-width:215px; margin-left:auto;">
+                                                    <input type="number" id="ciTotalWithGSTInput" class="form-control form-control-sm text-end" placeholder="Total" min="0" step="0.01">
+                                                    <button type="button" class="btn btn-outline-primary" id="ciApplyTariffBtn" title="Apply this total (or press Enter)">
+                                                        <i class="bi bi-check2 me-1 d-none" id="ciApplyTariffTick"></i><span id="ciApplyTariffLabel">Apply</span>
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -1344,12 +1565,18 @@ tr.status-cancelled .status-badge {
                                 <!-- hidden field consumed by submit handler -->
                                 <input type="hidden" id="expressTotalTariff" value="0">
 
-                                <!-- Discount section -->
-                                <div class="border rounded p-2 mb-3 bg-light">
-                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                <!-- Discount section (collapsed by default — optional on most stays) -->
+                                <div class="border rounded p-2 mb-2 bg-light">
+                                    <div class="d-flex align-items-center gap-2 ci-fold-toggle"
+                                         data-bs-toggle="collapse" data-bs-target="#ciFoldDiscount"
+                                         aria-expanded="false" aria-controls="ciFoldDiscount" role="button" tabindex="0">
+                                        <i class="bi bi-chevron-right ci-fold-chevron"></i>
                                         <i class="bi bi-tag text-warning"></i>
                                         <span style="font-size:0.82rem; font-weight:600;">Apply Discount (optional)</span>
+                                        <span class="ci-fold-badge is-empty ms-auto" data-fold-badge="ciFoldDiscount">none</span>
                                     </div>
+                                    <div class="collapse" id="ciFoldDiscount">
+                                    <div class="pt-2">
                                     <div class="mb-2">
                                         <label class="form-label" style="font-size:0.78rem;">Discount Amount (₹)</label>
                                         <input type="number" class="form-control form-control-sm"
@@ -1382,9 +1609,21 @@ tr.status-cancelled .status-badge {
                                         <i class="bi bi-exclamation-triangle me-1"></i>
                                         "Authorized By" is required when a discount is applied.
                                     </div>
+                                    </div><!-- /.pt-2 -->
+                                    </div><!-- /#ciFoldDiscount -->
                                 </div>
 
-                                <label class="form-label" style="font-size:0.82rem;">Payment Mode(s)</label>
+                                {# Balance counter sits on the Payment Mode(s) header row so it stays
+                                   in view while the operator keys amounts in. It updates live from
+                                   updateBalance(); the element id must stay `expressBalanceText`. #}
+                                <div class="ci-pay-head">
+                                    <label class="form-label mb-0" style="font-size:0.82rem;">Payment Mode(s)</label>
+                                    <span class="ci-balance-chip" id="expressBalanceChip"
+                                          title="Room tariff + extras − advance collected. Updates as you type.">
+                                        <span class="ci-balance-label">Balance to Pay</span>
+                                        <span class="ci-balance-val" id="expressBalanceText">₹ 0</span>
+                                    </span>
+                                </div>
                                 <div id="paymentRows" class="mb-2"></div>
                                 <button type="button" class="btn btn-sm btn-outline-secondary w-100 mb-3" id="btnAddPayment">
                                     <i class="bi bi-plus"></i> Add Payment Mode
@@ -1393,11 +1632,9 @@ tr.status-cancelled .status-badge {
                                     <label class="form-label" style="font-size:0.82rem;">Total Advance Paid (₹)</label>
                                     <input type="number" class="form-control form-control-sm" id="expressAdvance" value="0" readonly>
                                 </div>
-                                <div class="p-3 rounded d-flex justify-content-between align-items-center"
-                                    style="background:#1a1a2e; color:#fff;">
-                                    <span class="fw-semibold" style="color:#fff;">Balance to Pay:</span>
-                                    <h5 class="mb-0" id="expressBalanceText" style="color:#fff;">₹ 0</h5>
-                                </div>
+                                {# The dark "Balance to Pay" panel that used to sit here has moved up
+                                   to the Payment Mode(s) header row, where it is visible without
+                                   scrolling. #}
                             </div>
                         </div>
 
@@ -1719,6 +1956,87 @@ tr.status-cancelled .status-badge {
 <script src="{{ url_for('static', filename='js/booking-shared.js') }}"></script>
 <script src="{{ url_for('static', filename='js/guest-search.js') }}"></script>
 <script nonce="{{ csp_nonce }}">
+/* ── Check-in modal: collapsed optional sections ───────────────────────────
+   Other Guests, Additional Details, Company Billing and Profile Picture start
+   collapsed so the form fits a 1366x768 screen. A collapsed section must never
+   look like an empty one, so each header carries a badge counting the fields
+   that actually hold a value, refreshed whenever anything inside changes.
+   Sections also auto-open when they become relevant, so nothing is missed. */
+(function () {
+    const FOLDS = ['ciFoldGuests', 'ciFoldAddress', 'ciFoldCompany', 'ciFoldPhoto', 'ciFoldDiscount'];
+
+    function countFilled(panel) {
+        let n = 0;
+        panel.querySelectorAll('input, select, textarea').forEach(el => {
+            if (el.type === 'hidden' || el.type === 'file' || el.disabled) return;
+            const v = (el.value || '').trim();
+            if (!v) return;
+            // A select sitting on its placeholder option is not "filled".
+            if (el.tagName === 'SELECT' && (v === '' || /^(0|none|select)/i.test(v))) return;
+            n++;
+        });
+        return n;
+    }
+
+    function refreshBadge(id) {
+        const panel = document.getElementById(id);
+        const badge = document.querySelector('[data-fold-badge="' + id + '"]');
+        if (!panel || !badge) return;
+        const n = countFilled(panel);
+        badge.textContent = n ? (n + ' filled') : 'none';
+        badge.classList.toggle('is-empty', n === 0);
+    }
+
+    function refreshAll() { FOLDS.forEach(refreshBadge); }
+
+    function openFold(id) {
+        const panel = document.getElementById(id);
+        if (panel && !panel.classList.contains('show') && window.bootstrap) {
+            bootstrap.Collapse.getOrCreateInstance(panel).show();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        FOLDS.forEach(id => {
+            const panel = document.getElementById(id);
+            if (!panel) return;
+            panel.addEventListener('input',  () => refreshBadge(id));
+            panel.addEventListener('change', () => refreshBadge(id));
+        });
+
+        // "Add Other Guest" is outside the panel — expand before adding, or the
+        // new row would be added into a section the operator cannot see.
+        const addGuestBtn = document.getElementById('btnAddPassenger');
+        if (addGuestBtn) addGuestBtn.addEventListener('click', () => openFold('ciFoldGuests'));
+
+        // Corporate booking source implies corporate billing: open that section.
+        const src = document.getElementById('expressBookingSource');
+        if (src) src.addEventListener('change', function () {
+            if (/corporate|company|travel\s*agent/i.test(this.value || '')) openFold('ciFoldCompany');
+        });
+
+        // A guest loaded from search may already carry address/company data —
+        // surface it rather than leaving it hidden behind a collapsed header.
+        document.addEventListener('ci:guest-loaded', refreshAll);
+
+        refreshAll();
+    });
+
+    // Re-count each time the modal opens, so a reset form shows "none" again.
+    // A discount carried over from a rate plan or a reopened form must not stay
+    // hidden, so the discount panel opens whenever it already holds an amount.
+    const modalEl = document.getElementById('expressCheckinModal');
+    if (modalEl) modalEl.addEventListener('shown.bs.modal', function () {
+        refreshAll();
+        const amt = parseFloat((document.getElementById('expressDiscountAmount') || {}).value) || 0;
+        if (amt > 0) openFold('ciFoldDiscount');
+    });
+
+    window.ciRefreshFoldBadges = refreshAll;
+    window.ciOpenFold = openFold;   // used by the submit-time discount validation
+})();
+</script>
+<script nonce="{{ csp_nonce }}">
 (function () {
         let selectedGuest = null;
         let paymentModes = [];
@@ -1758,9 +2076,13 @@ tr.status-cancelled .status-badge {
         div.className = 'input-group mb-2 payment-row';
         div.id = `row_${rowId}`;
 
-        let options = paymentModes.map(m =>
-            `<option value="${m.id}"${(preSelectId && m.id == preSelectId) ? ' selected' : ''}>${m.name}</option>`
-        ).join('');
+        // Placeholder first, selected unless the caller pre-picked a mode. The
+        // operator chooses the mode deliberately rather than inheriting whichever
+        // one happened to be first in the list.
+        let options = `<option value=""${preSelectId ? '' : ' selected'}>— Select Mode —</option>` +
+            paymentModes.map(m =>
+                `<option value="${m.id}"${(preSelectId && m.id == preSelectId) ? ' selected' : ''}>${m.name}</option>`
+            ).join('');
 
         div.innerHTML = `
                 <select class="form-select mode-select">${options}</select>
@@ -1781,12 +2103,11 @@ tr.status-cancelled .status-badge {
 
     document.getElementById('btnAddPayment').addEventListener('click', () => addPaymentRow());
 
-    // Pre-populate Cash and UPI rows by default
-    const cashMode = paymentModes.find(m => m.name.toLowerCase().includes('cash'));
-    const upiMode  = paymentModes.find(m => m.name.toLowerCase().includes('upi'));
-    if (cashMode) addPaymentRow(cashMode.id);
-    if (upiMode)  addPaymentRow(upiMode.id);
-    if (!cashMode && !upiMode) addPaymentRow(); // fallback if neither found
+    // One empty row on open, defaulting to "— Select Mode —". Previously two rows
+    // (Cash + UPI) were pre-filled, which implied a split payment on every stay
+    // and pre-picked a mode the operator had not chosen. Extra rows come from
+    // "Add Payment Mode" when a stay really is split.
+    addPaymentRow();
 
     function updateBalance() {
         const total = parseFloat(document.getElementById('expressTotalTariff').value) || 0;
@@ -1967,6 +2288,8 @@ tr.status-cancelled .status-badge {
         if (inp) inp.value = '';
         if (roomsLoaded) renderRooms('');
         if (typeof window.ciResetTariff === 'function') window.ciResetTariff();
+        // Room gone — re-lock Modify Tariff and discard any manual override.
+        if (typeof window.ciSyncTariffToggle === 'function') window.ciSyncTariffToggle();
         updateBalance();
     });
 
@@ -1975,6 +2298,8 @@ tr.status-cancelled .status-badge {
         document.getElementById('selectedRoomText').textContent = `Room ${num} selected`;
         document.getElementById('selectedRoomBadge').classList.remove('d-none');
         document.getElementById('noRoomSelectedMsg').style.display = 'none';
+        // Room assigned — Modify Tariff now has something to override.
+        if (typeof window.ciSyncTariffToggle === 'function') window.ciSyncTariffToggle();
         // Hide validation error if shown
         const valErr = document.getElementById('ciRoomValidationError');
         if (valErr) valErr.classList.add('d-none');
@@ -2044,6 +2369,14 @@ tr.status-cancelled .status-badge {
         const btn = this;
         if (btn.disabled) return;  // guard against race-condition double-clicks
 
+        // Commit any tariff typed but not yet applied, so the figure submitted is
+        // always the one on screen. Blur normally does this; this covers the case
+        // where the field never lost focus.
+        if (document.getElementById('ciModifyTariff').checked &&
+            typeof window.ciApplyTariffNow === 'function') {
+            window.ciApplyTariffNow();
+        }
+
         const firstName = document.getElementById('expressFirstName').value;
         const phone = document.getElementById('expressPhone').value;
         const roomId = document.getElementById('expressRoomId').value;
@@ -2054,6 +2387,23 @@ tr.status-cancelled .status-badge {
             return;
         }
 
+        // A row can now sit on "— Select Mode —". An amount entered against no
+        // mode would serialise as mode_id: null and post money to no settlement
+        // head, so it is caught here rather than reaching the ledger.
+        var unsetModeRow = null;
+        document.querySelectorAll('.payment-row').forEach(function (row) {
+            var amt  = parseFloat(row.querySelector('.amount-input').value) || 0;
+            var mode = row.querySelector('.mode-select').value;
+            if (amt > 0 && !mode && !unsetModeRow) unsetModeRow = row;
+        });
+        if (unsetModeRow) {
+            alert('Please choose a payment mode for the amount entered.');
+            var sel = unsetModeRow.querySelector('.mode-select');
+            sel.focus();
+            sel.scrollIntoView({ block: 'center' });
+            return;
+        }
+
         // Disable immediately — before any async work — to prevent double-submit
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Processing...';
@@ -2061,9 +2411,12 @@ tr.status-cancelled .status-badge {
         const payments = [];
         document.querySelectorAll('.payment-row').forEach(row => {
             const amount = parseFloat(row.querySelector('.amount-input').value) || 0;
-            if (amount > 0) {
+            const modeId = row.querySelector('.mode-select').value;
+            // `modeId` is '' while the row still shows "— Select Mode —"; skipping
+            // those keeps parseInt('') === NaN out of the payload.
+            if (amount > 0 && modeId) {
                 payments.push({
-                    mode_id: parseInt(row.querySelector('.mode-select').value),
+                    mode_id: parseInt(modeId),
                     amount: amount
                 });
             }
@@ -2121,7 +2474,15 @@ tr.status-cancelled .status-badge {
         if ((data.discount_amount || 0) > 0 && !(data.discount_authorized_by || '').trim()) {
             const discAlert = document.getElementById('ciDiscountAlert');
             if (discAlert) discAlert.classList.remove('d-none');
-            document.getElementById('expressDiscountAuth').focus();
+            // The discount panel is collapsed by default. Without expanding it
+            // first, both the warning above and the focus() below land inside a
+            // hidden container — submit would fail with nothing visible to fix.
+            if (window.ciOpenFold) window.ciOpenFold('ciFoldDiscount');
+            const authEl = document.getElementById('expressDiscountAuth');
+            // Focus on the next tick so the panel has begun expanding.
+            setTimeout(function () {
+                if (authEl) { authEl.focus(); authEl.scrollIntoView({block: 'center'}); }
+            }, 0);
             btn.disabled = false;
             btn.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i><span id="ciSubmitLabel">' + (document.getElementById('ciModeFull').checked ? 'Complete Full Check-in' : 'Complete Express Check-in') + '</span>';
             return;
@@ -2203,8 +2564,10 @@ tr.status-cancelled .status-badge {
         // Reset Modify Tariff toggle to OFF and restore display/input visibility
         document.getElementById('ciModifyTariff').checked = false;
         document.getElementById('ciTotalWithGSTDisplay').classList.remove('d-none');
-        document.getElementById('ciTotalWithGSTInput').classList.add('d-none');
+        document.getElementById('ciTotalWithGSTEditor').classList.add('d-none');
         document.getElementById('ciTotalWithGSTInput').value = '';
+        // No room on a fresh form, so the override toggle starts disabled.
+        if (typeof window.ciSyncTariffToggle === 'function') window.ciSyncTariffToggle();
         // Seed today's date & current time
         if (typeof window.ciInitDatetime === 'function') window.ciInitDatetime();
     });
@@ -2985,21 +3348,121 @@ tr.status-cancelled .status-badge {
     document.getElementById('ciModifyTariff').addEventListener('change', function () {
         var on = this.checked;
         document.getElementById('ciTotalWithGSTDisplay').classList.toggle('d-none', on);
-        document.getElementById('ciTotalWithGSTInput').classList.toggle('d-none', !on);
+        document.getElementById('ciTotalWithGSTEditor').classList.toggle('d-none', !on);
         if (on) {
             // Pre-populate input with current calculated total so user has a starting point
             var currentTotal = parseFloat(document.getElementById('expressTotalTariff').value) || 0;
             if (currentTotal > 0) {
                 document.getElementById('ciTotalWithGSTInput').value = currentTotal.toFixed(2);
             }
-            window.ciRecalcBilling();
+            // Pre-filled value already matches the shown total, so open in the
+            // faded "Applied" state rather than looking like a pending edit.
+            if (typeof window.ciApplyTariffNow === 'function') window.ciApplyTariffNow();
+            else window.ciRecalcBilling();
         } else {
             // Turned OFF: reset to room's default tariff
             document.getElementById('ciTotalWithGSTInput').value = '';
             window.ciRecalcBilling();
         }
     });
-    document.getElementById('ciTotalWithGSTInput').addEventListener('input', window.ciRecalcBilling);
+    // ── Manual tariff: commit explicitly, never per keystroke ─────────────────
+    // Previously this recalculated on every `input` event, so a total typed as
+    // 1 → 15 → 150 → 1500 was recalculated four times and the field reformatted
+    // under the cursor mid-entry. The value is now committed only when the
+    // operator says so: Apply, Enter, or leaving the field.
+    (function () {
+        var input    = document.getElementById('ciTotalWithGSTInput');
+        var applyBtn = document.getElementById('ciApplyTariffBtn');
+        if (!input) return;
+
+        // Two visible states, so the operator can tell at a glance whether the
+        // figure on screen is live:
+        //   pending  — solid button, "Apply", clickable
+        //   applied  — faded and disabled, "Applied" with a tick
+        function markDirty(dirty) {
+            if (!applyBtn) return;
+            var tick  = document.getElementById('ciApplyTariffTick');
+            var label = document.getElementById('ciApplyTariffLabel');
+            applyBtn.classList.remove('btn-outline-primary');   // markup default
+            applyBtn.classList.toggle('btn-primary', dirty);
+            applyBtn.classList.toggle('btn-outline-secondary', !dirty);
+            applyBtn.classList.toggle('is-applied', !dirty);
+            applyBtn.disabled = !dirty;          // nothing to apply when clean
+            applyBtn.title = dirty ? 'Apply this total (or press Enter)'
+                                   : 'This total is applied';
+            if (tick)  tick.classList.toggle('d-none', dirty);
+            if (label) label.textContent = dirty ? 'Apply' : 'Applied';
+        }
+
+        function applyTariff() {
+            markDirty(false);
+            window.ciRecalcBilling();
+        }
+
+        // Starting state: the pre-filled total already matches what is shown.
+        markDirty(false);
+
+        input.addEventListener('input', function () { markDirty(true); });
+        input.addEventListener('change', applyTariff);   // committing on blur keeps
+                                                         // the submitted total correct
+                                                         // if Apply is never clicked
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); applyTariff(); }
+        });
+        if (applyBtn) applyBtn.addEventListener('click', applyTariff);
+
+        // A number input steps its value when the wheel is scrolled over it while
+        // focused. On a tariff field that silently rewrites money, so it is
+        // suppressed; the field still accepts typing and the arrow keys.
+        input.addEventListener('wheel', function (e) {
+            if (document.activeElement === input) { input.blur(); }
+        }, { passive: true });
+
+        // Select the existing figure on entry so typing replaces it outright —
+        // no drag-select or Ctrl+A first. Focus alone is not enough: on a mouse
+        // click the browser fires focus, then collapses the selection to the
+        // caret on mouseup. So the first mouseup after focus is suppressed;
+        // later clicks still position the caret normally for a partial edit.
+        var selectOnEntry = false;
+        input.addEventListener('mousedown', function () {
+            selectOnEntry = (document.activeElement !== input);
+        });
+        input.addEventListener('focus', function () {
+            input.select();
+        });
+        input.addEventListener('mouseup', function (e) {
+            if (selectOnEntry) { e.preventDefault(); selectOnEntry = false; }
+        });
+
+        window.ciApplyTariffNow = applyTariff;
+    })();
+
+    // ── Modify Tariff is gated on room assignment ─────────────────────────────
+    // The tariff is derived from the assigned room's type, so there is nothing
+    // to override until a room exists. Called on select, clear and modal reset.
+    window.ciSyncTariffToggle = function () {
+        var toggle = document.getElementById('ciModifyTariff');
+        if (!toggle) return;
+        var roomEl  = document.getElementById('expressRoomId');
+        var hasRoom = !!(roomEl && String(roomEl.value || '').trim());
+
+        toggle.disabled = !hasRoom;
+        var wrap = document.getElementById('ciModifyTariffWrap');
+        if (wrap) wrap.title = hasRoom ? '' : 'Assign a room before changing the tariff.';
+        var hint = document.getElementById('ciModifyTariffHint');
+        if (hint) hint.classList.toggle('d-none', hasRoom);
+
+        // Room cleared while an override was active — drop back to the room's
+        // calculated tariff rather than leaving a stale manual figure in place.
+        if (!hasRoom && toggle.checked) {
+            toggle.checked = false;
+            document.getElementById('ciTotalWithGSTDisplay').classList.remove('d-none');
+            document.getElementById('ciTotalWithGSTEditor').classList.add('d-none');
+            document.getElementById('ciTotalWithGSTInput').value = '';
+            window.ciRecalcBilling();
+        }
+    };
+    window.ciSyncTariffToggle();
 
     // ── Passenger modal management ────────────────────────────────────────────
     var paxList   = [];          // in-memory array
@@ -3209,9 +3672,10 @@ tr.status-cancelled .status-badge {
     var MS_120M = 120 * 60 * 1000;
 
     // Hotel's configured default checkout time for Regular bookings.
-    // Comes from Settings table (key: default_checkout_time); falls back to noon.
-    // Do NOT hardcode here — edit via hotel settings.
-    var CI_DEFAULT_CHECKOUT_HM = {{ default_checkout_hm | tojson }};
+    // Reuses the single page-level constant emitted from the server resolver
+    // _resolve_default_checkout_hm(); previously this re-emitted the same
+    // template value, giving two constants to keep in step. Do NOT hardcode.
+    var CI_DEFAULT_CHECKOUT_HM = window.CI_DEFAULT_CHECKOUT_HM;
 
     // Returns a Date or null. For Regular bookings with no stored checkout_time,
     // uses CI_DEFAULT_CHECKOUT_HM so departure datetime is departure_date + hotel time.

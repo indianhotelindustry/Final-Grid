@@ -81,6 +81,11 @@ TRANSACTIONAL_TABLES_IN_DELETE_ORDER = [
     'credit_notes',
     'overpayment_logs',
     'void_requests',
+    # ── Credit vouchers (redemptions reference vouchers + payments) ──────
+    'credit_voucher_redemptions',
+    'credit_vouchers',
+    # ── OTA settlement payouts (references users only) ───────────────────
+    'ota_payouts',
     # ── Reports / snapshots / alerts ─────────────────────────────────────
     'staff_performance_daily',
     'revenue_alerts',
@@ -116,6 +121,7 @@ TRANSACTIONAL_TABLES_IN_DELETE_ORDER = [
     'folios',
     # ── Reservation children + reservations ──────────────────────────────
     'reservation_passengers',
+    'reservation_rooms',
     'reservations',
     # ── Group blocks (references companies) ──────────────────────────────
     'group_blocks',
@@ -148,6 +154,32 @@ def _table_exists(db, table):
     except Exception:
         db.session.rollback()
         return False
+
+
+def _all_db_tables(db):
+    """Return the set of real tables in the connected database."""
+    if _get_db_dialect(db) == 'sqlite':
+        sql = ("SELECT name FROM sqlite_master WHERE type='table' "
+               "AND name NOT LIKE :pfx")
+        params = {'pfx': 'sqlite_%'}
+    else:
+        sql = ("SELECT tablename FROM pg_tables "
+               "WHERE schemaname = current_schema() AND tablename NOT LIKE :pfx")
+        params = {'pfx': 'pg_%'}
+    return {row[0] for row in db.session.execute(db.text(sql), params)}
+
+
+def _find_unclassified(db):
+    """Tables present in the DB but in NEITHER manifest.
+
+    A non-empty result means the manifest has drifted behind a migration.
+    That is not cosmetic: if an unlisted child table survives while its parent
+    is deleted, the reset leaves orphan rows behind and corrupts the DB.
+    """
+    known = (set(PRESERVED_TABLES)
+             | set(TRANSACTIONAL_TABLES_IN_DELETE_ORDER)
+             | {GUEST_TABLE})
+    return sorted(_all_db_tables(db) - known)
 
 
 def _reset_identity(db, table):
@@ -311,6 +343,9 @@ def main(argv=None):
                         help='Also clear the guests table (default: guests preserved for CRM/loyalty).')
     parser.add_argument('--i-understand-this-is-destructive', action='store_true',
                         help='Skip the interactive confirmation phrase. Use only in scripts.')
+    parser.add_argument('--allow-schema-drift', action='store_true',
+                        help='Proceed even if the DB has tables in neither manifest. '
+                             'They are left untouched, which may leave orphan rows.')
     parser.add_argument('--no-backup', action='store_true',
                         help='Skip the mandatory backup. DANGEROUS — only use if you just took one manually.')
     args = parser.parse_args(argv)
@@ -324,6 +359,20 @@ def main(argv=None):
         # ── Step 1: Report ──────────────────────────────────────────────
         report = _collect_report(db, include_guests=args.reset_guests)
         _print_report(report)
+
+        # ── Step 1b: Schema-drift guard ─────────────────────────────────
+        unclassified = _find_unclassified(db)
+        if unclassified:
+            print('  SCHEMA DRIFT — tables in neither manifest:')
+            for t in unclassified:
+                print(f'    {t:<32} {_row_count(db, t):>8} rows')
+            print()
+            if args.execute and not args.allow_schema_drift:
+                print('  Reset ABORTED — no data touched.')
+                print('  Classify these tables in reset_transactional_data.py,')
+                print('  or pass --allow-schema-drift to leave them untouched.')
+                print()
+                return 4
 
         if not args.execute:
             print('  This was a DRY-RUN. No data was modified.')
