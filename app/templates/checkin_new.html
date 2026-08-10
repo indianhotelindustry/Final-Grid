@@ -1151,6 +1151,10 @@
     </button>
 </div>
 
+{# bsCalcNights() — the same nights authority the check-in modal uses, so the
+   walk-in page and the modal cannot drift apart. Must load before the date
+   logic below. #}
+<script src="{{ url_for('static', filename='js/booking-shared.js') }}"></script>
 <script nonce="{{ csp_nonce }}">
 (function () {
 'use strict';
@@ -1760,6 +1764,34 @@ function buildDT(dateStr, timeStr) {
     return new Date((dateStr || '') + 'T' + (timeStr || '00:00') + ':00');
 }
 
+// Format a Date as YYYY-MM-DD in LOCAL time.
+// toISOString() converts to UTC first, which shifts the date backwards for any
+// zone ahead of UTC: in IST (+05:30) a 02:00 local check-in serialises to the
+// previous day, so the departure date landed on or before the arrival date.
+// buildDT() above already parses in local time; this is its inverse.
+function fmtLocalDate(d) {
+    const p = n => String(n).padStart(2, '0');
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+}
+
+// Stay length before the arrival date moved. Cannot be recomputed inside the
+// change handler — the arrival has already moved by then. Mirrors the check-in
+// modal so both entry points behave identically.
+let lastRegularNights = 1;
+
+// Move the departure date with the arrival, holding the stay length constant.
+// Previously changing the arrival called setDefaultCheckout(), which collapsed
+// any multi-night stay back to a single night. The check-out TIME is never
+// touched here, so a time typed by reception survives.
+function shiftCheckoutWithCheckin() {
+    if (isHourlyMode()) return;                  // duration-driven; leave alone
+    const ciDate = checkinDateInput && checkinDateInput.value;
+    if (!ciDate) return;
+    const co = buildDT(ciDate, '00:00');
+    co.setDate(co.getDate() + Math.max(1, lastRegularNights));
+    if (checkoutDateInput) checkoutDateInput.value = fmtLocalDate(co);
+}
+
 // Validate: check-out strictly after check-in; show/hide error row; return bool
 function validateDatetime() {
     const ciDate = checkinDateInput  && checkinDateInput.value;
@@ -1796,8 +1828,13 @@ function updateDuration() {
         // Backend receives nights=1 for hourly; staff uses Modify Tariff for amount
         if (nightsInput) nightsInput.value = '1';
     } else {
-        // Nights: ceiling of day difference
-        const nights = Math.max(1, Math.ceil(diffMs / 86400000));
+        // Calendar nights between the two DATES — never elapsed milliseconds.
+        // Check-out defaults to the property standard time, so an early arrival
+        // (06:15 -> 11:00 next day) spans 28h45m; ceil(28.75/24) read that as
+        // 2 nights and the guest was charged twice. bsCalcNights() is shared
+        // with the check-in modal so both count identically.
+        const nights = Math.max(1, bsCalcNights(ciDate, coDate));
+        lastRegularNights = nights;   // remembered for arrival-date moves
         if (durationDisplay) durationDisplay.value = nights;
         if (durationLabel)   durationLabel.textContent = 'Nights';
         if (durationUnit)    durationUnit.textContent  = 'nights';
@@ -1833,14 +1870,18 @@ function setDefaultCheckout() {
     const ciDT   = buildDT(ciDate, ciTime);
 
     if (isHourlyMode()) {
-        // Default: checkin + 1 hour
+        // Default: checkin + 1 hour. Duration rule unchanged; only the date is
+        // now formatted in local time (see fmtLocalDate).
         const coDT = new Date(ciDT.getTime() + 3600000);
-        if (checkoutDateInput) checkoutDateInput.value = coDT.toISOString().slice(0, 10);
+        if (checkoutDateInput) checkoutDateInput.value = fmtLocalDate(coDT);
         if (checkoutTimeInput) checkoutTimeInput.value = coDT.toTimeString().slice(0, 5);
     } else {
-        // Default: checkin date + 1 day; time = hotel standard.
-        const coDT = new Date(ciDT.getTime() + 86400000);
-        if (checkoutDateInput) checkoutDateInput.value = coDT.toISOString().slice(0, 10);
+        // Default: next calendar day; time = hotel standard.
+        // setDate() rather than +86400000ms so a DST boundary cannot land the
+        // stay on the wrong day.
+        const coDT = new Date(ciDT.getTime());
+        coDT.setDate(coDT.getDate() + 1);
+        if (checkoutDateInput) checkoutDateInput.value = fmtLocalDate(coDT);
         if (checkoutTimeInput) {
             // Detect a "stale" Hourly-mode time (matches checkin time +1h or
             // matches checkin time itself) and reset to the hotel standard.
@@ -1879,7 +1920,7 @@ document.querySelectorAll('input[name="booking_type"]').forEach(function (rb) {
     rb.addEventListener('change', applyBookingType);
 });
 
-checkinDateInput  && checkinDateInput.addEventListener('change',  function () { setDefaultCheckout(); updateDuration(); });
+checkinDateInput  && checkinDateInput.addEventListener('change',  function () { shiftCheckoutWithCheckin(); updateDuration(); });
 checkinTimeInput  && checkinTimeInput.addEventListener('change',  updateDuration);
 checkoutDateInput && checkoutDateInput.addEventListener('change', updateDuration);
 checkoutTimeInput && checkoutTimeInput.addEventListener('change', updateDuration);

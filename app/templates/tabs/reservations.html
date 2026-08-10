@@ -1713,6 +1713,10 @@ tr.status-cancelled .status-badge {
     </div>
 </div>
 
+{# Loaded here rather than at the foot of the page: bsCalcNights() is the single
+   authority for counting hotel nights and must be defined before the check-in
+   date/time logic below runs. #}
+<script src="{{ url_for('static', filename='js/booking-shared.js') }}"></script>
 <script src="{{ url_for('static', filename='js/guest-search.js') }}"></script>
 <script nonce="{{ csp_nonce }}">
 (function () {
@@ -2693,6 +2697,14 @@ tr.status-cancelled .status-badge {
     document.getElementById('expressState').addEventListener('change', function () { populateCities(this.value); });
     populateStates('India');
 
+    // ── Property standard check-out time ──────────────────────────────────────
+    // Single authority: server-side _resolve_default_checkout_hm() in routes.py,
+    // which reads Settings['default_checkout_time'] then the CI/CO Rules key
+    // Settings['cico_standard_checkout'], falling back to '11:00'. Emitted once
+    // here and reused by every consumer on this page — do not re-declare it and
+    // do not hardcode a time.
+    window.CI_DEFAULT_CHECKOUT_HM = {{ default_checkout_hm | tojson }};
+
     // ── Helpers ───────────────────────────────────────────────────────────────
     function pad(n) { return String(n).padStart(2, '0'); }
     function fmtDate(d) { return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()); }
@@ -2714,13 +2726,17 @@ tr.status-cancelled .status-badge {
     window.ciInitDatetime = function () {
         var now = nowDT();
         var ci  = now;
-        // Regular default: checkout = next day same time
+        // Regular default: departure is the next calendar day, and the time is
+        // the property's standard check-out — NOT the arrival time. Carrying the
+        // arrival time forward produced a rolling 24-hour stay (arrive 20:02 →
+        // depart 20:02), which is not how a hotel night works.
         var co  = new Date(ci); co.setDate(co.getDate() + 1);
 
         document.getElementById('expressCheckinDate').value  = fmtDate(ci);
+        // Arrival time stays the real system time — deliberately untouched.
         document.getElementById('expressCheckinTime').value  = fmtTime(ci);
         document.getElementById('expressCheckoutDate').value = fmtDate(co);
-        document.getElementById('expressCheckoutTime').value = fmtTime(co);
+        document.getElementById('expressCheckoutTime').value = window.CI_DEFAULT_CHECKOUT_HM;
         document.getElementById('ciBookingRegular').checked  = true;
         document.getElementById('ciHourlyAlert').classList.add('d-none');
         setDateWarning(null);
@@ -2765,13 +2781,54 @@ tr.status-cancelled .status-badge {
             hidden.value = hrs;
         } else {
             lbl.textContent = 'Nights';
-            // Count calendar nights (whole days)
-            var nights = Math.max(1, Math.ceil(diffMs / 86400000));
+            // Calendar nights = whole days between the two DATES; the times are
+            // irrelevant to a Regular stay. 09 -> 10 Aug is one night whether the
+            // guest arrives at 06:15 or 23:45.
+            //
+            // This must not be derived from elapsed milliseconds. Now that
+            // check-out defaults to the standard time rather than the arrival
+            // time, a 06:15 arrival departing 11:00 next day spans 28h45m, and
+            // ceil(28.75/24) would read 2 nights and charge the guest twice.
+            // The server trusts this figure — routes.py derives
+            // departure_date = business_date + nights from it — so an inflated
+            // count would extend the booking as well as the tariff.
+            // bsCalcNights() in static/js/booking-shared.js is the single
+            // authority — the walk-in page counts nights with the same call, so
+            // the two entry points cannot drift apart.
+            var nights = Math.max(1, bsCalcNights(ciDate, coDate));
             disp.value   = nights + ' night' + (nights !== 1 ? 's' : '');
             hidden.value = nights;
+            lastRegularNights = nights;   // remembered for arrival-date moves
         }
         window.ciRecalcBilling();
     }
+
+    // ── Moving the arrival date carries the stay with it ──────────────────────
+    // Nights is derived, not typed, so shifting the check-in date used to leave
+    // the old departure behind — often landing before the new arrival and
+    // tripping "Check-out must be after check-in". The stay length is held
+    // constant instead and the departure date moves with it. The check-out TIME
+    // is never touched here, so a time reception typed by hand survives.
+    // Stay length as it stood BEFORE the arrival date moved. It cannot be
+    // recomputed inside the handler: by then the check-in date has already
+    // changed, so bsCalcNights(newArrival, oldDeparture) would return the
+    // wrong length. updateDuration() keeps this current.
+    var lastRegularNights = 1;
+
+    function shiftCheckoutWithCheckin() {
+        if (isHourly()) return;                     // duration-driven; leave alone
+        var ciDate = document.getElementById('expressCheckinDate').value;
+        if (!ciDate) return;
+        var nights = Math.max(1, lastRegularNights);
+        var co = new Date(ciDate + 'T00:00');
+        co.setDate(co.getDate() + nights);          // calendar-safe across DST
+        document.getElementById('expressCheckoutDate').value = fmtDate(co);
+    }
+
+    document.getElementById('expressCheckinDate').addEventListener('change', function () {
+        shiftCheckoutWithCheckin();
+        updateDuration();
+    });
 
     // Wire date/time inputs → updateDuration
     ['expressCheckinDate','expressCheckinTime','expressCheckoutDate','expressCheckoutTime'].forEach(function(id) {
@@ -2791,13 +2848,27 @@ tr.status-cancelled .status-badge {
             var co     = new Date(base);
 
             if (hourly) {
+                // Hourly is duration-driven — behaviour unchanged.
                 co.setHours(co.getHours() + 1);          // +1 hour
+                document.getElementById('expressCheckoutDate').value = fmtDate(co);
+                document.getElementById('expressCheckoutTime').value = fmtTime(co);
             } else {
+                // Regular: next calendar day at the property's standard
+                // check-out time, matching ciInitDatetime.
                 co.setDate(co.getDate() + 1);             // +1 day
-            }
+                document.getElementById('expressCheckoutDate').value = fmtDate(co);
 
-            document.getElementById('expressCheckoutDate').value = fmtDate(co);
-            document.getElementById('expressCheckoutTime').value = fmtTime(co);
+                // Only overwrite the time if it still holds a machine-set value.
+                // A time reception typed by hand is preserved. Same stale-value
+                // test the walk-in page uses, so the two behave identically.
+                var coTimeEl = document.getElementById('expressCheckoutTime');
+                var current  = coTimeEl.value || '';
+                var plusHour = new Date(base); plusHour.setHours(plusHour.getHours() + 1);
+                var stale = ['', ciTime, fmtTime(plusHour), window.CI_DEFAULT_CHECKOUT_HM];
+                if (stale.indexOf(current) !== -1) {
+                    coTimeEl.value = window.CI_DEFAULT_CHECKOUT_HM;
+                }
+            }
             updateDuration();
         });
     });
@@ -3742,7 +3813,6 @@ tr.status-cancelled .status-badge {
 </div>
 
 <script src="{{ url_for('static', filename='js/guest-search-form.js') }}"></script>
-<script src="{{ url_for('static', filename='js/booking-shared.js') }}"></script>
 <script src="{{ url_for('static', filename='js/express-checkin.js') }}"></script>
 <script nonce="{{ csp_nonce }}">
 /* ── Room rate map (for bulk booking rate auto-fill) ── */
