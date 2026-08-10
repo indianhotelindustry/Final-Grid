@@ -490,8 +490,14 @@ page is reachable.
 
 ### W1-R9 — Night Audit reconciliation basis correction
 
-**Status: IMPLEMENTED.** One file, three functional lines, six regression
-cases passing with zero unexpected field movements. Evidence below.
+**Status: CLOSED** (commit `a6e2fe2`). One file, three functional lines, six
+regression cases passing with zero unexpected field movements. Evidence
+below.
+
+Do not reopen W1-R9 for cosmetic improvement. Extracting the ₹1.00 literal
+into a named constant is worthwhile and is filed under housekeeping; folding
+it back in here would dilute a release whose value is that its scope was
+exactly three lines.
 
 **Objective.** Correct the accounting basis used when Night Audit compares
 revenue against payments. Not a pricing change, not a CI/CO change, not a
@@ -745,10 +751,79 @@ for W1-R9 and none should be folded into it retrospectively.
    selling price, and the Standard room type's `gst_rate` of 0 against a
    `base_rate` of 1000. If Deluxe's tariff is stale, every booking will flag
    as leakage indefinitely — a reporting problem no code change will fix.
-5. **Name the reconciliation tolerance.** It is a bare `1.00` literal in the
-   close check. The invariant calls it "configured"; it is not. A named
-   constant would make it greppable and reviewable, and was left out of
-   W1-R9 only to hold the diff to the sanctioned scope.
+5. **Name the reconciliation tolerance** — *housekeeping release, not a
+   reopening of W1-R9*. It is a bare `1.00` literal in the close check. The
+   invariant calls it "configured"; it is not. A named constant would make
+   it greppable and reviewable. Deliberately deferred: W1-R9's value is that
+   its diff was exactly three functional lines.
+6. **Register the invariant as an executable rule — `INV-R01`.** See below.
+   This is the D4 item that turns W1-R9's protection from documentation into
+   a control.
+
+#### Next D4 item — INV-R01, gross reconciliation basis
+
+W1-R9 states its invariant in prose and in a docstring. Neither can fail.
+Under P11 — *a control that cannot fail is not a control* — the invariant
+should exist as an executable rule so it can be commissioned, fault-injected
+and eventually scheduled. The intended chain:
+
+```
+specification → implementation → executable invariant
+                                          ↓
+                                  fault injection
+                                          ↓
+                              scheduled verification
+```
+
+The proposed assertion, for every fully settled business day:
+
+```
+abs(accrual_gross - total_payments - today_outstanding) <= RECON_TOLERANCE
+```
+
+**Written exactly that way it would be partly vacuous, and the vacuity is
+worth designing out before commissioning rather than discovering afterwards.**
+Because `today_outstanding` is `max(0, accrual_gross - total_payments)`, the
+expression algebraically collapses:
+
+| condition | expression | detects? |
+|---|---|---|
+| `accrual_gross >= payments` | identically **0** | **never fails** |
+| `accrual_gross < payments` | `accrual_gross - payments` | fails correctly |
+
+The consequence for fault injection is concrete, and it was measured rather
+than argued. Evaluating the proposed expression against the five W1-R9
+scenarios returns PASS on every one — including `T2_partially_settled`,
+where it returns exactly `0.0` not because the day reconciles but because
+the terms cancel. Injecting two hypothetical faults into the T1 figures:
+
+| injection | gross | paid | expression | verdict |
+|---|---|---|---|---|
+| baseline | 1200.00 | 1200.00 | 0.00 | — |
+| delete a ₹500 **charge** (revenue removed) | 700.00 | 1200.00 | **−500.00** | **DETECTED** |
+| delete a ₹500 **payment** (cash removed) | 1200.00 | 700.00 | **0.00** | **not detected** |
+
+An INV-R01 built on the triple would therefore pass its commissioning run
+and still be blind to a missing payment — precisely the condition the
+original `:1030` comment claimed to monitor.
+
+Two ways to give it teeth, in preference order:
+
+1. **Assert on independently derived operands.** For days where every stay
+   is fully settled, assert `abs(accrual_gross - total_payments) <=
+   RECON_TOLERANCE` directly, without the self-cancelling third term. The
+   population "fully settled day" has to be defined from folio balances
+   rather than from the reconciliation figure itself, or the invariant
+   becomes circular.
+2. **Sequence it after the `max(0, …)` redesign** (follow-up 1), which makes
+   the sign meaningful and the triple non-degenerate.
+
+Whichever route is taken, the paired fault must delete a **payment**, not a
+charge. That is the direction the current arithmetic cannot see, so it is
+the only fault that proves the invariant is real.
+
+`RECON_TOLERANCE` presupposes follow-up 5, so the housekeeping release is a
+soft prerequisite for a clean INV-R01.
 
 ---
 
