@@ -353,6 +353,141 @@ reservations. Determine which is correct and correct the record.
 
 ---
 
+### W1-R8 — Night Audit HTML consolidation
+
+**Objective.** One HTML Night Audit page instead of two, with the snapshot
+integrity warning moved onto the page operators actually open. No financial
+figure changes; nothing is deleted until a release has proved it unreachable.
+
+| | |
+|---|---|
+| Canonical implementation | `main.night_audit` → `night_audit_panel.html`, as the `# Redirect HTML to the centralized Night Audit module` comment at `reports.py:2383` always intended |
+| Obsolete implementations to retire | `reports/night_audit.html` (3,975 lines) and the `render_template` fallthrough at `reports.py:2735` — **after** one release of deprecation logging, not before |
+| Affected reports | `reports.night_audit` (HTML branch only; `json` / `excel` / `print` unchanged), `main.night_audit` |
+| Affected services | none. `services.verify_snapshot_integrity` is called, not modified |
+| Migration requirements | **none** — no data touched |
+| Rollback | `git revert`. No data to restore |
+| Expected invariant movement | **none.** `INV-B02` already HOLDS and keeps holding — this release changes who can *see* it, not whether it fires |
+| Expected D1 movement | **none.** No derivation touched |
+| Datasets required | none new |
+| Fault injections required | none new. `FLT-D02` already edits a frozen snapshot and asserts `INV-B02` fires; W1-R8 adds the requirement that the **panel renders the warning** under that same fault |
+| Historical replay | D3 unchanged — no engine touched |
+| Certification evidence | D2 capture of the panel under `FLT-D02` showing the banner present, plus a route-level test matrix pinning each `format` to its template |
+
+**The defect, stated precisely.** `fmt` defaults to `'html'` at
+`reports.py:2381`, and the `fmt == 'html'` branch at `reports.py:2383-2389`
+redirects to `main.night_audit`. The branches run `json` → `excel` → `html`
+→ `print`, so the render at `reports.py:2735` is reachable **only** by an
+unrecognised `format` value. No template, JS or Python passes one. The stale
+`# --- HTML (default) and Print ---` comment sitting *below* the redirect is
+the fingerprint: the redirect was inserted above a block that used to serve
+HTML, and the block was left behind.
+
+**What is actually lost is narrower than it first appears.** Snapshot tamper
+*detection* is live and fault-proven: `INV-B02` is CRITICAL and
+`Blocking.RELEASE`, declares
+`canonical_engine='app.services.verify_snapshot_integrity'` so it calls the
+application's own helper rather than re-implementing the hash, and `FLT-D02`
+appends a space to `snapshot_json` and asserts it fires. P11 is satisfied at
+the verification layer. What is unreachable is the **operator-facing**
+surface: the red "Snapshot integrity warning — hash mismatch" banner at
+`reports/night_audit.html:391` and the Re-run Audit button it gates. The
+panel has no integrity surface at all — its one `shield-exclamation` is the
+"Money at Risk" section icon.
+
+**Why that still matters: nothing runs the invariant engine on a schedule.**
+`app/__init__.py:530-535` schedules the night audit and the daily backup.
+There is no invariant job. `INV-B02` fires only when someone runs the
+verification runner by hand, so between runs a tampered snapshot is visible
+to no one. This is the one part of W1-R8 that is not cosmetic.
+
+**Sequence. The ordering is the substance of this release.**
+
+1. **Restore the surface first.** Compute
+   `snapshot_integrity = verify_snapshot_integrity(current_log)` in
+   `main.night_audit` beside the existing context at `routes.py:4764`, and
+   port the banner block from `reports/night_audit.html:385-410` into
+   `night_audit_panel.html`. Silent, no gate beyond Wave 0.
+2. **Make the panel the single HTML authority.** Route keeps four branches:
+   panel (HTML), print, JSON, Excel.
+3. **Instrument before deleting.** Leave the fallthrough in place for one
+   release with a `log.warning("Deprecated template rendered")`. If nothing
+   logs, the reachability argument is proved by measurement rather than by
+   grep.
+4. **Schedule verification.** Night Audit → snapshot → verification job →
+   dashboard warning → audit status, so the control does not depend on
+   anybody remembering. This is the largest improvement in the release and
+   it closes the gap for the other 24 invariants too, not just `INV-B02`.
+5. **Delete** `reports/night_audit.html`, its `render_template`, and the
+   HTML fallthrough — only after step 3 has come back silent.
+6. **Regression tests** pinning each branch to its template: `/night-audit`
+   → `night_audit_panel.html`; `?format=print` → print template;
+   `?format=json` → JSON; `?format=excel` → Excel; and a hash mismatch
+   → warning rendered. These are what stop the situation reappearing.
+
+Step 5 without steps 1–2 would delete the surface rather than restore it.
+
+**Acceptance criteria.** Signed off against evidence, not against opinion.
+Every row is checkable by someone who did not write the change.
+
+| # | Criterion | Expected result | How it is evidenced | Step |
+|---|---|---|---|---|
+| A1 | Active Night Audit panel displays snapshot integrity | PASS | `GET /night-audit` on a date whose snapshot hash mismatches renders the banner | 1 |
+| A2 | `INV-B02` continues to HOLD | PASS | `inv-run` before and after, unchanged verdict. **Any movement fails this release** | 1–6 |
+| A3 | `FLT-D02` displays operator warning | PASS | Fault injected, panel captured showing the banner, fault cleaned up | 1 |
+| A4 | HTML panel becomes sole HTML implementation | PASS | Route matrix: exactly one branch returns an HTML page; `json` / `excel` / `print` unchanged | 2 |
+| A5 | Legacy template rendered during observation period | **0 occurrences** | `Deprecated template rendered` absent from a full release of logs | 3 |
+| A6 | Legacy template removed after observation release | PASS | `reports/night_audit.html`, its `render_template` and the fallthrough all gone; A4 still passes | 5 |
+| A7 | Route-to-template bindings pinned by test | PASS | Four tests green: panel / print / JSON / Excel, plus the A1 mismatch case | 6 |
+| A8 | No financial figure moves | PASS | D1 parity and D4 invariant runs identical before and after | 1–6 |
+
+A5 is the only criterion that cannot be satisfied by inspection: it is a
+measurement over a release, and it is what licenses A6. If A5 records even
+one occurrence, the reachability argument is wrong and step 5 does not
+proceed — the correct response is to find the caller, not to lower the bar.
+
+A2 and A8 are the release's safety rails. This is a routing and presentation
+change; if either moves, something outside the stated scope was touched.
+
+---
+
+### Platform note — verification scheduling exceeds this release
+
+Step 4 is written into W1-R8 because that is where the gap surfaced, but its
+scope is the platform, not the Night Audit. Today:
+
+```
+Application → data changes → nothing
+                                 ↓
+              developer remembers to run verification by hand
+```
+
+The architecture this should become:
+
+```
+Application → data changes → verification scheduler → invariant engine
+                                                            ↓
+                                                   dashboard / alerts
+```
+
+The difference is not convenience. Every Wave 0 control is currently an
+*on-demand* control: 25 invariants and 40 faults that fire only when a human
+invokes them, with an unbounded window in between. `INV-B02` is where this
+became visible because its only operator-facing surface was also missing —
+two independent silences stacked on the same control — but the scheduling
+gap belongs to all 25.
+
+Track it as a platform item. If it is delivered before W1-R8, step 4 reduces
+to subscribing the Night Audit panel to something that already exists.
+
+**Note for whoever picks this up.** `reports/night_audit.html` carries an
+Aug 2026 `.dash-corp` wrapper around its Daily Financial Summary call. It is
+correct and currently a no-op, kept so the panel is not the only styled
+render site if the view is ever revived. Its presence is not evidence the
+page is reachable.
+
+---
+
 ## 5. Re-evaluated ordering, and where it differs from the original
 
 The original Wave 1 ordering followed discovery: D1's findings, then D2's,
@@ -370,6 +505,7 @@ then D3's. **Wave 0 produced three pieces of evidence that change it.**
 
 ```
 W1-R1  surfaces that do not render          SILENT      no gate beyond Wave 0
+W1-R8  night audit HTML, steps 1-4          SILENT      no gate beyond Wave 0
 W1-R2  dormant financial correctness        SILENT      no gate beyond Wave 0
         ---- D9 required below this line ----
 W1-R3  folio routing                        attribution only
@@ -377,7 +513,14 @@ W1-R4  derivation consolidation             reporting
 W1-R5  closed-period integrity              HISTORICAL — approval required
 W1-R6  OTA receivable restatement           HISTORICAL — approval required
 W1-R7  operational data remediation         approval required
+W1-R8  night audit HTML, steps 5-6          deletion — one release after step 3
 ```
+
+**W1-R8 appears twice deliberately.** Its first four steps are silent and
+belong beside W1-R1: both are surfaces the hotel cannot reach, and neither
+moves a figure. Its deletion step cannot run in the same release as its
+instrumentation step, because the whole point of step 3 is to spend a
+release proving by measurement what step 5 then acts on.
 
 `certification_blocking` counts violated invariants whose blocking is
 RELEASE **or** CERTIFICATION, so it is a superset of the release count and
@@ -475,6 +618,18 @@ Stated so the blueprint is not read as a claim of completeness.
 - **The coverage ledger does not measure D3**, deliberately.
 - **Four faults remain UNCOVERED**: `FLT-B04`, `FLT-D04`, `FLT-D05`,
   `FLT-D07`.
+- **No invariant runs without a human.** `app/__init__.py:530-535` schedules
+  the night audit and the daily backup; nothing schedules the invariant
+  engine. Every Wave 0 control is therefore an *on-demand* control, and the
+  window between runs is unbounded. `INV-B02` is where this was found — see
+  W1-R8 step 4 and the platform note beneath it — but the gap is not
+  specific to it and closing it for one invariant closes it for all 25.
+  **This is a platform limitation, not a Night Audit one**, and it is the
+  single largest gap in this list.
+- **Reachability is not tested.** Nothing asserts which template a route
+  renders, which is how a 3,975-line Night Audit view became unreachable
+  without any check failing. W1-R8 step 6 addresses this for one route; the
+  general case is untested.
 
 ---
 
