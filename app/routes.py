@@ -4704,9 +4704,18 @@ def night_audit():
     audit_is_closed = current_log and current_log.status in ('Completed', 'Warning')
 
     # ── Report data source: snapshot-first for closed audits ─────
-    # Closed audits with a stored snapshot_json show FROZEN data
-    # (what the numbers were at close time). Live recompute is only
-    # used for un-closed dates or when the snapshot is missing/corrupt.
+    # Closed audits with a VALID stored snapshot_json show FROZEN data
+    # (what the numbers were at close time). Live recompute is used for
+    # un-closed dates, for a missing or corrupt snapshot, and for a snapshot
+    # that has been explicitly invalidated.
+    #
+    # DEF-004 Phase 5: snapshot_valid is the authority, not status. Reopen
+    # sets snapshot_valid=False while deliberately keeping snapshot_json for
+    # forensic comparison, and it also moves status off 'Completed'/'Warning'
+    # — which is why gating on status alone happened to behave correctly.
+    # Any path that invalidates a snapshot WITHOUT changing status, such as
+    # the INV-B02 hash-mismatch control, would otherwise keep rendering a
+    # snapshot the system has already declared untrustworthy.
     report = None
     exc_summary = None
     panel_ui = None
@@ -4715,7 +4724,7 @@ def night_audit():
 
     if active_tab in ('dashboard', 'analytics') or request.args.get('format') in ('json', 'print', 'excel'):
         # Try snapshot first for closed audits
-        if audit_is_closed and current_log.snapshot_json:
+        if audit_is_closed and current_log.snapshot_json and current_log.snapshot_valid:
             try:
                 report = _json.loads(current_log.snapshot_json)
                 audit_source = 'snapshot'

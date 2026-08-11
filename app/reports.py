@@ -2796,6 +2796,12 @@ def night_audit_run():
     folio = svc.folio_control()
     occ = svc.occupancy_position()
     shifts = svc.staff_shift_summary()
+    # DEF-004 Phase 3: the run path refreshed eleven financial fields but not
+    # the reconciliation, so after a reopen the panel showed newly-run
+    # operational checks beside a reconciliation left over from the previous
+    # close. Recomputed here from the same service call the completion path
+    # validates against, so Run and Complete can never disagree.
+    ctrl = svc.final_control()
 
     # v2.2.16 FIX 2 — duplicate-date guard. Production carries legacy
     # duplicate NightAuditLog rows for some dates (2026-05-04 / 2026-05-07).
@@ -2822,6 +2828,7 @@ def night_audit_run():
     log.total_discount = rev['discount_total']
     log.total_payments = pay['total_collected']
     log.outstanding_amount = folio['total_outstanding']
+    log.reconciliation_difference = ctrl['reconciliation_difference']
     log.occupancy_count = occ['occupied']
     log.pending_checkouts = len(occ['expected_not_checkedout'])
     # Cash from shifts
@@ -2969,6 +2976,22 @@ def night_audit_complete():
         if override_reason:
             log.override_used = True
             log.override_reason = override_reason
+        else:
+            # DEF-004 Phase 4: a clean completion must not inherit the
+            # override provenance of an earlier forced close. Without this,
+            # an audit reopened and then closed with everything reconciling
+            # still reported "Override used" with the old reason, which reads
+            # as a forced close that never happened. Reaching this branch
+            # means hard_blocks was empty — the refusal above returns early
+            # otherwise — so the completion is genuinely clean.
+            #
+            # The override timestamp and the acting user are not separate
+            # columns: the timestamp is appended into override_reason at
+            # submission and the actor is run_by_user_id, which is reset just
+            # above to whoever completed this run. Clearing these two fields
+            # therefore clears the whole override record.
+            log.override_used = False
+            log.override_reason = None
 
         # Save immutable snapshot + mark valid + tamper-detection hash
         try:
