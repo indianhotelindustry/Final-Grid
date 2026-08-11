@@ -2886,11 +2886,16 @@ def night_audit_complete():
     if exc['blocker_count'] > 0:
         hard_blocks.append(f"{exc['blocker_count']} unresolved blocker(s)")
 
+    # DEF-005: one decision point for "does this day reconcile", shared with
+    # final_control's close reasons and with INV-R01, and one tolerance. The
+    # verdict also names the probable cause: a residual equal to the day's tax
+    # is a net-vs-gross regression, not a missing payment, and saying so here
+    # stops the next investigation starting in the wrong place.
+    from app.night_audit_service import evaluate_reconciliation
     recon_diff = float(ctrl['reconciliation_difference'])
-    if abs(recon_diff) > 1.0:
-        hard_blocks.append(
-            f"Reconciliation difference ₹{abs(recon_diff):,.2f} — must be zero"
-        )
+    _recon = evaluate_reconciliation(ctrl, rev)
+    if not _recon['within_tolerance']:
+        hard_blocks.append(_recon['message'])
 
     if folio['checkout_outstanding_total'] > 0.01:
         hard_blocks.append(
@@ -2997,7 +3002,27 @@ def night_audit_complete():
         try:
             from app.services import compute_snapshot_hash as _csh
             from app import APP_VERSION as _AV
-            _snap_text = _json.dumps(svc.full_report(), default=_serial)
+            from app.night_audit_service import (
+                RECONCILIATION_ALGORITHM_VERSION as _RAV,
+                RECONCILIATION_INVARIANT_VERSION as _RIV,
+                RECONCILIATION_TOLERANCE as _RTOL,
+            )
+            # DEF-005 Phase 7: stamp the snapshot with the rules that produced
+            # it. A snapshot written before W1-R9 and one written after are
+            # both valid JSON with the same shape and the same app version can
+            # span both, so nothing in the file distinguished them — a reader
+            # had to infer the accounting basis from the date. recon_algorithm
+            # states it outright, and absence of the block means "legacy,
+            # written before this stamp existed", which is itself the answer.
+            _report = svc.full_report()
+            _report['_meta'] = {
+                'recon_algorithm_version':  _RAV,
+                'recon_invariant_version':  _RIV,
+                'recon_tolerance':          _RTOL,
+                'generated_at':             datetime.utcnow().isoformat(),
+                'app_build':                _AV,
+            }
+            _snap_text = _json.dumps(_report, default=_serial)
             log.snapshot_json    = _snap_text
             log.snapshot_valid   = True
             log.snapshot_hash    = _csh(_snap_text)

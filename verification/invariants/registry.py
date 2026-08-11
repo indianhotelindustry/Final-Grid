@@ -149,7 +149,9 @@ def load_all() -> None:
     at package import keeps ``verification.invariants.model`` usable by
     tooling that only wants the vocabularies.
     """
-    from verification.invariants import rules_a, rules_b, rules_c, rules_d  # noqa: F401
+    from verification.invariants import (  # noqa: F401
+        rules_a, rules_b, rules_c, rules_d, rules_r,
+    )
 
 
 def all_invariants() -> list:

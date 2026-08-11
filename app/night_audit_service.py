@@ -32,6 +32,100 @@ from app.services import calculate_stay_amount, get_business_date
 
 
 # ---------------------------------------------------------------------------
+# Reconciliation policy (DEF-005)
+# ---------------------------------------------------------------------------
+
+#: Single source of truth for the reconciliation tolerance, in rupees.
+#:
+#: Referenced by ``final_control`` (close reasons), by the Complete Audit
+#: route, and by the executable invariant INV-R01. It was previously a bare
+#: ``1.00`` repeated at each site, so the invariant could not honestly call it
+#: "configured" and changing it meant finding every literal.
+#:
+#: The value is unchanged at 1.00 and deliberately so. ``tax_amount`` sums
+#: TaxLine rows each quantised to 0.01, so worst-case drift is n x 0.005 for
+#: n lines in a day; breaching 1.00 needs 200 tax lines on one date. The
+#: property has 39 rooms and its busiest date on record carries 4. Widening
+#: this widens the blind spot for no measured benefit.
+RECONCILIATION_TOLERANCE = 1.00
+
+#: Bumped whenever the meaning of ``reconciliation_difference`` changes, so a
+#: stored snapshot can be told apart from one written under a different rule
+#: without inferring it from the application version.
+#:   1 - pre-W1-R9: accrual_net (pre-tax) compared against cash (tax-inclusive)
+#:   2 - W1-R9 onwards: accrual_gross compared against cash, like for like
+RECONCILIATION_ALGORITHM_VERSION = 2
+
+#: Version of the reconciliation invariant contract (INV-R01).
+RECONCILIATION_INVARIANT_VERSION = 'INV-R01@1.0'
+
+#: Diagnostic codes returned by :func:`evaluate_reconciliation`.
+RECON_OK = 'OK'
+RECON_GAP = 'RECONCILIATION_GAP'
+RECON_GROSS_NET = 'LIKELY_GROSS_NET_REGRESSION'
+
+
+def evaluate_reconciliation(control, revenue, tolerance=None) -> dict:
+    """Judge a day's reconciliation and name the probable cause.
+
+    The single decision point for "does this day reconcile". ``final_control``
+    calls it for its close reasons, the Complete Audit route calls it for its
+    hard blocks, and INV-R01 calls it for historical verification, so the three
+    cannot drift apart.
+
+    The gross/net diagnostic exists because that regression has a signature.
+    When revenue is compared pre-tax against tax-inclusive cash, the residual
+    is not an arbitrary number - it is exactly the day's tax. Reporting
+    "reconciliation gap Rs 57.15" sends someone hunting for a missing payment;
+    reporting LIKELY_GROSS_NET_REGRESSION points at the accounting basis,
+    which is where the fault actually is. This is the W1-R9 defect, and the
+    check is what stops it reappearing unrecognised.
+
+    Args:
+        control: the dict returned by ``final_control()``
+        revenue: the dict returned by ``revenue_summary()``
+        tolerance: override in rupees; defaults to RECONCILIATION_TOLERANCE
+
+    Returns a dict carrying ``code``, the figures behind the verdict, and a
+    human-readable ``message``.
+    """
+    tol = RECONCILIATION_TOLERANCE if tolerance is None else float(tolerance)
+    diff = _f(control.get('reconciliation_difference'))
+    tax = _f(revenue.get('tax_amount')) if revenue else 0.0
+    magnitude = abs(diff)
+
+    out = {
+        'code': RECON_OK,
+        'difference': diff,
+        'abs_difference': magnitude,
+        'tolerance': tol,
+        'tax_amount': tax,
+        'within_tolerance': magnitude <= tol,
+        'message': '',
+    }
+    if magnitude <= tol:
+        out['message'] = f'Reconciled within Rs {tol:,.2f}'
+        return out
+
+    # A residual equal to the day's tax is the fingerprint of a net-vs-gross
+    # comparison, not of missing money. Guard on tax > tol so a zero-tax day
+    # (GST-exempt property) can never match this by arithmetic accident.
+    if tax > tol and abs(magnitude - tax) <= tol:
+        out['code'] = RECON_GROSS_NET
+        out['message'] = (
+            f'Reconciliation difference Rs {magnitude:,.2f} equals the day\'s '
+            f'tax of Rs {tax:,.2f}. This is the signature of comparing pre-tax '
+            f'revenue against tax-inclusive cash (the W1-R9 defect), not of a '
+            f'missing payment. Check the accounting basis in '
+            f'NightAuditService.final_control before investigating payments.')
+        return out
+
+    out['code'] = RECON_GAP
+    out['message'] = f'Reconciliation difference Rs {magnitude:,.2f} — must be zero'
+    return out
+
+
+# ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
@@ -1078,11 +1172,17 @@ class NightAuditService:
         close_reasons = []
         if exc['blocker_count'] > 0:
             close_reasons.append(f"{exc['blocker_count']} blocker(s) unresolved")
-        # Only block if there's a genuine reconciliation gap (not lifetime balance)
-        if exc['can_close'] and abs(recon_diff) > 1.0:
+        # Only block if there's a genuine reconciliation gap (not lifetime
+        # balance). DEF-005: the verdict and the tolerance both come from
+        # evaluate_reconciliation, so this site, the Complete Audit route and
+        # INV-R01 cannot disagree about whether a day reconciles.
+        _recon_verdict = evaluate_reconciliation(
+            {'reconciliation_difference': recon_diff}, rev)
+        if exc['can_close'] and not _recon_verdict['within_tolerance']:
             close_reasons.append(f"Reconciliation gap ₹{abs(recon_diff):,.2f}")
 
         return {
+            'reconciliation_verdict': _recon_verdict,
             'total_posted_revenue': accrual_net,
             'tax_liability': tax_liability,
             'total_collected': total_payments,
