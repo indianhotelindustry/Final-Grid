@@ -43,7 +43,13 @@ import os
 import sys
 
 os.environ.setdefault('FLASK_ENV', 'production')
-logging.disable(logging.WARNING)
+
+# NOTE: logging.disable() is deliberately NOT called at import time.
+# app/admin_reset.py imports this module to reuse its table manifests, so an
+# import-time logging.disable(WARNING) silenced every WARNING, INFO and DEBUG
+# record in the whole application for the life of the process — including the
+# night audit's snapshot-parse fallback warning. It is a CLI convenience and
+# now applies only when this file is actually run as a script (see main()).
 
 
 # ─── Table classification ──────────────────────────────────────────────────
@@ -331,6 +337,11 @@ def _execute_delete(db, include_guests):
 
 # ─── Main ──────────────────────────────────────────────────────────────────
 def main(argv=None):
+    # Quieten library chatter for the CLI run only. Scoped here rather than at
+    # module import so that importing this module never reconfigures logging
+    # for a host application.
+    logging.disable(logging.WARNING)
+
     parser = argparse.ArgumentParser(
         description='Reset PMS transactional data while preserving masters.',
         formatter_class=argparse.RawDescriptionHelpFormatter,

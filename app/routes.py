@@ -4770,6 +4770,14 @@ def night_audit():
 
     settings = {s.key: s.value for s in Settings.query.all()}
 
+    # W1-R8 step 1: snapshot tamper detection has an operator-facing surface
+    # again. INV-B02 already calls this same helper as its canonical engine,
+    # so the banner and the invariant cannot disagree about what "tampered"
+    # means. Computed for every tab because the warning is about whether the
+    # stored figures can be trusted at all, not about one view of them.
+    from app.services import verify_snapshot_integrity as _vsi
+    snapshot_integrity = _vsi(current_log)
+
     return render_template(
         'night_audit_panel.html',
         business_date=business_date,
@@ -4786,6 +4794,7 @@ def night_audit():
         today=date.today(),
         panel_ui=panel_ui,
         panel_explanation=panel_explanation,
+        snapshot_integrity=snapshot_integrity,
     )
 
 

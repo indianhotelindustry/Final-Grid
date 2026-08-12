@@ -127,6 +127,90 @@
 </ul>
 
 {# ══════════════════════════════════════════════════════════════════════════
+   SNAPSHOT INTEGRITY — W1-R8 step 1
+   Ported from reports/night_audit.html:391-459, which the fmt=='html'
+   redirect made unreachable. INV-B02 detects a tampered snapshot and
+   FLT-D02 proves it fires, but nothing schedules the invariant engine, so
+   between manual runs this banner is the only thing that tells an operator
+   the frozen figures can no longer be trusted.
+
+   Deliberately OUTSIDE the tab conditionals: a trust warning that
+   disappears when you change tab is not a warning.
+
+   Whitespace-controlled so that an intact snapshot emits nothing at all:
+   the rendered panel is then byte-identical to the pre-W1-R8 page.
+══════════════════════════════════════════════════════════════════════════ #}
+{%- if snapshot_integrity and snapshot_integrity.has_hash and not snapshot_integrity.matches %}
+<div class="alert alert-danger border-2 border-danger d-flex align-items-start gap-2 mb-2">
+  <i class="bi bi-shield-exclamation fs-3"></i>
+  <div class="flex-grow-1">
+    <div class="fw-bold fs-6">Snapshot integrity warning — hash mismatch</div>
+    <div class="small mt-1">
+      The frozen snapshot for <strong>{{ audit_date.strftime('%d %b %Y') }}</strong>
+      no longer matches its recorded SHA-256 hash. The data was either edited
+      directly in the database or the snapshot's structure changed after a
+      version upgrade. Investigate before trusting any figure on this page.
+    </div>
+    <div class="small mt-1 font-monospace text-muted">
+      Stored: <code>{{ (snapshot_integrity.stored_hash or '')[:16] }}…</code>
+      &nbsp;•&nbsp;
+      Current: <code>{{ (snapshot_integrity.current_hash or '')[:16] }}…</code>
+      {% if snapshot_integrity.stored_version %}
+      &nbsp;•&nbsp; Captured under v{{ snapshot_integrity.stored_version }}
+      {% endif %}
+    </div>
+    <div class="d-flex gap-2 mt-2 flex-wrap">
+      {% if current_log %}
+      <a href="{{ url_for('reports.night_audit_snapshot', log_id=current_log.id, format='json') }}"
+         target="_blank"
+         class="btn btn-sm btn-outline-danger">
+        <i class="bi bi-braces me-1"></i>View Snapshot JSON
+      </a>
+      {% endif %}
+      {# night_audit_run reads request.form['audit_date']; the original block
+         posted 'date', so its Re-run button always failed validation. #}
+      <form method="POST" action="{{ url_for('reports.night_audit_run') }}" class="d-inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="audit_date" value="{{ audit_date.isoformat() }}">
+        <button type="submit" class="btn btn-sm btn-danger fw-semibold">
+          <i class="bi bi-play-fill me-1"></i>Re-run Audit
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% elif snapshot_integrity and snapshot_integrity.has_hash and not snapshot_integrity.version_match %}
+<div class="alert alert-warning d-flex align-items-start gap-2 mb-2">
+  <i class="bi bi-arrow-up-circle fs-4"></i>
+  <div class="flex-grow-1">
+    <div class="fw-semibold">Snapshot captured under an older app version</div>
+    <div class="small mt-1">
+      Frozen under <strong>v{{ snapshot_integrity.stored_version }}</strong>
+      (current: v{{ snapshot_integrity.app_version }}). Hash matches, so
+      figures are still authoritative — note the version drift if you
+      compare to recently-closed audits.
+    </div>
+    <div class="d-flex gap-2 mt-2 flex-wrap">
+      {% if current_log %}
+      <a href="{{ url_for('reports.night_audit_snapshot', log_id=current_log.id, format='json') }}"
+         target="_blank"
+         class="btn btn-sm btn-outline-warning">
+        <i class="bi bi-braces me-1"></i>View Snapshot JSON
+      </a>
+      {% endif %}
+      <form method="POST" action="{{ url_for('reports.night_audit_run') }}" class="d-inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="audit_date" value="{{ audit_date.isoformat() }}">
+        <button type="submit" class="btn btn-sm btn-warning">
+          <i class="bi bi-play-fill me-1"></i>Re-run to refresh under current version
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{%- endif -%}
+
+{# ══════════════════════════════════════════════════════════════════════════
    TAB A — DASHBOARD (CEO-level financial control system)
 ══════════════════════════════════════════════════════════════════════════ #}
 {% if active_tab == 'dashboard' %}

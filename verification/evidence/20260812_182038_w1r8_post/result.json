@@ -1,0 +1,675 @@
+{
+  "app_version": "2.2.18",
+  "copy_method": "sqlite-backup-api",
+  "counts": {
+    "AGREED": 15,
+    "DIVERGED": 4,
+    "SINGLE_SOURCE": 1,
+    "VACUOUS": 2
+  },
+  "duration_seconds": 1.74,
+  "finished_at": "2026-08-12T18:20:39",
+  "mode": "cross-implementation",
+  "overall": "FAIL",
+  "pvf_version": "0.5.0",
+  "quantities": [
+    {
+      "detail": {
+        "by_source": {
+          "Walk-in": 4
+        },
+        "by_status": {
+          "CheckedOut": 4
+        }
+      },
+      "divergences": [],
+      "duration_ms": 0,
+      "error": "",
+      "implementations": {
+        "reservations.count": 4
+      },
+      "label": "Reservation count and status distribution",
+      "note": "Census \u2014 establishes the denominator for every other quantity.",
+      "policy": "EXACT",
+      "quantity_id": "Q01",
+      "severity": "BLOCK",
+      "verdict": "SINGLE_SOURCE"
+    },
+    {
+      "detail": {
+        "by_category": {
+          "late_checkout": "476.19"
+        },
+        "count": 2,
+        "reversal_rows": 0
+      },
+      "divergences": [],
+      "duration_ms": 1,
+      "error": "",
+      "implementations": {
+        "raw sum(amount)": "476.19",
+        "signed sum (correction-aware)": "476.19"
+      },
+      "label": "Charge count and total by category",
+      "note": "Raw and signed agree only while no reversal rows exist. Reversal count is reported so the agreement is not mistaken for proof that signing works.",
+      "policy": "EXACT",
+      "quantity_id": "Q02",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "D2_single_night_total": "3619.04",
+        "per_reservation": {
+          "1": {
+            "d1_canonical": "761.90",
+            "d2_single_night": "761.90",
+            "d3_rate_x_nights": "761.90",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "2": {
+            "d1_canonical": "1428.57",
+            "d2_single_night": "1428.57",
+            "d3_rate_x_nights": "1428.57",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "3": {
+            "d1_canonical": "952.38",
+            "d2_single_night": "952.38",
+            "d3_rate_x_nights": "952.38",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "4": {
+            "d1_canonical": "476.19",
+            "d2_single_night": "476.19",
+            "d3_rate_x_nights": "476.19",
+            "has_room_rent": false,
+            "nights": 1
+          }
+        },
+        "reservations_with_room_rent_rows": 0
+      },
+      "divergences": [],
+      "duration_ms": 6,
+      "error": "",
+      "implementations": {
+        "D1 canonical (get_room_revenue)": "3619.04",
+        "D3 report style (rate x nights)": "3619.04"
+      },
+      "label": "Room revenue per reservation (3 definitions)",
+      "note": "D1 and D3 can only agree while zero room_rent ledger rows exist. Reservations carrying room_rent rows: 0. This is the trap Wave 1 disarms.",
+      "policy": "EXACT",
+      "quantity_id": "Q03",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "per_date": {
+          "2026-08-09": {
+            "kpi_helpers": "761.9",
+            "night_audit": "761.9",
+            "posted_room_rent": "0.0"
+          },
+          "2026-08-10": {
+            "kpi_helpers": "2857.14",
+            "night_audit": "2857.14",
+            "posted_room_rent": "0.0"
+          }
+        },
+        "posted_room_rent_total": "0.0"
+      },
+      "divergences": [],
+      "duration_ms": 88,
+      "error": "",
+      "implementations": {
+        "NightAuditService.revenue_summary": "3619.04",
+        "kpi_helpers.get_accrual_room_revenue": "3619.04"
+      },
+      "label": "Room revenue per business date",
+      "note": "Ledger-posted room rent is ZERO across all dates, so the two tariff-based implementations agree by default. Agreement here is not evidence that they would agree once posting is active.",
+      "policy": "EXACT",
+      "quantity_id": "Q04",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "category_source_counts": {
+          "charge_category": 0,
+          "description_parsed": 2
+        },
+        "per_date": {
+          "2026-08-09": {
+            "kpi_helpers": "380.95",
+            "night_audit": "380.95",
+            "night_audit_by_category": {
+              "Late Check-out \u2014 02": "380.95"
+            }
+          },
+          "2026-08-10": {
+            "kpi_helpers": "95.24",
+            "night_audit": "95.24",
+            "night_audit_by_category": {
+              "Late Check-out \u2014 12": "95.24"
+            }
+          }
+        }
+      },
+      "divergences": [],
+      "duration_ms": 1,
+      "error": "",
+      "implementations": {
+        "NightAuditService.revenue_summary": "476.19",
+        "kpi_helpers.get_accrual_extras": "476.19"
+      },
+      "label": "Ancillary revenue by category",
+      "note": "Night audit derives its category from the description string; charge_category is populated on 0 of 2 rows. Totals may agree while categorisation diverges.",
+      "policy": "EXACT",
+      "quantity_id": "Q05",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "distinct_sources": 6,
+        "inflation_factor": "2.00",
+        "per_date": {
+          "2026-08-09": {
+            "gst_report_deduped": "1142.85",
+            "night_audit_raw": "2285.7"
+          },
+          "2026-08-10": {
+            "gst_report_deduped": "2952.38",
+            "night_audit_raw": "5904.76"
+          }
+        },
+        "tax_line_count": 12
+      },
+      "divergences": [
+        {
+          "delta": "-1142.85",
+          "impl_a": "gst_service.get_gst_report",
+          "impl_b": "NightAuditService.tax_snapshot",
+          "scope": "2026-08-09",
+          "value_a": "1142.85",
+          "value_b": "2285.7"
+        },
+        {
+          "delta": "-2952.38",
+          "impl_a": "gst_service.get_gst_report",
+          "impl_b": "NightAuditService.tax_snapshot",
+          "scope": "2026-08-10",
+          "value_a": "2952.38",
+          "value_b": "5904.76"
+        }
+      ],
+      "duration_ms": 2,
+      "error": "",
+      "implementations": {
+        "deduplicated by charge source": "4095.23",
+        "raw sum of all tax lines": "8190.46"
+      },
+      "label": "Taxable base (deduplicated vs raw)",
+      "note": "CGST and SGST each carry the full taxable value of one supply. Summing both double-counts the base.",
+      "policy": "RUPEE",
+      "quantity_id": "Q06",
+      "severity": "BLOCK",
+      "verdict": "DIVERGED"
+    },
+    {
+      "detail": {
+        "by_component": {
+          "CGST": "102.37",
+          "SGST": "102.37"
+        }
+      },
+      "divergences": [],
+      "duration_ms": 2,
+      "error": "",
+      "implementations": {
+        "live compute_stay_gst": "204.77",
+        "stored TaxLine rows": "204.74"
+      },
+      "label": "Tax by component (CGST / SGST / IGST)",
+      "note": "Stored tax is the authority per Article VI \u00a71. The live figure is what calculate_stay_amount uses for balance, so divergence here is an invoice-versus-balance gap.",
+      "policy": "RUPEE",
+      "quantity_id": "Q07",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "reservations_with_discount": 0,
+        "suppressed_by_csa": []
+      },
+      "divergences": [],
+      "duration_ms": 4,
+      "error": "",
+      "implementations": {
+        "NightAuditService.discount_total": "0.0",
+        "calculate_stay_amount.discount": "0.0",
+        "reservations.discount_amount field": "0.00"
+      },
+      "label": "Discount applied per reservation",
+      "note": "calculate_stay_amount suppresses the discount when nightly rows or room_rent rows exist; the night audit always applies it. Divergence appears only once those rows exist.",
+      "policy": "EXACT",
+      "quantity_id": "Q08",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "payment_count": 6,
+        "reversal_rows": 0,
+        "voided_count": 0
+      },
+      "divergences": [],
+      "duration_ms": 6,
+      "error": "",
+      "implementations": {
+        "raw ORM sum": "4300.00",
+        "raw SQL func.sum": "4300.00",
+        "signed (signed_payment_amount)": "4300.0",
+        "via calculate_stay_amount": "4300.0"
+      },
+      "label": "Payments total (signed vs raw)",
+      "note": "0 reversal rows exist. Signed and raw agree only while that count is zero \u2014 the agreement proves nothing about correction handling.",
+      "policy": "EXACT",
+      "quantity_id": "Q09",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "by_category": {
+          "direct_payment": "4300.00"
+        },
+        "by_mode": {
+          "Card": "500.00",
+          "Cash": "2800.00",
+          "UPI": "1000.00"
+        },
+        "by_purpose": {
+          "settlement": "4300.00"
+        }
+      },
+      "divergences": [],
+      "duration_ms": 1,
+      "error": "",
+      "implementations": {
+        "ORM by category (direct_payment)": "4300.00",
+        "kpi_helpers.get_cash_revenue summed": "4300.0"
+      },
+      "label": "Payments by mode and purpose",
+      "note": "Category split determines what counts as cash collected.",
+      "policy": "EXACT",
+      "quantity_id": "Q10",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "night_audit_total_refunds": "0.0",
+        "refund_row_count": 0,
+        "void_count": 0
+      },
+      "divergences": [],
+      "duration_ms": 6,
+      "error": "",
+      "implementations": {
+        "payment_purpose = refund (true refunds)": "0",
+        "voided payments (what night audit calls refunds)": "0"
+      },
+      "label": "Refunds, separated from voids",
+      "note": "A void asserts an entry should not have existed; a refund asserts money left the business. The night audit reports voids as refunds (Article VIII \u00a75).",
+      "policy": "EXACT",
+      "quantity_id": "Q11",
+      "severity": "BLOCK",
+      "verdict": "VACUOUS"
+    },
+    {
+      "detail": {
+        "cases": [],
+        "reservations_disagreeing": 0
+      },
+      "divergences": [],
+      "duration_ms": 3,
+      "error": "",
+      "implementations": {
+        "balance (unrounded grand total)": "0.0",
+        "settlement_balance (invoiced total)": "0.0"
+      },
+      "label": "Outstanding per reservation (2 bases)",
+      "note": "Article IV \u00a71 permits exactly one amount owed per reservation. 0 reservations currently carry two.",
+      "policy": "EXACT",
+      "quantity_id": "Q12",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "by_balance": {
+          "settled": 4
+        },
+        "by_settlement": {
+          "settled": 4
+        }
+      },
+      "divergences": [],
+      "duration_ms": 3,
+      "error": "",
+      "implementations": {
+        "by balance basis": "{'settled': 4}",
+        "by settlement basis": "{'settled': 4}"
+      },
+      "label": "Settlement status distribution",
+      "note": "A reservation classified differently by the two bases can appear in two contradictory exception lists.",
+      "policy": "EXACT",
+      "quantity_id": "Q13",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "folio_count": 4,
+        "folio_paid": "0.0",
+        "reservation_paid": "4300.0",
+        "total_charges": 2,
+        "total_payments": 6,
+        "unrouted_charges": 2,
+        "unrouted_payments": 6
+      },
+      "divergences": [
+        {
+          "delta": "-476.19",
+          "impl_a": "sum over folios (charges)",
+          "impl_b": "sum over reservations (charges)",
+          "scope": "charge partition",
+          "value_a": "0.0",
+          "value_b": "476.19"
+        }
+      ],
+      "duration_ms": 73,
+      "error": "",
+      "implementations": {
+        "sum over folios (charges)": "0.0",
+        "sum over reservations (charges)": "476.19"
+      },
+      "label": "Folio balances / partition integrity",
+      "note": "2 charges and 6 payments carry folio_id = NULL. Article V \u00a73 requires every row to belong to a folio.",
+      "policy": "EXACT",
+      "quantity_id": "Q14",
+      "severity": "BLOCK",
+      "verdict": "DIVERGED"
+    },
+    {
+      "detail": {
+        "audit_log_count": 1,
+        "fields_compared_per_date": [
+          "total_revenue",
+          "accrual_revenue",
+          "occupancy_count",
+          "reconciliation_difference"
+        ],
+        "per_date": {
+          "2026-08-09": {
+            "accrual_revenue": {
+              "recomputed": "1142.85",
+              "stored": "1142.85"
+            },
+            "occupancy_count": {
+              "recomputed": "1.0",
+              "stored": "1.0"
+            },
+            "reconciliation_difference": {
+              "recomputed": "-0.01",
+              "stored": "-0.01"
+            },
+            "snapshot_valid": true,
+            "status": "Completed",
+            "total_revenue (cash)": {
+              "recomputed": "1200.0",
+              "stored": "1200.00"
+            }
+          }
+        }
+      },
+      "divergences": [],
+      "duration_ms": 17,
+      "error": "",
+      "implementations": {
+        "recomputed NightAuditService (\u03a3 compared fields)": "2343.84",
+        "stored NightAuditLog (\u03a3 compared fields)": "2343.84"
+      },
+      "label": "Night audit \u2014 stored vs recomputed sections",
+      "note": "Stored close figures compared against a fresh read-only recomputation. Note the recomputed reconciliation_difference is structurally incapable of being positive (Phase 2 INV-09), so agreement on that field is not evidence the control works.",
+      "policy": "EXACT",
+      "quantity_id": "Q15",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "business_date": "2026-08-10",
+        "concepts_compared": 7,
+        "surface": "/reports/flash?date=2026-08-10"
+      },
+      "divergences": [],
+      "duration_ms": 84,
+      "error": "",
+      "implementations": {
+        "ADR::kpi_helpers.get_adr": 0.0,
+        "ADR::reports.flash.arr": 0.0,
+        "RevPAR::kpi_helpers.get_revpar": 0.0,
+        "RevPAR::reports.flash.revpar": 0.0,
+        "accrual revenue::kpi_helpers.get_accrual_revenue": 2952.38,
+        "accrual revenue::reports.flash.accrual_net": 2952.38,
+        "daily collections::kpi_helpers.get_daily_revenue": 3100.0,
+        "daily collections::reports.flash.day_revenue": 3100.0,
+        "month-to-date collections::kpi_helpers.get_monthly_revenue": 4300.0,
+        "month-to-date collections::reports.flash.mtd_revenue": 4300.0,
+        "occupancy pct::kpi_helpers.get_occupancy": 0.0,
+        "occupancy pct::reports.flash.occ_pct": 0.0,
+        "sellable rooms::kpi_helpers.get_occupancy.total": 39,
+        "sellable rooms::reports.flash.total_rooms": 39
+      },
+      "label": "Daily report totals vs canonical engines",
+      "note": "The Flash Report is compared against the canonical helpers it is supposed to be a view over. A divergence here means the report is not a view \u2014 it is a second implementation.",
+      "policy": "RUPEE",
+      "quantity_id": "Q16",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "concepts_compared": 6,
+        "range_days": 1,
+        "surface": "/reports/front-office-mis?from_date=2026-08-10&to_date=2026-08-10"
+      },
+      "divergences": [
+        {
+          "delta": "-8.1",
+          "impl_a": "kpi_helpers.get_occupancy",
+          "impl_b": "reports.mis.business.occupancy_pct",
+          "scope": "occupancy pct",
+          "value_a": 0.0,
+          "value_b": 8.1
+        },
+        {
+          "delta": "-952.38",
+          "impl_a": "kpi_helpers.get_adr",
+          "impl_b": "reports.mis.business.arr",
+          "scope": "ADR",
+          "value_a": 0.0,
+          "value_b": 952.38
+        }
+      ],
+      "duration_ms": 107,
+      "error": "",
+      "implementations": {
+        "ADR::kpi_helpers.get_adr": 0.0,
+        "ADR::reports.mis.business.arr": 952.38,
+        "daily collections (report-to-report)::reports.flash.day_revenue": 3100.0,
+        "daily collections (report-to-report)::reports.mis.billing.total_collected": 3100.0,
+        "daily collections::kpi_helpers.get_daily_revenue": 3100.0,
+        "daily collections::reports.mis.billing.total_collected": 3100.0,
+        "departures completed::reports.flash.departures_done": 1,
+        "departures completed::reports.mis.movement.departures_done": 0,
+        "occupancy pct::kpi_helpers.get_occupancy": 0.0,
+        "occupancy pct::reports.mis.business.occupancy_pct": 8.1,
+        "occupied rooms::kpi_helpers.get_occupancy.occupied": 0,
+        "occupied rooms::reports.mis.business.occupied_rooms": 0
+      },
+      "label": "MIS aggregates vs canonical engines and the flash report",
+      "note": "MIS is scoped to the single business date so it is directly comparable with the flash report and the daily engines. Where the two reports disagree about the same day, at least one of them is wrong on every day.",
+      "policy": "RUPEE",
+      "quantity_id": "Q17",
+      "severity": "WARN",
+      "verdict": "DIVERGED"
+    },
+    {
+      "detail": {
+        "business_date": "2026-08-10",
+        "concepts_compared": 6,
+        "surface": "/dashboard"
+      },
+      "divergences": [],
+      "duration_ms": 166,
+      "error": "",
+      "implementations": {
+        "arrivals completed::dashboard.checked_in_today": 0,
+        "arrivals completed::reports.flash.arrivals_done": 0,
+        "daily collections (tile-to-report)::dashboard.cash_collected_today": 3100.0,
+        "daily collections (tile-to-report)::reports.flash.day_revenue": 3100.0,
+        "daily collections (tile-to-summary)::dashboard.cash_collected_today": 3100.0,
+        "daily collections (tile-to-summary)::dashboard.daily_financial_summary.total_collected": 3100.0,
+        "daily collections::dashboard.cash_collected_today": 3100.0,
+        "daily collections::kpi_helpers.get_daily_revenue": 3100.0,
+        "departures completed::dashboard.checked_out_today": 0,
+        "departures completed::reports.flash.departures_done": 1,
+        "rooms available::dashboard.available_rooms": 37,
+        "rooms available::kpi_helpers.get_occupancy.sellable": 37
+      },
+      "label": "Executive dashboard tiles vs canonical engines",
+      "note": "The dashboard is the surface management reads first. Each tile is compared against the engine that should own it and against the report that shows the same concept.",
+      "policy": "RUPEE",
+      "quantity_id": "Q18",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "occupied_room_nights_over_activity_window": 4,
+        "room_status_occupied_count": 0,
+        "sellable_rooms": 37,
+        "snapshot": {
+          "anomaly": false,
+          "occupied": 0,
+          "orphan_checked_in": 0,
+          "pct": 0.0,
+          "sellable": 37,
+          "total": 39
+        }
+      },
+      "divergences": [],
+      "duration_ms": 5,
+      "error": "",
+      "implementations": {
+        "kpi_helpers.get_occupied_count": 0,
+        "occupancy_engine.occupied_rooms": 0
+      },
+      "label": "Occupancy and rooms sold",
+      "note": "occupancy_engine is already canonical (Phase 2 \u00a73). Room.status reports 0 occupied and is recorded for drift detection only, never as an implementation.",
+      "policy": "EXACT",
+      "quantity_id": "Q19",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    },
+    {
+      "detail": {
+        "night_audit_adr_by_date": {
+          "2026-08-09": "761.90",
+          "2026-08-10": "952.38"
+        },
+        "revpar_from_kpi_helpers": "0.0"
+      },
+      "divergences": [
+        {
+          "delta": "-904.76",
+          "impl_a": "kpi_helpers.get_adr (AVG rate_per_night, no date scope)",
+          "impl_b": "room revenue / occupied room-nights (date-scoped)",
+          "scope": "ADR",
+          "value_a": "0.0",
+          "value_b": "904.76"
+        }
+      ],
+      "duration_ms": 4,
+      "error": "",
+      "implementations": {
+        "kpi_helpers.get_adr (AVG rate_per_night, no date scope)": "0.0",
+        "room revenue / occupied room-nights (date-scoped)": "904.76"
+      },
+      "label": "ADR and RevPAR (multiple definitions)",
+      "note": "kpi_helpers.get_adr takes NO date parameter \u2014 it averages the tariffs of currently checked-in reservations, so any historical ADR is actually today's ADR.",
+      "policy": "EXACT",
+      "quantity_id": "Q20",
+      "severity": "BLOCK",
+      "verdict": "DIVERGED"
+    },
+    {
+      "detail": {
+        "shift_count": 0,
+        "shifts": [],
+        "total_declared": "0",
+        "total_variance": "0"
+      },
+      "divergences": [],
+      "duration_ms": 0,
+      "error": "",
+      "implementations": {
+        "recomputed calculate_expected_cash": "0",
+        "stored Shift.expected_cash": "0"
+      },
+      "label": "Cash position and variance",
+      "note": "Cash control cannot be verified without shift data. 0 shifts exist.",
+      "policy": "EXACT",
+      "quantity_id": "Q21",
+      "severity": "BLOCK",
+      "verdict": "VACUOUS"
+    },
+    {
+      "detail": {
+        "company_credit_used_total": "0.0",
+        "get_ota_pending_error": "",
+        "individual_credit_outstanding": "0",
+        "misclassified_ota_head_count": 0,
+        "misclassified_ota_head_total": "0",
+        "misclassified_rows": [],
+        "ota_payout_rows": 0
+      },
+      "divergences": [],
+      "duration_ms": 9,
+      "error": "",
+      "implementations": {
+        "compute_ota_outstanding (gross)": "0",
+        "get_ota_pending (net of payouts)": "0.0"
+      },
+      "label": "Receivables \u2014 OTA, corporate, individual",
+      "note": "Gross and net agree only while zero payouts exist. 0 payments totalling 0 sit on OTA receivable heads against non-OTA bookings (Article IV \u00a76).",
+      "policy": "EXACT",
+      "quantity_id": "Q22",
+      "severity": "BLOCK",
+      "verdict": "AGREED"
+    }
+  ],
+  "read_only_verified": true,
+  "source_db": "C:\\Users\\SIPL Server\\Downloads\\DSS\\SukoonPMS\\SukoonPMS\\instance\\pms.db",
+  "source_hash_after": "373a60741b261398ebf8da2d68c9c412b24e5e0fb06cdfeaecf8055833c8a7f3",
+  "source_hash_before": "373a60741b261398ebf8da2d68c9c412b24e5e0fb06cdfeaecf8055833c8a7f3",
+  "source_size_bytes": 733184,
+  "started_at": "2026-08-12T18:20:38"
+}

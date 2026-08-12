@@ -2401,7 +2401,18 @@ def night_audit():
     if fmt == 'excel':
         return _night_audit_excel(svc, audit_date)
 
-    # --- Redirect HTML to the centralized Night Audit module ---
+    # ── W1-R8 step 2: the panel is the sole HTML authority ──────────────
+    # This route serves exactly four things, and nothing else renders an
+    # HTML Night Audit page:
+    #
+    #   format=json   -> JSON payload            (above)
+    #   format=excel  -> .xlsx workbook          (above)
+    #   format=html   -> redirect to main.night_audit  <- the only HTML
+    #   format=print  -> night_audit_print.html  (A4 standalone)
+    #
+    # 'html' is also the default, so a bare GET lands on the panel. The
+    # pinned route matrix in the W1-R8 evidence pack is what stops a fifth
+    # HTML render site reappearing.
     if fmt == 'html':
         redirect_args = {'tab': 'analytics'}
         if date_str:
@@ -2751,6 +2762,24 @@ def night_audit():
 
     # Legacy alias kept for templates not yet migrated.
     is_history_view = (audit_mode == 'snapshot')
+
+    # ── W1-R8 step 3: instrument before deleting ────────────────────────
+    # This render is unreachable in normal use. The branches above run
+    # json -> excel -> html -> print, `fmt` defaults to 'html', and the
+    # html branch redirects to main.night_audit, so only an UNRECOGNISED
+    # format value arrives here. No template, JS or Python passes one.
+    #
+    # The branch is deliberately left working rather than removed: if it
+    # were made unreachable by construction, the observation below could
+    # only ever come back silent and would prove nothing. Deletion
+    # (W1-R8 step 5) is licensed by this log staying empty for a full
+    # release, not by the grep that predicted it would.
+    import logging as _na_dep_log
+    _na_dep_log.getLogger(__name__).warning(
+        'Deprecated template rendered: reports/night_audit.html '
+        '(format=%r, date=%s, user=%s). Reachable only via an unrecognised '
+        'format value; report this caller before W1-R8 step 5 deletes it.',
+        fmt, audit_date, getattr(current_user, 'username', '?'))
 
     return render_template(
         'reports/night_audit.html',
