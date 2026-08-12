@@ -18,7 +18,7 @@
         <small class="text-muted">{{ report_date.strftime('%d %B %Y') }}</small>
     </div>
     <div class="d-flex gap-2 d-print-none">
-        <a href="{{ url_for('reports.daily_reconciliation', **request.args, format='excel') }}"
+        <a href="{{ url_for('reports.daily_reconciliation', date=report_date.isoformat(), mode=mode_filter, staff=staff_filter, format='excel') }}"
            class="btn btn-sm btn-success">
             <i class="bi bi-file-earmark-excel me-1"></i>Excel
         </a>

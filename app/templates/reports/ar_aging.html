@@ -74,7 +74,7 @@
                     {% for r in rows %}
                     <tr>
                         <td>
-                            <a href="{{ url_for('main.guest_folio', reservation_id=r.reservation_id) }}">
+                            <a href="{{ url_for('main.reservation_folio', reservation_id=r.reservation_id) }}">
                                 {{ r.guest_name }}
                             </a>
                         </td>

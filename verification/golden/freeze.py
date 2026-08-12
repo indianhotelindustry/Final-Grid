@@ -49,6 +49,7 @@ rather than producing masters that quietly rot.
 from __future__ import annotations
 
 import datetime as _dtmod
+import sqlite3 as _sqlite3
 import sys
 
 _real_datetime = _dtmod.datetime
@@ -128,6 +129,18 @@ class ClockFreeze:
 
         _dtmod.datetime = FrozenDateTime
         _dtmod.date = FrozenDate
+
+        # sqlite3 resolves adapters by EXACT type, so the stdlib adapters
+        # registered for datetime.date / datetime.datetime never match our
+        # subclasses. Without these two lines any surface that binds a
+        # frozen-derived date into a raw SQL query dies with
+        # "type 'FrozenDate' is not supported" — the freeze itself would be
+        # manufacturing a 500 the application does not have, and the surface
+        # could never be captured. The conversions mirror the stdlib
+        # adapters exactly so a frozen run binds what a live run binds.
+        _sqlite3.register_adapter(FrozenDate,     lambda v: v.isoformat())
+        _sqlite3.register_adapter(FrozenDateTime, lambda v: v.isoformat(' '))
+
         self._installed = True
         self.rebind_loaded_modules()
         return self
@@ -185,6 +198,18 @@ class ClockFreeze:
         if svc is not None and hasattr(svc, 'datetime'):
             p3 = svc.datetime.now()
 
+        # Path 4 — a frozen date must survive being bound as a SQL
+        # parameter and must round-trip to the same text a real date would.
+        # Raw-SQL reports pass dates straight through, so if this breaks the
+        # freeze fabricates a 500 that production does not have.
+        try:
+            _c = _sqlite3.connect(':memory:')
+            p4_date = _c.execute('SELECT ?', (FrozenDate.today(),)).fetchone()[0]
+            p4_dt = _c.execute('SELECT ?', (FrozenDateTime.now(),)).fetchone()[0]
+            _c.close()
+        except Exception:
+            p4_date = p4_dt = None
+
         checks = {
             'fresh_import_datetime_now': p1_now == expect_dt,
             'fresh_import_date_today': p1_today == expect_d,
@@ -194,6 +219,8 @@ class ClockFreeze:
                 isinstance(_real_date(2000, 1, 1), _dtmod.date),
             'isinstance_real_datetime_still_true':
                 isinstance(_real_datetime(2000, 1, 1), _dtmod.datetime),
+            'sqlite_binds_frozen_date': p4_date == expect_d.isoformat(),
+            'sqlite_binds_frozen_datetime': p4_dt == expect_dt.isoformat(' '),
         }
         if p3 is not None:
             checks['app_services_binding'] = (p3 == expect_dt)
@@ -216,6 +243,8 @@ class ClockFreeze:
             except Exception:
                 pass
         self._rebound.clear()
+        for _cls in (FrozenDate, FrozenDateTime):
+            _sqlite3.adapters.pop((_cls, _sqlite3.PrepareProtocol), None)
         _dtmod.datetime = _real_datetime
         _dtmod.date = _real_date
         self._installed = False

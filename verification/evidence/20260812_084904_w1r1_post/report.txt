@@ -1,0 +1,130 @@
+====================================================================================================
+DSBC FRONTLINE — FINANCIAL PARITY HARNESS
+Production Verification Framework, Wave 0 Deliverable 1
+====================================================================================================
+Mode            : cross-implementation
+Started         : 2026-08-12T08:49:04
+Finished        : 2026-08-12T08:49:05
+Duration        : 1.2s
+Application     : v2.2.18
+PVF             : v0.5.0
+
+----------------------------------------------------------------------------------------------------
+READ-ONLY GUARANTEE
+----------------------------------------------------------------------------------------------------
+Source database : C:\Users\SIPL Server\Downloads\DSS\SukoonPMS\SukoonPMS\instance\pms.db
+Size            : 733,184 bytes
+Copy method     : sqlite-backup-api
+SHA-256 before  : 373a60741b261398ebf8da2d68c9c412b24e5e0fb06cdfeaecf8055833c8a7f3
+SHA-256 after   : 373a60741b261398ebf8da2d68c9c412b24e5e0fb06cdfeaecf8055833c8a7f3
+Guarantee       : VERIFIED — production database byte-identical after run
+
+----------------------------------------------------------------------------------------------------
+SUMMARY
+----------------------------------------------------------------------------------------------------
+  AGREED              15
+  SINGLE_SOURCE        1
+  DIVERGED             4
+  VACUOUS              2
+  NOT_IMPLEMENTED      0
+  ERROR                0
+  TOTAL               22
+
+  OVERALL VERDICT  : FAIL
+  Blocking failures: 5
+
+----------------------------------------------------------------------------------------------------
+QUANTITY RESULTS
+----------------------------------------------------------------------------------------------------
+ID    QUANTITY                                     POLICY         SEV    VERDICT              ms
+----------------------------------------------------------------------------------------------------
+Q01   Reservation count and status distribution    EXACT          BLOCK  SINGLE_SOURCE         0
+Q02   Charge count and total by category           EXACT          BLOCK  AGREED                0
+Q03   Room revenue per reservation (3 definitions  EXACT          BLOCK  AGREED                3
+Q04   Room revenue per business date               EXACT          BLOCK  AGREED               64
+Q05   Ancillary revenue by category                EXACT          BLOCK  AGREED                1
+Q06   Taxable base (deduplicated vs raw)           RUPEE          BLOCK  DIVERGED              1
+Q07   Tax by component (CGST / SGST / IGST)        RUPEE          BLOCK  AGREED                1
+Q08   Discount applied per reservation             EXACT          BLOCK  AGREED                2
+Q09   Payments total (signed vs raw)               EXACT          BLOCK  AGREED                5
+Q10   Payments by mode and purpose                 EXACT          BLOCK  AGREED                1
+Q11   Refunds, separated from voids                EXACT          BLOCK  VACUOUS               4
+Q12   Outstanding per reservation (2 bases)        EXACT          BLOCK  AGREED                2
+Q13   Settlement status distribution               EXACT          BLOCK  AGREED                2
+Q14   Folio balances / partition integrity         EXACT          BLOCK  DIVERGED             48
+Q15   Night audit — stored vs recomputed sections  EXACT          BLOCK  AGREED               13
+Q16   Daily report totals vs canonical engines     RUPEE          BLOCK  AGREED               64
+Q17   MIS aggregates vs canonical engines and the  RUPEE          WARN   DIVERGED             72
+Q18   Executive dashboard tiles vs canonical engi  RUPEE          BLOCK  AGREED              122
+Q19   Occupancy and rooms sold                     EXACT          BLOCK  AGREED                4
+Q20   ADR and RevPAR (multiple definitions)        EXACT          BLOCK  DIVERGED              2
+Q21   Cash position and variance                   EXACT          BLOCK  VACUOUS               0
+Q22   Receivables — OTA, corporate, individual     EXACT          BLOCK  AGREED                7
+
+====================================================================================================
+DIVERGENCES
+====================================================================================================
+
+[Q06] Taxable base (deduplicated vs raw)   (BLOCK, policy RUPEE)
+----------------------------------------------------------------------------------------------------
+  CGST and SGST each carry the full taxable value of one supply. Summing both double-counts the base.
+  Implementations:
+    deduplicated by charge source                4095.23
+    raw sum of all tax lines                     8190.46
+  Attributed divergences:
+    2026-08-09               gst_service.get_gst_report = 1142.85  vs  NightAuditService.tax_snapshot = 2285.7   (delta -1142.85)
+    2026-08-10               gst_service.get_gst_report = 2952.38  vs  NightAuditService.tax_snapshot = 5904.76   (delta -2952.38)
+
+[Q14] Folio balances / partition integrity   (BLOCK, policy EXACT)
+----------------------------------------------------------------------------------------------------
+  2 charges and 6 payments carry folio_id = NULL. Article V §3 requires every row to belong to a folio.
+  Implementations:
+    sum over folios (charges)                    0.0
+    sum over reservations (charges)              476.19
+  Attributed divergences:
+    charge partition         sum over folios (charges) = 0.0  vs  sum over reservations (charges) = 476.19   (delta -476.19)
+
+[Q17] MIS aggregates vs canonical engines and the flash report   (WARN, policy RUPEE)
+----------------------------------------------------------------------------------------------------
+  MIS is scoped to the single business date so it is directly comparable with the flash report and the daily engines. Where the two reports disagree about the same day, at least one of them is wrong on every day.
+  Implementations:
+    ADR::kpi_helpers.get_adr                     0.0
+    ADR::reports.mis.business.arr                952.38
+    daily collections (report-to-report)::reports.flash.day_revenue 3100.0
+    daily collections (report-to-report)::reports.mis.billing.total_collected 3100.0
+    daily collections::kpi_helpers.get_daily_revenue 3100.0
+    daily collections::reports.mis.billing.total_collected 3100.0
+    departures completed::reports.flash.departures_done 1
+    departures completed::reports.mis.movement.departures_done 0
+    occupancy pct::kpi_helpers.get_occupancy     0.0
+    occupancy pct::reports.mis.business.occupancy_pct 8.1
+    occupied rooms::kpi_helpers.get_occupancy.occupied 0
+    occupied rooms::reports.mis.business.occupied_rooms 0
+  Attributed divergences:
+    occupancy pct            kpi_helpers.get_occupancy = 0.0  vs  reports.mis.business.occupancy_pct = 8.1   (delta -8.1)
+    ADR                      kpi_helpers.get_adr = 0.0  vs  reports.mis.business.arr = 952.38   (delta -952.38)
+
+[Q20] ADR and RevPAR (multiple definitions)   (BLOCK, policy EXACT)
+----------------------------------------------------------------------------------------------------
+  kpi_helpers.get_adr takes NO date parameter — it averages the tariffs of currently checked-in reservations, so any historical ADR is actually today's ADR.
+  Implementations:
+    kpi_helpers.get_adr (AVG rate_per_night, no date scope) 0.0
+    room revenue / occupied room-nights (date-scoped) 904.76
+  Attributed divergences:
+    ADR                      kpi_helpers.get_adr (AVG rate_per_night, no date scope) = 0.0  vs  room revenue / occupied room-nights (date-scoped) = 904.76   (delta -904.76)
+
+====================================================================================================
+VACUOUS — measured, but the population is empty
+====================================================================================================
+These implementations agreed only because there was nothing to
+disagree about. Per Principle 10 that is not evidence of
+correctness. Each requires a regression dataset (Wave 0 D6)
+before it can be reported as verified.
+  [Q11] Refunds, separated from voids
+         A void asserts an entry should not have existed; a refund asserts money left the business. The night audit reports voids as refunds (Article VIII §5).
+  [Q21] Cash position and variance
+         Cash control cannot be verified without shift data. 0 shifts exist.
+
+====================================================================================================
+END OF REPORT
+====================================================================================================

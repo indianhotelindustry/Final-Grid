@@ -3,6 +3,7 @@ from functools import wraps
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from app.models import db, User, Shift, AuditLog
+from sqlalchemy.orm import joinedload
 from datetime import datetime
 from app import limiter
 from app import shift_service
@@ -426,9 +427,13 @@ def shifts():
     if not current_user.has_role('Admin', 'Manager'):
         flash('Access denied.', 'danger')
         return redirect(url_for('main.dashboard'))
+    # Shift has three FKs to users (user_id, closed_by_user_id,
+    # approved_by_user_id), so a bare join(User) cannot pick an onclause.
+    # The template only reads s.user, so eager-load that one relationship —
+    # this both disambiguates the join and avoids 100 lazy lookups.
     all_shifts = (
         Shift.query
-        .join(User)
+        .options(joinedload(Shift.user))
         .order_by(Shift.start_time.desc())
         .limit(100)
         .all()

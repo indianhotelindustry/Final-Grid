@@ -571,7 +571,12 @@ def _detect_revenue_alerts(ctx: dict, body: dict) -> list:
     # reading the sales_vs_target mtd.full_month_target if present (set by
     # build_sales_vs_target for the MTD scope). Fall back to 0.
     mtd_scope = svt.get('mtd') or {}
-    full_monthly_target = float(mtd_scope.get('full_month_target') or 0)
+    # build_sales_vs_target emits full_month_target as a metric envelope
+    # ({value, display, sub}), not a bare number — the same shape every
+    # quick_answers entry above is read through. Unwrapping it is what this
+    # line always meant to do; without it float() received the dict and the
+    # whole detector died before emitting a single alert.
+    full_monthly_target = float((mtd_scope.get('full_month_target') or {}).get('value') or 0)
 
     # ── MTD_REVENUE_BELOW_PACE ─────────────────────────────────────────
     # Use sales_vs_target.mtd.progress_pct which is actual / pro-rated × 100.

@@ -20,7 +20,7 @@
         </small>
     </div>
     <div class="d-flex gap-2 d-print-none">
-        <a href="{{ url_for('reports.tip_report', **request.args, format='excel') }}"
+        <a href="{{ url_for('reports.tip_report', from=from_str, to=to_str, format='excel') }}"
            class="btn btn-sm btn-success">
             <i class="bi bi-file-earmark-excel me-1"></i>Excel
         </a>

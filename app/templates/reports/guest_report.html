@@ -70,7 +70,10 @@
             <a href="{{ url_for('reports.guest_report') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
         </div>
         <div class="col-auto d-flex gap-1 ms-auto">
-            <a href="{{ url_for('reports.guest_report', **request.args.to_dict()) | replace('format=html','format=excel') }}&format=excel"
+            <a href="{{ url_for('reports.guest_report', from=from_date, to=to_date,
+                        room_type=rt_filter, source=src_filter,
+                        payment_mode=mode_filter, status=status_filter,
+                        format='excel') }}"
                class="btn btn-sm btn-outline-success" title="Export A4 Excel">
                 <i class="bi bi-file-earmark-excel"></i> Excel
             </a>

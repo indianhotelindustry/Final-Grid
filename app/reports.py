@@ -25,6 +25,7 @@ All routes accept ?format=excel to return an .xlsx file.
 
 import io
 from datetime import date, datetime, timedelta
+from types import SimpleNamespace
 from flask import Blueprint, render_template, request, send_file, Response, jsonify
 from flask_login import login_required, current_user
 from sqlalchemy import func
@@ -1881,6 +1882,26 @@ def guest_report():
     """)
 
     rows_raw = db.session.execute(sql, params).fetchall()
+
+    # SQLite hands back DATE columns from a raw text query as ISO strings, not
+    # date objects — the ORM's type coercion never runs on sa_text(). Three
+    # consumers call .strftime on these: the Excel branch below and both the
+    # screen and print templates. Coerce once here so there is a single place
+    # that knows the storage format, rather than three that each re-parse it.
+    def _as_date(v):
+        if isinstance(v, str):
+            try:
+                return date.fromisoformat(v[:10])
+            except ValueError:
+                return None
+        return v
+
+    rows_raw = [
+        SimpleNamespace(**{**dict(r._mapping),
+                           'arrival_date':   _as_date(r._mapping.get('arrival_date')),
+                           'departure_date': _as_date(r._mapping.get('departure_date'))})
+        for r in rows_raw
+    ]
 
     # payment_mode filter is applied in Python (needs aggregated pay data)
     if mode_filter:
@@ -5094,11 +5115,19 @@ def daily_reconciliation():
                       if p.payment_mode and p.payment_mode.name.lower() == mode_filter.lower()]
 
     # ── 2. Collection by mode ───────────────────────────────────────────────
+    # Each mode carries both the money and the transaction count: a cash
+    # reconciliation is checked on both, and the screen template has always
+    # read data.amount / data.count. It previously received a bare float,
+    # which is why this surface 500'd once its template syntax error was
+    # cleared.
     by_mode: dict = {}
     for p in payments_q:
         mn = p.payment_mode.name if p.payment_mode else 'Unknown'
-        by_mode[mn] = by_mode.get(mn, 0.0) + float(p.amount)
-    total_collection = sum(by_mode.values())
+        slot = by_mode.setdefault(mn, {'amount': 0.0, 'count': 0})
+        slot['amount'] += float(p.amount)
+        slot['count']  += 1
+    total_collection    = sum(d['amount'] for d in by_mode.values())
+    total_payment_count = sum(d['count']  for d in by_mode.values())
 
     # ── 3. Refunds ──────────────────────────────────────────────────────────
     refund_q = (OverpaymentLog.query
@@ -5170,8 +5199,8 @@ def daily_reconciliation():
 
         ws.append(['Collection by Mode', ''])
         ws.cell(ws.max_row, 1).font = Font(bold=True)
-        for mode, amt in by_mode.items():
-            ws.append([f'  {mode}', f'₹{amt:,.2f}'])
+        for mode, d in by_mode.items():
+            ws.append([f'  {mode}', f'₹{d["amount"]:,.2f}'])
         ws.append([])
         _section('Total Collection', total_collection, dark_fill)
         _section('Total Refunds', total_refunds, red_fill)
@@ -5282,6 +5311,7 @@ def daily_reconciliation():
     return render_template('reports/daily_reconciliation.html',
                            report_date=report_date,
                            by_mode=by_mode,
+                           total_payment_count=total_payment_count,
                            payments=payments_q,
                            total_collection=total_collection,
                            refunds=refund_q,

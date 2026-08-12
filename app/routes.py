@@ -7028,6 +7028,11 @@ def load_tab(tab_name):
             countries=COUNTRIES,
             india_states_cities=INDIA_STATES_CITIES,
             now_time=datetime.now().strftime('%H:%M'),
+            # The template pipes this through |tojson; without it the AJAX tab
+            # refresh renders an Undefined into json.dumps and 500s, while the
+            # full-page render (which does pass it) works. Same single
+            # authority the other three render paths use.
+            default_checkout_hm=_resolve_default_checkout_hm(),
             forfeit_admin_threshold=get_forfeit_approval_threshold())
     
     return '', 404
