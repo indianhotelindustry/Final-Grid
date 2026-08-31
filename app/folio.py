@@ -14,11 +14,117 @@ from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
 from datetime import datetime
 
-from app.models import db, Reservation, Folio, ExtraCharge, Payment, Company
+from app.models import db, Reservation, Folio, ExtraCharge, Payment, Company, AuditLog
 
 logger = logging.getLogger(__name__)
 
 folio_bp = Blueprint('folio', __name__)
+
+
+# ── Authorization (Phase 2a — finding R7) ────────────────────────────────────
+# The endpoints on this blueprint move money between billing parties. Until
+# this gate existed they were guarded by @login_required alone, which let any
+# authenticated account — including Housekeeping — re-attribute a charge or a
+# payment, leaving no AuditLog entry behind.
+#
+# Enforcement lives on the blueprint rather than on each route, and is
+# FAIL-CLOSED: an endpoint absent from _FOLIO_ROLES is denied to everyone. A
+# folio route added by a later phase is therefore guarded by default. That is
+# the failure mode R6 describes — "the next route added will be guarded
+# incorrectly and nothing will detect it" — removed for this blueprint.
+#
+# Why not one of the guard decorators already in the codebase: all of them
+# (role_required, admin_required, _manager_required, _admin_only,
+# _require_accountant, _deny_role) flash and redirect. On a JSON API that
+# yields a 302 to an HTML page, which a caller reads as success. Refusals here
+# must be machine-readable. Generalising this shape to the rest of the
+# application is finding R6 and belongs to a later phase; it is deliberately
+# scoped to this blueprint.
+
+#: Endpoint name → roles permitted to reach it. Mutating endpoints match
+#: payment_void_service.can_approve_void() so that the maker-checker work in
+#: Phase 2b adds an approval step to this boundary rather than moving it.
+_FOLIO_ROLES = {
+    'folio.list_folios':      ('Admin', 'Manager'),
+    'folio.create_folio':     ('Admin', 'Manager'),
+    'folio.transfer_charge':  ('Admin', 'Manager'),
+    'folio.transfer_payment': ('Admin', 'Manager'),
+}
+
+#: Request methods that cannot change state. Anything else counts as a mutation
+#: when deciding whether a refusal is worth recording.
+_SAFE_METHODS = frozenset(('GET', 'HEAD', 'OPTIONS'))
+
+
+def _record_denial(endpoint):
+    """Record a refused folio mutation. Best effort — never raises.
+
+    The refusal is the control; this row is only its evidence. A failure to
+    write the evidence must not turn a 403 into a 500, so unlike the mutation
+    paths below this one is deliberately non-fatal.
+    """
+    try:
+        target = 0
+        if request.view_args:
+            target = (request.view_args.get('folio_id')
+                      or request.view_args.get('reservation_id') or 0)
+        db.session.add(AuditLog(
+            entity_type='Folio',
+            entity_id=int(target),
+            action='folio_access_denied',
+            before_state=None,
+            after_state={'endpoint': endpoint,
+                         'method': request.method,
+                         'role': getattr(current_user, 'role', None)},
+            staff_user_id=current_user.id,
+            ip_address=request.remote_addr,
+        ))
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        logger.exception('Could not record folio access denial for %s', endpoint)
+
+
+@folio_bp.before_request
+def _require_folio_role():
+    """Fail-closed authorization for every route on this blueprint."""
+    if not current_user.is_authenticated:
+        return jsonify({'error': 'Authentication required.'}), 401
+
+    allowed = _FOLIO_ROLES.get(request.endpoint)
+    if allowed and current_user.role in allowed:
+        return None
+
+    if request.method not in _SAFE_METHODS:
+        _record_denial(request.endpoint)
+    return jsonify(
+        {'error': 'You do not have permission to perform this action.'}), 403
+
+
+def _audited(entity_type, entity_id, action, before_state, after_state):
+    """Write an AuditLog row inside the caller's open transaction.
+
+    Returns True only if the row actually reached the session; the caller is
+    expected to roll back and fail the request on False.
+
+    The shared helper in routes.py is documented as never raising — audit
+    failures there are deliberately non-fatal. That is right for most entities
+    and wrong for a financial attribution write: a mutation must never commit
+    with its audit record silently missing. This wrapper keeps the shared
+    helper's behaviour untouched for every other caller and applies the
+    stricter rule only here.
+    """
+    from sqlalchemy import func as _func
+    try:
+        from app.routes import _write_audit  # local import: avoids a cycle
+        before_ct = db.session.query(_func.count(AuditLog.id)).scalar() or 0
+        _write_audit(entity_type, entity_id, action, before_state, after_state)
+        after_ct = db.session.query(_func.count(AuditLog.id)).scalar() or 0
+        return after_ct > before_ct
+    except Exception:
+        logger.exception('Audit write failed for %s %s %s',
+                         entity_type, entity_id, action)
+        return False
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
