@@ -47,7 +47,7 @@ def render_registry() -> str:
     datasets = registry.all_datasets()
 
     add('=' * W)
-    add('DSBC FRONTLINE — REGRESSION DATASET REGISTRY')
+    add('FINALGRID — REGRESSION DATASET REGISTRY')
     add('Production Verification Framework, Wave 0 Deliverable 6')
     add('=' * W)
     add(f'Registered datasets : {len(datasets)}')
@@ -182,7 +182,7 @@ def render_commission(run) -> str:
     add = L.append
 
     add('=' * W)
-    add('DSBC FRONTLINE — REGRESSION DATASET COMMISSIONING')
+    add('FINALGRID — REGRESSION DATASET COMMISSIONING')
     add('Production Verification Framework, Wave 0 Deliverable 6')
     add('=' * W)
     add(f'Started            : {run.started_at}')

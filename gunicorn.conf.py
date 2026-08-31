@@ -35,7 +35,7 @@ preload_app = True
 
 def on_starting(server):
     import logging
-    logging.getLogger("gunicorn.error").info("Sukoon PMS starting...")
+    logging.getLogger("gunicorn.error").info("FinalGrid starting...")
 
 def post_fork(server, worker):
     # Ensure logs directory exists in each worker

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#C2410C">
-    <title>{{ config.HOTEL_NAME }} — Staff Login</title>
+    <title>{{ app_display_name }} — Staff Login</title>
     <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap-icons/font/bootstrap-icons.css') }}">
     <style>
@@ -111,8 +111,8 @@
             <i class="bi bi-building"></i>
         </div>
         <div class="text-center mb-4">
-            <div class="login-title">{{ config.HOTEL_NAME }}</div>
-            <div class="login-subtitle">Front Office Management System</div>
+            <div class="login-title">{{ app_display_name }}</div>
+            <div class="login-subtitle">{{ property_name or config.HOTEL_NAME }} &middot; Front Office Management System</div>
         </div>
 
         {% with messages = get_flashed_messages(with_categories=true) %}

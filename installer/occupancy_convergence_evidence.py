@@ -32,7 +32,7 @@ ZERO mutation risk:
   - no COMMIT, no schema change
 
 Usage at Pearl Inn:
-    cd "C:\\path\\to\\Sukoon PMS"
+    cd "C:\\path\\to\\FinalGrid"
     venv\\Scripts\\python.exe installer\\occupancy_convergence_evidence.py
 
 Optionally pass an explicit DB path as the first argument. Then paste the

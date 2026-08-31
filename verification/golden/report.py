@@ -36,7 +36,7 @@ def render_capture(run) -> str:
     L: list[str] = []
     add = L.append
     add('=' * W)
-    add('DSBC FRONTLINE — GOLDEN MASTER CAPTURE')
+    add('FINALGRID — GOLDEN MASTER CAPTURE')
     add('Production Verification Framework, Wave 0 Deliverable 2')
     add('=' * W)
     add(f'Started         : {run.started_at}')
@@ -140,7 +140,7 @@ def render_comparison(result, run) -> str:
     L: list[str] = []
     add = L.append
     add('=' * W)
-    add('DSBC FRONTLINE — GOLDEN MASTER VERIFICATION')
+    add('FINALGRID — GOLDEN MASTER VERIFICATION')
     add('Production Verification Framework, Wave 0 Deliverable 2')
     add('=' * W)
     add(f'Master set      : {result.tag}')

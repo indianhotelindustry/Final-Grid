@@ -45,7 +45,7 @@ if /i "!ALLOW_LAN!"=="1"    set BIND_HOST=0.0.0.0
 if /i "!ALLOW_LAN!"=="true" set BIND_HOST=0.0.0.0
 if /i "!ALLOW_LAN!"=="yes"  set BIND_HOST=0.0.0.0
 
-title %HOTEL_NAME% — PMS Server
+title FinalGrid — %HOTEL_NAME%
 color 0A
 
 REM ─── Ensure writable folders exist ─────────────────────────────
@@ -83,7 +83,7 @@ if errorlevel 1 (
 
 echo.
 echo  ================================================================
-echo   %HOTEL_NAME%  ^|  Property Management System
+echo   FinalGrid  ^|  %HOTEL_NAME%
 echo  ================================================================
 echo   Version  : v!APP_VER!   (DB migration: !MIG_VER!)
 echo   Local    : http://localhost:%APP_PORT%

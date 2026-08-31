@@ -15,7 +15,7 @@ performed on the returned evidence — keeping the production-truth
 determination explicit and reviewable.
 
 Usage at Pearl Inn:
-    cd "C:\\path\\to\\Sukoon PMS"
+    cd "C:\\path\\to\\FinalGrid"
     venv\\Scripts\\python.exe installer\\topology_classify.py
 
 Then paste the entire stdout block back to engineering for classification.
@@ -89,7 +89,7 @@ def main(db_path: str) -> int:
     if not os.path.exists(db_path):
         print()
         print('FAIL: database not found at', db_path)
-        print('Confirm the current directory is the Sukoon PMS install root')
+        print('Confirm the current directory is the FinalGrid install root')
         print('(the folder that contains the "instance" sub-folder).')
         return 9
 

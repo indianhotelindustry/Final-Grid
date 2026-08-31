@@ -1,9 +1,9 @@
 """
-Sukoon PMS — Native desktop-window launcher (OPTIONAL)
-=======================================================
+FinalGrid — Native desktop-window launcher (OPTIONAL)
+=====================================================
 Starts waitress on a background thread and opens the PMS UI inside a
 dedicated native window via pywebview — so the hotel sees a branded
-"Sukoon PMS" application instead of the default browser.
+"FinalGrid" application instead of the default browser.
 
 Design rules (per Phase C brief):
     * Does NOT replace browser mode. The existing start.bat / start_pms.bat
@@ -138,14 +138,14 @@ def _open_window(url: str, title: str) -> bool:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description='Sukoon PMS desktop launcher')
+    parser = argparse.ArgumentParser(description='FinalGrid desktop launcher')
     parser.add_argument('--browser', action='store_true',
                         help='Force browser mode (skip pywebview)')
     args = parser.parse_args()
 
     host, port = _resolve_host_port()
     title_url = f'http://localhost:{port}'
-    window_title = 'Sukoon PMS'
+    window_title = 'FinalGrid'
 
     # If the server is already running (e.g. started by the hidden VBS at
     # login), just open a window / browser pointed at the existing port.

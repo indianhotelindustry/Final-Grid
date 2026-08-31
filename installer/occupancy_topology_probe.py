@@ -23,7 +23,7 @@ ZERO mutation risk:
 Emits NO verdict. Raw evidence only. Classification is a human step.
 
 Usage at Pearl Inn:
-    cd "C:\\path\\to\\Sukoon PMS"
+    cd "C:\\path\\to\\FinalGrid"
     venv\\Scripts\\python.exe installer\\occupancy_topology_probe.py
 
 Then paste the entire stdout block back to engineering.

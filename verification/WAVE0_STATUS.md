@@ -1,6 +1,6 @@
 # Wave 0 — Deliverable Status
 
-DSBC Frontline v2.2.18. Last verified 2026-08-08 (Wave 0.8).
+FinalGrid v2.2.18. Last verified 2026-08-08 (Wave 0.8).
 
 Counts in this document are read from the live registries, not
 transcribed from the completion reports. Where a report and the

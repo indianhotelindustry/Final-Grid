@@ -3,7 +3,7 @@ Wave 0 — Deliverable D4: the Financial Invariant Engine.
 
 What this is
 ------------
-The permanent constitutional verification engine for DSBC Frontline. It
+The permanent constitutional verification engine for FinalGrid. It
 does not fix anything. It answers one question, repeatedly and with
 evidence:
 

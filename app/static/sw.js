@@ -1,5 +1,5 @@
 /**
- * Hotel PMS Service Worker — Offline-First
+ * FinalGrid Service Worker — Offline-First
  *
  * Strategy:
  *  - HTML pages  → Network-first (never cache; each page carries a CSP nonce

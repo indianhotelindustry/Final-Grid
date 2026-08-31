@@ -42,7 +42,7 @@ def render_registry() -> str:
     invariants = registry.all_invariants()
 
     add('=' * W)
-    add('DSBC FRONTLINE — FINANCIAL INVARIANT REGISTRY')
+    add('FINALGRID — FINANCIAL INVARIANT REGISTRY')
     add('Production Verification Framework, Wave 0 Deliverable 4')
     add('=' * W)
     add(f'Registered invariants : {len(invariants)}')
@@ -217,7 +217,7 @@ def render_run(run) -> str:
     counts = run.counts
 
     add('=' * W)
-    add('DSBC FRONTLINE — FINANCIAL INVARIANT ENGINE')
+    add('FINALGRID — FINANCIAL INVARIANT ENGINE')
     add('Production Verification Framework, Wave 0 Deliverable 4')
     add('=' * W)
     add(f'Started           : {run.started_at}')
@@ -430,7 +430,7 @@ def render_history(run) -> str:
     L: list[str] = []
     add = L.append
     add('=' * W)
-    add('DSBC FRONTLINE — INVARIANT HISTORICAL REPLAY')
+    add('FINALGRID — INVARIANT HISTORICAL REPLAY')
     add('Production Verification Framework, Wave 0 Deliverable 4')
     add('=' * W)
     add(f'Started           : {run.started_at}')

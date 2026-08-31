@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion
 cd /d "%~dp0"
 
 REM ═══════════════════════════════════════════════════════════════════
-REM  Sukoon PMS — Start (installed version)
+REM  FinalGrid — Start (installed version)
 REM  Starts the server and opens the browser.
 REM ═══════════════════════════════════════════════════════════════════
 
@@ -32,7 +32,7 @@ if exist "start_hidden.vbs" (
 )
 
 REM Wait for server to be ready
-echo Starting Sukoon PMS...
+echo Starting FinalGrid...
 for /L %%i in (1,1,10) do (
     timeout /t 1 /nobreak >nul
     for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":%APP_PORT% " ^| findstr "LISTENING" 2^>nul') do (

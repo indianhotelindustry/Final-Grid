@@ -1,10 +1,10 @@
 @echo off
 setlocal enabledelayedexpansion
 cd /d "%~dp0"
-title Sukoon PMS — Enable LAN access
+title FinalGrid — Enable LAN access
 
 REM ═══════════════════════════════════════════════════════════════════
-REM  Sukoon PMS — Enable LAN Access
+REM  FinalGrid — Enable LAN Access
 REM  ─────────────────────────────────────────────────────────────────
 REM  Opts this install in to LAN multi-user mode:
 REM   1. Sets ALLOW_LAN=1 in .env (idempotent — toggles if already present).
@@ -15,7 +15,7 @@ REM  Safe to run on an already-enabled install (idempotent). Run as admin.
 REM ═══════════════════════════════════════════════════════════════════
 
 echo.
-echo  Enabling LAN access for Sukoon PMS...
+echo  Enabling LAN access for FinalGrid...
 echo.
 
 REM ─── Find PORT from .env, default 5000 ──────────────────────────
@@ -26,7 +26,7 @@ if exist ".env" (
     )
 ) else (
     echo  ERROR: .env not found in current directory.
-    echo  Run this from the Sukoon PMS install folder (same dir as start.bat).
+    echo  Run this from the FinalGrid install folder (same dir as start.bat).
     pause & exit /b 1
 )
 

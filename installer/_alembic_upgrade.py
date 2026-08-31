@@ -1,4 +1,4 @@
-"""Alembic upgrade runner — Sukoon PMS patch_apply (v2.2.12).
+"""Alembic upgrade runner — FinalGrid patch_apply (v2.2.12).
 
 Replaces the multi-line ``python -c "..."`` heredoc that previously called
 ``flask_migrate.upgrade()``. The heredoc did not execute under cmd.exe

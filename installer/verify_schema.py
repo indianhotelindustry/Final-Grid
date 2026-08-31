@@ -1,4 +1,4 @@
-"""Schema verification gate — Sukoon PMS deployment governance (v2.2.13 Phase 2).
+"""Schema verification gate — FinalGrid deployment governance (v2.2.13 Phase 2).
 
 This script is part of the **release-governance contract**. Installer success
 is impossible without verify_schema PASS. patch_apply.bat must invoke this

@@ -1,4 +1,4 @@
-"""Canonical Occupancy Engine — Sukoon PMS (KPI Phase 1, Step 2).
+"""Canonical Occupancy Engine — FinalGrid (KPI Phase 1, Step 2).
 
 THE single source of occupancy truth. Every KPI surface (Dashboard,
 Night Audit, Room Revenue Report, KPI Command Center, MIS) must consume

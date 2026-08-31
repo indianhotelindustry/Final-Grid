@@ -1,4 +1,4 @@
-# The Financial Constitution — DSBC Frontline
+# The Financial Constitution — FinalGrid
 
 Phase 2.6. Engineering law for this project.
 

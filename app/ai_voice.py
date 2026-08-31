@@ -117,7 +117,9 @@ class VoiceCommandParser:
             return {'action': 'unknown', 'params': {}, 'confidence': 0, 'raw_text': ''}
 
         cleaned = text.lower().strip()
-        # Remove filler words
+        # Remove filler words. 'hey sukoon' / 'sukoon' are retained wake-word
+        # aliases: staff already speak them, and dropping them would change
+        # command parsing. They are not the product name (see README.md).
         cleaned = re.sub(r'\b(please|can you|could you|um|uh|hey sukoon|sukoon|okay)\b', '', cleaned).strip()
 
         for pattern, action, extractor in self.PATTERNS:

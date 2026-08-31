@@ -1,6 +1,6 @@
 # Production Initialization Framework
 
-`tools/production_initialize.py` — prepares a Sukoon PMS database for pilot
+`tools/production_initialize.py` — prepares a FinalGrid database for pilot
 or production use by **preserving every piece of configuration and removing
 every piece of business activity**. The result behaves like a freshly
 installed system that has already been fully configured.

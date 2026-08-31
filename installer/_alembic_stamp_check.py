@@ -1,4 +1,4 @@
-"""Alembic stamp-gate check — Sukoon PMS patch_apply (v2.2.12).
+"""Alembic stamp-gate check — FinalGrid patch_apply (v2.2.12).
 
 Replaces the multi-line ``python -c "..."`` heredoc that was the smoking gun
 of the v2.2.11 deployment incident. The heredoc pattern does not execute

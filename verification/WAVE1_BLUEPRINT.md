@@ -1,6 +1,6 @@
 # Wave 1 Implementation Blueprint
 
-DSBC Frontline v2.2.18. Written 2026-08-08 at the close of Wave 0.8.
+FinalGrid v2.2.18. Written 2026-08-08 at the close of Wave 0.8.
 
 **No production code was written to produce this document, and none may be
 written against it until the gate in §9 is passed.**

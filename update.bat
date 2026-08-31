@@ -1,12 +1,12 @@
 @echo off
 setlocal enabledelayedexpansion
-title Hotel PMS — Apply Update
+title FinalGrid — Apply Update
 color 0E
 cd /d "%~dp0"
 
 echo.
 echo  ============================================================
-echo   Hotel PMS — Apply Update Package
+echo   FinalGrid — Apply Update Package
 echo  ============================================================
 echo.
 

@@ -1,4 +1,4 @@
-# Engineering Guide — DSBC Frontline
+# Engineering Guide — FinalGrid
 
 How work is done on this system. Written Wave 0.5.
 

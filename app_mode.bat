@@ -1,10 +1,10 @@
 @echo off
 setlocal enabledelayedexpansion
 cd /d "%~dp0"
-title Sukoon PMS (App Mode)
+title FinalGrid (App Mode)
 
 REM ═══════════════════════════════════════════════════════════════════
-REM  Sukoon PMS — App Mode launcher
+REM  FinalGrid — App Mode launcher
 REM  ─────────────────────────────────────────────────────────────────
 REM  Opens the PMS in a dedicated native window (via pywebview) if the
 REM  package is installed, else falls back to the default browser.

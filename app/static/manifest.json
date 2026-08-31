@@ -1,7 +1,7 @@
 {
-  "name": "Sukoon City View - PMS",
-  "short_name": "PMS",
-  "description": "Front Office Property Management System",
+  "name": "FinalGrid",
+  "short_name": "FinalGrid",
+  "description": "FinalGrid — Front Office Property Management System",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

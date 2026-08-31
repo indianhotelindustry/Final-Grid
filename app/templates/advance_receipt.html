@@ -59,7 +59,7 @@
           {% else %}BOOKING CONFIRMATION{% endif %}
         </div>
         <h4 class="mb-0 mt-1 text-dark">
-          {{ inv.get('hotel_name') or 'Sukoon PMS' }}
+          {{ inv.get('hotel_name') or property_name or config.HOTEL_NAME }}
         </h4>
         {% if inv.get('hotel_address') %}
         <div class="small text-muted">{{ inv.get('hotel_address') }}</div>

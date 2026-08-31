@@ -1,5 +1,5 @@
 """
-GST Service — India Hotel PMS
+GST Service — FinalGrid (India)
 ==============================
 GST slabs as per CGST (Rate) Notification No. 03/2022 (effective 18 Jul 2022):
 

@@ -1,10 +1,10 @@
 @echo off
 setlocal enabledelayedexpansion
 cd /d "%~dp0"
-title Sukoon PMS — Disable LAN access
+title FinalGrid — Disable LAN access
 
 REM ═══════════════════════════════════════════════════════════════════
-REM  Sukoon PMS — Disable LAN Access
+REM  FinalGrid — Disable LAN Access
 REM  ─────────────────────────────────────────────────────────────────
 REM   1. Sets ALLOW_LAN=0 in .env.
 REM   2. Removes the Windows Firewall rule.
@@ -13,7 +13,7 @@ REM  Idempotent. Run as admin for the firewall step.
 REM ═══════════════════════════════════════════════════════════════════
 
 echo.
-echo  Disabling LAN access for Sukoon PMS...
+echo  Disabling LAN access for FinalGrid...
 echo.
 
 if not exist ".env" (

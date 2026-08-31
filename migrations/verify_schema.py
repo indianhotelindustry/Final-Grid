@@ -1,4 +1,4 @@
-"""Schema verification gate — Sukoon PMS deployment hardening (v2.2.10).
+"""Schema verification gate — FinalGrid deployment hardening (v2.2.10).
 
 Runs after every alembic upgrade in `installer/patch_apply.bat`. Fails
 the patch if the schema does not match the contract; the installer's

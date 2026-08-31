@@ -505,4 +505,4 @@ def webhook_logs():
 
 @webhook_bp.route('/ping')
 def ping():
-    return jsonify({'status': 'ok', 'service': 'Sukoon PMS Webhook', 'timestamp': datetime.utcnow().isoformat()})
+    return jsonify({'status': 'ok', 'service': 'FinalGrid Webhook', 'timestamp': datetime.utcnow().isoformat()})

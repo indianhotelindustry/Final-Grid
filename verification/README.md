@@ -1,6 +1,6 @@
 # Production Verification Framework — Wave 0
 
-Measurement instrumentation for DSBC Frontline. **Contains no production
+Measurement instrumentation for FinalGrid. **Contains no production
 code and is never imported by the application.**
 
 Governing documents, in this repository:

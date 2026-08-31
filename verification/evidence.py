@@ -153,7 +153,7 @@ def render_report(run: RunResult) -> str:
     add = L.append
 
     add('=' * W)
-    add('DSBC FRONTLINE — FINANCIAL PARITY HARNESS')
+    add('FINALGRID — FINANCIAL PARITY HARNESS')
     add('Production Verification Framework, Wave 0 Deliverable 1')
     add('=' * W)
     add(f'Mode            : {run.mode}')

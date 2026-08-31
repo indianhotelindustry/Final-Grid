@@ -1,5 +1,5 @@
 """
-GSTR-1 JSON Export — India Hotel PMS
+GSTR-1 JSON Export — FinalGrid (India)
 =====================================
 Generates the GSTR-1 JSON structure for direct upload to the GST portal.
 

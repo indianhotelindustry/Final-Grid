@@ -1,6 +1,6 @@
 """
-DSBC Frontline — Production Verification Framework (PVF)
-========================================================
+FinalGrid — Production Verification Framework (PVF)
+===================================================
 
 Wave 0 deliverable set. This package contains NO production code and is
 NEVER imported by the Flask application. It exists solely to measure the

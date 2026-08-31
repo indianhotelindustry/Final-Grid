@@ -530,7 +530,7 @@ def _write_evidence(outcomes: list, passed: int, total: int) -> str:
         'outcomes': [asdict(o) for o in outcomes],
     }
     lines = ['=' * 100,
-             'DSBC FRONTLINE — GOLDEN MASTER COMMISSIONING',
+             'FINALGRID — GOLDEN MASTER COMMISSIONING',
              'Wave 0 Deliverable 2 — Principle 9 / Principle 11',
              '=' * 100,
              f'Result: {passed}/{total} '

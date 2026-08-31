@@ -1,13 +1,13 @@
 @echo off
 REM ============================================================
-REM  Sukoon PMS — Cloudflare Tunnel Starter
+REM  FinalGrid — Cloudflare Tunnel Starter
 REM  Double-click this file to start the internet tunnel.
 REM  Keep this window open while the hotel is operating.
 REM ============================================================
 
 echo.
 echo  ====================================
-echo    Sukoon City View PMS
+echo    FinalGrid
 echo    Starting Cloudflare Tunnel...
 echo  ====================================
 echo.

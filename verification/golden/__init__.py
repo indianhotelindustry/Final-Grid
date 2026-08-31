@@ -1,6 +1,6 @@
 """
-DSBC Frontline — Golden Master Framework (Wave 0, Deliverable D2)
-=================================================================
+FinalGrid — Golden Master Framework (Wave 0, Deliverable D2)
+============================================================
 
 D1 measures the *engines*. D2 measures the *surfaces*: what a report,
 dashboard or API endpoint actually renders to a user. A financial figure

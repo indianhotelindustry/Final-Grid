@@ -1,12 +1,12 @@
 @echo off
 setlocal enabledelayedexpansion
-title Hotel PMS — Factory Reset
+title FinalGrid — Factory Reset
 color 0C
 cd /d "%~dp0"
 
 echo.
 echo  ============================================================
-echo   Hotel PMS — Factory Reset
+echo   FinalGrid — Factory Reset
 echo  ============================================================
 echo.
 echo   This will PERMANENTLY DELETE all operational data:

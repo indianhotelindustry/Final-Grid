@@ -1,5 +1,5 @@
 ' ──────────────────────────────────────────────────────
-' Sukoon PMS — Start server in background (no window)
+' FinalGrid — Start server in background (no window)
 ' Called by Task Scheduler on Windows login.
 ' To see the server console, run start.bat manually.
 ' ──────────────────────────────────────────────────────

@@ -1,7 +1,7 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-title Sukoon PMS - Stopping Server
+title FinalGrid - Stopping Server
 
 REM ─── Read port from .env ──────────────────────────────────────
 set APP_PORT=5000

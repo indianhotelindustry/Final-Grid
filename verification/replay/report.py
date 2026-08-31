@@ -70,7 +70,7 @@ def render_replay(run) -> str:
     counts = run.counts
 
     add('=' * W)
-    add('DSBC FRONTLINE — HISTORICAL REPLAY')
+    add('FINALGRID — HISTORICAL REPLAY')
     add('Production Verification Framework, Wave 0 Deliverable 3')
     add('=' * W)
     add(f'Started           : {run.started_at}')
@@ -328,7 +328,7 @@ def render_comparison(result, run) -> str:
     L: list[str] = []
     add = L.append
     add('=' * W)
-    add('DSBC FRONTLINE — HISTORICAL REPLAY VERIFICATION')
+    add('FINALGRID — HISTORICAL REPLAY VERIFICATION')
     add('Production Verification Framework, Wave 0 Deliverable 3')
     add('=' * W)
     add(f'Stored replay     : {result.tag}')

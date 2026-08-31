@@ -1,4 +1,4 @@
-# DSBC Frontline — repository exclusions
+# FinalGrid — repository exclusions
 #
 # The governing question for every line here is "would committing this
 # either leak live data or destroy the signal in the history?"

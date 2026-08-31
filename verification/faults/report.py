@@ -62,7 +62,7 @@ def render_registry() -> str:
                   Severity.LOW]
 
     add('=' * W)
-    add('DSBC FRONTLINE — FAULT REGISTRY')
+    add('FINALGRID — FAULT REGISTRY')
     add('Production Verification Framework, Wave 0 Deliverable 5')
     add('=' * W)
     add(f'Registered faults : {len(faults)}')
@@ -190,7 +190,7 @@ def render_run(run) -> str:
     counts = run.counts
 
     add('=' * W)
-    add('DSBC FRONTLINE — FAULT INJECTION PLATFORM RUN')
+    add('FINALGRID — FAULT INJECTION PLATFORM RUN')
     add('Production Verification Framework, Wave 0 Deliverable 5')
     add('=' * W)
     add(f'Started         : {run.started_at}')

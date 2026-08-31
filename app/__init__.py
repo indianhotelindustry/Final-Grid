@@ -432,10 +432,10 @@ def create_app():
                 _an = _Sett.query.filter_by(key='app_name').first()
                 _al = _Sett.query.filter_by(key='app_logo_filename').first()
                 _hn = _Sett.query.filter_by(key='hotel_name').first()
-                # Global app name: use stored app_name, default to "DSBC Frontline"
+                # Global app name: use stored app_name, default to "FinalGrid"
                 ctx['app_display_name'] = (
                     _an.value.strip() if _an and _an.value and _an.value.strip()
-                    else 'DSBC Frontline'
+                    else 'FinalGrid'
                 )
                 ctx['app_logo_url'] = (_uf('static', filename='uploads/' + _al.value) if _al and _al.value else None)
                 # Property name: from hotel_name setting, fallback to HOTEL_NAME config
@@ -444,7 +444,7 @@ def create_app():
                     else _ca.config.get('HOTEL_NAME', '')
                 )
             except Exception:
-                ctx.setdefault('app_display_name', 'DSBC Frontline')
+                ctx.setdefault('app_display_name', 'FinalGrid')
                 ctx.setdefault('app_logo_url', None)
                 ctx.setdefault('property_name', app.config.get('HOTEL_NAME', ''))
             return ctx

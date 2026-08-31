@@ -688,7 +688,7 @@ def _cmd_selfcheck(args) -> int:
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(
         prog='python -m verification',
-        description='DSBC Frontline — Financial Parity Harness (PVF D1)')
+        description='FinalGrid — Financial Parity Harness (PVF D1)')
     sub = p.add_subparsers(dest='cmd', required=True)
 
     r = sub.add_parser('run', help='cross-implementation parity run')

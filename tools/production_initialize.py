@@ -1,7 +1,7 @@
 """
 Production Initialization Framework — master-preserving reset.
 
-Prepares a Sukoon PMS database for pilot or production use by preserving
+Prepares a FinalGrid database for pilot or production use by preserving
 every piece of configuration and removing every piece of business
 activity. The result behaves like a freshly installed system that has
 already been fully configured.
