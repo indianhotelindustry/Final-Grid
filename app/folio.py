@@ -242,6 +242,14 @@ def create_folio(reservation_id):
             notes=notes,
         )
         db.session.add(folio)
+        db.session.flush()          # assign folio.id so the audit row can cite it
+        if not _audited('Folio', folio.id, 'folio_create', None,
+                        {'reservation_id': reservation_id,
+                         'folio_letter': letter,
+                         'label': label,
+                         'company_id': company_id}):
+            db.session.rollback()
+            return jsonify({'error': 'Could not create folio. Please try again.'}), 500
         db.session.commit()
     except Exception as e:
         db.session.rollback()
@@ -319,7 +327,15 @@ def transfer_charge(folio_id):
                 db.session.rollback()
                 return jsonify({'error': 'Source folio is closed'}), 400
 
+        _before = {'folio_id': charge.folio_id}
         charge.folio_id = target_folio.id
+        if not _audited('ExtraCharge', charge.id, 'folio_charge_transfer',
+                        _before,
+                        {'folio_id': target_folio.id,
+                         'folio_letter': target_folio.folio_letter,
+                         'amount': str(charge.amount)}):
+            db.session.rollback()
+            return jsonify({'error': 'Could not transfer charge. Please try again.'}), 500
         db.session.commit()
     except Exception as e:
         db.session.rollback()
@@ -398,7 +414,15 @@ def transfer_payment(folio_id):
                 db.session.rollback()
                 return jsonify({'error': 'Source folio is closed'}), 400
 
+        _before = {'folio_id': payment.folio_id}
         payment.folio_id = target_folio.id
+        if not _audited('Payment', payment.id, 'folio_payment_transfer',
+                        _before,
+                        {'folio_id': target_folio.id,
+                         'folio_letter': target_folio.folio_letter,
+                         'amount': str(payment.amount)}):
+            db.session.rollback()
+            return jsonify({'error': 'Could not transfer payment. Please try again.'}), 500
         db.session.commit()
     except Exception as e:
         db.session.rollback()
