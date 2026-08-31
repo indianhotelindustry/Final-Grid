@@ -1,0 +1,1283 @@
+====================================================================================================
+FINALGRID — GOLDEN MASTER VERIFICATION
+Production Verification Framework, Wave 0 Deliverable 2
+====================================================================================================
+Master set      : production
+Master captured : 2026-08-03T11:38:16 (app v2.2.18)
+Current run     : 2026-08-31T16:00:40 (app v2.2.18)
+Master clock    : 2026-05-28T12:00:00
+Current clock   : 2026-08-10T12:00:00
+Read-only       : VERIFIED
+
+Surfaces compared : 158
+Surfaces clean    : 31
+Differences       : 3342
+Blocking          : 2162
+
+VERDICT           : FAIL
+
+----------------------------------------------------------------------------------------------------
+DIFFERENCES BY KIND
+----------------------------------------------------------------------------------------------------
+  ANON_STATUS_CHANGED          1
+  BODY_CHANGED               118
+  FIGURE_ADDED               204
+  FIGURE_CHANGED            1482
+  FIGURE_REMOVED            1502
+  NORMALISATION_CHANGED        2
+  STATUS_CHANGED               8
+  SURFACE_ADDED                6
+  SURFACE_REMOVED              6
+  TEMPLATES_CHANGED            8
+  TRUNCATION_CHANGED           5
+
+====================================================================================================
+DIFFERENCES
+====================================================================================================
+
+billing.credit_notes_list   [FINANCIAL]
+  /billing/credit-notes
+    [BLOCK] FIGURE_CHANGED         g_business_date
+            master : 2026-05-28
+            current: 2026-08-10
+
+billing.gst_report   [FINANCIAL]
+  /billing/gst-report
+    [BLOCK] FIGURE_CHANGED         data.cgst_total
+            master : 948.62
+            current: 102.37   (delta -846.25)
+    [BLOCK] FIGURE_CHANGED         data.from_date
+            master : 2026-05-01
+            current: 2026-08-01
+    [BLOCK] FIGURE_CHANGED         data.grand_total
+            master : 39843.91
+            current: 4299.97   (delta -35543.94)
+    [BLOCK] FIGURE_CHANGED         data.rate_groups.5%.cgst
+            master : 948.62
+            current: 102.37   (delta -846.25)
+    [BLOCK] FIGURE_CHANGED         data.rate_groups.5%.sgst
+            master : 948.62
+            current: 102.37   (delta -846.25)
+    [BLOCK] FIGURE_CHANGED         data.rate_groups.5%.taxable
+            master : 37946.67
+            current: 4095.23   (delta -33851.44)
+    [BLOCK] FIGURE_CHANGED         data.rows[len]
+            master : 66
+            current: 12   (delta -54)
+    [BLOCK] FIGURE_CHANGED         data.sgst_total
+            master : 948.62
+            current: 102.37   (delta -846.25)
+    [BLOCK] FIGURE_CHANGED         data.to_date
+            master : 2026-05-28
+            current: 2026-08-10
+    [BLOCK] FIGURE_CHANGED         data.total_tax
+            master : 1897.24
+            current: 204.74   (delta -1692.5)
+    [BLOCK] FIGURE_CHANGED         data.total_taxable
+            master : 37946.67
+            current: 4095.23   (delta -33851.44)
+    [BLOCK] FIGURE_CHANGED         g_business_date
+            master : 2026-05-28
+            current: 2026-08-10
+    [BLOCK] FIGURE_REMOVED         data.rows[12][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[13][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[14][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[15][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[16][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[17][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[18][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[19][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[20][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[21][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[22][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[23][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[24][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[25][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[26][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[27][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[28][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[29][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[30][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[31][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[32][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[33][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[34][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[35][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[36][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[37][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[38][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[39][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[40][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[41][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[42][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[43][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[44][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[45][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[46][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[47][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[48][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[49][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[50][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[51][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[52][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[53][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[54][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[55][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[56][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[57][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[58][type]
+            master : TaxLine
+            current: 
+    [BLOCK] FIGURE_REMOVED         data.rows[59][type]
+            master : TaxLine
+            current: 
+
+billing.invoice_register   [FINANCIAL]
+  /billing/invoice-register
+    [BLOCK] FIGURE_ADDED           rows[0].modes.Cash
+            master : 
+            current: 1200
+    [BLOCK] FIGURE_CHANGED         from_date
+            master : 2026-05-28
+            current: 2026-08-10
+    [BLOCK] FIGURE_CHANGED         g_business_date
+            master : 2026-05-28
+            current: 2026-08-10
+    [BLOCK] FIGURE_CHANGED         rows[0].billing.balance
+            master : -57.14
+            current: -57.15   (delta -0.01)
+    [BLOCK] FIGURE_CHANGED         rows[0].billing.total
+            master : 1142.86
+            current: 1142.85   (delta -0.01)
+    [BLOCK] FIGURE_CHANGED         rows[len]
+            master : 13
+            current: 1   (delta -12)
+    [BLOCK] FIGURE_CHANGED         summary.count
+            master : 13
+            current: 1   (delta -12)
+    [BLOCK] FIGURE_CHANGED         summary.settled_count
+            master : 13
+            current: 1   (delta -12)
+    [BLOCK] FIGURE_CHANGED         summary.total_billed
+            master : 16616.97
+            current: 1142.85   (delta -15474.12)
+    [BLOCK] FIGURE_CHANGED         summary.total_collected
+            master : 17448.14
+            current: 1200   (delta -16248.14)
+    [BLOCK] FIGURE_CHANGED         summary.total_pending
+            master : -831.17
+            current: -57.15   (delta +774.02)
+    [BLOCK] FIGURE_CHANGED         to_date
+            master : 2026-05-28
+            current: 2026-08-10
+    [BLOCK] FIGURE_REMOVED         rows[0].modes.UPI
+            master : 1200
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[10].billing.balance
+            master : -57.14
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[10].billing.paid
+            master : 1200
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[10].billing.total
+            master : 1142.86
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[10].billing[len]
+            master : 3
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[10].modes.UPI
+            master : 1200
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[10].modes[len]
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[10].reservation[type]
+            master : Reservation
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[10][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[11].billing.balance
+            master : -61.9
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[11].billing.paid
+            master : 1300
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[11].billing.total
+            master : 1238.1
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[11].billing[len]
+            master : 3
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[11].modes.UPI
+            master : 1300
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[11].modes[len]
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[11].reservation[type]
+            master : Reservation
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[11][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[12].billing.balance
+            master : -57.14
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[12].billing.paid
+            master : 1200
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[12].billing.total
+            master : 1142.86
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[12].billing[len]
+            master : 3
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[12].modes.Cash
+            master : 1200
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[12].modes[len]
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[12].reservation[type]
+            master : Reservation
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[12][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[1].billing.balance
+            master : -61.9
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[1].billing.paid
+            master : 1300
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[1].billing.total
+            master : 1238.1
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[1].billing[len]
+            master : 3
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[1].modes.UPI
+            master : 1300
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[1].modes[len]
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[1].reservation[type]
+            master : Reservation
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[1][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[2].billing.balance
+            master : -47.62
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[2].billing.paid
+            master : 1000
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[2].billing.total
+            master : 952.38
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[2].billing[len]
+            master : 3
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[2].modes.Cash
+            master : 300
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[2].modes.UPI
+            master : 700
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[2].modes[len]
+            master : 2
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[2].reservation[type]
+            master : Reservation
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[2][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[3].billing.balance
+            master : -76.76
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[3].billing.paid
+            master : 1611.99
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[3].billing.total
+            master : 1535.23
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[3].billing[len]
+            master : 3
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[3].modes.EaseMyTrip Paid
+            master : 1611.99
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[3].modes[len]
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[3].reservation[type]
+            master : Reservation
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[3][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[4].billing.balance
+            master : -80.81
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[4].billing.paid
+            master : 1700.15
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[4].billing.total
+            master : 1619.34
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[4].billing[len]
+            master : 3
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[4].modes.MMT Paid
+            master : 1700.15
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[4].modes[len]
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[4].reservation[type]
+            master : Reservation
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[4][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[5].billing.balance
+            master : -71.43
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[5].billing.paid
+            master : 1500
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[5].billing.total
+            master : 1428.57
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[5].billing[len]
+            master : 3
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[5].modes.UPI
+            master : 1500
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[5].modes[len]
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[5].reservation[type]
+            master : Reservation
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[5][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[6].billing.balance
+            master : -57.14
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[6].billing.paid
+            master : 1200
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[6].billing.total
+            master : 1142.86
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[6].billing[len]
+            master : 3
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[6].modes.UPI
+            master : 1200
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[6].modes[len]
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[6].reservation[type]
+            master : Reservation
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[6][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[7].billing.balance
+            master : -68.86
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[7].billing.paid
+            master : 1436
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[7].billing.total
+            master : 1367.14
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[7].billing[len]
+            master : 3
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[7].modes.Other OTA Paid
+            master : 1435.5
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[7].modes.UPI
+            master : 0.5
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[7].modes[len]
+            master : 2
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[7].reservation[type]
+            master : Reservation
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[7][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[8].billing.balance
+            master : -71.43
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[8].billing.paid
+            master : 1500
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[8].billing.total
+            master : 1428.57
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[8].billing[len]
+            master : 3
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[8].modes.UPI
+            master : 1500
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[8].modes[len]
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[8].reservation[type]
+            master : Reservation
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[8][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[9].billing.balance
+            master : -61.9
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[9].billing.paid
+            master : 1300
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[9].billing.total
+            master : 1238.1
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[9].billing[len]
+            master : 3
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[9].modes.UPI
+            master : 1300
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[9].modes[len]
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[9].reservation[type]
+            master : Reservation
+            current: 
+    [BLOCK] FIGURE_REMOVED         rows[9][len]
+            master : 5
+            current: 
+
+billing.void_history__any_reservation   [FINANCIAL]
+  /billing/void/history/1
+    [BLOCK] FIGURE_CHANGED         g_business_date
+            master : 2026-05-28
+            current: 2026-08-10
+
+billing.void_pending   [FINANCIAL]
+  /billing/void/pending
+    [BLOCK] FIGURE_CHANGED         g_business_date
+            master : 2026-05-28
+            current: 2026-08-10
+
+folio.list_folios__checked_out_reservation   [FINANCIAL]
+  /api/reservation/1/folios
+    [BLOCK] ANON_STATUS_CHANGED   
+            master : 302
+            current: 401
+
+loyalty.config   [FINANCIAL]
+  /loyalty/config
+    [BLOCK] FIGURE_CHANGED         g_business_date
+            master : 2026-05-28
+            current: 2026-08-10
+
+loyalty.milestones   [FINANCIAL]
+  /loyalty/milestones
+    [BLOCK] FIGURE_CHANGED         g_business_date
+            master : 2026-05-28
+            current: 2026-08-10
+
+loyalty.transactions   [FINANCIAL]
+  /loyalty/transactions
+    [BLOCK] FIGURE_CHANGED         g_business_date
+            master : 2026-05-28
+            current: 2026-08-10
+
+main.analytics_data   [FINANCIAL]
+  /api/analytics/data
+    [BLOCK] FIGURE_CHANGED         $.booking_sources[0].count
+            master : 28
+            current: 4   (delta -24)
+    [BLOCK] FIGURE_CHANGED         $.occupancy_trend[28].pct
+            master : 35.9
+            current: 2.6   (delta -33.3)
+    [BLOCK] FIGURE_CHANGED         $.occupancy_trend[29].pct
+            master : 41
+            current: 7.7   (delta -33.3)
+    [BLOCK] FIGURE_CHANGED         $.revenue_trend[28].rev
+            master : 20848.14
+            current: 1200   (delta -19648.14)
+    [BLOCK] FIGURE_CHANGED         $.revenue_trend[29].rev
+            master : 18796.15
+            current: 3100   (delta -15696.15)
+    [BLOCK] FIGURE_CHANGED         $.room_performance[0].avg_rate
+            master : 1333
+            current: 1429   (delta +96)
+    [BLOCK] FIGURE_CHANGED         $.room_performance[0].bookings
+            master : 3
+            current: 1   (delta -2)
+    [BLOCK] FIGURE_CHANGED         $.room_performance[0].occ_pct
+            master : 10
+            current: 3.3   (delta -6.7)
+    [BLOCK] FIGURE_CHANGED         $.room_performance[0].revenue
+            master : 4200
+            current: 1500   (delta -2700)
+    [BLOCK] FIGURE_CHANGED         $.room_performance[1].avg_rate
+            master : 1381
+            current: 762   (delta -619)
+    [BLOCK] FIGURE_CHANGED         $.room_performance[1].bookings
+            master : 2
+            current: 1   (delta -1)
+    [BLOCK] FIGURE_CHANGED         $.room_performance[1].occ_pct
+            master : 6.7
+            current: 3.3   (delta -3.4)
+    [BLOCK] FIGURE_CHANGED         $.room_performance[1].revenue
+            master : 2900.15
+            current: 1200   (delta -1700.15)
+    [BLOCK] FIGURE_CHANGED         $.room_performance[2].avg_rate
+            master : 1238
+            current: 952   (delta -286)
+    [BLOCK] FIGURE_CHANGED         $.room_performance[2].occ_pct
+            master : 6.7
+            current: 3.3   (delta -3.4)
+    [BLOCK] FIGURE_CHANGED         $.room_performance[2].revenue
+            master : 2860
+            current: 1000   (delta -1860)
+    [BLOCK] FIGURE_CHANGED         $.room_performance[3].avg_rate
+            master : 1238
+            current: 476   (delta -762)
+    [BLOCK] FIGURE_CHANGED         $.room_performance[3].bookings
+            master : 2
+            current: 1   (delta -1)
+    [BLOCK] FIGURE_CHANGED         $.room_performance[3].occ_pct
+            master : 6.7
+            current: 3.3   (delta -3.4)
+    [BLOCK] FIGURE_CHANGED         $.room_performance[3].revenue
+            master : 2600
+            current: 600   (delta -2000)
+    [BLOCK] FIGURE_CHANGED         $.room_performance[len]
+            master : 24
+            current: 4   (delta -20)
+    [BLOCK] FIGURE_REMOVED         $.room_performance[10].avg_rate
+            master : 1367
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[10].bookings
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[10].occ_pct
+            master : 3.3
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[10].revenue
+            master : 1436
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[10][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[11].avg_rate
+            master : 1238
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[11].bookings
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[11].occ_pct
+            master : 3.3
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[11].revenue
+            master : 1300
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[11][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[12].avg_rate
+            master : 1238
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[12].bookings
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[12].occ_pct
+            master : 3.3
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[12].revenue
+            master : 1300
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[12][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[13].avg_rate
+            master : 1238
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[13].bookings
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[13].occ_pct
+            master : 3.3
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[13].revenue
+            master : 1300
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[13][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[14].avg_rate
+            master : 1238
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[14].bookings
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[14].occ_pct
+            master : 3.3
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[14].revenue
+            master : 1300
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[14][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[15].avg_rate
+            master : 1238
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[15].bookings
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[15].occ_pct
+            master : 3.3
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[15].revenue
+            master : 1300
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[15][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[16].avg_rate
+            master : 1143
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[16].bookings
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[16].occ_pct
+            master : 3.3
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[16].revenue
+            master : 1200
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[16][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[17].avg_rate
+            master : 1143
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[17].bookings
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[17].occ_pct
+            master : 3.3
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[17].revenue
+            master : 1200
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[17][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[18].avg_rate
+            master : 1143
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[18].bookings
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[18].occ_pct
+            master : 3.3
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[18].revenue
+            master : 1200
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[18][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[19].avg_rate
+            master : 1143
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[19].bookings
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[19].occ_pct
+            master : 3.3
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[19].revenue
+            master : 1200
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[19][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[20].avg_rate
+            master : 1143
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[20].bookings
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[20].occ_pct
+            master : 3.3
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[20].revenue
+            master : 1200
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[20][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[21].avg_rate
+            master : 1143
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[21].bookings
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[21].occ_pct
+            master : 3.3
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[21].revenue
+            master : 1200
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[21][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[22].avg_rate
+            master : 952
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[22].bookings
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[22].occ_pct
+            master : 3.3
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[22].revenue
+            master : 1000
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[22][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[23].avg_rate
+            master : 762
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[23].bookings
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[23].occ_pct
+            master : 3.3
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[23].revenue
+            master : 800
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[23][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[4].avg_rate
+            master : 952
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[4].bookings
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[4].occ_pct
+            master : 6.7
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[4].revenue
+            master : 2000
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[4][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[5].avg_rate
+            master : 1457
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[5].bookings
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[5].occ_pct
+            master : 3.3
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[5].revenue
+            master : 1836
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[5][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[6].avg_rate
+            master : 1619
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[6].bookings
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[6].occ_pct
+            master : 3.3
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[6].revenue
+            master : 1700.15
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[6][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[7].avg_rate
+            master : 1535
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[7].bookings
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[7].occ_pct
+            master : 3.3
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[7].revenue
+            master : 1611.99
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[7][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[8].avg_rate
+            master : 1429
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[8].bookings
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[8].occ_pct
+            master : 3.3
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[8].revenue
+            master : 1500
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[8][len]
+            master : 5
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[9].avg_rate
+            master : 1429
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[9].bookings
+            master : 1
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[9].occ_pct
+            master : 3.3
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[9].revenue
+            master : 1500
+            current: 
+    [BLOCK] FIGURE_REMOVED         $.room_performance[9][len]
+            master : 5
+            current: 
+
+main.ceo_dashboard   [FINANCIAL]
+  /ceo
+    [BLOCK] FIGURE_CHANGED         g_business_date
+            master : 2026-05-28
+            current: 2026-08-10
+
+main.command_center_data   [FINANCIAL]
+  /api/dashboard/command-center/data
+    [BLOCK] FIGURE_CHANGED         $.alerts[0].days_active
+            master : 1
+            current: 75   (delta +74)
+    [BLOCK] FIGURE_CHANGED         $.alerts[0].is_persistent
+            master : False
+            current: True
+    [BLOCK] FIGURE_CHANGED         $.alerts_summary.persistent_count
+            master : 0
+            current: 1   (delta +1)
+    [BLOCK] FIGURE_CHANGED         $.governance.credit_outstanding_count
+            master : 1
+            current: 0   (delta -1)
+    [BLOCK] FIGURE_CHANGED         $.governance.credit_outstanding_total
+            master : 200
+            current: 0   (delta -200)
+    [BLOCK] FIGURE_CHANGED         $.monthly_trend.trend_compare.adr[1]
+            master : 1283
+            current: 1000   (delta -283)
+    [BLOCK] FIGURE_CHANGED         $.monthly_trend.trend_compare.adr[sum]
+            master : 1283
+            current: 1000   (delta -283)
+    [BLOCK] FIGURE_CHANGED         $.monthly_trend.trend_compare.occupancy[1]
+            master : 2.7
+            current: 1.1   (delta -1.6)
+    [BLOCK] FIGURE_CHANGED         $.monthly_trend.trend_compare.occupancy[sum]
+            master : 2.7
+            current: 1.1   (delta -1.6)
+    [BLOCK] FIGURE_CHANGED         $.monthly_trend.trend_compare.revpar[1]
+            master : 34
+            current: 11   (delta -23)
+    [BLOCK] FIGURE_CHANGED         $.monthly_trend.trend_compare.revpar[sum]
+            master : 34
+            current: 11   (delta -23)
+    [BLOCK] FIGURE_CHANGED         $.monthly_trend.trend_compare.sales[1]
+            master : 37217
+            current: 4000   (delta -33217)
+    [BLOCK] FIGURE_CHANGED         $.monthly_trend.trend_compare.sales[sum]
+            master : 37217
+            current: 4000   (delta -33217)
+    [BLOCK] FIGURE_CHANGED         $.monthly_trend.trend_continuous.adr[5]
+            master : 1283
+            current: 1000   (delta -283)
+    [BLOCK] FIGURE_CHANGED         $.monthly_trend.trend_continuous.adr[sum]
+            master : 1283
+            current: 1000   (delta -283)
+    [BLOCK] FIGURE_CHANGED         $.monthly_trend.trend_continuous.occupancy[5]
+            master : 2.7
+            current: 1.1   (delta -1.6)
+    [BLOCK] FIGURE_CHANGED         $.monthly_trend.trend_continuous.occupancy[sum]
+            master : 2.7
+            current: 1.1   (delta -1.6)
+    [BLOCK] FIGURE_CHANGED         $.monthly_trend.trend_continuous.revpar[5]
+            master : 34
+            current: 11   (delta -23)
+    [BLOCK] FIGURE_CHANGED         $.monthly_trend.trend_continuous.revpar[sum]
+            master : 34
+            current: 11   (delta -23)
+    [BLOCK] FIGURE_CHANGED         $.monthly_trend.trend_continuous.sales[5]
+            master : 37217
+            current: 4000   (delta -33217)
+    [BLOCK] FIGURE_CHANGED         $.monthly_trend.trend_continuous.sales[sum]
+            master : 37217
+            current: 4000   (delta -33217)
+    [BLOCK] FIGURE_CHANGED         $.monthly_trend.trend_continuous.variance[5]
+            master : 37217
+            current: 4000   (delta -33217)
+    [BLOCK] FIGURE_CHANGED         $.monthly_trend.trend_continuous.variance[sum]
+            master : 37217
+            current: 4000   (delta -33217)
+    [BLOCK] FIGURE_CHANGED         $.quick_answers.forecast_month_end.value
+            master : 42012.716786
+            current: 13876.158   (delta -28136.558786)
+    [BLOCK] FIGURE_CHANGED         $.quick_answers.mtd_sales.value
+            master : 37946.97
+            current: 4476.18   (delta -33470.79)
+    [BLOCK] FIGURE_CHANGED         $.quick_answers.occupancy_mtd.value
+            master : 2.655678
+            current: 1.081081   (delta -1.574597)
+    [BLOCK] FIGURE_CHANGED         $.quick_answers.occupancy_today.value
+            master : 38.461538
+            current: 8.108108   (delta -30.35343)
+    [BLOCK] FIGURE_CHANGED         $.quick_answers.surplus_deficit.value
+            master : 37946.97
+            current: 4476.18   (delta -33470.79)
+    [BLOCK] FIGURE_CHANGED         $.quick_answers.today_sales.value
+            master : 20282.38
+            current: 2952.38   (delta -17330)
+    [BLOCK] FIGURE_CHANGED         $.range_revenue.extras_revenue.value
+            master : 729.7
+            current: 95.24   (delta -634.46)
+    [BLOCK] FIGURE_CHANGED         $.range_revenue.occupancy_range.value
+            master : 38.461538
+            current: 8.108108   (delta -30.35343)
+    [BLOCK] FIGURE_CHANGED         $.range_revenue.ota_receivable.value
+            master : 3230.28
+            current: 0   (delta -3230.28)
+    [BLOCK] FIGURE_CHANGED         $.range_revenue.room_revenue.value
+            master : 19552.68
+            current: 2857.14   (delta -16695.54)
+    [BLOCK] FIGURE_CHANGED         $.sales_vs_target.mtd.actual.value
+            master : 37946.97
+            current: 4476.18   (delta -33470.79)
+    [BLOCK] FIGURE_CHANGED         $.sales_vs_target.mtd.variance.value
+            master : 37946.97
+            current: 4476.18   (delta -33470.79)
+    [BLOCK] FIGURE_CHANGED         $.sales_vs_target.today.actual.value
+            master : 20282.38
+            current: 2952.38   (delta -17330)
+    [BLOCK] FIGURE_CHANGED         $.sales_vs_target.today.variance.value
+            master : 20282.38
+            current: 2952.38   (delta -17330)
+    [BLOCK] FIGURE_CHANGED         $.summary_cards.adr.value
+            master : 1303.512
+            current: 952.38   (delta -351.132)
+    [BLOCK] FIGURE_CHANGED         $.summary_cards.revpar.value
+            master : 501.350769
+            current: 77.22   (delta -424.130769)
+    [BLOCK] FIGURE_CHANGED         $.summary_cards.rooms_available.value
+            master : 39
+            current: 37   (delta -2)
+    [BLOCK] FIGURE_CHANGED         $.summary_cards.rooms_sold.value
+            master : 15
+            current: 3   (delta -12)
+
+main.dashboard   [FINANCIAL]
+  /dashboard
+    [BLOCK] FIGURE_CHANGED         available_rooms
+            master : 39
+            current: 37   (delta -2)
+    [BLOCK] FIGURE_CHANGED         business_date
+            master : 2026-05-28
+            current: 2026-08-10
+    [BLOCK] FIGURE_CHANGED         card_revenue
+            master : 0
+            current: 500   (delta +500)
+    [BLOCK] FIGURE_CHANGED         cash_collected_today
+            master : 15565.87
+            current: 3100   (delta -12465.87)
+    [BLOCK] FIGURE_CHANGED         cash_only_revenue
+            master : 5165.87
+            current: 1600   (delta -3565.87)
+    [BLOCK] FIGURE_CHANGED         checked_in_today
+            master : 14
+            current: 1   (delta -13)
+    [BLOCK] FIGURE_CHANGED         checked_out_today
+            master : 13
+            current: 1   (delta -12)
+    [BLOCK] FIGURE_CHANGED         credit_outstanding_count
+            master : 1
+            current: 0   (delta -1)
+    [BLOCK] FIGURE_CHANGED         credit_outstanding_total
+            master : 200
+            current: 0   (delta -200)
+    [BLOCK] FIGURE_CHANGED         daily_financial_summary.business_date
+            master : 2026-05-28
+            current: 2026-08-10
+    [BLOCK] FIGURE_CHANGED         daily_financial_summary.cash_minus_revenue
+            master : 14836.17
+            current: 3004.76   (delta -11831.41)
+    [BLOCK] FIGURE_CHANGED         daily_financial_summary.credit_outstanding
+            master : 200
+            current: 0   (delta -200)
+    [BLOCK] FIGURE_CHANGED         daily_financial_summary.individual_credit
+            master : 200
+            current: 0   (delta -200)
+    [BLOCK] FIGURE_CHANGED         daily_financial_summary.revenue_accrual
+            master : 729.7
+            current: 95.24   (delta -634.46)
+    [BLOCK] FIGURE_CHANGED         daily_financial_summary.settlement_collected
+            master : 15565.87
+            current: 3100   (delta -12465.87)
+    [BLOCK] FIGURE_CHANGED         daily_financial_summary.total_collected
+            master : 15565.87
+            current: 3100   (delta -12465.87)
+    [BLOCK] FIGURE_CHANGED         g_business_date
+            master : 2026-05-28
+            current: 2026-08-10
+    [BLOCK] FIGURE_CHANGED         goppar
+            master : 259.43
+            current: 54.46   (delta -204.97)
+    [BLOCK] FIGURE_CHANGED         incomplete_folios
+            master : 28
+            current: 32   (delta +4)
+    [BLOCK] FIGURE_CHANGED         live_today_extras
+            master : 729.7
+            current: 95.24   (delta -634.46)
+    [BLOCK] FIGURE_CHANGED         live_today_revenue
+            master : 729.7
+            current: 95.24   (delta -634.46)
+    [BLOCK] FIGURE_CHANGED         maintenance
+            master : 0
+            current: 2   (delta +2)
+    [BLOCK] FIGURE_CHANGED         mtd_revenue
+            master : 31666.37
+            current: 4300   (delta -27366.37)
+    [BLOCK] FIGURE_CHANGED         occ_change_pts
+            master : -35.9
+            current: -2.7   (delta +33.2)
+    [BLOCK] FIGURE_CHANGED         ota_outstanding_total
+            master : 7977.92
+            current: 0   (delta -7977.92)
+    [BLOCK] FIGURE_CHANGED         ota_posted_today
+            master : 3230.28
+            current: 0   (delta -3230.28)
+    [BLOCK] FIGURE_CHANGED         ota_receivable_mtd
+            master : 7977.92
+            current: 0   (delta -7977.92)
+    [BLOCK] FIGURE_CHANGED         ota_receivable_today
+            master : 3230.28
+            current: 0   (delta -3230.28)
+    [BLOCK] FIGURE_CHANGED         revenue_change_pct
+            master : -3.3
+            current: 158.3   (delta +161.6)
+    [BLOCK] FIGURE_CHANGED         ri_avail_pct
+            master : 100
+            current: 95   (delta -5)
+    [BLOCK] FIGURE_CHANGED         ri_avail_rooms
+            master : 39
+            current: 37   (delta -2)
+    [BLOCK] FIGURE_CHANGED         sellable_rooms
+            master : 39
+            current: 37   (delta -2)
+    [BLOCK] FIGURE_CHANGED         settled_accrual
+            master : 17664.59
+            current: 1142.85   (delta -16521.74)
+    [BLOCK] FIGURE_CHANGED         settled_adr
+            master : 1261.76
+            current: 1142.85   (delta -118.91)
+    [BLOCK] FIGURE_CHANGED         settled_net_rev
+            master : 16100.5
+            current: 1200   (delta -14900.5)
+    [BLOCK] FIGURE_CHANGED         settled_occ_pct
+            master : 35.9
+            current: 2.7   (delta -33.2)
+    [BLOCK] FIGURE_CHANGED         settled_occupancy
+            master : 14
+            current: 1   (delta -13)
+    [BLOCK] FIGURE_CHANGED         settled_revenue
+            master : 16100.5
+            current: 1200   (delta -14900.5)
+    [BLOCK] FIGURE_CHANGED         settled_revpar
+            master : 452.94
+            current: 30.89   (delta -422.05)
+    [BLOCK] FIGURE_CHANGED         settled_rooms_sold
+            master : 14
+            current: 1   (delta -13)
+    [BLOCK] FIGURE_CHANGED         today_revenue
+            master : 15565.87
+            current: 3100   (delta -12465.87)
+    [BLOCK] FIGURE_CHANGED         total_folios
+            master : 28
+            current: 32   (delta +4)
+    [BLOCK] FIGURE_CHANGED         upi_revenue
+            master : 10400
+            current: 1000   (delta -9400)
+    [BLOCK] FIGURE_CHANGED         walk_in_today
+            master : 14
+            current: 0   (delta -14)
+    [BLOCK] FIGURE_CHANGED         walkin_bookings
+            master : 14
+            current: 1   (delta -13)
+    [BLOCK] FIGURE_CHANGED         walkin_rooms_today
+            master : 14
+            current: 3   (delta -11)
+    [BLOCK] FIGURE_CHANGED         yesterday_occ_pct
+            master : 35.9
+            current: 2.7   (delta -33.2)
+    [BLOCK] FIGURE_CHANGED         yesterday_revenue
+            master : 16100.5
+            current: 1200   (delta -14900.5)
+
+main.guest_folio__any_guest   [FINANCIAL]
+  /guest/1
+    [BLOCK] FIGURE_CHANGED         g_business_date
+            master : 2026-05-28
+            current: 2026-08-10
+    [BLOCK] FIGURE_CHANGED         history_rows[len]
+            master : 1
+            current: 0   (delta -1)
+    [BLOCK] FIGURE_CHANGED         lifetime_spend
+            master : 2095.24
+            current: 0   (delta -2095.24)
+    [BLOCK] FIGURE_CHANGED         outstanding_bal
+            master : 200
+            current: 0   (delta -200)
+    [BLOCK] FIGURE_CHANGED         reservations[len]
+            master : 1
+            current: 0   (delta -1)
+    [BLOCK] FIGURE_CHANGED         total_paid_all
+            master : 2000
+            current: 0   (delta -2000)
+    [BLOCK] FIGURE_CHANGED         total_visits
+            master : 1
+            current: 0   (delta -1)
+    [BLOCK] FIGURE_REMOVED         history_rows[0].billing.balance
+            master : 200
+            current: 
+    [BLOCK] FIGURE_REMOVED         history_rows[0].billing.company_credit
+            master : 0
+            current: 
+    [BLOCK] FIGURE_REMOVED         history_rows[0].billing.discount
+            master : 0
+            current: 
+    [BLOCK] FIGURE_REMOVED         history_rows[0].billing.extra_charges
+            master : 190.48
+            current: 
+  ... 2942 more (see result.json — nothing is omitted there)
+
+====================================================================================================
+END OF REPORT
+====================================================================================================
