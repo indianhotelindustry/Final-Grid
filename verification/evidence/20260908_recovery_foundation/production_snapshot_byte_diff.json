@@ -1,0 +1,19 @@
+{
+  "diff_bytes_beyond_header": 0,
+  "header_diff_offsets": [
+    26,
+    27,
+    43,
+    94,
+    95
+  ],
+  "identical": false,
+  "note": "read-only comparison; header offsets are SQLite backup-API bookkeeping (change counter, schema cookie, version-valid-for)",
+  "production_path": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS\\instance\\pms.db",
+  "production_sha256": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "size_equal": true,
+  "size_restored": 733184,
+  "size_source": 733184,
+  "snapshot_path": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\db-backups\\pms_20260908_193942_recovery_rehearsal.db",
+  "snapshot_sha256": "99505a475fecc508a91d323ef0387142159ac483d6577d7a6801b40ea49eb3cd"
+}

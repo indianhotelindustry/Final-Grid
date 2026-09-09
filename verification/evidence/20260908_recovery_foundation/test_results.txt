@@ -1,0 +1,27 @@
+test_cli_exit_codes (__main__.RestoreDbTests.test_cli_exit_codes) ... REFUSED    : destination already exists: 'C:\\Users\\SIPLSE~1\\AppData\\Local\\Temp\\restore_test_0i7g60qw\\out\\restored.db' (pass --overwrite-dest to replace an isolated file)
+REFUSED    : destination resolves to the production database or the instance/ directory; refusing
+VERDICT    : RESTORE FAILED — source verification failed before restore
+ok
+test_content_digest_detects_row_difference (__main__.RestoreDbTests.test_content_digest_detects_row_difference) ... ok
+test_corrupted_source_fails_integrity_before_restore (__main__.RestoreDbTests.test_corrupted_source_fails_integrity_before_restore) ... ok
+test_empty_backup_is_refused (__main__.RestoreDbTests.test_empty_backup_is_refused) ... ok
+test_encrypted_backup_roundtrip (__main__.RestoreDbTests.test_encrypted_backup_roundtrip) ... ok
+test_encrypted_backup_without_key_is_refused (__main__.RestoreDbTests.test_encrypted_backup_without_key_is_refused) ... ok
+test_foreign_key_violation_in_backup_is_reported (__main__.RestoreDbTests.test_foreign_key_violation_in_backup_is_reported) ... ok
+test_manifest_hash_mismatch_fails_before_restore (__main__.RestoreDbTests.test_manifest_hash_mismatch_fails_before_restore) ... ok
+test_manifest_is_generated_and_complete (__main__.RestoreDbTests.test_manifest_is_generated_and_complete) ... ok
+test_manifest_row_count_mismatch_is_detected (__main__.RestoreDbTests.test_manifest_row_count_mismatch_is_detected) ... ok
+test_missing_backup_is_refused (__main__.RestoreDbTests.test_missing_backup_is_refused) ... ok
+test_missing_required_table_is_reported (__main__.RestoreDbTests.test_missing_required_table_is_reported) ... ok
+test_non_sqlite_source_fails_before_restore (__main__.RestoreDbTests.test_non_sqlite_source_fails_before_restore) ... ok
+test_overwrite_isolated_destination_only_with_flag (__main__.RestoreDbTests.test_overwrite_isolated_destination_only_with_flag) ... ok
+test_production_as_source_is_refused (__main__.RestoreDbTests.test_production_as_source_is_refused) ... ok
+test_production_destination_is_refused (__main__.RestoreDbTests.test_production_destination_is_refused) ... ok
+test_same_file_and_directory_destination_refused (__main__.RestoreDbTests.test_same_file_and_directory_destination_refused) ... ok
+test_successful_isolated_restore (__main__.RestoreDbTests.test_successful_isolated_restore) ... ok
+test_valid_backup_with_matching_manifest (__main__.RestoreDbTests.test_valid_backup_with_matching_manifest) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 1.304s
+
+OK

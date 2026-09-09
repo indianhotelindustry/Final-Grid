@@ -980,3 +980,72 @@ push. Implementation authorization will be issued separately.
 
 ---
 
+# Founder Resolution Round 2 — FG-P1-RECOVERY-FOUNDATION-20260908-01
+
+| | |
+|---|---|
+| Recorded | 2026-09-08 |
+| Governed HEAD | `e69f2ac242f7fdc3e0c042ceb40dc0393280134b` |
+| Context | Answers the six questions in `verification/evidence/20260908_phase1_implementation_readiness/FOUNDER_DECISION_GATE.md`. Identifiers are the existing ones (Q-1…Q-6; CD-1); no new FD numbers are assigned by this entry. |
+| Evidence for Q-6 | `verification/evidence/20260908_recovery_foundation/` |
+| Kind | Founder decisions. **Q-6 authorizes recovery infrastructure only.** Nothing below authorizes Phase 1 financial implementation. |
+
+## Q-1 / CD-1 — Missing folio at posting
+
+> APPROVED: Create the required folio and audit it.
+>
+> If a financial operation has valid reservation context but the required billing folio does not yet exist: create/obtain the required folio through the authoritative lifecycle; ensure the resulting financial transaction is attributed to that folio; ensure the operation is auditable; fail closed if the required folio cannot be safely established.
+>
+> Do not silently create arbitrary or ambiguous folios.
+>
+> This decision does not authorize implementation of the financial writer changes.
+
+## Q-2 — Correction of a NULL-folio original
+
+> APPROVED: Refuse correction/attribution of the historical NULL-folio original.
+>
+> The eight D11 historical commissioning/test rows remain protected under FD-010 Option A. Do not: assign folios to them; alter them; reverse them; create corrective financial entries; rewrite invoices/GST records.
+>
+> A future correction operation must not silently mutate historical NULL-folio records merely to satisfy INV-A02.
+
+## Q-3 — Phase 1 attribution scope
+
+> APPROVED: Phase 1 focuses on financial folio attribution.
+>
+> Do not broaden Phase 1 into the general business-date correction program. Known wall-clock/business-date defects remain primarily a Phase 3 concern unless a Phase 1 writer cannot safely operate without a minimum business-date dependency explicitly identified in its implementation design.
+>
+> Do not use this decision to permit unrelated date refactoring.
+
+## Q-4 — Golden Master
+
+> APPROVED: Recapture the Golden Master baseline before Phase 1 financial implementation.
+>
+> The baseline must be captured before financial behavior is changed. It must distinguish, where applicable: existing expected behavior; existing known defects; D11 historical test data; Phase 1-intended behavioral changes.
+>
+> Do not alter the Golden Master during this Recovery Foundation implementation unless the recovery work itself legitimately requires it.
+
+State at recording: approved, **not performed** under this directive; the golden master remains the 2026-08-03 capture.
+
+## Q-5 — Strict audit coupling
+
+> APPROVED: Strict audit coupling for Phase 1 financial writers that are touched by implementation.
+>
+> For affected financial operations: financial mutation and its required audit record must succeed or the operation must fail/roll back according to the transaction boundary.
+>
+> Include the identified POS ordering defect in the Phase 1 implementation requirement.
+>
+> Do not implement this during the Recovery Foundation slice. Record it as a binding Phase 1 implementation requirement.
+
+**Recorded as a binding Phase 1 implementation requirement** (readiness report R-AUD-1/2/3; POS `app/pos.py:110-134` ordering defect included). **Not implemented** under this directive; `app/` unchanged.
+
+## Q-6 — Recovery Foundation before Phase 1
+
+> APPROVED: Authorize a bounded Recovery Foundation implementation before broader Phase 1 implementation.
+>
+> This is a prerequisite slice. It authorizes recovery infrastructure only. It does NOT authorize: folio attribution; payment changes; extra-charge changes; room-rent changes; night-audit changes; financial audit coupling changes; FK enforcement; NOT NULL migration; data migration; invoice changes; GST changes.
+
+Executed under this directive: `tools/restore_db.py` and `tools/test_restore_db.py` created (19 tests pass); one isolated restore rehearsal `RR-20260908-01` — **PASS**, 16/16 checks, production `instance/pms.db` byte-identical before and after (`51dd83b7…30bc2`, 733,184 B); D11 rows untouched; `tools/backup_db.py` unchanged. Evidence: `verification/evidence/20260908_recovery_foundation/`. **Uncommitted, unpushed**, pending review.
+
+## Consequence for the Phase 1 gate
+
+`PHASE 1 NOT READY FOR EXECUTION AUTHORIZATION` (readiness report, 2026-09-08) had three conversion conditions: Q-1…Q-6 ruled (**done**); a Slice 1 directive with a rehearsal record (**done, pending review**); adoption of `PHASE1_EXECUTION_PLAN.md` as the Phase 1 implementation directive (**not yet done**). Per this directive's next-step rule, Phase 1 financial implementation does **not** begin until: Recovery Foundation is reviewed; PD-006 is verified; the golden-master requirement (Q-4) is reviewed; a separate Phase 1 execution authorization is issued.

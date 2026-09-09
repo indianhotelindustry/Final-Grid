@@ -1,0 +1,241 @@
+{
+  "backup_manifest": {
+    "created_at": "2026-09-08T19:39:42",
+    "method": "sqlite-backup-api",
+    "row_counts": {
+      "audit_logs": 23,
+      "backup_logs": 0,
+      "business_date": 1,
+      "checkin_records": 4,
+      "cico_charge_logs": 2,
+      "companies": 0,
+      "credit_notes": 0,
+      "credit_voucher_redemptions": 0,
+      "credit_vouchers": 0,
+      "equipment": 0,
+      "equipment_health_logs": 0,
+      "extra_charges": 2,
+      "folios": 4,
+      "foreign_national_info": 0,
+      "group_blocks": 0,
+      "guest_feedback": 0,
+      "guest_id_documents": 0,
+      "guests": 32,
+      "loyalty_config": 3,
+      "loyalty_milestones": 3,
+      "loyalty_redemptions": 0,
+      "loyalty_transactions": 0,
+      "maintenance_requests": 0,
+      "night_audit_logs": 1,
+      "night_audit_reopen_logs": 5,
+      "no_show_logs": 0,
+      "notification_logs": 5,
+      "notification_queue": 4,
+      "ota_payouts": 0,
+      "overpayment_logs": 0,
+      "payment_modes": 12,
+      "payments": 6,
+      "pos_items": 8,
+      "precheckin_submissions": 0,
+      "precheckin_tokens": 0,
+      "preventive_schedules": 0,
+      "rate_plans": 0,
+      "reservation_night_rates": 4,
+      "reservation_passengers": 0,
+      "reservation_rooms": 4,
+      "reservations": 4,
+      "revenue_alerts": 0,
+      "room_types": 3,
+      "rooms": 39,
+      "schema_migrations": 57,
+      "settings": 60,
+      "shift_adjustments": 0,
+      "shifts": 0,
+      "staff_performance_daily": 0,
+      "tax_lines": 12,
+      "users": 1,
+      "void_requests": 0,
+      "webhook_logs": 0
+    },
+    "snapshot_sha256": "99505a475fecc508a91d323ef0387142159ac483d6577d7a6801b40ea49eb3cd",
+    "source_sha256_before": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+  },
+  "byte_comparison": {
+    "diff_bytes_beyond_header": 0,
+    "header_diff_offsets": [],
+    "identical": true,
+    "size_equal": true,
+    "size_restored": 733184,
+    "size_source": 733184
+  },
+  "checks": {
+    "body_identical_beyond_header": {
+      "detail": "size_equal=True, differing bytes beyond header=0",
+      "ok": true
+    },
+    "content_digests_equal_all_tables": {
+      "detail": "differ: []",
+      "ok": true
+    },
+    "invoice_count_equal": {
+      "detail": "4 != 4",
+      "ok": true
+    },
+    "required_tables_present": {
+      "detail": "missing: []",
+      "ok": true
+    },
+    "restored_file_exists": {
+      "detail": "restored file missing",
+      "ok": true
+    },
+    "restored_foreign_key_check": {
+      "detail": "0 violation(s)",
+      "ok": true
+    },
+    "restored_integrity_check": {
+      "detail": "ok",
+      "ok": true
+    },
+    "restored_sqlite_header": {
+      "detail": "no SQLite header",
+      "ok": true
+    },
+    "row_counts_equal": {
+      "detail": "differences: {}",
+      "ok": true
+    },
+    "row_counts_match_backup_manifest": {
+      "detail": "differences: {}",
+      "ok": true
+    },
+    "schema_readable": {
+      "detail": null,
+      "ok": true
+    },
+    "schema_sql_equal": {
+      "detail": "123 source vs 123 restored schema objects, or text differs",
+      "ok": true
+    },
+    "source_integrity_check": {
+      "detail": "ok",
+      "ok": true
+    },
+    "source_matches_backup_manifest": {
+      "detail": "manifest 99505a475fecc508a91d323ef0387142159ac483d6577d7a6801b40ea49eb3cd != actual 99505a475fecc508a91d323ef0387142159ac483d6577d7a6801b40ea49eb3cd",
+      "ok": true
+    },
+    "source_sqlite_header": {
+      "detail": "file does not start with the SQLite header",
+      "ok": true
+    },
+    "whole_file_sha256_identical": {
+      "detail": "identical",
+      "ok": null
+    }
+  },
+  "content_digests": {
+    "differing_tables": [],
+    "financial_tables": {
+      "audit_logs": {
+        "restored": "f89cb501e444a68cfd4be65988e797ad975994a27a1131402a3f47527ac0842d",
+        "source": "f89cb501e444a68cfd4be65988e797ad975994a27a1131402a3f47527ac0842d"
+      },
+      "extra_charges": {
+        "restored": "89e6e4c0c3ec0110353e6e7f30fabe23564e7f4a040b445d3ae972532e3c5ce8",
+        "source": "89e6e4c0c3ec0110353e6e7f30fabe23564e7f4a040b445d3ae972532e3c5ce8"
+      },
+      "folios": {
+        "restored": "6c364aa0ba8c0a1ad833bad9fc41a8617d27349c1a50bc2cb56f8a7f721b45eb",
+        "source": "6c364aa0ba8c0a1ad833bad9fc41a8617d27349c1a50bc2cb56f8a7f721b45eb"
+      },
+      "night_audit_logs": {
+        "restored": "77c0457acdb0d386c53e445e0d48a07da6cdf21a93f656abb7c4a37a7f8afcf4",
+        "source": "77c0457acdb0d386c53e445e0d48a07da6cdf21a93f656abb7c4a37a7f8afcf4"
+      },
+      "payments": {
+        "restored": "2f8b79899b844a395ccf60b3bd0255d915cff594141f78a28f8625dbeb503efc",
+        "source": "2f8b79899b844a395ccf60b3bd0255d915cff594141f78a28f8625dbeb503efc"
+      },
+      "reservations": {
+        "restored": "221c648ec6bb0523fd1cdeca83430dec8ddc24c25c09db5e73162ee77e1d0506",
+        "source": "221c648ec6bb0523fd1cdeca83430dec8ddc24c25c09db5e73162ee77e1d0506"
+      },
+      "tax_lines": {
+        "restored": "b0e8446f744fb5852f41c8a1a188413c853d8e002158dd72b47c82aa26f53f5f",
+        "source": "b0e8446f744fb5852f41c8a1a188413c853d8e002158dd72b47c82aa26f53f5f"
+      }
+    },
+    "tables_compared": 53
+  },
+  "failures": [],
+  "finished_at": "2026-09-08T19:39:43",
+  "foreign_key_check_violations": [],
+  "limitations": [
+    "Database-level verification only. The application was not booted against the restored file (create_app() runs migrations, init_data() and the scheduler). Application-level equivalence is not claimed.",
+    "No table named \"invoices\" exists in FinalGrid; invoice identity is evaluated via reservations.invoice_number and tax_lines."
+  ],
+  "manifest_paths": [
+    "C:\\Users\\SIPLSE~1\\AppData\\Local\\Temp\\claude\\c--Users-SIPL-Server-Downloads-DSS-FinalGrid-SukoonPMS\\857307e0-10d6-4769-9b4e-d033974225ec\\scratchpad\\restore_rehearsal\\restored.db.restore_manifest.json",
+    "verification/evidence/20260908_recovery_foundation\\restore_manifest.json"
+  ],
+  "production_db_path": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS\\instance\\pms.db",
+  "production_touched": false,
+  "restore_method": "sqlite-backup-api",
+  "restored_at": "2026-09-08T19:39:43",
+  "restored_path": "C:\\Users\\SIPLSE~1\\AppData\\Local\\Temp\\claude\\c--Users-SIPL-Server-Downloads-DSS-FinalGrid-SukoonPMS\\857307e0-10d6-4769-9b4e-d033974225ec\\scratchpad\\restore_rehearsal\\restored.db",
+  "restored_sha256": "99505a475fecc508a91d323ef0387142159ac483d6577d7a6801b40ea49eb3cd",
+  "restored_sha256_equals_source": true,
+  "restored_size_bytes": 733184,
+  "restored_tables": 53,
+  "row_counts": {
+    "differences": {},
+    "invoices": {
+      "basis": "reservations.invoice_number IS NOT NULL",
+      "restored": 4,
+      "source": 4
+    },
+    "key_tables": {
+      "audit_logs": {
+        "restored": 23,
+        "source": 23
+      },
+      "extra_charges": {
+        "restored": 2,
+        "source": 2
+      },
+      "folios": {
+        "restored": 4,
+        "source": 4
+      },
+      "night_audit_logs": {
+        "restored": 1,
+        "source": 1
+      },
+      "payments": {
+        "restored": 6,
+        "source": 6
+      },
+      "reservations": {
+        "restored": 4,
+        "source": 4
+      },
+      "tax_lines": {
+        "restored": 12,
+        "source": 12
+      }
+    },
+    "tables": 53,
+    "total_rows_restored": 299,
+    "total_rows_source": 299
+  },
+  "run_id": "RR-20260908-01",
+  "source_encrypted": false,
+  "source_manifest_path": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\db-backups\\pms_20260908_193942_recovery_rehearsal.db.manifest.json",
+  "source_path": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\db-backups\\pms_20260908_193942_recovery_rehearsal.db",
+  "source_sha256": "99505a475fecc508a91d323ef0387142159ac483d6577d7a6801b40ea49eb3cd",
+  "source_size_bytes": 733184,
+  "started_at": "2026-09-08T19:39:43",
+  "tool": "tools/restore_db.py",
+  "verification_status": "PASS"
+}
