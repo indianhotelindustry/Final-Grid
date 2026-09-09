@@ -1,0 +1,54 @@
+# COMMIT 1 — LEDGER RECAPTURE (D3 replay, May -> August)
+# Directive FG-PRECOMMIT-STAGE-20260909-01 · prepared 2026-09-09 · HEAD e69f2ac (unchanged)
+# Staged and verified index-only; NOT committed. Status codes vs HEAD: A add, M modify, D delete.
+# Paths: 47
+#------------------------------------------------------------------------------
+# git add -A verification/ledgers/ <4 evidence dirs>
+#
+A	verification/evidence/20260830_101236_inv_run_production/report.txt
+A	verification/evidence/20260830_101236_inv_run_production/result.json
+A	verification/evidence/20260830_101251_inv_run_production/report.txt
+A	verification/evidence/20260830_101251_inv_run_production/result.json
+A	verification/evidence/20260831_043518_replay_production/report.txt
+A	verification/evidence/20260831_043518_replay_production/result.json
+A	verification/evidence/20260831_043544_replay_production/report.txt
+A	verification/evidence/20260831_043544_replay_production/result.json
+D	verification/ledgers/production/dates/2026-05-01.json
+D	verification/ledgers/production/dates/2026-05-02.json
+D	verification/ledgers/production/dates/2026-05-03.json
+D	verification/ledgers/production/dates/2026-05-04.json
+D	verification/ledgers/production/dates/2026-05-05.json
+D	verification/ledgers/production/dates/2026-05-06.json
+D	verification/ledgers/production/dates/2026-05-07.json
+D	verification/ledgers/production/dates/2026-05-08.json
+D	verification/ledgers/production/dates/2026-05-09.json
+D	verification/ledgers/production/dates/2026-05-10.json
+D	verification/ledgers/production/dates/2026-05-11.json
+D	verification/ledgers/production/dates/2026-05-12.json
+D	verification/ledgers/production/dates/2026-05-13.json
+D	verification/ledgers/production/dates/2026-05-14.json
+D	verification/ledgers/production/dates/2026-05-15.json
+D	verification/ledgers/production/dates/2026-05-16.json
+D	verification/ledgers/production/dates/2026-05-17.json
+D	verification/ledgers/production/dates/2026-05-18.json
+D	verification/ledgers/production/dates/2026-05-19.json
+D	verification/ledgers/production/dates/2026-05-20.json
+D	verification/ledgers/production/dates/2026-05-21.json
+D	verification/ledgers/production/dates/2026-05-22.json
+D	verification/ledgers/production/dates/2026-05-23.json
+D	verification/ledgers/production/dates/2026-05-24.json
+D	verification/ledgers/production/dates/2026-05-25.json
+D	verification/ledgers/production/dates/2026-05-26.json
+D	verification/ledgers/production/dates/2026-05-27.json
+D	verification/ledgers/production/dates/2026-05-28.json
+A	verification/ledgers/production/dates/2026-08-01.json
+A	verification/ledgers/production/dates/2026-08-02.json
+A	verification/ledgers/production/dates/2026-08-03.json
+A	verification/ledgers/production/dates/2026-08-04.json
+A	verification/ledgers/production/dates/2026-08-05.json
+A	verification/ledgers/production/dates/2026-08-06.json
+A	verification/ledgers/production/dates/2026-08-07.json
+A	verification/ledgers/production/dates/2026-08-08.json
+A	verification/ledgers/production/dates/2026-08-09.json
+A	verification/ledgers/production/dates/2026-08-10.json
+M	verification/ledgers/production/index.json

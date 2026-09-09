@@ -1,0 +1,41 @@
+# COMMIT 5 — PHASE 1 FINANCIAL FOUNDATION + W-20 CLOSURE
+# Directive FG-PRECOMMIT-STAGE-20260909-01 · prepared 2026-09-09 · HEAD e69f2ac (unchanged)
+# Staged and verified index-only; NOT committed. Status codes vs HEAD: A add, M modify, D delete.
+# Paths: 34
+#------------------------------------------------------------------------------
+# 8 app files (554 insertions, 45 deletions) + 26 evidence files. app/folio.py NOT staged.
+#
+M	app/cico_service.py
+M	app/night_audit_service.py
+M	app/noshow_service.py
+M	app/pos.py
+M	app/reports.py
+M	app/routes.py
+M	app/seed.py
+M	app/services.py
+A	verification/evidence/20260909_013001_inv_run_production/report.txt
+A	verification/evidence/20260909_013001_inv_run_production/result.json
+A	verification/evidence/20260909_013003_gm_verify_production/report.txt
+A	verification/evidence/20260909_013003_gm_verify_production/result.json
+A	verification/evidence/20260909_013008_replay_verify_production/report.txt
+A	verification/evidence/20260909_013008_replay_verify_production/result.json
+A	verification/evidence/20260909_013158_replay_verify_production/report.txt
+A	verification/evidence/20260909_013158_replay_verify_production/result.json
+A	verification/evidence/20260909_013200_inv_run_production/report.txt
+A	verification/evidence/20260909_013200_inv_run_production/result.json
+A	verification/evidence/20260909_013202_gm_verify_production/report.txt
+A	verification/evidence/20260909_013202_gm_verify_production/result.json
+A	verification/evidence/20260909_013458_replay_verify_production/report.txt
+A	verification/evidence/20260909_013458_replay_verify_production/result.json
+A	verification/evidence/20260909_013500_inv_run_production/report.txt
+A	verification/evidence/20260909_013500_inv_run_production/result.json
+A	verification/evidence/20260909_013502_gm_verify_production/report.txt
+A	verification/evidence/20260909_013502_gm_verify_production/result.json
+A	verification/evidence/20260909_phase1_execution/COMPLETION_REPORT.md
+A	verification/evidence/20260909_phase1_execution/existing_data_classification.json
+A	verification/evidence/20260909_phase1_execution/result.json
+A	verification/evidence/20260909_phase1_execution/verify.py
+A	verification/evidence/20260909_w20_runtime/W20_RUNTIME_VERIFICATION.md
+A	verification/evidence/20260909_w20_runtime/result.json
+A	verification/evidence/20260909_w20_runtime/test_results.txt
+A	verification/evidence/20260909_w20_runtime/verify.py

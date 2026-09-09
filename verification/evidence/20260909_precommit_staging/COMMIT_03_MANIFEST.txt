@@ -1,0 +1,20 @@
+# COMMIT 3 — RECOVERY FOUNDATION
+# Directive FG-PRECOMMIT-STAGE-20260909-01 · prepared 2026-09-09 · HEAD e69f2ac (unchanged)
+# Staged and verified index-only; NOT committed. Status codes vs HEAD: A add, M modify, D delete.
+# Paths: 10 (9 whole + 1 partial)
+#------------------------------------------------------------------------------
+# FOUNDER_DECISIONS.md staged PARTIAL: increment over commit 2 = hunk @@ -980,3 +980,72 @@
+#   (file lines 983-1051, Founder Resolution Round 2 Q-1..Q-6): 69 added, 0 removed.
+#   resulting blob 8a5a36569d29f19f09f4b386230437a3a96c5f99 = 1051 lines = working tree.
+# Directive target was 9; actual 10 because FOUNDER_DECISIONS.md appears in commits 2 and 3.
+#
+A	tools/restore_db.py
+A	tools/test_restore_db.py
+M	verification/FOUNDER_DECISIONS.md
+A	verification/evidence/20260908_recovery_foundation/IMPLEMENTATION_RECORD.md
+A	verification/evidence/20260908_recovery_foundation/RESTORE_REHEARSAL.md
+A	verification/evidence/20260908_recovery_foundation/backup_manifest.json
+A	verification/evidence/20260908_recovery_foundation/production_snapshot_byte_diff.json
+A	verification/evidence/20260908_recovery_foundation/restore_manifest.json
+A	verification/evidence/20260908_recovery_foundation/result.json
+A	verification/evidence/20260908_recovery_foundation/test_results.txt

@@ -1,0 +1,39 @@
+# COMMIT 2 — GOVERNANCE / ADR ADOPTION
+# Directive FG-PRECOMMIT-STAGE-20260909-01 · prepared 2026-09-09 · HEAD e69f2ac (unchanged)
+# Staged and verified index-only; NOT committed. Status codes vs HEAD: A add, M modify, D delete.
+# Paths: 30
+#------------------------------------------------------------------------------
+# MASTER_PLAN.md staged WHOLE (intentional, see STAGING_PLAN.md §5).
+# FOUNDER_DECISIONS.md staged PARTIAL: hunk @@ -865,3 +865,118 @@ (file lines 868-982) ONLY.
+#   staged blob ab3e3aed640035a3094b9bcb4bd54e3234f63a5a = 982 lines, contains NO Q-1..Q-6.
+#
+M	verification/FOUNDER_DECISIONS.md
+M	verification/MASTER_PLAN.md
+M	verification/adr/ADR-001-system-of-record-boundary.md
+M	verification/adr/ADR-002-folio-attribution-contract.md
+M	verification/adr/ADR-003-room-rent-ownership.md
+M	verification/adr/ADR-004-business-date-authority.md
+M	verification/adr/ADR-005-sqlite-foreign-key-enforcement.md
+M	verification/adr/ADR-006-production-mutation-controls.md
+M	verification/adr/ADR-007-backup-restore-architecture.md
+M	verification/adr/ADR-008-application-authorization-architecture.md
+M	verification/adr/ADR-009-reporting-authorization.md
+M	verification/adr/ADR-010-maker-checker-architecture.md
+M	verification/adr/ADR-011-operator-accountability.md
+M	verification/adr/ADR-012-audit-retention.md
+A	verification/adr/BACKLOG.md
+M	verification/adr/README.md
+A	verification/evidence/20260908_architecture_resolution_round1/ADR_ADOPTION_READINESS.json
+A	verification/evidence/20260908_architecture_resolution_round1/ADR_ADOPTION_READINESS.md
+A	verification/evidence/20260908_architecture_resolution_round1/RECORD.md
+A	verification/evidence/20260908_architecture_resolution_round1/result.json
+A	verification/evidence/20260908_phase1_implementation_readiness/FINANCIAL_WRITER_INVENTORY.md
+A	verification/evidence/20260908_phase1_implementation_readiness/FOUNDER_DECISION_GATE.md
+A	verification/evidence/20260908_phase1_implementation_readiness/MIGRATION_AND_DATA_PLAN.md
+A	verification/evidence/20260908_phase1_implementation_readiness/PHASE1_EXECUTION_PLAN.md
+A	verification/evidence/20260908_phase1_implementation_readiness/READINESS_REPORT.md
+A	verification/evidence/20260908_phase1_implementation_readiness/RECOVERY_GATE_PLAN.md
+A	verification/evidence/20260908_phase1_implementation_readiness/VERIFICATION_PLAN.md
+A	verification/evidence/20260908_phase1_implementation_readiness/result.json
+A	verification/evidence/20260908_repo_identity_designation/RECORD.md
+A	verification/evidence/20260908_repo_identity_designation/result.json

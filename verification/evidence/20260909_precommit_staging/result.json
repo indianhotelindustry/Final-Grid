@@ -1,0 +1,234 @@
+{
+ "directive": "FG-PRECOMMIT-STAGE-20260909-01",
+ "title": "FinalGrid five-commit staging preparation + secret remediation",
+ "executed": "2026-09-09",
+ "repository": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS",
+ "branch": "main",
+ "status": "PRE-COMMIT STAGING PASS - FIVE COMMIT BOUNDARIES VERIFIED",
+ "head": {
+  "starting": "e69f2ac242f7fdc3e0c042ceb40dc0393280134b",
+  "ending": "e69f2ac242f7fdc3e0c042ceb40dc0393280134b",
+  "unchanged": true,
+  "origin_main": "e69f2ac242f7fdc3e0c042ceb40dc0393280134b",
+  "nothing_unpushed": true
+ },
+ "actions": {
+  "commit_created": false,
+  "push_performed": false,
+  "amend": false,
+  "head_reset": false,
+  "rebase": false,
+  "working_tree_cleaned": false,
+  "application_code_changed": false,
+  "production_data_changed": false,
+  "schema_changed": false
+ },
+ "index": {
+  "final_staged_files": 0,
+  "empty": true
+ },
+ "paths": {
+  "initial": 306,
+  "after_junk_deletion": 304,
+  "final": 304,
+  "porcelain_initial": 254,
+  "porcelain_final": 252,
+  "distinct_across_scopes": 304,
+  "uncovered": 0,
+  "staged_twice": [
+   "verification/FOUNDER_DECISIONS.md"
+  ]
+ },
+ "junk_deleted": [
+  {
+   "path": "_audit_stage_src.tgz",
+   "size_bytes": 5052054,
+   "sha256": "45f3ac2dd187e740b7517b486362c1e50b405eb55f1dd0e29e4372f51ea6a453",
+   "was_tracked": false,
+   "contained_dotenv": true,
+   "contained_secret_key": true,
+   "secret_value_recorded": false,
+   "contained_db_or_backups": false,
+   "in_git_history": false,
+   "history_rewrite_required": false
+  },
+  {
+   "path": "package-lock.json",
+   "size_bytes": 88,
+   "sha256": "176163bec3190b132213479511541702fdccdfc4053e03cc0b7fecae700bba0a",
+   "was_tracked": false,
+   "reason": "stub, no package.json, npm residue"
+  }
+ ],
+ "dotenv_preserved": {
+  "exists": true,
+  "ignored": true,
+  "tracked": false,
+  "in_any_scope": false
+ },
+ "commits": [
+  {
+   "n": 1,
+   "name": "Ledger recapture",
+   "paths": 47,
+   "target": 47,
+   "match": true,
+   "status_counts": {
+    "A": 18,
+    "D": 28,
+    "M": 1
+   },
+   "leakage": 0,
+   "manifest": "COMMIT_01_MANIFEST.txt"
+  },
+  {
+   "n": 2,
+   "name": "Governance / ADR adoption",
+   "paths": 30,
+   "target": 30,
+   "match": true,
+   "status_counts": {
+    "A": 15,
+    "M": 15
+   },
+   "leakage": 0,
+   "manifest": "COMMIT_02_MANIFEST.txt",
+   "founder_decisions": "partial: file lines 868-982, blob ab3e3aed640035a3094b9bcb4bd54e3234f63a5a (982 lines)",
+   "master_plan": "whole file, intentional per directive s16"
+  },
+  {
+   "n": 3,
+   "name": "Recovery Foundation",
+   "paths": 10,
+   "target": 9,
+   "match": false,
+   "deviation": "10 vs 9: FOUNDER_DECISIONS.md appears in commits 2 and 3 by the authorized split",
+   "status_counts": {
+    "A": 9,
+    "M": 1
+   },
+   "leakage": 0,
+   "manifest": "COMMIT_03_MANIFEST.txt",
+   "founder_decisions": "partial increment: file lines 983-1051, +69/-0, blob 8a5a36569d29f19f09f4b386230437a3a96c5f99 (1051 lines)"
+  },
+  {
+   "n": 4,
+   "name": "Golden Master recapture",
+   "paths": 184,
+   "target": 184,
+   "match": true,
+   "status_counts": {
+    "A": 27,
+    "D": 6,
+    "M": 151
+   },
+   "leakage": 0,
+   "manifest": "COMMIT_04_MANIFEST.txt"
+  },
+  {
+   "n": 5,
+   "name": "Phase 1 + W-20",
+   "paths": 34,
+   "target": 34,
+   "match": true,
+   "status_counts": {
+    "A": 26,
+    "M": 8
+   },
+   "leakage": 0,
+   "manifest": "COMMIT_05_MANIFEST.txt",
+   "app_diff": "554 insertions, 45 deletions across 8 files",
+   "folio_py_staged": false,
+   "pyc_staged": 0
+  }
+ ],
+ "founder_decisions_split": {
+  "head_lines": 867,
+  "working_lines": 1051,
+  "pure_append": true,
+  "line_endings": "LF",
+  "commit2_contains_Q1_Q6": false,
+  "commit3_contains_Q1_Q6": true,
+  "governance_duplicated": false,
+  "duplicate_fd_ids_introduced": false,
+  "commit3_increment_hunk": "@@ -980,3 +980,72 @@",
+  "commit3_increment_added": 69,
+  "commit3_increment_removed": 0,
+  "method": "blob materialisation + git update-index --cacheinfo (git add -p unavailable: no interactive stdin)"
+ },
+ "dependency_order": {
+  "verified": true,
+  "order": [
+   "ledger",
+   "governance",
+   "recovery",
+   "golden_master",
+   "phase1_w20"
+  ],
+  "ledger_before_golden_master": true,
+  "governance_before_recovery": true,
+  "recovery_before_golden_master": true,
+  "golden_master_before_phase1": true,
+  "phase1_before_w20": true,
+  "evidence": {
+   "Q4_at_head": 0,
+   "Q4_in_worktree": 1,
+   "audited_financial_write_at_head": 0,
+   "audited_financial_write_in_worktree": 2,
+   "stored_replay_captured": "2026-08-31T04:35:44"
+  },
+  "runtime_reexecution_claimed": false
+ },
+ "secret_scan": {
+  "files_scanned": 270,
+  "dotenv_files": 0,
+  "archives": 0,
+  "key_material": 0,
+  "database_files": 0,
+  "private_key_blocks": 0,
+  "assigned_secret_values": 0,
+  "identifier_only_references": 7,
+  "stop_condition_triggered": false,
+  "paths_withheld": 0
+ },
+ "production": {
+  "path": "instance/pms.db",
+  "sha256_before": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "size_before": 733184,
+  "size_after": 733184,
+  "unchanged": true,
+  "integrity_check": "ok",
+  "d11_payments": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "d11_extra_charges": [
+   1,
+   2
+  ],
+  "d11_total": 4776.19,
+  "d11_unchanged": true,
+  "audit_logs_before": 23,
+  "audit_logs_after": 23,
+  "audit_logs_unchanged": true,
+  "schema_objects": 144,
+  "schema_fingerprint_unchanged": true,
+  "schema_fingerprint_method": "sha256 over ordered (type,name,sql) from sqlite_master; differs by construction from the GM record's a7428da6... and is used only as a before/after comparator"
+ },
+ "unassigned": {
+  "path": "verification/evidence/20260909_precommit_staging/",
+  "reason": "meta-evidence about the five commits; no sixth functional commit created per directive s12",
+  "decision_required_from": "Founder"
+ },
+ "limitations": [
+  "Staging and boundary audit only; no inv-run, gm-verify, replay-verify or test suite was re-executed.",
+  "Scopes verified independently from an empty index against HEAD, not as a sequential commit run.",
+  "No commit created, so no commit/tree hash was produced or validated.",
+  "SECRET_KEY rotation not performed; not required by this finding (artifact never reached Git or origin)."
+ ]
+}
