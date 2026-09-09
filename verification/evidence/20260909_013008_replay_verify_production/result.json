@@ -1,0 +1,3220 @@
+{
+  "blocking_count": 32,
+  "by_kind": {
+    "ENGINE_CHANGED": 10,
+    "ENGINE_FIGURE_ADDED": 310
+  },
+  "current_app_version": "2.2.18",
+  "current_business_date": "2026-08-10",
+  "dates_clean": 0,
+  "dates_compared": 10,
+  "difference_count": 320,
+  "differences": [
+    {
+      "current": "24",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "+1",
+      "key": "nas.folio_control[len]",
+      "kind": "ENGINE_CHANGED",
+      "severity": "BLOCK",
+      "stored": "23"
+    },
+    {
+      "current": "0",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.folio_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.misrouted_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "476.19",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.reservation_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "476.19",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "1",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[0]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[1]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "3",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[sum]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "7",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.folio_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.misrouted_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "4300",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.reservation_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "4300",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "1",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[0]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[1]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "3",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[2]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "4",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[3]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "5",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[4]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[5]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "21",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[sum]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "7",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "8",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "4776.19",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.unattributed_total",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "True",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution.views_agree",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "8",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "",
+      "key": "nas.folio_control.attribution[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "BLOCK",
+      "stored": ""
+    },
+    {
+      "current": "24",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "+1",
+      "key": "nas.folio_control[len]",
+      "kind": "ENGINE_CHANGED",
+      "severity": "WARN",
+      "stored": "23"
+    },
+    {
+      "current": "0",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.folio_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.misrouted_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "476.19",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.reservation_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "476.19",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "1",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[0]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[1]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "3",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[sum]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "7",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.folio_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.misrouted_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4300",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.reservation_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4300",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "1",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[0]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[1]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "3",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[2]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[3]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "5",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[4]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[5]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "21",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[sum]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "7",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "8",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4776.19",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.unattributed_total",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "True",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.views_agree",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "8",
+      "date": "2026-08-01",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "24",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "+1",
+      "key": "nas.folio_control[len]",
+      "kind": "ENGINE_CHANGED",
+      "severity": "WARN",
+      "stored": "23"
+    },
+    {
+      "current": "0",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.folio_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.misrouted_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "476.19",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.reservation_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "476.19",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "1",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[0]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[1]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "3",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[sum]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "7",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.folio_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.misrouted_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4300",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.reservation_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4300",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "1",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[0]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[1]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "3",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[2]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[3]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "5",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[4]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[5]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "21",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[sum]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "7",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "8",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4776.19",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.unattributed_total",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "True",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.views_agree",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "8",
+      "date": "2026-08-02",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "24",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "+1",
+      "key": "nas.folio_control[len]",
+      "kind": "ENGINE_CHANGED",
+      "severity": "WARN",
+      "stored": "23"
+    },
+    {
+      "current": "0",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.folio_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.misrouted_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "476.19",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.reservation_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "476.19",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "1",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[0]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[1]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "3",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[sum]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "7",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.folio_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.misrouted_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4300",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.reservation_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4300",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "1",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[0]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[1]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "3",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[2]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[3]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "5",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[4]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[5]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "21",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[sum]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "7",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "8",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4776.19",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.unattributed_total",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "True",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.views_agree",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "8",
+      "date": "2026-08-03",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "24",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "+1",
+      "key": "nas.folio_control[len]",
+      "kind": "ENGINE_CHANGED",
+      "severity": "WARN",
+      "stored": "23"
+    },
+    {
+      "current": "0",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.folio_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.misrouted_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "476.19",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.reservation_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "476.19",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "1",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[0]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[1]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "3",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[sum]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "7",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.folio_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.misrouted_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4300",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.reservation_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4300",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "1",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[0]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[1]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "3",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[2]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[3]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "5",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[4]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[5]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "21",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[sum]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "7",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "8",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4776.19",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.unattributed_total",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "True",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.views_agree",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "8",
+      "date": "2026-08-04",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "24",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "+1",
+      "key": "nas.folio_control[len]",
+      "kind": "ENGINE_CHANGED",
+      "severity": "WARN",
+      "stored": "23"
+    },
+    {
+      "current": "0",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.folio_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.misrouted_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "476.19",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.reservation_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "476.19",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "1",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[0]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[1]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "3",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[sum]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "7",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.folio_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.misrouted_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4300",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.reservation_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4300",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "1",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[0]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[1]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "3",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[2]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[3]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "5",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[4]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[5]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "21",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[sum]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "7",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "8",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4776.19",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.unattributed_total",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "True",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.views_agree",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "8",
+      "date": "2026-08-05",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "24",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "+1",
+      "key": "nas.folio_control[len]",
+      "kind": "ENGINE_CHANGED",
+      "severity": "WARN",
+      "stored": "23"
+    },
+    {
+      "current": "0",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.folio_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.misrouted_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "476.19",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.reservation_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "476.19",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "1",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[0]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[1]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "3",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[sum]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "7",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.folio_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.misrouted_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4300",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.reservation_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4300",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "1",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[0]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[1]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "3",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[2]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[3]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "5",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[4]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[5]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "21",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[sum]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "7",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "8",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4776.19",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.unattributed_total",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "True",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.views_agree",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "8",
+      "date": "2026-08-06",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "24",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "+1",
+      "key": "nas.folio_control[len]",
+      "kind": "ENGINE_CHANGED",
+      "severity": "WARN",
+      "stored": "23"
+    },
+    {
+      "current": "0",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.folio_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.misrouted_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "476.19",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.reservation_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "476.19",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "1",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[0]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[1]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "3",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[sum]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "7",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.folio_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.misrouted_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4300",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.reservation_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4300",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "1",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[0]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[1]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "3",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[2]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[3]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "5",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[4]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[5]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "21",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[sum]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "7",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "8",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4776.19",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.unattributed_total",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "True",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.views_agree",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "8",
+      "date": "2026-08-07",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "24",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "+1",
+      "key": "nas.folio_control[len]",
+      "kind": "ENGINE_CHANGED",
+      "severity": "WARN",
+      "stored": "23"
+    },
+    {
+      "current": "0",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.folio_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.misrouted_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "476.19",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.reservation_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "476.19",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "1",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[0]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[1]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "3",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[sum]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "7",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.folio_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.misrouted_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4300",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.reservation_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4300",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "1",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[0]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[1]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "3",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[2]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[3]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "5",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[4]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[5]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "21",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[sum]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "7",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "8",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "4776.19",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.unattributed_total",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "True",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution.views_agree",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "8",
+      "date": "2026-08-08",
+      "day_state": "OPEN",
+      "delta": "",
+      "key": "nas.folio_control.attribution[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "WARN",
+      "stored": ""
+    },
+    {
+      "current": "24",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "+1",
+      "key": "nas.folio_control[len]",
+      "kind": "ENGINE_CHANGED",
+      "severity": "INFO",
+      "stored": "23"
+    },
+    {
+      "current": "0",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.folio_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.misrouted_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "476.19",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.reservation_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "476.19",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "1",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[0]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[1]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "3",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges.unattributed_ids[sum]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "7",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.charges[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.folio_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.misrouted_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "0",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.misrouted_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "4300",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.reservation_view",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "4300",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "1",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[0]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "2",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[1]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "3",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[2]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "4",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[3]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "5",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[4]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[5]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "6",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "21",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments.unattributed_ids[sum]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "7",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.payments[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "8",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.unattributed_count",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "4776.19",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.unattributed_total",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "True",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution.views_agree",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    },
+    {
+      "current": "8",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "",
+      "key": "nas.folio_control.attribution[len]",
+      "kind": "ENGINE_FIGURE_ADDED",
+      "severity": "INFO",
+      "stored": ""
+    }
+  ],
+  "read_only_verified": true,
+  "stored_app_version": "2.2.18",
+  "stored_business_date": "2026-08-10",
+  "stored_captured_at": "2026-08-31T04:35:44",
+  "tag": "production",
+  "verdict": "FAIL"
+}

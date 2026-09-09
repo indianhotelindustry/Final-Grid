@@ -1,0 +1,46 @@
+====================================================================================================
+FINALGRID — GOLDEN MASTER VERIFICATION
+Production Verification Framework, Wave 0 Deliverable 2
+====================================================================================================
+Master set      : production
+Master captured : 2026-09-09T00:56:05 (app v2.2.18)
+Current run     : 2026-09-09T01:32:02 (app v2.2.18)
+Master clock    : 2026-08-10T12:00:00
+Current clock   : 2026-08-10T12:00:00
+Read-only       : VERIFIED
+
+Surfaces compared : 158
+Surfaces clean    : 157
+Differences       : 4
+Blocking          : 4
+
+VERDICT           : FAIL
+
+----------------------------------------------------------------------------------------------------
+DIFFERENCES BY KIND
+----------------------------------------------------------------------------------------------------
+  FIGURE_ADDED                 1
+  FIGURE_CHANGED               3
+
+====================================================================================================
+DIFFERENCES
+====================================================================================================
+
+main.night_audit   [FINANCIAL]
+  /night-audit
+    [BLOCK] FIGURE_ADDED           panel_ui.attribution[len]
+            master : 
+            current: 8
+    [BLOCK] FIGURE_CHANGED         panel_ui.total_issues
+            master : 1
+            current: 2   (delta +1)
+    [BLOCK] FIGURE_CHANGED         panel_ui.warn_conditions
+            master : 1
+            current: 2   (delta +1)
+    [BLOCK] FIGURE_CHANGED         panel_ui[len]
+            master : 24
+            current: 25   (delta +1)
+
+====================================================================================================
+END OF REPORT
+====================================================================================================

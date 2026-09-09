@@ -335,6 +335,35 @@ def _write_audit(entity_type, entity_id, action, before_state, after_state):
 
 
 # ---------------------------------------------------------------------------
+# Phase 1 — folio attribution and strict audit coupling
+# ---------------------------------------------------------------------------
+# Both resolve app.services lazily, the idiom this module already uses in 172
+# places, so no import cycle is introduced.
+
+def _billing_folio_id(reservation, **kw):
+    """The folio a new financial row on *reservation* belongs to (ADR-002 R-1).
+
+    Raises ``FolioResolutionError`` rather than returning None: a writer must
+    not be able to post an unattributed row by ignoring a falsy return.
+    """
+    from app.services import resolve_billing_folio_id
+    return resolve_billing_folio_id(reservation, **kw)
+
+
+def _write_audit_strict(entity_type, entity_id, action, before_state, after_state):
+    """The audit row for a financial mutation, coupled to it (Q-5).
+
+    Unlike ``_write_audit`` above — which is documented as never raising, and
+    stays that way for every other caller — this RAISES when the row cannot
+    be written, so the caller's transaction is rolled back instead of
+    committing a financial change whose audit record silently failed.
+    """
+    from app.services import audited_financial_write
+    return audited_financial_write(entity_type, entity_id, action,
+                                   before_state, after_state)
+
+
+# ---------------------------------------------------------------------------
 # Auth guard — all routes in this blueprint require login
 # ---------------------------------------------------------------------------
 @bp.before_request
@@ -1929,12 +1958,21 @@ def bulk_booking_api():
             _purpose = 'advance' if first_res.arrival_date > today_biz else 'settlement'
             pmt = Payment(
                 reservation_id  = first_res.id,
+                folio_id        = _billing_folio_id(first_res),      # R-1
                 payment_mode_id = int(payment_mode_id),
                 amount          = advance,
                 payment_date    = today_biz,
                 payment_purpose = _purpose,
             )
             db.session.add(pmt)
+            db.session.flush()
+            _write_audit_strict('Payment', pmt.id, 'posted',          # Q-5
+                                {},
+                                {'amount': float(advance),
+                                 'reservation_id': first_res.id,
+                                 'folio_id': pmt.folio_id,
+                                 'payment_purpose': _purpose,
+                                 'flow': 'bulk_booking'})
 
     db.session.commit()
     flash(f'Bulk booking created: {created_count} reservation(s) for {group_name or guest.name}', 'success')
@@ -2194,6 +2232,7 @@ def new_reservation():
             purpose = 'advance' if arrival_date > today_biz else 'settlement'
             payment = Payment(
                 reservation_id=reservation.id,
+                folio_id=_billing_folio_id(reservation),              # R-1
                 payment_mode_id=payment_mode_id,
                 amount=advance,
                 payment_date=today_biz,
@@ -2201,12 +2240,13 @@ def new_reservation():
             )
             db.session.add(payment)
             db.session.flush()
-            _write_audit('Payment', payment.id, 'posted',
-                         {},
-                         {'amount': float(advance),
-                          'reservation_id': reservation.id,
-                          'payment_purpose': purpose,
-                          'flow': 'advance_booking'})
+            _write_audit_strict('Payment', payment.id, 'posted',      # Q-5
+                                {},
+                                {'amount': float(advance),
+                                 'reservation_id': reservation.id,
+                                 'folio_id': payment.folio_id,
+                                 'payment_purpose': purpose,
+                                 'flow': 'advance_booking'})
 
         # ── Apr 2026: Apply Credit Voucher if one was supplied ────────
         voucher_msg = None
@@ -3054,11 +3094,19 @@ def checkout(reservation_id):
             if extra_desc and extra_amount and extra_amount > 0:
                 extra = ExtraCharge(
                     reservation_id=reservation.id,
+                    folio_id=_billing_folio_id(reservation),          # R-1
                     description=extra_desc,
                     amount=extra_amount
                 )
                 db.session.add(extra)
                 db.session.flush()
+                _write_audit_strict('ExtraCharge', extra.id, 'posted',   # Q-5
+                                    {},
+                                    {'amount': float(extra_amount),
+                                     'description': extra_desc,
+                                     'reservation_id': reservation.id,
+                                     'folio_id': extra.folio_id,
+                                     'flow': 'checkout_extra'})
 
             # ── Discount — applied before billing calc so balance is correct ──
             co_disc_amt  = request.form.get('discount_amount', type=float) or 0.0
@@ -3241,6 +3289,7 @@ def checkout(reservation_id):
                         if _room_amt > 0.01:
                             _ota_pmt = Payment(
                                 reservation_id=reservation.id,
+                                folio_id=_billing_folio_id(reservation),   # R-1
                                 payment_mode_id=ota_head.id,
                                 amount=_room_amt,
                                 payment_date=get_business_date(),
@@ -3249,6 +3298,13 @@ def checkout(reservation_id):
                             )
                             db.session.add(_ota_pmt)
                             db.session.flush()
+                            _write_audit_strict(                            # Q-5
+                                'Payment', _ota_pmt.id, 'posted', {},
+                                {'amount': float(_room_amt),
+                                 'reservation_id': reservation.id,
+                                 'folio_id': _ota_pmt.folio_id,
+                                 'mode': ota_head.name,
+                                 'flow': 'ota_auto_settlement'})
                             ota_settled_amount = _room_amt
                             logger.info(
                                 'OTA auto-settle: res=%d head=%s amount=%.2f source=%s',
@@ -3273,6 +3329,7 @@ def checkout(reservation_id):
                 paying_now_total += amt
                 pmt = Payment(
                     reservation_id=reservation.id,
+                    folio_id=_billing_folio_id(reservation),          # R-1
                     payment_mode_id=pm.id,
                     amount=amt,
                     payment_date=get_business_date(),
@@ -3280,6 +3337,12 @@ def checkout(reservation_id):
                 )
                 db.session.add(pmt)
                 db.session.flush()
+                _write_audit_strict('Payment', pmt.id, 'posted', {},   # Q-5
+                                    {'amount': float(amt),
+                                     'reservation_id': reservation.id,
+                                     'folio_id': pmt.folio_id,
+                                     'mode': pm.name,
+                                     'flow': 'checkout_settlement'})
 
             # ── CRITICAL: expire the SQLAlchemy identity-map cache for the
             # payments (and extra_charges) relationship before re-reading.
@@ -3387,15 +3450,23 @@ def checkout(reservation_id):
                     # engine this is a funds-reclassification line, not a taxable
                     # supply — no GST is computed on it (kills the ghost-balance trap).
                     label = f'Tip — {waiter_name}'
-                    db.session.add(ExtraCharge(
+                    _tip = ExtraCharge(
                         reservation_id=reservation.id,
+                        folio_id=_billing_folio_id(reservation),      # R-1
                         description=label,
                         amount=overpay_amount,
                         charge_date=get_business_date(),
                         charge_type='tip',
                         charge_category='Tip',
-                    ))
+                    )
+                    db.session.add(_tip)
                     db.session.flush()
+                    _write_audit_strict('ExtraCharge', _tip.id, 'posted', {},  # Q-5
+                                        {'amount': float(overpay_amount),
+                                         'reservation_id': reservation.id,
+                                         'folio_id': _tip.folio_id,
+                                         'charge_type': 'tip',
+                                         'flow': 'checkout_overpay_tip'})
                     db.session.expire(reservation, ['payments', 'extra_charges'])
                     billing = calculate_stay_amount(reservation)
 
@@ -3415,15 +3486,23 @@ def checkout(reservation_id):
                     # not a taxable supply — no GST is computed on it (kills the
                     # ghost-balance trap where the resolution ExtraCharge re-introduced
                     # an unpayable rounding remainder).
-                    db.session.add(ExtraCharge(
+                    _oi = ExtraCharge(
                         reservation_id=reservation.id,
+                        folio_id=_billing_folio_id(reservation),      # R-1
                         description=f'Other Income — {remarks}',
                         amount=overpay_amount,
                         charge_date=get_business_date(),
                         charge_type='other_income',
                         charge_category='Other Income',
-                    ))
+                    )
+                    db.session.add(_oi)
                     db.session.flush()
+                    _write_audit_strict('ExtraCharge', _oi.id, 'posted', {},   # Q-5
+                                        {'amount': float(overpay_amount),
+                                         'reservation_id': reservation.id,
+                                         'folio_id': _oi.folio_id,
+                                         'charge_type': 'other_income',
+                                         'flow': 'checkout_overpay_income'})
                     db.session.expire(reservation, ['payments', 'extra_charges'])
                     billing = calculate_stay_amount(reservation)
 
@@ -5744,6 +5823,7 @@ def add_payment(reservation_id):
         _purpose = 'credit_recovery' if is_credit_settlement else 'settlement'
         payment = Payment(
             reservation_id=reservation_id,
+            folio_id=_billing_folio_id(reservation),                  # R-1
             payment_mode_id=payment_mode.id,
             amount=amount,
             payment_date=get_business_date(),
@@ -5775,12 +5855,15 @@ def add_payment(reservation_id):
             raise
 
         # Write the audit row in the SAME transaction as the payment so
-        # they succeed or fail together.
-        _write_audit('Payment', payment.id, 'posted',
-                     {},
-                     {'amount': amount, 'mode': payment_mode.name,
-                      'reservation_id': reservation_id,
-                      'flow': 'credit_settlement' if is_credit_settlement else 'standard'})
+        # they succeed or fail together. Q-5 makes the coupling enforced:
+        # _write_audit_strict raises, so the outer handler rolls the payment
+        # back rather than committing it with no audit record.
+        _write_audit_strict('Payment', payment.id, 'posted',
+                            {},
+                            {'amount': amount, 'mode': payment_mode.name,
+                             'reservation_id': reservation_id,
+                             'folio_id': payment.folio_id,
+                             'flow': 'credit_settlement' if is_credit_settlement else 'standard'})
 
         # Credit-settlement hook — advances credit_settled_amount and
         # stamps credit_settled_at when the receivable hits zero. The
@@ -7447,6 +7530,7 @@ def walkin_search_express():
         for p in payments:
             payment = Payment(
                 reservation_id=reservation.id,
+                folio_id=_billing_folio_id(reservation),              # R-1
                 payment_mode_id=p['mode_id'],
                 amount=p['amount'],
                 payment_date=business_date,
@@ -7454,6 +7538,12 @@ def walkin_search_express():
                 payment_purpose='settlement',
             )
             db.session.add(payment)
+            db.session.flush()
+            _write_audit_strict('Payment', payment.id, 'posted', {},   # Q-5
+                                {'amount': float(p['amount']),
+                                 'reservation_id': reservation.id,
+                                 'folio_id': payment.folio_id,
+                                 'flow': 'walkin_express_checkin'})
 
         # 6. Corporate credit validation
         _billing_resp = data.get('billing_responsibility', 'Guest')
@@ -7975,14 +8065,24 @@ def add_overstay_charge(reservation_id):
     hrs_label = f'{billable_hours} hr{"s" if billable_hours > 1 else ""}'
     extra = ExtraCharge(
         reservation_id=reservation.id,
+        folio_id=_billing_folio_id(reservation),                      # R-1
         description=f'Overstay — {hrs_label} @ ₹{hourly_rate:,.2f}/hr',
         amount=charge_amount,
         charge_date=now.date()
     )
     db.session.add(extra)
+    db.session.flush()
+    _write_audit_strict('ExtraCharge', extra.id, 'posted', {},        # Q-5
+                        {'amount': float(charge_amount),
+                         'reservation_id': reservation.id,
+                         'folio_id': extra.folio_id,
+                         'charge_type': 'overstay',
+                         'flow': 'overstay_charge'})
     reservation.overstay_billed_until = now
-    db.session.commit()
 
+    # Both audit rows are written BEFORE the commit. Previously this one ran
+    # after it, so the row was flushed into a session that was never committed
+    # again and was discarded at teardown (K-5).
     _write_audit('Reservation', reservation.id, 'overstay_charged', {},
                  {
                      'action_type': 'charge',
@@ -7994,6 +8094,7 @@ def add_overstay_charge(reservation_id):
                      'charge_excl_gst': charge_amount,
                      'description': extra.description,
                  })
+    db.session.commit()
     flash(f'Overstay charge ₹{charge_amount:,.2f} ({hrs_label}) added to folio.', 'success')
     return redirect(url_for('main.reservations'))
 
@@ -9226,6 +9327,7 @@ def settle_credit(reservation_id):
         try:
             payment = Payment(
                 reservation_id   = reservation.id,
+                folio_id         = _billing_folio_id(reservation),    # R-1
                 amount           = amount,
                 payment_mode_id  = mode_id,
                 payment_date     = get_business_date(),
@@ -9235,6 +9337,12 @@ def settle_credit(reservation_id):
             )
             db.session.add(payment)
             db.session.flush()
+            _write_audit_strict('Payment', payment.id, 'posted', {},   # Q-5
+                                {'amount': float(amount),
+                                 'reservation_id': reservation.id,
+                                 'folio_id': payment.folio_id,
+                                 'mode': pm.name,
+                                 'flow': 'credit_settlement'})
 
             apply_credit_settlement(reservation, amount,
                                     by_user_id=current_user.id,

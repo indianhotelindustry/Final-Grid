@@ -3338,8 +3338,13 @@ def _rerun_skipped_audit(target_date, user_id: int, reason: str) -> tuple[bool, 
                 continue
 
             room_no = res.room.room_number if res.room else '?'
+            # R-2 / AR-002 — same rule as the live night audit: the folio owns
+            # the room-rent financial transaction. Idempotency (the `already`
+            # check above) and the target business date are unchanged.
+            from app.services import resolve_billing_folio_id
             ec = ExtraCharge(
                 reservation_id=res.id,
+                folio_id=resolve_billing_folio_id(res, user_id=user_id),
                 description=(f'Room Rent — {target_date.strftime("%d %b")} '
                              f'(Room {room_no})  [recovered]'),
                 amount=rate,

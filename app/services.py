@@ -8,6 +8,233 @@ scheduler = BackgroundScheduler()
 _night_audit_app = None  # captured by setup_night_audit_scheduler
 
 
+# ---------------------------------------------------------------------------
+# Phase 1 — folio attribution foundation
+# ---------------------------------------------------------------------------
+# Architecture, adopted 2026-09-08 (ADR-001, ADR-002, ADR-003):
+#
+#     Reservation operational ownership + folio financial ownership.
+#
+#     The reservation remains the operational source for determining the
+#     stay and the room-rate entitlement; the resulting financial
+#     transaction belongs to the reservation's billing folio.
+#
+# Under Level 2 (D5 / FD-011) a stay has exactly one billing party, so the
+# billing folio is always folio A of the row's own reservation. There is no
+# routing decision to make here and no fallback: a writer either attributes
+# to that folio or it fails. Level 3 split billing would introduce a routing
+# decision and is a separate Founder decision (ADR-002 O-3) — do not add one.
+#
+# The eight pre-Phase-1 rows carrying folio_id NULL are D11 commissioning /
+# test activity, preserved unchanged under FD-010 Option A. Nothing here
+# reads, repairs or exempts them: INV-A02 stays universal (AR-001) and keeps
+# reporting them. This module's job is to make sure NEW activity can never
+# reproduce that condition.
+
+BILLING_FOLIO_LETTER = 'A'
+
+
+class FolioResolutionError(RuntimeError):
+    """The billing folio of a reservation could not be safely established.
+
+    Raised rather than returning None, so that a caller cannot post a
+    financial row with ``folio_id`` unset by ignoring a falsy return.
+    """
+
+
+class AuditCouplingError(RuntimeError):
+    """A financial mutation's required audit row did not reach the session.
+
+    The caller must not commit. Q-5: a financial mutation and its required
+    audit record succeed together, or the operation fails.
+    """
+
+
+def resolve_billing_folio(reservation, *, user_id=None, ip_address=None):
+    """Return the Folio that owns *reservation*'s financial transactions.
+
+    ``reservation`` may be a ``Reservation`` instance or a reservation id.
+
+    * **Deterministic** — always folio ``A`` of that reservation. Never
+      another reservation's folio, never a letter chosen at run time.
+    * **Idempotent** — repeated calls return the same folio and create at
+      most one, including under concurrent execution: the insert is made
+      inside a SAVEPOINT and a losing racer re-reads the winner's row
+      through the ``uq_folio_letter`` unique constraint.
+    * **Fail closed** — raises :class:`FolioResolutionError` when the
+      reservation is absent, unknown, or its billing folio cannot be
+      established. It never returns ``None``.
+    * **Auditable** — when it has to create the folio it writes a
+      ``folio_auto_created`` audit row in the same transaction (Q-1).
+
+    Q-1 / CD-1: a valid reservation with no folio A is unreachable through
+    the application — ``app/models.py`` creates it on reservation insert —
+    but is reachable for a row inserted by raw SQL or a future import. In
+    that case the folio is created under the same rule as the listener and
+    the creation is audited, rather than the posting being refused at the
+    front desk.
+    """
+    from sqlalchemy.exc import IntegrityError
+    from app.models import Folio, Reservation as _Reservation, db as _db
+
+    rid = getattr(reservation, 'id', reservation)
+    if rid is None:
+        raise FolioResolutionError(
+            'a reservation is required to attribute a financial row')
+    try:
+        rid = int(rid)
+    except (TypeError, ValueError):
+        raise FolioResolutionError(
+            f'invalid reservation reference: {reservation!r}')
+
+    # Fail closed on an unknown reservation rather than creating a folio
+    # that belongs to nothing.
+    if _db.session.get(_Reservation, rid) is None:
+        raise FolioResolutionError(
+            f'reservation {rid} does not exist; refusing to attribute a '
+            f'financial row to it')
+
+    def _lookup():
+        return (_db.session.query(Folio)
+                .filter_by(reservation_id=rid,
+                           folio_letter=BILLING_FOLIO_LETTER)
+                .first())
+
+    folio = _lookup()
+    if folio is not None:
+        return folio
+
+    # Q-1: create the missing billing folio, inside a SAVEPOINT so that a
+    # unique-constraint collision with a concurrent creator does not poison
+    # the caller's transaction.
+    try:
+        with _db.session.begin_nested():
+            folio = Folio(reservation_id=rid,
+                          folio_letter=BILLING_FOLIO_LETTER,
+                          label='Guest',
+                          is_closed=False)
+            _db.session.add(folio)
+            _db.session.flush()
+    except IntegrityError:
+        folio = _lookup()
+        if folio is None:
+            raise FolioResolutionError(
+                f'billing folio for reservation {rid} could not be created '
+                f'and does not exist')
+        return folio
+
+    if folio is None or folio.id is None:
+        raise FolioResolutionError(
+            f'billing folio for reservation {rid} could not be established')
+
+    audited_financial_write(
+        'Folio', folio.id, 'folio_auto_created',
+        None,
+        {'reservation_id': rid,
+         'folio_letter': BILLING_FOLIO_LETTER,
+         'label': 'Guest',
+         'why': 'billing folio was missing at posting time (Q-1 / CD-1)'},
+        user_id=user_id, ip_address=ip_address)
+    return folio
+
+
+def resolve_billing_folio_id(reservation, *, user_id=None, ip_address=None):
+    """``resolve_billing_folio(...).id`` — the form most writers want."""
+    return resolve_billing_folio(reservation, user_id=user_id,
+                                 ip_address=ip_address).id
+
+
+def inherit_billing_folio_id(original, *, what='row'):
+    """Return the ``folio_id`` a correction/reversal row inherits.
+
+    R-3 (ADR-002): a correction or reversal carries the attribution of the
+    row it corrects, so a corrected pair never lands on a different folio
+    from its original.
+
+    Q-2: when the original carries no attribution it is a pre-Phase-1
+    historical row. On the production database the only such rows are the
+    eight D11 commissioning/test rows, preserved unchanged under FD-010
+    Option A. Correcting one would have to either mutate history or create a
+    fresh unattributed row, so the correction is **refused** — fail closed —
+    rather than silently doing either.
+    """
+    fid = getattr(original, 'folio_id', None)
+    if fid is None:
+        raise FolioResolutionError(
+            'refusing to correct %s %s: it carries no folio attribution. '
+            'Unattributed historical rows are preserved unchanged under '
+            'FD-010 Option A (Q-2) — correcting one would either mutate '
+            'history or create a new unattributed row.'
+            % (what, getattr(original, 'id', '?')))
+    return fid
+
+
+def audited_financial_write(entity_type, entity_id, action,
+                            before_state, after_state, *,
+                            user_id=None, ip_address=None):
+    """Write a financial mutation's audit row inside the caller's transaction.
+
+    Returns the ``AuditLog`` row. Raises :class:`AuditCouplingError` if the
+    row did not reach the session, so the caller's transaction is rolled
+    back rather than committed with its audit record missing (Q-5).
+
+    Deliberately stricter than ``app.routes._write_audit``, which is
+    documented as never raising. That is correct for most entities and wrong
+    for a financial mutation: a payment or charge that commits while its
+    audit row silently failed is exactly the unattributable change these
+    controls exist to prevent. The shared helper's behaviour is unchanged
+    for every other caller; the stricter rule is applied only here, which is
+    the pattern Phase 2a established in ``app/folio.py::_audited``.
+    """
+    from app.models import AuditLog, db as _db
+
+    if entity_id is None:
+        raise AuditCouplingError(
+            f'{action}: entity_id is required to audit a financial mutation')
+
+    actor = user_id
+    if actor is None:
+        try:
+            from flask_login import current_user
+            if current_user and current_user.is_authenticated:
+                actor = current_user.id
+        except Exception:
+            actor = None
+    if actor is None:
+        # Same convention as _write_audit: 0 marks a system / unauthenticated
+        # actor. AR-013 will replace this with a controlled system identity.
+        actor = 0
+
+    ip = ip_address
+    if ip is None:
+        try:
+            from flask import request, has_request_context
+            if has_request_context():
+                ip = request.remote_addr
+        except Exception:
+            ip = None
+
+    log = AuditLog(entity_type=entity_type,
+                   entity_id=int(entity_id),
+                   action=action,
+                   before_state=before_state,
+                   after_state=after_state,
+                   staff_user_id=actor,
+                   ip_address=ip)
+    try:
+        _db.session.add(log)
+        _db.session.flush()
+    except Exception as exc:
+        raise AuditCouplingError(
+            f'audit row for {entity_type} {entity_id} ({action}) could not be '
+            f'written: {exc.__class__.__name__}: {exc}') from exc
+    if log.id is None:
+        raise AuditCouplingError(
+            f'audit row for {entity_type} {entity_id} ({action}) did not reach '
+            f'the session')
+    return log
+
+
 def run_night_audit(app=None):
     """
     Night audit — called by APScheduler (auto) or manually from a route.
@@ -144,8 +371,14 @@ def run_night_audit(app=None):
                     continue
 
                 room_no = res.room.room_number if res.room else '?'
+                # R-2 / AR-002 — the reservation remains the operational source
+                # for the stay and the rate (resolved above from
+                # ReservationNightRate, else the reservation's own rate); the
+                # resulting financial transaction belongs to the reservation's
+                # billing folio. Idempotency and the business date are unchanged.
                 charge = ExtraCharge(
                     reservation_id=res.id,
+                    folio_id=resolve_billing_folio_id(res),
                     description=f'Room Rent — {_bd.strftime("%d %b")} (Room {room_no})',
                     amount=rate,
                     charge_date=_bd,
@@ -919,9 +1152,13 @@ def post_payment_correction(original_payment, *,
 
     today = _date.today()
 
+    # R-3 / Q-2 — the pair inherits the original's folio, and a correction of
+    # an unattributed historical row is refused rather than silently posted.
+    _folio_id = inherit_billing_folio_id(original_payment, what='payment')
+
     reversal = Payment(
         reservation_id    = original_payment.reservation_id,
-        folio_id          = original_payment.folio_id,
+        folio_id          = _folio_id,
         payment_mode_id   = original_payment.payment_mode_id,
         amount            = original_payment.amount,
         payment_date      = today,
@@ -952,7 +1189,7 @@ def post_payment_correction(original_payment, *,
         mode_id = int(new_mode_id) if new_mode_id else int(original_payment.payment_mode_id)
         replacement = Payment(
             reservation_id    = original_payment.reservation_id,
-            folio_id          = original_payment.folio_id,
+            folio_id          = _folio_id,
             payment_mode_id   = mode_id,
             amount            = float(new_amount),
             payment_date      = today,
@@ -1004,9 +1241,12 @@ def post_extra_charge_correction(original_charge, *,
     desc_prefix = '[REVERSAL] '
     rev_desc = (desc_prefix + (original_charge.description or 'extra charge'))[:100]
 
+    # R-3 / Q-2 — see post_payment_correction.
+    _folio_id = inherit_billing_folio_id(original_charge, what='charge')
+
     reversal = ExtraCharge(
         reservation_id    = original_charge.reservation_id,
-        folio_id          = original_charge.folio_id,
+        folio_id          = _folio_id,
         description       = rev_desc,
         amount            = original_charge.amount,
         charge_date       = today,
@@ -1040,7 +1280,7 @@ def post_extra_charge_correction(original_charge, *,
         repl_desc = (new_description or original_charge.description or 'extra charge')[:100]
         replacement = ExtraCharge(
             reservation_id    = original_charge.reservation_id,
-            folio_id          = original_charge.folio_id,
+            folio_id          = _folio_id,
             description       = repl_desc,
             amount            = float(new_amount),
             charge_date       = today,
@@ -1486,8 +1726,12 @@ def post_cancellation_disposition(reservation, *, disposition, refund_amount=0,
         if not refund_mode_id:
             raise ValueError('Refund mode is required when issuing a refund.')
         from datetime import date as _date
+        # R-4 / CD-3 — a refund is attributed to the reservation's billing
+        # folio, like any other payment. It is the one reversal-shaped path
+        # that has no original row to inherit from.
         refund_payment = Payment(
             reservation_id    = reservation.id,
+            folio_id          = resolve_billing_folio_id(reservation, user_id=user_id),
             amount            = refund_amount,
             payment_mode_id   = int(refund_mode_id),
             payment_date      = _date.today(),
@@ -1784,6 +2028,7 @@ def redeem_credit_voucher(voucher, reservation, amount, *, user_id=None,
             raise RuntimeError('No payment mode available for voucher redemption.')
         payment = Payment(
             reservation_id   = reservation.id,
+            folio_id         = resolve_billing_folio_id(reservation),   # R-1
             payment_mode_id  = pm.id,
             amount           = amount,
             payment_date     = _d.today(),
@@ -2536,6 +2781,8 @@ def convert_overpayment_to_upsell(reservation, *, overpay_gross=None, reason=Non
             label = f'{label} ({reason})'
         charge = ExtraCharge(
             reservation_id=reservation.id,
+            folio_id=resolve_billing_folio_id(                        # R-2
+                reservation, user_id=authorized_by_user_id),
             description=label,
             amount=float(pretax_increment),
             charge_date=get_business_date(),
@@ -2790,6 +3037,9 @@ class CheckInService:
             if checkin.deposit_amount > 0 and checkin.deposit_payment_mode_id:
                 payment = Payment(
                     reservation_id=reservation_id,
+                    folio_id=resolve_billing_folio_id(               # R-1
+                        reservation_id, user_id=staff_user_id,
+                        ip_address=request_ip),
                     payment_mode_id=checkin.deposit_payment_mode_id,
                     amount=checkin.deposit_amount,
                     payment_date=get_business_date()

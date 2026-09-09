@@ -1,0 +1,440 @@
+{
+  "anchor_matches": true,
+  "application_code_changed": false,
+  "audit": {
+    "after_state": {
+      "amount": 2000.0,
+      "charge_type": "overstay",
+      "flow": "overstay_charge",
+      "folio_id": 6,
+      "reservation_id": 6
+    },
+    "reservation_audit_rows": 1,
+    "rows": [
+      [
+        "posted",
+        "ExtraCharge",
+        3
+      ]
+    ]
+  },
+  "audit_failure_injection": {
+    "audit_after": 25,
+    "audit_before": 25,
+    "billing_marker_advanced": false,
+    "charges_after": 3,
+    "charges_before": 3,
+    "http_status": 500
+  },
+  "cases_passed": 23,
+  "cases_total": 23,
+  "copy_method": "sqlite-backup-api",
+  "d11": {
+    "extra_charges": [
+      1,
+      2
+    ],
+    "payments": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "unchanged": true
+  },
+  "directive": "FG-P1-W20-RUNTIME-20260909-01",
+  "financial_row": {
+    "amount": 2000.0,
+    "charge_date": "2026-09-09",
+    "description": "Overstay \u2014 20 hrs @ \u20b9100.00/hr",
+    "folio_id": 6,
+    "id": 3,
+    "reservation_id": 6
+  },
+  "finished_at": "2026-09-09T08:07:02",
+  "fixture_correction": "booking_type='Hourly', checkout_time='12:00', departure_date=yesterday, status='CheckedIn', rate_per_night=2400, overstay_billed_until=None",
+  "folio": {
+    "actual": 6,
+    "expected": 6,
+    "letter": "A",
+    "owner_reservation": 6
+  },
+  "frozen_anchor": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "idempotency": {
+    "all_charges": [
+      {
+        "amount": 2000.0,
+        "description": "Overstay \u2014 20 hrs @ \u20b9100.00/hr",
+        "folio_id": 6,
+        "id": 3
+      },
+      {
+        "amount": 100.0,
+        "description": "Overstay \u2014 1 hr @ \u20b9100.00/hr",
+        "folio_id": 6,
+        "id": 4
+      }
+    ],
+    "billing_marker_first": "2026-09-09 08:07:02.833063",
+    "billing_marker_second": "2026-09-09 08:07:02.899686",
+    "charges_after_two_calls": 2,
+    "folios": 1,
+    "second_window_charged": true
+  },
+  "mocked": false,
+  "production_db": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS\\instance\\pms.db",
+  "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "production_sha256_before": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "production_size_after": 733184,
+  "production_size_before": 733184,
+  "production_unchanged": true,
+  "results": [
+    {
+      "case": "W20-01",
+      "expect": 0,
+      "got": 0,
+      "note": "this is why the Phase 1 case passed vacuously",
+      "pass": true,
+      "what": "Regular booking posts no charge (route exits early)"
+    },
+    {
+      "case": "W20-02",
+      "expect": 1,
+      "got": 1,
+      "note": "HTTP 302",
+      "pass": true,
+      "what": "route produced exactly one ExtraCharge"
+    },
+    {
+      "case": "W20-03",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "what": "folio_id IS NOT NULL"
+    },
+    {
+      "case": "W20-04",
+      "expect": 6,
+      "got": 6,
+      "note": "",
+      "pass": true,
+      "what": "folio_id is the reservation's billing folio (A)"
+    },
+    {
+      "case": "W20-05",
+      "expect": [
+        6,
+        "A"
+      ],
+      "got": [
+        6,
+        "A"
+      ],
+      "note": "",
+      "pass": true,
+      "what": "that folio belongs to this reservation, letter A"
+    },
+    {
+      "case": "W20-06",
+      "expect": 6,
+      "got": 6,
+      "note": "",
+      "pass": true,
+      "what": "charge is not attached to any other reservation"
+    },
+    {
+      "case": "W20-07",
+      "expect": [
+        [
+          "posted",
+          "ExtraCharge",
+          3
+        ]
+      ],
+      "got": [
+        [
+          "posted",
+          "ExtraCharge",
+          3
+        ]
+      ],
+      "note": "",
+      "pass": true,
+      "what": "ExtraCharge audit row exists for this charge"
+    },
+    {
+      "case": "W20-08",
+      "expect": 6,
+      "got": 6,
+      "note": "",
+      "pass": true,
+      "what": "audit records the same folio as the charge"
+    },
+    {
+      "case": "W20-09",
+      "expect": 2000.0,
+      "got": 2000.0,
+      "note": "",
+      "pass": true,
+      "what": "audit records the same amount as the charge"
+    },
+    {
+      "case": "W20-10",
+      "expect": 1,
+      "got": 1,
+      "note": "it was written after commit() before Phase 1 and was discarded",
+      "pass": true,
+      "what": "the Reservation-level audit row also survived the commit"
+    },
+    {
+      "case": "W20-11",
+      "expect": [
+        "CheckedIn",
+        "2026-09-08",
+        "2026-09-08",
+        2400.0,
+        "Hourly",
+        "12:00",
+        10
+      ],
+      "got": [
+        "CheckedIn",
+        "2026-09-08",
+        "2026-09-08",
+        2400.0,
+        "Hourly",
+        "12:00",
+        10
+      ],
+      "note": "",
+      "pass": true,
+      "what": "reservation context unchanged by the charge"
+    },
+    {
+      "case": "W20-12",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "what": "overstay_billed_until advanced (idempotency marker set)"
+    },
+    {
+      "case": "W20-13",
+      "expect": 3,
+      "got": 3,
+      "note": "",
+      "pass": true,
+      "what": "audit failure commits no overstay charge"
+    },
+    {
+      "case": "W20-14",
+      "expect": 25,
+      "got": 25,
+      "note": "",
+      "pass": true,
+      "what": "audit failure commits no audit row either"
+    },
+    {
+      "case": "W20-15",
+      "expect": true,
+      "got": true,
+      "note": "HTTP 500",
+      "pass": true,
+      "what": "caller is told it failed (no misleading success)"
+    },
+    {
+      "case": "W20-16",
+      "expect": null,
+      "got": null,
+      "note": "",
+      "pass": true,
+      "what": "billing marker not advanced on the failed attempt"
+    },
+    {
+      "case": "W20-17",
+      "expect": true,
+      "got": true,
+      "note": "billing marker moves forward, never re-bills the same window",
+      "pass": true,
+      "what": "no duplicate of the ALREADY-BILLED window"
+    },
+    {
+      "case": "W20-18",
+      "expect": 1,
+      "got": 1,
+      "note": "",
+      "pass": true,
+      "what": "repeat call creates no duplicate folio"
+    },
+    {
+      "case": "W20-19",
+      "expect": [
+        6,
+        6
+      ],
+      "got": [
+        6,
+        6
+      ],
+      "note": "route bills the new window \u2014 pre-existing semantics, see limitations",
+      "pass": true,
+      "what": "any charge for the NEW window is also attributed"
+    },
+    {
+      "case": "W20-20",
+      "expect": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "got": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "note": "",
+      "pass": true,
+      "what": "D11 NULL-folio id sets unchanged"
+    },
+    {
+      "case": "W20-21",
+      "expect": {
+        "charges": {
+          "1": [
+            380.95,
+            null,
+            1
+          ],
+          "2": [
+            95.24,
+            null,
+            4
+          ]
+        },
+        "payments": {
+          "1": [
+            800.0,
+            null,
+            1
+          ],
+          "2": [
+            400.0,
+            null,
+            1
+          ],
+          "3": [
+            1500.0,
+            null,
+            2
+          ],
+          "4": [
+            1000.0,
+            null,
+            3
+          ],
+          "5": [
+            500.0,
+            null,
+            4
+          ],
+          "6": [
+            100.0,
+            null,
+            4
+          ]
+        }
+      },
+      "got": {
+        "charges": {
+          "1": [
+            380.95,
+            null,
+            1
+          ],
+          "2": [
+            95.24,
+            null,
+            4
+          ]
+        },
+        "payments": {
+          "1": [
+            800.0,
+            null,
+            1
+          ],
+          "2": [
+            400.0,
+            null,
+            1
+          ],
+          "3": [
+            1500.0,
+            null,
+            2
+          ],
+          "4": [
+            1000.0,
+            null,
+            3
+          ],
+          "5": [
+            500.0,
+            null,
+            4
+          ],
+          "6": [
+            100.0,
+            null,
+            4
+          ]
+        }
+      },
+      "note": "",
+      "pass": true,
+      "what": "D11 amounts / folio / reservation unchanged"
+    },
+    {
+      "case": "W20-22",
+      "expect": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+      "got": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+      "note": "",
+      "pass": true,
+      "what": "production database hash unchanged"
+    },
+    {
+      "case": "W20-23",
+      "expect": 733184,
+      "got": 733184,
+      "note": "",
+      "pass": true,
+      "what": "production database size unchanged"
+    }
+  ],
+  "route_exercised": "POST /reservation/<id>/overstay-charge",
+  "started_at": "2026-09-09T08:07:01",
+  "vacuous_cause": "route requires booking_type == 'Hourly' and a recorded checkout_time; the Phase 1 fixture had booking_type 'Regular' (the model default) and no checkout_time, so the handler returned before the charge block",
+  "verdict": "PASS",
+  "writer": "W-20 main.add_overstay_charge"
+}

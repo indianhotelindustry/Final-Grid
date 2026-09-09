@@ -1,0 +1,123 @@
+2026-09-09 08:07:02 [WARNING] app: Running on SQLite — row-level locking (with_for_update) is not enforced. SQLite uses a database-wide write lock; concurrent writers will serialise. Move to PostgreSQL for true per-row locking and higher concurrency.
+2026-09-09 08:07:02 [INFO] app: ------- SECURITY MODE -------
+2026-09-09 08:07:02 [INFO] app:   env                : production
+2026-09-09 08:07:02 [INFO] app:   secret_key         : set (>=32 chars)
+2026-09-09 08:07:02 [INFO] app:   updater_signing    : ENFORCED
+2026-09-09 08:07:02 [INFO] app:   encryption         : available
+2026-09-09 08:07:02 [INFO] app:   lan_access         : disabled (127.0.0.1 only)
+2026-09-09 08:07:02 [INFO] app:   schema_drift_mode  : warn-only
+2026-09-09 08:07:02 [INFO] app: -----------------------------
+2026-09-09 08:07:02 [INFO] app: db.create_all() skipped in production. Use Alembic migrations for schema changes. Set DB_AUTO_CREATE=1 to force-enable at next boot.
+2026-09-09 08:07:02 [INFO] app: SQLite: ensured table credit_vouchers exists
+2026-09-09 08:07:02 [INFO] app: SQLite: ensured table credit_voucher_redemptions exists
+2026-09-09 08:07:02 [INFO] apscheduler.scheduler: Scheduler started
+2026-09-09 08:07:02 [INFO] apscheduler.scheduler: Added job "setup_backup_scheduler.<locals>._scheduled_backup" to job store "default"
+2026-09-09 08:07:02 [INFO] app.backup_manager: Daily backup scheduled at 03:00
+2026-09-09 08:07:02 [INFO] apscheduler.scheduler: Added job "flush_notification_queue" to job store "default"
+2026-09-09 08:07:02 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._prune_old_logs" to job store "default"
+2026-09-09 08:07:02 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._run_predictive_maintenance" to job store "default"
+2026-09-09 08:07:02 [ERROR] app: Exception on /reservation/7/overstay-charge [POST]
+Traceback (most recent call last):
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\venv\Lib\site-packages\flask_login\utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\app\routes.py", line 8075, in add_overstay_charge
+    _write_audit_strict('ExtraCharge', extra.id, 'posted', {},        # Q-5
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\app\routes.py", line 362, in _write_audit_strict
+    return audited_financial_write(entity_type, entity_id, action,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\verification\evidence\20260909_w20_runtime\verify.py", line 273, in exploding_audit
+    raise svc.AuditCouplingError('injected audit failure (W-20 path)')
+app.services.AuditCouplingError: injected audit failure (W-20 path)
+2026-09-09 08:07:02 [ERROR] app: Internal server error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.
+Traceback (most recent call last):
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\venv\Lib\site-packages\flask_login\utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\app\routes.py", line 8075, in add_overstay_charge
+    _write_audit_strict('ExtraCharge', extra.id, 'posted', {},        # Q-5
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\app\routes.py", line 362, in _write_audit_strict
+    return audited_financial_write(entity_type, entity_id, action,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\verification\evidence\20260909_w20_runtime\verify.py", line 273, in exploding_audit
+    raise svc.AuditCouplingError('injected audit failure (W-20 path)')
+app.services.AuditCouplingError: injected audit failure (W-20 path)
+==========================================================================================================================
+W-20 OVERSTAY — RUNTIME VERIFICATION
+==========================================================================================================================
+production      : C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\instance\pms.db
+sha256 before   : 51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2
+anchor          : MATCHES
+disposable copy : C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\verification\_work\w20_overstay.db  (sqlite-backup-api)
+--------------------------------------------------------------------------------------------------------------------------
+D11 population  : payments=[1, 2, 3, 4, 5, 6] charges=[1, 2]
+--------------------------------------------------------------------------------------------------------------------------
+fixtures        : hourly res=6 folio=6 | regular res=5 folio=5
+--------------------------------------------------------------------------------------------------------------------------
+1. THE DISCLOSED VACUOUS CONDITION
+--------------------------------------------------------------------------------------------------------------------------
+OK    W20-01    Regular booking posts no charge (route exits early)  expect=0                        got=0                        this is why the Phase 1 case passed vacuously
+--------------------------------------------------------------------------------------------------------------------------
+2. ACTUAL ROUTE EXECUTION (main.add_overstay_charge)
+--------------------------------------------------------------------------------------------------------------------------
+OK    W20-02    route produced exactly one ExtraCharge               expect=1                        got=1                        HTTP 302
+   created row  : {'id': 3, 'reservation_id': 6, 'folio_id': 6, 'amount': 2000.0, 'description': 'Overstay — 20 hrs @ ₹100.00/hr', 'charge_date': '2026-09-09'}
+OK    W20-03    folio_id IS NOT NULL                                 expect=True                     got=True                     
+OK    W20-04    folio_id is the reservation's billing folio (A)      expect=6                        got=6                        
+OK    W20-05    that folio belongs to this reservation, letter A     expect=(6, 'A')                 got=(6, 'A')                 
+OK    W20-06    charge is not attached to any other reservation      expect=6                        got=6                        
+OK    W20-07    ExtraCharge audit row exists for this charge         expect=[('posted', 'ExtraCharge got=[('posted', 'ExtraCharge 
+OK    W20-08    audit records the same folio as the charge           expect=6                        got=6                        
+OK    W20-09    audit records the same amount as the charge          expect=2000.0                   got=2000.0                   
+OK    W20-10    the Reservation-level audit row also survived the commit expect=1                        got=1                        it was written after commit() before Phase 1 and was discarded
+OK    W20-11    reservation context unchanged by the charge          expect=('CheckedIn', datetime.d got=('CheckedIn', datetime.d 
+OK    W20-12    overstay_billed_until advanced (idempotency marker set) expect=True                     got=True                     
+--------------------------------------------------------------------------------------------------------------------------
+3. AUDIT COUPLING ON THE OVERSTAY PATH (Q-5)
+--------------------------------------------------------------------------------------------------------------------------
+OK    W20-13    audit failure commits no overstay charge             expect=3                        got=3                        
+OK    W20-14    audit failure commits no audit row either            expect=25                       got=25                       
+OK    W20-15    caller is told it failed (no misleading success)     expect=True                     got=True                     HTTP 500
+OK    W20-16    billing marker not advanced on the failed attempt    expect=None                     got=None                     
+--------------------------------------------------------------------------------------------------------------------------
+4. REPEAT EXECUTION (existing window semantics)
+--------------------------------------------------------------------------------------------------------------------------
+OK    W20-17    no duplicate of the ALREADY-BILLED window            expect=True                     got=True                     billing marker moves forward, never re-bills the same window
+OK    W20-18    repeat call creates no duplicate folio               expect=1                        got=1                        
+OK    W20-19    any charge for the NEW window is also attributed     expect=[6, 6]                   got=[6, 6]                   route bills the new window — pre-existing semantics, see limitations
+--------------------------------------------------------------------------------------------------------------------------
+5. D11 AND PRODUCTION SAFETY
+--------------------------------------------------------------------------------------------------------------------------
+OK    W20-20    D11 NULL-folio id sets unchanged                     expect=([1, 2, 3, 4, 5, 6], [1, got=([1, 2, 3, 4, 5, 6], [1, 
+OK    W20-21    D11 amounts / folio / reservation unchanged          expect={'payments': {1: (800.0, got={'payments': {1: (800.0, 
+OK    W20-22    production database hash unchanged                   expect='51dd83b7f0fa42a3e85afb0 got='51dd83b7f0fa42a3e85afb0 
+OK    W20-23    production database size unchanged                   expect=733184                   got=733184                   
+--------------------------------------------------------------------------------------------------------------------------
+RESULT: 23 / 23 passed
+==========================================================================================================================
+result.json written
+2026-09-09 08:07:02 [INFO] apscheduler.scheduler: Scheduler has been shut down

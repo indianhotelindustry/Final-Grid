@@ -71,6 +71,16 @@ def _pm(name: str) -> Optional[PaymentMode]:
     return pm or PaymentMode.query.filter_by(is_active=True).first()
 
 
+def _folio(reservation) -> int:
+    """The billing folio a seeded financial row belongs to (ADR-002, CD-4).
+
+    Fixtures obey the same contract as production writers, so a seeded
+    database is never a standing counterexample to INV-A02.
+    """
+    from app.services import resolve_billing_folio_id
+    return resolve_billing_folio_id(reservation)
+
+
 def _booking_ref() -> str:
     return 'DEMO' + secrets.token_hex(3).upper()
 
@@ -305,6 +315,7 @@ def _do_seed() -> None:
             # Advance payment
             if cash:
                 p = Payment(reservation_id=res.id, payment_mode_id=cash.id,
+                            folio_id=_folio(res),
                             amount=rate, payment_date=biz_date + timedelta(days=offset))
                 db.session.add(p)
                 db.session.flush()
@@ -325,6 +336,7 @@ def _do_seed() -> None:
     ]
     for res, desc, amt in extra_specs:
         ec = ExtraCharge(reservation_id=res.id, description=desc,
+                         folio_id=_folio(res),
                          amount=amt, charge_date=biz_date)
         db.session.add(ec)
         db.session.flush()
@@ -355,6 +367,7 @@ def _do_seed() -> None:
         res.checked_out_at = datetime.combine(departure, datetime.min.time())
         if upi:
             p = Payment(reservation_id=res.id, payment_mode_id=upi.id,
+                        folio_id=_folio(res),
                         amount=rate * nn, payment_date=departure)
             db.session.add(p)
             db.session.flush()
@@ -371,10 +384,12 @@ def _do_seed() -> None:
     # Additional payments (UPI + Card for variety)
     if upi and len(inhouse_res) > 1:
         p = Payment(reservation_id=inhouse_res[1].id, payment_mode_id=upi.id,
+                    folio_id=_folio(inhouse_res[1]),
                     amount=4800, payment_date=biz_date)
         db.session.add(p); db.session.flush(); manifest['payments'].append(p.id)
     if card and len(inhouse_res) > 4:
         p = Payment(reservation_id=inhouse_res[4].id, payment_mode_id=card.id,
+                    folio_id=_folio(inhouse_res[4]),
                     amount=900, payment_date=biz_date)
         db.session.add(p); db.session.flush(); manifest['payments'].append(p.id)
 

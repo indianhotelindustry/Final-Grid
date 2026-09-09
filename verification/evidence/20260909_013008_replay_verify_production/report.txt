@@ -1,0 +1,1013 @@
+====================================================================================================
+FINALGRID — HISTORICAL REPLAY VERIFICATION
+Production Verification Framework, Wave 0 Deliverable 3
+====================================================================================================
+Stored replay     : production
+Stored captured   : 2026-08-31T04:35:44 (app v2.2.18)
+Current run       : 2026-09-09T01:30:08 (app v2.2.18)
+Business date     : 2026-08-10 -> 2026-08-10
+Read-only         : VERIFIED
+
+Dates compared    : 10
+Dates clean       : 0
+Differences       : 320
+Blocking          : 32
+
+VERDICT           : FAIL
+
+----------------------------------------------------------------------------------------------------
+DIFFERENCES BY KIND
+----------------------------------------------------------------------------------------------------
+  ENGINE_CHANGED                  10
+  ENGINE_FIGURE_ADDED            310
+
+====================================================================================================
+DIFFERENCES
+====================================================================================================
+Severity follows the state of the day: a closed day may not move
+at all, an open past day may move but is reported, and the
+current business date is expected to move.
+
+2026-08-09   [CLOSED]
+    [BLOCK] ENGINE_CHANGED             nas.folio_control[len]
+            stored : 23
+            current: 24   (delta +1)
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.folio_view
+            stored : 
+            current: 0
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.misrouted_count
+            stored : 
+            current: 0
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.misrouted_ids[len]
+            stored : 
+            current: 0
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.reservation_view
+            stored : 
+            current: 476.19
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed
+            stored : 
+            current: 476.19
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_count
+            stored : 
+            current: 2
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[0]
+            stored : 
+            current: 1
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[1]
+            stored : 
+            current: 2
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[len]
+            stored : 
+            current: 2
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[sum]
+            stored : 
+            current: 3
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges[len]
+            stored : 
+            current: 7
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.misrouted_count
+            stored : 
+            current: 0
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.folio_view
+            stored : 
+            current: 0
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.misrouted_count
+            stored : 
+            current: 0
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.misrouted_ids[len]
+            stored : 
+            current: 0
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.reservation_view
+            stored : 
+            current: 4300
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed
+            stored : 
+            current: 4300
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_count
+            stored : 
+            current: 6
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[0]
+            stored : 
+            current: 1
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[1]
+            stored : 
+            current: 2
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[2]
+            stored : 
+            current: 3
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[3]
+            stored : 
+            current: 4
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[4]
+            stored : 
+            current: 5
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[5]
+            stored : 
+            current: 6
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[len]
+            stored : 
+            current: 6
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[sum]
+            stored : 
+            current: 21
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments[len]
+            stored : 
+            current: 7
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.unattributed_count
+            stored : 
+            current: 8
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.unattributed_total
+            stored : 
+            current: 4776.19
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.views_agree
+            stored : 
+            current: True
+    [BLOCK] ENGINE_FIGURE_ADDED        nas.folio_control.attribution[len]
+            stored : 
+            current: 8
+
+2026-08-01   [OPEN]
+    [WARN ] ENGINE_CHANGED             nas.folio_control[len]
+            stored : 23
+            current: 24   (delta +1)
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.folio_view
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.misrouted_ids[len]
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.reservation_view
+            stored : 
+            current: 476.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed
+            stored : 
+            current: 476.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_count
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[0]
+            stored : 
+            current: 1
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[1]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[len]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[sum]
+            stored : 
+            current: 3
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges[len]
+            stored : 
+            current: 7
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.folio_view
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.misrouted_ids[len]
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.reservation_view
+            stored : 
+            current: 4300
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed
+            stored : 
+            current: 4300
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_count
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[0]
+            stored : 
+            current: 1
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[1]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[2]
+            stored : 
+            current: 3
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[3]
+            stored : 
+            current: 4
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[4]
+            stored : 
+            current: 5
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[5]
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[len]
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[sum]
+            stored : 
+            current: 21
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments[len]
+            stored : 
+            current: 7
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.unattributed_count
+            stored : 
+            current: 8
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.unattributed_total
+            stored : 
+            current: 4776.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.views_agree
+            stored : 
+            current: True
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution[len]
+            stored : 
+            current: 8
+
+2026-08-02   [OPEN]
+    [WARN ] ENGINE_CHANGED             nas.folio_control[len]
+            stored : 23
+            current: 24   (delta +1)
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.folio_view
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.misrouted_ids[len]
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.reservation_view
+            stored : 
+            current: 476.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed
+            stored : 
+            current: 476.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_count
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[0]
+            stored : 
+            current: 1
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[1]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[len]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[sum]
+            stored : 
+            current: 3
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges[len]
+            stored : 
+            current: 7
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.folio_view
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.misrouted_ids[len]
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.reservation_view
+            stored : 
+            current: 4300
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed
+            stored : 
+            current: 4300
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_count
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[0]
+            stored : 
+            current: 1
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[1]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[2]
+            stored : 
+            current: 3
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[3]
+            stored : 
+            current: 4
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[4]
+            stored : 
+            current: 5
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[5]
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[len]
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[sum]
+            stored : 
+            current: 21
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments[len]
+            stored : 
+            current: 7
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.unattributed_count
+            stored : 
+            current: 8
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.unattributed_total
+            stored : 
+            current: 4776.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.views_agree
+            stored : 
+            current: True
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution[len]
+            stored : 
+            current: 8
+
+2026-08-03   [OPEN]
+    [WARN ] ENGINE_CHANGED             nas.folio_control[len]
+            stored : 23
+            current: 24   (delta +1)
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.folio_view
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.misrouted_ids[len]
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.reservation_view
+            stored : 
+            current: 476.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed
+            stored : 
+            current: 476.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_count
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[0]
+            stored : 
+            current: 1
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[1]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[len]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[sum]
+            stored : 
+            current: 3
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges[len]
+            stored : 
+            current: 7
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.folio_view
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.misrouted_ids[len]
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.reservation_view
+            stored : 
+            current: 4300
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed
+            stored : 
+            current: 4300
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_count
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[0]
+            stored : 
+            current: 1
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[1]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[2]
+            stored : 
+            current: 3
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[3]
+            stored : 
+            current: 4
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[4]
+            stored : 
+            current: 5
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[5]
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[len]
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[sum]
+            stored : 
+            current: 21
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments[len]
+            stored : 
+            current: 7
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.unattributed_count
+            stored : 
+            current: 8
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.unattributed_total
+            stored : 
+            current: 4776.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.views_agree
+            stored : 
+            current: True
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution[len]
+            stored : 
+            current: 8
+
+2026-08-04   [OPEN]
+    [WARN ] ENGINE_CHANGED             nas.folio_control[len]
+            stored : 23
+            current: 24   (delta +1)
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.folio_view
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.misrouted_ids[len]
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.reservation_view
+            stored : 
+            current: 476.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed
+            stored : 
+            current: 476.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_count
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[0]
+            stored : 
+            current: 1
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[1]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[len]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[sum]
+            stored : 
+            current: 3
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges[len]
+            stored : 
+            current: 7
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.folio_view
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.misrouted_ids[len]
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.reservation_view
+            stored : 
+            current: 4300
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed
+            stored : 
+            current: 4300
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_count
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[0]
+            stored : 
+            current: 1
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[1]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[2]
+            stored : 
+            current: 3
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[3]
+            stored : 
+            current: 4
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[4]
+            stored : 
+            current: 5
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[5]
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[len]
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[sum]
+            stored : 
+            current: 21
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments[len]
+            stored : 
+            current: 7
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.unattributed_count
+            stored : 
+            current: 8
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.unattributed_total
+            stored : 
+            current: 4776.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.views_agree
+            stored : 
+            current: True
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution[len]
+            stored : 
+            current: 8
+
+2026-08-05   [OPEN]
+    [WARN ] ENGINE_CHANGED             nas.folio_control[len]
+            stored : 23
+            current: 24   (delta +1)
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.folio_view
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.misrouted_ids[len]
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.reservation_view
+            stored : 
+            current: 476.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed
+            stored : 
+            current: 476.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_count
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[0]
+            stored : 
+            current: 1
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[1]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[len]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[sum]
+            stored : 
+            current: 3
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges[len]
+            stored : 
+            current: 7
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.folio_view
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.misrouted_ids[len]
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.reservation_view
+            stored : 
+            current: 4300
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed
+            stored : 
+            current: 4300
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_count
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[0]
+            stored : 
+            current: 1
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[1]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[2]
+            stored : 
+            current: 3
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[3]
+            stored : 
+            current: 4
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[4]
+            stored : 
+            current: 5
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[5]
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[len]
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[sum]
+            stored : 
+            current: 21
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments[len]
+            stored : 
+            current: 7
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.unattributed_count
+            stored : 
+            current: 8
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.unattributed_total
+            stored : 
+            current: 4776.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.views_agree
+            stored : 
+            current: True
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution[len]
+            stored : 
+            current: 8
+
+2026-08-06   [OPEN]
+    [WARN ] ENGINE_CHANGED             nas.folio_control[len]
+            stored : 23
+            current: 24   (delta +1)
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.folio_view
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.misrouted_ids[len]
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.reservation_view
+            stored : 
+            current: 476.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed
+            stored : 
+            current: 476.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_count
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[0]
+            stored : 
+            current: 1
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[1]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[len]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[sum]
+            stored : 
+            current: 3
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges[len]
+            stored : 
+            current: 7
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.folio_view
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.misrouted_ids[len]
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.reservation_view
+            stored : 
+            current: 4300
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed
+            stored : 
+            current: 4300
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_count
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[0]
+            stored : 
+            current: 1
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[1]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[2]
+            stored : 
+            current: 3
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[3]
+            stored : 
+            current: 4
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[4]
+            stored : 
+            current: 5
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[5]
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[len]
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[sum]
+            stored : 
+            current: 21
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments[len]
+            stored : 
+            current: 7
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.unattributed_count
+            stored : 
+            current: 8
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.unattributed_total
+            stored : 
+            current: 4776.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.views_agree
+            stored : 
+            current: True
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution[len]
+            stored : 
+            current: 8
+
+2026-08-07   [OPEN]
+    [WARN ] ENGINE_CHANGED             nas.folio_control[len]
+            stored : 23
+            current: 24   (delta +1)
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.folio_view
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.misrouted_ids[len]
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.reservation_view
+            stored : 
+            current: 476.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed
+            stored : 
+            current: 476.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_count
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[0]
+            stored : 
+            current: 1
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[1]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[len]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[sum]
+            stored : 
+            current: 3
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges[len]
+            stored : 
+            current: 7
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.folio_view
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.misrouted_ids[len]
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.reservation_view
+            stored : 
+            current: 4300
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed
+            stored : 
+            current: 4300
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_count
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[0]
+            stored : 
+            current: 1
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[1]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[2]
+            stored : 
+            current: 3
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[3]
+            stored : 
+            current: 4
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[4]
+            stored : 
+            current: 5
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[5]
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[len]
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[sum]
+            stored : 
+            current: 21
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments[len]
+            stored : 
+            current: 7
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.unattributed_count
+            stored : 
+            current: 8
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.unattributed_total
+            stored : 
+            current: 4776.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.views_agree
+            stored : 
+            current: True
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution[len]
+            stored : 
+            current: 8
+
+2026-08-08   [OPEN]
+    [WARN ] ENGINE_CHANGED             nas.folio_control[len]
+            stored : 23
+            current: 24   (delta +1)
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.folio_view
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.misrouted_ids[len]
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.reservation_view
+            stored : 
+            current: 476.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed
+            stored : 
+            current: 476.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_count
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[0]
+            stored : 
+            current: 1
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[1]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[len]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[sum]
+            stored : 
+            current: 3
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges[len]
+            stored : 
+            current: 7
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.folio_view
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.misrouted_count
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.misrouted_ids[len]
+            stored : 
+            current: 0
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.reservation_view
+            stored : 
+            current: 4300
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed
+            stored : 
+            current: 4300
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_count
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[0]
+            stored : 
+            current: 1
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[1]
+            stored : 
+            current: 2
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[2]
+            stored : 
+            current: 3
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[3]
+            stored : 
+            current: 4
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[4]
+            stored : 
+            current: 5
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[5]
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[len]
+            stored : 
+            current: 6
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[sum]
+            stored : 
+            current: 21
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments[len]
+            stored : 
+            current: 7
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.unattributed_count
+            stored : 
+            current: 8
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.unattributed_total
+            stored : 
+            current: 4776.19
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.views_agree
+            stored : 
+            current: True
+    [WARN ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution[len]
+            stored : 
+            current: 8
+
+2026-08-10   [BUSINESS_DATE]
+    [INFO ] ENGINE_CHANGED             nas.folio_control[len]
+            stored : 23
+            current: 24   (delta +1)
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.folio_view
+            stored : 
+            current: 0
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.misrouted_count
+            stored : 
+            current: 0
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.misrouted_ids[len]
+            stored : 
+            current: 0
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.reservation_view
+            stored : 
+            current: 476.19
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed
+            stored : 
+            current: 476.19
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_count
+            stored : 
+            current: 2
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[0]
+            stored : 
+            current: 1
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[1]
+            stored : 
+            current: 2
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[len]
+            stored : 
+            current: 2
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges.unattributed_ids[sum]
+            stored : 
+            current: 3
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.charges[len]
+            stored : 
+            current: 7
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.misrouted_count
+            stored : 
+            current: 0
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.folio_view
+            stored : 
+            current: 0
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.misrouted_count
+            stored : 
+            current: 0
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.misrouted_ids[len]
+            stored : 
+            current: 0
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.reservation_view
+            stored : 
+            current: 4300
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed
+            stored : 
+            current: 4300
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_count
+            stored : 
+            current: 6
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[0]
+            stored : 
+            current: 1
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[1]
+            stored : 
+            current: 2
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[2]
+            stored : 
+            current: 3
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[3]
+            stored : 
+            current: 4
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[4]
+            stored : 
+            current: 5
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[5]
+            stored : 
+            current: 6
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[len]
+            stored : 
+            current: 6
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments.unattributed_ids[sum]
+            stored : 
+            current: 21
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.payments[len]
+            stored : 
+            current: 7
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.unattributed_count
+            stored : 
+            current: 8
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.unattributed_total
+            stored : 
+            current: 4776.19
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution.views_agree
+            stored : 
+            current: True
+    [INFO ] ENGINE_FIGURE_ADDED        nas.folio_control.attribution[len]
+            stored : 
+            current: 8
+
+====================================================================================================
+END OF REPORT
+====================================================================================================

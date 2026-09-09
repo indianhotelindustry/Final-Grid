@@ -1,0 +1,541 @@
+{
+  "anchor_matches": true,
+  "cases_passed": 44,
+  "cases_total": 44,
+  "copy_method": "sqlite-backup-api",
+  "d11_extra_charges": [
+    1,
+    2
+  ],
+  "d11_payments": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "d11_unchanged": true,
+  "directive": "FG-P1-EXEC-20260909-01",
+  "finished_at": "2026-09-09T07:04:57",
+  "frozen_anchor": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "phase": "1",
+  "production_db": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS\\instance\\pms.db",
+  "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "production_sha256_before": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "read_only_verified": true,
+  "results": [
+    {
+      "case": "T-L01",
+      "expect": 5,
+      "got": 5,
+      "group": "S2",
+      "note": "",
+      "pass": true,
+      "what": "existing folio A returned"
+    },
+    {
+      "case": "T-L02",
+      "expect": "A",
+      "got": "A",
+      "group": "S2",
+      "note": "",
+      "pass": true,
+      "what": "returned folio is letter A"
+    },
+    {
+      "case": "T-L03",
+      "expect": 5,
+      "got": 5,
+      "group": "S2",
+      "note": "",
+      "pass": true,
+      "what": "resolver accepts reservation id"
+    },
+    {
+      "case": "T-L05",
+      "expect": 1,
+      "got": 1,
+      "group": "S2",
+      "note": "",
+      "pass": true,
+      "what": "repeated resolution creates no folio"
+    },
+    {
+      "case": "T-L06",
+      "expect": [
+        5,
+        "A"
+      ],
+      "got": [
+        5,
+        "A"
+      ],
+      "group": "S2",
+      "note": "",
+      "pass": true,
+      "what": "folio B never selected when A exists"
+    },
+    {
+      "case": "T-L07",
+      "expect": 0,
+      "got": 0,
+      "group": "S2",
+      "note": "",
+      "pass": true,
+      "what": "raw-SQL reservation starts with no folio"
+    },
+    {
+      "case": "T-L08",
+      "expect": [
+        "A",
+        6
+      ],
+      "got": [
+        "A",
+        6
+      ],
+      "group": "S2",
+      "note": "",
+      "pass": true,
+      "what": "missing folio A is created (Q-1)"
+    },
+    {
+      "case": "T-L09",
+      "expect": true,
+      "got": true,
+      "group": "S2",
+      "note": "",
+      "pass": true,
+      "what": "folio creation is audited (Q-1)"
+    },
+    {
+      "case": "T-L10",
+      "expect": 1,
+      "got": 1,
+      "group": "S2",
+      "note": "",
+      "pass": true,
+      "what": "exactly one folio created for that reservation"
+    },
+    {
+      "case": "T-L11",
+      "expect": 7,
+      "got": 7,
+      "group": "S2",
+      "note": "",
+      "pass": true,
+      "what": "second resolution reuses the created folio"
+    },
+    {
+      "case": "T-L12",
+      "expect": "FolioResolutionError",
+      "got": "FolioResolutionError",
+      "group": "S2",
+      "note": "",
+      "pass": true,
+      "what": "None reservation fails closed"
+    },
+    {
+      "case": "T-L13",
+      "expect": "FolioResolutionError",
+      "got": "FolioResolutionError",
+      "group": "S2",
+      "note": "",
+      "pass": true,
+      "what": "unknown reservation fails closed"
+    },
+    {
+      "case": "T-L14",
+      "expect": true,
+      "got": true,
+      "group": "S2",
+      "note": "",
+      "pass": true,
+      "what": "audited_financial_write persists a row"
+    },
+    {
+      "case": "T-L15",
+      "expect": "AuditCouplingError",
+      "got": "AuditCouplingError",
+      "group": "S2",
+      "note": "",
+      "pass": true,
+      "what": "audit helper fails closed on bad input"
+    },
+    {
+      "case": "T-W01",
+      "expect": [],
+      "got": [],
+      "group": "S3a",
+      "note": "",
+      "pass": true,
+      "what": "every enumerated writer constructor sets folio_id"
+    },
+    {
+      "case": "T-W02",
+      "expect": [],
+      "got": [],
+      "group": "S3a",
+      "note": "33 call sites scanned",
+      "pass": true,
+      "what": "no financial constructor anywhere lacks folio_id"
+    },
+    {
+      "case": "T-W05",
+      "expect": [
+        200,
+        5
+      ],
+      "got": [
+        200,
+        5
+      ],
+      "group": "S3b",
+      "note": "",
+      "pass": true,
+      "what": "add_payment attributes to folio A"
+    },
+    {
+      "case": "T-W15",
+      "expect": [
+        200,
+        5,
+        true
+      ],
+      "got": [
+        200,
+        5,
+        true
+      ],
+      "group": "S3b",
+      "note": "",
+      "pass": true,
+      "what": "POS charge attributed and audited in one commit"
+    },
+    {
+      "case": "T-W20",
+      "expect": true,
+      "got": true,
+      "group": "S3b",
+      "note": "no charge posted",
+      "pass": true,
+      "what": "overstay charge attributed (if posted)"
+    },
+    {
+      "case": "T-W13",
+      "expect": 5,
+      "got": 5,
+      "group": "S3b",
+      "note": "",
+      "pass": true,
+      "what": "CICO charge attributed"
+    },
+    {
+      "case": "T-W08",
+      "expect": 5,
+      "got": 5,
+      "group": "S3b",
+      "note": "",
+      "pass": true,
+      "what": "payment correction inherits attribution"
+    },
+    {
+      "case": "T-Q02",
+      "expect": "FolioResolutionError",
+      "got": "FolioResolutionError",
+      "group": "S3b",
+      "note": "",
+      "pass": true,
+      "what": "correction of a NULL-folio original is refused (Q-2)"
+    },
+    {
+      "case": "T-A01",
+      "expect": 8,
+      "got": 8,
+      "group": "S3c",
+      "note": "",
+      "pass": true,
+      "what": "audit failure rolls back the payment"
+    },
+    {
+      "case": "T-A02",
+      "expect": 4,
+      "got": 4,
+      "group": "S3c",
+      "note": "",
+      "pass": true,
+      "what": "audit failure rolls back the POS charge"
+    },
+    {
+      "case": "T-A03",
+      "expect": true,
+      "got": true,
+      "group": "S3c",
+      "note": "",
+      "pass": true,
+      "what": "payment caller is told it failed (no false success)"
+    },
+    {
+      "case": "T-A04",
+      "expect": true,
+      "got": true,
+      "group": "S3c",
+      "note": "",
+      "pass": true,
+      "what": "POS caller is told it failed (no false success)"
+    },
+    {
+      "case": "T-R01",
+      "expect": [
+        1,
+        [
+          8
+        ],
+        [
+          "2026-08-10"
+        ]
+      ],
+      "got": [
+        1,
+        [
+          8
+        ],
+        [
+          "2026-08-10"
+        ]
+      ],
+      "group": "S4",
+      "note": "",
+      "pass": true,
+      "what": "night audit posts room rent attributed to folio A"
+    },
+    {
+      "case": "T-R02",
+      "expect": 1,
+      "got": 1,
+      "group": "S4",
+      "note": "",
+      "pass": true,
+      "what": "night audit rerun posts no duplicate room rent"
+    },
+    {
+      "case": "T-R04",
+      "expect": 0.0,
+      "got": 0.0,
+      "group": "S4",
+      "note": "room rent posted = 1200.00",
+      "pass": true,
+      "what": "folio balance still excludes room revenue"
+    },
+    {
+      "case": "T-N01",
+      "expect": true,
+      "got": true,
+      "group": "S5",
+      "note": "",
+      "pass": true,
+      "what": "attribution control is its own report section"
+    },
+    {
+      "case": "T-N02",
+      "expect": "set()",
+      "got": "set()",
+      "group": "S5",
+      "note": "",
+      "pass": true,
+      "what": "existing folio_control keys all still present"
+    },
+    {
+      "case": "T-N02b",
+      "expect": "{'negative_folios', 'open_folio_list', 'closed_folios_count', 'checkout_outstanding_total', 'in_house_outstanding', 'checkout_outstanding_list', 'total_outstanding', 'open_folios_count'}",
+      "got": "{'negative_folios', 'open_folio_list', 'closed_folios_count', 'checkout_outstanding_total', 'in_house_outstanding', 'checkout_outstanding_list', 'total_outstanding', 'open_folios_count'}",
+      "group": "S5",
+      "note": "",
+      "pass": true,
+      "what": "folio_control gains no key (replay ledger intact)"
+    },
+    {
+      "case": "T-N02c",
+      "expect": false,
+      "got": false,
+      "group": "S5",
+      "note": "",
+      "pass": true,
+      "what": "attribution is not nested inside folio_control"
+    },
+    {
+      "case": "T-N03",
+      "expect": true,
+      "got": true,
+      "group": "S5",
+      "note": "",
+      "pass": true,
+      "what": "reservation and folio views reconcile"
+    },
+    {
+      "case": "T-N04",
+      "expect": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "got": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "group": "S5",
+      "note": "",
+      "pass": true,
+      "what": "unattributed bucket is exactly the D11 rows"
+    },
+    {
+      "case": "T-N05",
+      "expect": "warning",
+      "got": "warning",
+      "group": "S5",
+      "note": "",
+      "pass": true,
+      "what": "unattributed rows are flagged, not shown as clean"
+    },
+    {
+      "case": "T-N06",
+      "expect": 4776.19,
+      "got": 4776.19,
+      "group": "S5",
+      "note": "",
+      "pass": true,
+      "what": "D11 total is reported separately, not netted in"
+    },
+    {
+      "case": "T-N07",
+      "expect": 0,
+      "got": 0,
+      "group": "S5",
+      "note": "",
+      "pass": true,
+      "what": "no row is routed to another reservation's folio"
+    },
+    {
+      "case": "T-N08",
+      "expect": [
+        "danger",
+        1
+      ],
+      "got": [
+        "danger",
+        1
+      ],
+      "group": "S5",
+      "note": "",
+      "pass": true,
+      "what": "control detects a misrouted row (P9 commissioning)"
+    },
+    {
+      "case": "T-D01",
+      "expect": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "got": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "group": "D11",
+      "note": "",
+      "pass": true,
+      "what": "NULL-folio payment id set unchanged"
+    },
+    {
+      "case": "T-D02",
+      "expect": [
+        1,
+        2
+      ],
+      "got": [
+        1,
+        2
+      ],
+      "group": "D11",
+      "note": "",
+      "pass": true,
+      "what": "NULL-folio charge id set unchanged"
+    },
+    {
+      "case": "T-D03",
+      "expect": {
+        "1": 800.0,
+        "2": 400.0,
+        "3": 1500.0,
+        "4": 1000.0,
+        "5": 500.0,
+        "6": 100.0
+      },
+      "got": {
+        "1": 800.0,
+        "2": 400.0,
+        "3": 1500.0,
+        "4": 1000.0,
+        "5": 500.0,
+        "6": 100.0
+      },
+      "group": "D11",
+      "note": "",
+      "pass": true,
+      "what": "D11 payment amounts unchanged"
+    },
+    {
+      "case": "T-D04",
+      "expect": {
+        "1": 380.95,
+        "2": 95.24
+      },
+      "got": {
+        "1": 380.95,
+        "2": 95.24
+      },
+      "group": "D11",
+      "note": "",
+      "pass": true,
+      "what": "D11 charge amounts unchanged"
+    },
+    {
+      "case": "T-P01",
+      "expect": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+      "got": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+      "group": "PROD",
+      "note": "",
+      "pass": true,
+      "what": "production database unchanged"
+    }
+  ],
+  "started_at": "2026-09-09T07:04:52",
+  "verdict": "PASS"
+}

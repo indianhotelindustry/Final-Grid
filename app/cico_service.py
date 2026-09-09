@@ -338,7 +338,7 @@ def post_charge(reservation, charge_type, amount, slab_label,
         ExtraCharge object if posted, None if skipped.
     """
     from app.models import ExtraCharge, AuditLog, CICOChargeLog, db
-    from app.services import get_business_date
+    from app.services import get_business_date, resolve_billing_folio_id
 
     if amount <= 0:
         return None
@@ -352,6 +352,7 @@ def post_charge(reservation, charge_type, amount, slab_label,
 
     ec = ExtraCharge(
         reservation_id=reservation.id,
+        folio_id=resolve_billing_folio_id(reservation, user_id=user_id),  # R-1
         description=description,
         amount=amount,
         charge_date=charge_date or get_business_date(),

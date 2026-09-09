@@ -140,8 +140,11 @@ def process_reservation_noshow(
 
     # --- No-show fee as ExtraCharge ---
     if fee_applied:
+        from app.services import resolve_billing_folio_id
         db.session.add(ExtraCharge(
             reservation_id=reservation.id,
+            folio_id=resolve_billing_folio_id(                        # R-1
+                reservation, user_id=posted_by_user_id),
             description=f'No-Show Fee ({config["fee_mode"]})',
             amount=fee_amount,
             charge_date=business_date,

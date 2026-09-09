@@ -15,7 +15,8 @@ Routes:
 """
 
 from datetime import datetime
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import (Blueprint, render_template, request, redirect, url_for,
+                   flash, jsonify, current_app)
 from flask_login import login_required, current_user
 from app.models import db, Room, Reservation, Guest, RoomType, ExtraCharge, POSItem, PaymentMode
 from app.services import get_business_date
@@ -107,31 +108,41 @@ def post_charge():
     # Determine GST category from catalog item or default to 'Other'
     _category = item.category if pos_item_id and item else 'Other'
 
-    charge = ExtraCharge(
-        reservation_id=reservation_id,
-        description=description,
-        amount=amount,
-        charge_date=get_business_date(),
-        charge_category=_category,
-    )
-    db.session.add(charge)
-    db.session.commit()
-
-    # Audit log
+    # Q-5 — the charge and its audit row are written in ONE transaction and
+    # committed together. Previously the charge was committed first and the
+    # audit attempted afterwards with its exception swallowed, so a POS charge
+    # could land with no audit record and the caller still saw success.
+    from app.services import (resolve_billing_folio_id,
+                              audited_financial_write)
     try:
-        from app.models import AuditLog
-        log = AuditLog(
-            staff_user_id=current_user.id,
-            entity_type='ExtraCharge',
-            entity_id=charge.id,
-            action='pos_charge',
-            before_state={},
-            after_state={'reservation_id': reservation_id, 'description': description, 'amount': amount},
+        charge = ExtraCharge(
+            reservation_id=reservation_id,
+            folio_id=resolve_billing_folio_id(reservation),           # R-1
+            description=description,
+            amount=amount,
+            charge_date=get_business_date(),
+            charge_category=_category,
         )
-        db.session.add(log)
+        db.session.add(charge)
+        db.session.flush()
+        audited_financial_write(
+            'ExtraCharge', charge.id, 'pos_charge', {},
+            {'reservation_id': reservation_id, 'description': description,
+             'amount': amount, 'folio_id': charge.folio_id},
+            user_id=current_user.id if current_user.is_authenticated else None)
         db.session.commit()
-    except Exception:
-        pass
+    except Exception as exc:
+        # Covers FolioResolutionError and AuditCouplingError as well as any
+        # database error: in every case nothing is committed and the caller is
+        # told the truth rather than being shown a misleading success.
+        db.session.rollback()
+        current_app.logger.exception('POS charge failed for res=%s: %s',
+                                     reservation_id, exc)
+        msg = 'Could not post the charge. Nothing was saved.'
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'error': msg}), 500
+        flash(msg, 'danger')
+        return redirect(url_for('pos.index'))
 
     guest_name = reservation.guest.name if reservation.guest else 'Guest'
     room_num = reservation.room.room_number if reservation.room else reservation.room_type.name

@@ -713,6 +713,99 @@ class NightAuditService:
     # -----------------------------------------------------------------------
     # 6. Folio and Ledger Control
     # -----------------------------------------------------------------------
+    def attribution_control(self) -> dict:
+        """Reservation-level and folio-attributed views of the same money.
+
+        Phase 1 unit 1.7. The reservation remains the operational source for
+        the stay; the folio is the financial owner of the transaction
+        (AR-002 / ADR-003). Under Level 2 the two views must total the same,
+        which is exactly what INV-A03 asserts — so this control shows them
+        side by side rather than replacing one with the other.
+
+        Rows carrying no folio are reported in their **own** bucket. They are
+        never netted into the folio view and never presented as compliant
+        folio activity: on the production database the unattributed rows are
+        the eight D11 commissioning/test rows, preserved unchanged under
+        FD-010 Option A. A non-zero unattributed bucket is surfaced as a
+        warning, not silently averaged away (P11).
+        """
+        from app.models import Payment, ExtraCharge, Folio
+        from app.services import (signed_payment_amount,
+                                  signed_extra_charge_amount)
+
+        folio_owner = dict(db.session.query(Folio.id, Folio.reservation_id).all())
+
+        def split(rows, signed):
+            reservation_view = 0.0
+            folio_view = 0.0
+            unattributed = 0.0
+            unattributed_ids = []
+            misrouted_ids = []
+            for row in rows:
+                amt = float(signed(row))
+                reservation_view += amt
+                if row.folio_id is None:
+                    unattributed += amt
+                    unattributed_ids.append(row.id)
+                    continue
+                folio_view += amt
+                if folio_owner.get(row.folio_id) != row.reservation_id:
+                    misrouted_ids.append(row.id)
+            return {
+                'reservation_view': round(reservation_view, 2),
+                'folio_view': round(folio_view, 2),
+                'unattributed': round(unattributed, 2),
+                'unattributed_count': len(unattributed_ids),
+                'unattributed_ids': unattributed_ids[:50],
+                'misrouted_count': len(misrouted_ids),
+                'misrouted_ids': misrouted_ids[:50],
+            }
+
+        payments = split([p for p in db.session.query(Payment).all()
+                          if not p.is_voided], signed_payment_amount)
+        charges = split(db.session.query(ExtraCharge).all(),
+                        signed_extra_charge_amount)
+
+        def agrees(b):
+            return (abs(b['reservation_view'] - (b['folio_view'] + b['unattributed']))
+                    < 0.01) and b['misrouted_count'] == 0
+
+        unattributed_total = round(payments['unattributed'] + charges['unattributed'], 2)
+        unattributed_count = payments['unattributed_count'] + charges['unattributed_count']
+        misrouted_count = payments['misrouted_count'] + charges['misrouted_count']
+        views_agree = agrees(payments) and agrees(charges)
+
+        if misrouted_count:
+            state, note = 'danger', (
+                '%d financial row(s) are attributed to a folio belonging to a '
+                'different reservation.' % misrouted_count)
+        elif not views_agree:
+            state, note = 'danger', (
+                'The reservation-level and folio-attributed views of the same '
+                'money do not reconcile.')
+        elif unattributed_count:
+            state, note = 'warning', (
+                '%d historical financial row(s) totalling %.2f carry no folio '
+                'attribution. These are preserved unchanged as commissioning / '
+                'test activity (D11-F2, FD-010 Option A) and are NOT folio '
+                'activity. INV-A02 continues to report them.'
+                % (unattributed_count, unattributed_total))
+        else:
+            state, note = 'success', (
+                'Every financial row is attributed to its reservation\'s '
+                'billing folio; both views reconcile.')
+
+        return {
+            'payments': payments,
+            'charges': charges,
+            'views_agree': views_agree,
+            'unattributed_total': unattributed_total,
+            'unattributed_count': unattributed_count,
+            'misrouted_count': misrouted_count,
+            'state': state,
+            'note': note,
+        }
+
     def folio_control(self) -> dict:
         open_folios = []
         closed_folios = []
@@ -1520,16 +1613,29 @@ class NightAuditService:
             warnings_row = _row('warning',
                                 f'{_eff_warning} review note(s) to acknowledge')
 
+        # ── F. Folio attribution (Phase 1 unit 1.7) ────────────────────────────
+        # The folio-attributed view of the money beside the reservation-level
+        # one. A disagreement is a danger row; historical unattributed rows
+        # (D11, preserved under FD-010) are a review note, never presented as
+        # compliant folio activity.
+        _attr = report.get('attribution') or {}
+        _attr_state = _attr.get('state', 'warning')
+        attribution_row = _row(
+            _attr_state,
+            _attr.get('note', 'Folio attribution control unavailable'))
+
         # ── Aggregate danger / warning condition counts ────────────────────────
         danger_conditions = sum([
             1 if recon_abs >= 1      else 0,
             1 if overpay_count > 0   else 0,
             1 if unsettled_count > 0 else 0,
             1 if blocker_count > 0   else 0,
+            1 if _attr_state == 'danger' else 0,
         ])
         warn_conditions = sum([
             1 if _eff_warning > 0  else 0,
             1 if leakage_total > 0 else 0,
+            1 if _attr_state == 'warning' else 0,
         ])
         total_issues = danger_conditions + warn_conditions
 
@@ -1663,6 +1769,7 @@ class NightAuditService:
             'recon':    recon_row,
             'overpay':  overpay_row,
             'checkout': checkout_row,
+            'attribution': attribution_row,
             'blockers': blockers_row,
             'warnings': warnings_row,
             # ── Banner ────────────────────────────────────────────────────────
@@ -1705,6 +1812,15 @@ class NightAuditService:
             'revenue': self._get('revenue_summary'),
             'payments': self._get('payment_summary'),
             'folio': self._get('folio_control'),
+            # Phase 1 unit 1.7 — the folio-attributed view of the money beside
+            # the reservation-level one. Deliberately a section of its own
+            # rather than a key inside folio_control: the D3 replay ledger
+            # captures the figures of the sections named in
+            # verification/replay/engines.py::NAS_SECTIONS, and adding a key
+            # inside one of those would change every stored historical figure
+            # set. This keeps the stored replay identical while still putting
+            # the figure on the night-audit screen.
+            'attribution': self._get('attribution_control'),
             'room_charges': self._get('room_charge_audit'),
             'exceptions': self._get('exception_report'),
             'tax': self._get('tax_snapshot'),
