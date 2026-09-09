@@ -5,7 +5,7 @@
   "body_sha256": "44ba25e3063b75025fab45388986e0834bbdee3a8072feb3aac1ff8ce5c19a62",
   "category": "OPERATIONAL",
   "content_type": "application/json",
-  "duration_ms": 3,
+  "duration_ms": 2,
   "endpoint": "loyalty.api_balance",
   "error": "",
   "figure_source": "json",

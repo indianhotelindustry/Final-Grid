@@ -5,7 +5,7 @@
   "body_sha256": "036101d37f9b6007652d675134a823c4d0b531898b4461f3e8c519eba3f8ee30",
   "category": "PUBLIC",
   "content_type": "application/json",
-  "duration_ms": 8,
+  "duration_ms": 4,
   "endpoint": "booking.rates_api",
   "error": "",
   "figure_source": "json",

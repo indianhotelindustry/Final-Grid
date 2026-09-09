@@ -1,17 +1,17 @@
 {
   "anon_location": "/auth/login?next=%2Fai%2Fanomalies",
   "anon_status": 302,
-  "body_bytes": 32961,
-  "body_sha256": "72949b4fdbd2817dce7296ac75fe399fbfbd43c9a37d29febe2ea84221f6b6ce",
+  "body_bytes": 33624,
+  "body_sha256": "24d58ae1c3acfe4f81615afe0b360a13eb67bded199b6f95fad08a152c9b6279",
   "category": "ADVISORY",
   "content_type": "text/html",
-  "duration_ms": 39,
+  "duration_ms": 93,
   "endpoint": "ai.anomaly_dashboard",
   "error": "",
   "figure_source": "context",
   "figures": {
     "dev_seed_enabled": "False",
-    "g_business_date": "2026-05-28",
+    "g_business_date": "2026-08-10",
     "g_business_date_locked": "False",
     "pending_shift_count": "0",
     "pending_void_count": "0"

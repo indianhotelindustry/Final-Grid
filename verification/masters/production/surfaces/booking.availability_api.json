@@ -5,7 +5,7 @@
   "body_sha256": "7103b1fd92b6b52605b7b71d915c681719e1dd31cf4bd041fca67c82298ccb2b",
   "category": "PUBLIC",
   "content_type": "application/json",
-  "duration_ms": 2,
+  "duration_ms": 1,
   "endpoint": "booking.availability_api",
   "error": "",
   "figure_source": "json",

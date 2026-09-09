@@ -5,7 +5,7 @@
   "body_sha256": "974e4feba60d3637e5fbe38bad7bc2cabf395e61486ada685d677ac1d7ca68a4",
   "category": "OPERATIONAL",
   "content_type": "application/json",
-  "duration_ms": 6,
+  "duration_ms": 4,
   "endpoint": "main.api_staff_performance_today",
   "error": "",
   "figure_source": "json",

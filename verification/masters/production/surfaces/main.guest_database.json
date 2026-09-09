@@ -5,7 +5,7 @@
   "body_sha256": "853c8189e9badd409a210a936fb888b70140ddd470448bd516c40f68219b11f3",
   "category": "OPERATIONAL",
   "content_type": "text/html",
-  "duration_ms": 4,
+  "duration_ms": 1,
   "endpoint": "main.guest_database",
   "error": "",
   "figure_source": "none",

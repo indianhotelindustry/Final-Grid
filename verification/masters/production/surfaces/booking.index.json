@@ -1,17 +1,17 @@
 {
   "anon_location": "",
   "anon_status": 200,
-  "body_bytes": 16009,
-  "body_sha256": "c483b130863185fe531efa405ae2618f7c0ecddc572febedad38b32270d4f402",
+  "body_bytes": 16008,
+  "body_sha256": "1baea084eb940ca2ca58e3504e7f28453c8bdb8a8fa95133d97659debc535982",
   "category": "PUBLIC",
   "content_type": "text/html",
-  "duration_ms": 17,
+  "duration_ms": 30,
   "endpoint": "booking.index",
   "error": "",
   "figure_source": "context",
   "figures": {
     "dev_seed_enabled": "False",
-    "g_business_date": "2026-05-28",
+    "g_business_date": "2026-08-10",
     "g_business_date_locked": "False",
     "pending_shift_count": "0",
     "pending_void_count": "0",
@@ -19,8 +19,8 @@
     "room_types[1][type]": "RoomType",
     "room_types[2][type]": "RoomType",
     "room_types[len]": "3",
-    "today": "2026-05-28",
-    "tomorrow": "2026-05-29"
+    "today": "2026-08-10",
+    "tomorrow": "2026-08-11"
   },
   "location": "",
   "normalisation_hits": {

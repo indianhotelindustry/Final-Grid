@@ -5,7 +5,7 @@
   "body_sha256": "5413f61813dcee10cf27960071457af9c562f59baca445cbf9741ee2af385876",
   "category": "FINANCIAL",
   "content_type": "application/json",
-  "duration_ms": 2,
+  "duration_ms": 1,
   "endpoint": "main.voucher_lookup",
   "error": "",
   "figure_source": "json",

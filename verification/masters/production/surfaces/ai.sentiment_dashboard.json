@@ -1,17 +1,17 @@
 {
   "anon_location": "/auth/login?next=%2Fai%2Fsentiment",
   "anon_status": 302,
-  "body_bytes": 41069,
-  "body_sha256": "b0ef30f7d6103f517bd3b7912c23f9a404eed6874144a8529e5fc8e33c6b257e",
+  "body_bytes": 41732,
+  "body_sha256": "32fa0a0bb604b64a33500b48617ab7abd9aff83bd4977bb345e14965ebbed540",
   "category": "ADVISORY",
   "content_type": "text/html",
-  "duration_ms": 6,
+  "duration_ms": 26,
   "endpoint": "ai.sentiment_dashboard",
   "error": "",
   "figure_source": "context",
   "figures": {
     "dev_seed_enabled": "False",
-    "g_business_date": "2026-05-28",
+    "g_business_date": "2026-08-10",
     "g_business_date_locked": "False",
     "pending_shift_count": "0",
     "pending_void_count": "0"

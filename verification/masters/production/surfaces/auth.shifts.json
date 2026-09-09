@@ -1,20 +1,21 @@
 {
   "anon_location": "/auth/login?next=%2Fauth%2Fshifts",
   "anon_status": 302,
-  "body_bytes": 22209,
-  "body_sha256": "8931f699d96fb6a23698f707bf243b7895a8f8bfb0c9d3760b995dc0916b5eb0",
+  "body_bytes": 23516,
+  "body_sha256": "6647f65ca51cc52a6bafcaf17b7f95359a0f607284b93322c3a7cb1522c912a1",
   "category": "OPERATIONAL",
   "content_type": "text/html",
-  "duration_ms": 30,
+  "duration_ms": 15,
   "endpoint": "auth.shifts",
   "error": "",
   "figure_source": "context",
   "figures": {
     "dev_seed_enabled": "False",
-    "g_business_date": "2026-05-28",
+    "g_business_date": "2026-08-10",
     "g_business_date_locked": "False",
     "pending_shift_count": "0",
-    "pending_void_count": "0"
+    "pending_void_count": "0",
+    "shifts[len]": "0"
   },
   "location": "",
   "normalisation_hits": {
@@ -25,10 +26,10 @@
   "origin": "discovered",
   "params": {},
   "severity": "WARN",
-  "status": 500,
+  "status": 200,
   "surface_id": "auth.shifts",
   "templates": [
-    "errors/500.html"
+    "auth/shifts.html"
   ],
   "truncations": [],
   "url": "/auth/shifts"

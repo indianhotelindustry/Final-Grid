@@ -1,11 +1,11 @@
 {
   "anon_location": "/auth/login?next=%2Fota%2F",
   "anon_status": 302,
-  "body_bytes": 33502,
-  "body_sha256": "731b9a19d97a75f2b7738a49ac5cbfb0b3561b60fdc9748ef1a77d36ef9c6fff",
+  "body_bytes": 34165,
+  "body_sha256": "6affae7eaeeca6cb934ec5aa6ae241eb2b74bb08c7de37b43c641f9983909f91",
   "category": "FINANCIAL",
   "content_type": "text/html",
-  "duration_ms": 49,
+  "duration_ms": 37,
   "endpoint": "ota.dashboard",
   "error": "",
   "figure_source": "context",
@@ -13,9 +13,9 @@
     "by_source[len]": "0",
     "dev_seed_enabled": "False",
     "failed_count": "0",
-    "g_business_date": "2026-05-28",
+    "g_business_date": "2026-08-10",
     "g_business_date_locked": "False",
-    "month_start": "2026-05-01",
+    "month_start": "2026-08-01",
     "ota_res[len]": "0",
     "ota_share": "0",
     "ota_sources[len]": "9",
@@ -27,9 +27,9 @@
     "room_types[2][type]": "RoomType",
     "room_types[len]": "3",
     "status_counts[len]": "0",
-    "today": "2026-05-28",
+    "today": "2026-08-10",
     "total_ota_revenue": "0",
-    "total_revenue": "39644.29"
+    "total_revenue": "4300"
   },
   "location": "",
   "normalisation_hits": {

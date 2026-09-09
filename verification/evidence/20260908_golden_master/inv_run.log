@@ -1,0 +1,271 @@
+2026-09-09 06:26:20 [WARNING] app: Running on SQLite — row-level locking (with_for_update) is not enforced. SQLite uses a database-wide write lock; concurrent writers will serialise. Move to PostgreSQL for true per-row locking and higher concurrency.
+2026-09-09 06:26:20 [INFO] app: ------- SECURITY MODE -------
+2026-09-09 06:26:20 [INFO] app:   env                : production
+2026-09-09 06:26:20 [INFO] app:   secret_key         : set (>=32 chars)
+2026-09-09 06:26:20 [INFO] app:   updater_signing    : ENFORCED
+2026-09-09 06:26:20 [INFO] app:   encryption         : available
+2026-09-09 06:26:20 [INFO] app:   lan_access         : disabled (127.0.0.1 only)
+2026-09-09 06:26:20 [INFO] app:   schema_drift_mode  : warn-only
+2026-09-09 06:26:20 [INFO] app: -----------------------------
+2026-09-09 06:26:20 [INFO] app: db.create_all() skipped in production. Use Alembic migrations for schema changes. Set DB_AUTO_CREATE=1 to force-enable at next boot.
+2026-09-09 06:26:20 [INFO] app: SQLite: ensured table credit_vouchers exists
+2026-09-09 06:26:20 [INFO] app: SQLite: ensured table credit_voucher_redemptions exists
+2026-09-09 06:26:20 [INFO] apscheduler.scheduler: Scheduler started
+2026-09-09 06:26:20 [INFO] apscheduler.scheduler: Added job "setup_backup_scheduler.<locals>._scheduled_backup" to job store "default"
+2026-09-09 06:26:20 [INFO] app.backup_manager: Daily backup scheduled at 03:00
+2026-09-09 06:26:20 [INFO] apscheduler.scheduler: Added job "flush_notification_queue" to job store "default"
+2026-09-09 06:26:20 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._prune_old_logs" to job store "default"
+2026-09-09 06:26:20 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._run_predictive_maintenance" to job store "default"
+2026-09-09 06:26:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 06:26:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+
+====================================================================================================
+FINALGRID — FINANCIAL INVARIANT ENGINE
+Production Verification Framework, Wave 0 Deliverable 4
+====================================================================================================
+Started           : 2026-09-09T00:56:20
+Duration          : 1.6s
+Application       : v2.2.18
+PVF               : v0.5.0
+Mode / scope      : ENTIRE_DATABASE
+Business date     : 2026-08-10
+Clock frozen at   : 2026-08-10T12:00:00
+
+----------------------------------------------------------------------------------------------------
+CONTROLS (Principle 11 — positive evidence, not silence)
+----------------------------------------------------------------------------------------------------
+Source database   : C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\instance\pms.db
+Copy method       : sqlite-backup-api
+SHA-256 before    : 51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2
+SHA-256 after     : 51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2
+  read-only       : VERIFIED — production byte-identical after run
+  zero writes     : VERIFIED — 0 write statements counted across the whole registry
+  frozen clock    : proven
+  repeatable      : VERIFIED — a second evaluation produced identical findings
+  order independent: VERIFIED — reverse-order evaluation produced identical findings
+  commissioning   : VERIFIED — every COMMISSIONED claim is backed by 20260808_074606_inv_commission
+
+----------------------------------------------------------------------------------------------------
+SUMMARY
+----------------------------------------------------------------------------------------------------
+  Registered        : 26
+  HOLDS             : 17
+  VIOLATED          : 2
+  VACUOUS           : 7
+  NOT_APPLICABLE    : 0
+  ERROR             : 0
+  Violations found  : 10
+  Uncommissioned    : 1  (reported, but excluded from the verdict)
+
+  OVERALL VERDICT   : FAIL
+  Release blocking  : 1
+  Cert. blocking    : 2
+
+====================================================================================================
+FAILURE REPORT — 2 invariant(s) violated
+====================================================================================================
+
+----------------------------------------------------------------------------------------------------
+INV-A02  [HIGH / CERTIFICATION_BLOCKING]  Every financial row belongs to a folio
+----------------------------------------------------------------------------------------------------
+  What it means:
+      Financial rows exist that belong to no folio. The money is real and its attribution is
+      not.
+  Why it matters:
+      A folio is the unit a bill is issued against and the unit a company or an OTA is
+      invoiced on. A payment or a charge that belongs to no folio still moves the hotel's
+      money, but it cannot be attributed to anything, cannot appear on a split bill, and
+      cannot be reconciled by anyone downstream.
+  Financial impact  : 4776.19 (sum of the amounts carried by the violating rows)
+  Population        : 8
+  Violations        : 8
+  Confidence        : PROVEN
+  Observed          : 6/6 payments and 2/2 charges are unrouted, carrying 4776.19
+  Variance          : 4776.19
+  Constitutional    : P1, P5
+  Reports affected  :
+      - main.reservation_folio
+      - billing.gst_report
+      - reports.daily_reconciliation
+      - night audit folio control
+  Root cause candidates:
+      - Posting paths that write a payment before a folio exists
+      - A folio-creation step that runs only on the check-in route
+      - Legacy rows predating the folio model, never backfilled
+  Recommended investigation:
+      - Group the unrouted rows by created_at to see whether they are legacy or still being produced today
+      - Trace the posting path for the most recent unrouted row
+      - Check whether folio creation is conditional on booking_type
+  Affected objects:
+      payment 1
+          expected folio_id set
+          observed folio_id NULL   (amount 800)
+      payment 2
+          expected folio_id set
+          observed folio_id NULL   (amount 400)
+      payment 3
+          expected folio_id set
+          observed folio_id NULL   (amount 1500)
+      payment 4
+          expected folio_id set
+          observed folio_id NULL   (amount 1000)
+      payment 5
+          expected folio_id set
+          observed folio_id NULL   (amount 500)
+      payment 6
+          expected folio_id set
+          observed folio_id NULL   (amount 100)
+      extra_charge 1
+          expected folio_id set
+          observed folio_id NULL   (amount 380.95)
+      extra_charge 2
+          expected folio_id set
+          observed folio_id NULL   (amount 95.24)
+
+----------------------------------------------------------------------------------------------------
+INV-A03  [HIGH / RELEASE_BLOCKING]  Charges summed over folios equal charges summed over reservations
+----------------------------------------------------------------------------------------------------
+  What it means:
+      The folio and reservation views of the same charges disagree.
+  Why it matters:
+      The same money must total the same whichever way it is sliced. If the folio view and the
+      reservation view of the same charges differ, then at least one report in the system is
+      showing a number that does not exist.
+  Financial impact  : 476.19 (sum of the amounts carried by the violating rows)
+  Population        : 2
+  Violations        : 2
+  Confidence        : PROVEN
+  Observed          : reservation view 476.19, folio view 0.00
+  Variance          : -476.19
+  Constitutional    : P1, P5
+  Reports affected  :
+      - main.reservation_folio
+      - reports.revenue
+      - night audit folio control
+  Root cause candidates:
+      - A charge whose folio belongs to a different reservation
+      - Charges with folio_id NULL falling out of the folio view
+      - A folio whose reservation_id was repointed
+  Recommended investigation:
+      - List charges whose folio.reservation_id differs from their own reservation_id
+      - Check INV-A02 first — unrouted rows are the usual cause
+  Affected objects:
+      extra_charge 1
+          expected reachable through a folio
+          observed folio missing or unset   (amount 380.95)
+      extra_charge 2
+          expected reachable through a folio
+          observed folio missing or unset   (amount 95.24)
+
+====================================================================================================
+NOT PROVEN — evaluated but not exercised
+====================================================================================================
+These invariants did not fail. They also did not pass: the
+population was empty, or the mode does not apply. Under P10
+absence of data is not evidence of correctness, and reporting
+them as green would make the engine exactly the kind of control
+that cannot fail.
+  [VACUOUS        ] INV-A06  A guest who has paid more than they owe has an overpayment record
+      overpaid reservations: no rows in scope
+  [VACUOUS        ] INV-C01  A walk-in reservation is never settled through an OTA receivable
+      0 of 0 OTA posting(s) sit on walk-in bookings, carrying 0.00
+  [VACUOUS        ] INV-C05  An OTA settlement identifies the agent it will be collected from
+      reservations with OTA postings: no rows in scope
+  [VACUOUS        ] INV-C06  Corporate credit is backed by a company account that exists
+      no folio names a company and no reservation is flagged corporate; the rule was not exercised
+  [VACUOUS        ] INV-D02  Every correction and reversal references the transaction it corrects
+      no correction or reversal rows exist, so the rule was not exercised. The signing logic in signed_extra_charge_amount is therefore also untested by live data
+  [VACUOUS        ] INV-D05  Every void request and credit note references what it cancels
+      no void requests and no credit notes exist, so the rule was not exercised
+  [VACUOUS        ] INV-D07  Every overpayment record corresponds to a real overpayment
+      overpayment log rows: no rows in scope
+
+====================================================================================================
+PERFORMANCE AND SAFETY
+====================================================================================================
+ID        STATUS              POP  VIOL     ms   reads  writes    rows  peak KB  TITLE
+----------------------------------------------------------------------------------------------------
+INV-A01   HOLDS                 4     0     49      25       0       0      967  Settlement identity: grand total -
+INV-A02   VIOLATED              8     8      0       4       0      10        6  Every financial row belongs to a f
+INV-A03   VIOLATED              2     2      0       1       0       2        1  Charges summed over folios equal c
+INV-A04   HOLDS                 6     0      3       5       0       8       77  Daily collections equal the direct
+INV-A05   HOLDS                12     0      0       1       0      12        4  Every stored tax line equals its t
+INV-A06   VACUOUS               0     0     16      27       0       1       93  A guest who has paid more than the
+INV-B01   HOLDS                 3     0      0       3       0       4        3  No financial row was created into 
+INV-B02   HOLDS                 1     0      4       1       0       0      145  Every frozen night-audit snapshot 
+INV-B03   HOLDS                 8     0    247      44       0       0     4447  Recomputing a closed day reproduce
+INV-B04   HOLDS                 1     0      0       4       0       1       12  Exactly one business date exists a
+INV-B05   HOLDS                 1     0      0       2       0       2        1  Night audits form an unbroken sequ
+INV-B06   HOLDS                 6     0      0       1       0       6        2  A payment is never dated outside t
+INV-C01   VACUOUS               0     0      0       1       0       0        1  A walk-in reservation is never set
+INV-C02   HOLDS                 4     0     27      24       0       1      473  A checked-out reservation is settl
+INV-C03   HOLDS                20     0      0       9       0       6        4  Every financial event belongs to a
+INV-C04   HOLDS                 4     0      0       1       0       4        2  No room is occupied by two reserva
+INV-C05   VACUOUS               0     0      0       1       0       0        1  An OTA settlement identifies the a
+INV-C06   VACUOUS               0     0      0       4       0       2        1  Corporate credit is backed by a co
+INV-D01   HOLDS                 4     0      0       2       0       1        1  Every folio references a reservati
+INV-D02   VACUOUS               0     0      0       4       0       2        2  Every correction and reversal refe
+INV-D03   HOLDS                 6     0      0       3       0      13        4  Every payment references a payment
+INV-D04   HOLDS                12     0      0      13       0      24        5  Every tax line names the charge it
+INV-D05   VACUOUS               0     0      0       6       0       4        4  Every void request and credit note
+INV-D06   HOLDS                 4     0      0       2       0       5        1  Every priced room night belongs to
+INV-D07   VACUOUS               0     0      0       2       0       1        1  Every overpayment record correspon
+INV-R01   HOLDS                 1     0     61      42       0       0      627  A day reconciles gross accrual aga
+----------------------------------------------------------------------------------------------------
+TOTAL                                10    407     232       0     109     4447
+
+====================================================================================================
+COMMISSIONING GAPS (1)
+====================================================================================================
+An invariant that has never been shown to fail is not yet a
+control. These are reported by the engine and excluded from its
+verdict until commissioning demonstrates the failure.
+  INV-R01    NOT_COMMISSIONED
+      declared but not yet commissioned
+
+====================================================================================================
+END OF REPORT
+====================================================================================================
+2026-09-09 06:26:21 [INFO] apscheduler.scheduler: Scheduler has been shut down
+
+[inv] evidence pack: C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\verification\evidence\20260909_005620_inv_run_production

@@ -5,7 +5,7 @@
   "body_sha256": "fa439f5075a32f212627606afc0025ad98eeffa48e90ed0c97611565dd425e75",
   "category": "OPERATIONAL",
   "content_type": "text/html",
-  "duration_ms": 6,
+  "duration_ms": 3,
   "endpoint": "portal.view_submission",
   "error": "",
   "figure_source": "none",

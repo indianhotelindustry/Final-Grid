@@ -5,7 +5,7 @@
   "body_sha256": "0f7ab152ee9ade8cd69db39dc38e2799aa959051586db29d67d78bcfbf11ab19",
   "category": "FINANCIAL",
   "content_type": "application/json",
-  "duration_ms": 8,
+  "duration_ms": 2,
   "endpoint": "main.dashboard_alerts_summary",
   "error": "",
   "figure_source": "json",

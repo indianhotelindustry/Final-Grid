@@ -5,7 +5,7 @@
   "body_sha256": "2b8f71ef103db0d41f1217118bb41a37f68c8bf1b4cd7fb58072db325f1cfa91",
   "category": "OPERATIONAL",
   "content_type": "text/html",
-  "duration_ms": 5,
+  "duration_ms": 2,
   "endpoint": "main.edit_reservation",
   "error": "",
   "figure_source": "none",

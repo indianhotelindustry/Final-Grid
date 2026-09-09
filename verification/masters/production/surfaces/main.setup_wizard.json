@@ -1,8 +1,8 @@
 {
   "anon_location": "",
   "anon_status": 404,
-  "body_bytes": 22171,
-  "body_sha256": "d05502c1bc699325b5242b65998bc475b0f9420b1e6a4a00167d4f81d20bc85a",
+  "body_bytes": 22834,
+  "body_sha256": "b9a5a0dc215fde08698aa8c1352d53f2595e826751edde43f71417c4b071c9ce",
   "category": "OPERATIONAL",
   "content_type": "text/html",
   "duration_ms": 10,
@@ -11,7 +11,7 @@
   "figure_source": "context",
   "figures": {
     "dev_seed_enabled": "False",
-    "g_business_date": "2026-05-28",
+    "g_business_date": "2026-08-10",
     "g_business_date_locked": "False",
     "pending_shift_count": "0",
     "pending_void_count": "0"

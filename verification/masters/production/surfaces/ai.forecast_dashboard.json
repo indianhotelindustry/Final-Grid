@@ -1,17 +1,17 @@
 {
   "anon_location": "/auth/login?next=%2Fai%2Fforecast",
   "anon_status": 302,
-  "body_bytes": 33369,
-  "body_sha256": "c1444b3a6feddfc7332aa4d214c672bb6abcc5edadd39d5f675e88d72f6a46a7",
+  "body_bytes": 34032,
+  "body_sha256": "89bd0f690649dd1c2a8fe1847a6e5f054206a32b7069084b28e54bc12bed1701",
   "category": "ADVISORY",
   "content_type": "text/html",
-  "duration_ms": 6,
+  "duration_ms": 18,
   "endpoint": "ai.forecast_dashboard",
   "error": "",
   "figure_source": "context",
   "figures": {
     "dev_seed_enabled": "False",
-    "g_business_date": "2026-05-28",
+    "g_business_date": "2026-08-10",
     "g_business_date_locked": "False",
     "pending_shift_count": "0",
     "pending_void_count": "0"

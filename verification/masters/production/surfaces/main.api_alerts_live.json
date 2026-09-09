@@ -5,7 +5,7 @@
   "body_sha256": "9a095d6c1888c7589add67218abb8ca95d409dd9789a3ae699f1d5583132881b",
   "category": "OPERATIONAL",
   "content_type": "application/json",
-  "duration_ms": 3,
+  "duration_ms": 2,
   "endpoint": "main.api_alerts_live",
   "error": "",
   "figure_source": "json",

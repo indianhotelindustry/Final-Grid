@@ -1,18 +1,18 @@
 {
   "anon_location": "/auth/login?next=%2Freports%2Foverstay-control",
   "anon_status": 302,
-  "body_bytes": 28187,
-  "body_sha256": "7d9602401f5e436f649946605735aa655cd99be46ee13f82aff6e77d47713958",
+  "body_bytes": 28850,
+  "body_sha256": "a2b02c37060e4b351b382fc70b33f7cb037137caef0ca5ec950393aff015a04d",
   "category": "FINANCIAL",
   "content_type": "text/html",
-  "duration_ms": 44,
+  "duration_ms": 22,
   "endpoint": "reports.overstay_control",
   "error": "",
   "figure_source": "context",
   "figures": {
     "dev_seed_enabled": "False",
-    "from_date": "2026-05-01",
-    "g_business_date": "2026-05-28",
+    "from_date": "2026-08-01",
+    "g_business_date": "2026-08-10",
     "g_business_date_locked": "False",
     "pending_shift_count": "0",
     "pending_void_count": "0",
@@ -26,7 +26,7 @@
     "summary.total_waived_excl": "0",
     "summary.waive_count": "0",
     "summary[len]": "8",
-    "to_date": "2026-05-28"
+    "to_date": "2026-08-10"
   },
   "location": "",
   "normalisation_hits": {

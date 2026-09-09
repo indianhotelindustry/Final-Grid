@@ -1,22 +1,22 @@
 {
   "anon_location": "/auth/login?next=%2Freports%2Fgstr1-export",
   "anon_status": 302,
-  "body_bytes": 24743,
-  "body_sha256": "602c52cbee1368e19e20dfcebadc5f197f7b1771e01f564ffb0d9e813c351846",
+  "body_bytes": 25406,
+  "body_sha256": "3e9ce6536d94107e1128d31d9baa0e11693a8c8a2dbc46648282166f77e1fffc",
   "category": "FINANCIAL",
   "content_type": "text/html",
-  "duration_ms": 10,
+  "duration_ms": 16,
   "endpoint": "reports.gstr1_export",
   "error": "",
   "figure_source": "context",
   "figures": {
     "dev_seed_enabled": "False",
-    "from_date": "2026-04-01",
-    "g_business_date": "2026-05-28",
+    "from_date": "2026-07-01",
+    "g_business_date": "2026-08-10",
     "g_business_date_locked": "False",
     "pending_shift_count": "0",
     "pending_void_count": "0",
-    "to_date": "2026-04-30"
+    "to_date": "2026-07-31"
   },
   "location": "",
   "normalisation_hits": {

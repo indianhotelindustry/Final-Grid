@@ -1,0 +1,59 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Frevenue%3Fstart_date%3D2026-08-01%26end_date%3D2026-08-10",
+  "anon_status": 302,
+  "body_bytes": 33462,
+  "body_sha256": "1a0971acefcbd9ed7f45340629de413541966675b673c6c85e447823c74d871d",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 5,
+  "endpoint": "reports.revenue",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "by_mode.Card": "500",
+    "by_mode.Cash": "2800",
+    "by_mode.UPI": "1000",
+    "by_mode[len]": "3",
+    "by_source.Walk-in": "4095.23",
+    "by_source[len]": "1",
+    "by_type.Deluxe": "4095.23",
+    "by_type[len]": "1",
+    "checked_out[0][type]": "Reservation",
+    "checked_out[1][type]": "Reservation",
+    "checked_out[2][type]": "Reservation",
+    "checked_out[3][type]": "Reservation",
+    "checked_out[len]": "4",
+    "daily_trend.2026-08-10": "1142.85",
+    "daily_trend.2026-08-11": "2952.38",
+    "daily_trend[len]": "2",
+    "dev_seed_enabled": "False",
+    "from_date": "2026-07-12",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "to_date": "2026-08-10",
+    "total_extra_revenue": "476.19",
+    "total_payments": "4300",
+    "total_room_revenue": "3619.04"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 5,
+    "csrf_meta": 1
+  },
+  "note": "Revenue report, month to date.",
+  "origin": "declared",
+  "params": {
+    "business_date": "2026-08-10",
+    "month_start": "2026-08-01"
+  },
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.revenue__start_date_2026_08_01_end_date_2026_08_10",
+  "templates": [
+    "reports/revenue.html"
+  ],
+  "truncations": [],
+  "url": "/reports/revenue?start_date=2026-08-01&end_date=2026-08-10"
+}

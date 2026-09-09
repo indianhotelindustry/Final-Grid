@@ -1,8 +1,8 @@
 {
   "anon_location": "/auth/login?next=%2Fota%2Fwebhook%2Flogs",
   "anon_status": 302,
-  "body_bytes": 24204,
-  "body_sha256": "876ef1ff93794b2a27083f89b07d80c518d51e5bd3fe0f59bdf92aa9ec4bbdb8",
+  "body_bytes": 24867,
+  "body_sha256": "42ad1a041ae015b4693b56f4b854d4eb345e5f62e33d35ef90d82bf0995bef57",
   "category": "FINANCIAL",
   "content_type": "text/html",
   "duration_ms": 20,
@@ -11,7 +11,7 @@
   "figure_source": "context",
   "figures": {
     "dev_seed_enabled": "False",
-    "g_business_date": "2026-05-28",
+    "g_business_date": "2026-08-10",
     "g_business_date_locked": "False",
     "logs[type]": "QueryPagination",
     "pending_shift_count": "0",

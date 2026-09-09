@@ -1,25 +1,25 @@
 {
   "anon_location": "/auth/login?next=http://localhost/guests",
   "anon_status": 302,
-  "body_bytes": 234515,
-  "body_sha256": "53c02f5449c460fc1aecfaa81ace440b4647a63007d80c9e8a2ded9db4b674be",
+  "body_bytes": 174470,
+  "body_sha256": "4c984a07f7707ef53ec82474e1d0e7cb79453ad678c1f286897487d30aaea6ee",
   "category": "OPERATIONAL",
   "content_type": "text/html",
-  "duration_ms": 119,
+  "duration_ms": 57,
   "endpoint": "main.guests_list",
   "error": "",
   "figure_source": "context",
   "figures": {
     "active_stays": "0",
-    "checked_out": "28",
+    "checked_out": "4",
     "dev_seed_enabled": "False",
-    "g_business_date": "2026-05-28",
+    "g_business_date": "2026-08-10",
     "g_business_date_locked": "False",
     "guests[type]": "QueryPagination",
     "pending_shift_count": "0",
     "pending_void_count": "0",
     "repeat_guests": "0",
-    "total_guests": "28"
+    "total_guests": "32"
   },
   "location": "",
   "normalisation_hits": {

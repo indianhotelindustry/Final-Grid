@@ -1,17 +1,17 @@
 {
   "anon_location": "/auth/login?next=http://localhost/ceo",
   "anon_status": 302,
-  "body_bytes": 36766,
-  "body_sha256": "c1e3414afe16728d79c406f51878d8f948a34a575f078073f2115b7ca0a3871e",
+  "body_bytes": 37445,
+  "body_sha256": "1b74af25034c93a60e610b71e77bc23c51dcff3a02e7d2495aba6ac23dff9b86",
   "category": "FINANCIAL",
   "content_type": "text/html",
-  "duration_ms": 13,
+  "duration_ms": 11,
   "endpoint": "main.ceo_dashboard",
   "error": "",
   "figure_source": "context",
   "figures": {
     "dev_seed_enabled": "False",
-    "g_business_date": "2026-05-28",
+    "g_business_date": "2026-08-10",
     "g_business_date_locked": "False",
     "pending_shift_count": "0",
     "pending_void_count": "0"

@@ -1,23 +1,23 @@
 {
   "anon_location": "/auth/login?next=%2Freports%2Farrivals",
   "anon_status": 302,
-  "body_bytes": 24223,
-  "body_sha256": "c475aa4f18f7af6bb9911a3d2233192bc646c1acbf6cce8b0c513fa8df1c0291",
+  "body_bytes": 24889,
+  "body_sha256": "6c657208688e9ec075417bb695611a23fb1fea29e9f78315ffb03ecf963c1685",
   "category": "FINANCIAL",
   "content_type": "text/html",
-  "duration_ms": 38,
+  "duration_ms": 29,
   "endpoint": "reports.arrivals",
   "error": "",
   "figure_source": "context",
   "figures": {
     "dev_seed_enabled": "False",
-    "g_business_date": "2026-05-28",
+    "g_business_date": "2026-08-10",
     "g_business_date_locked": "False",
     "pending_shift_count": "0",
     "pending_void_count": "0",
     "records[len]": "0",
-    "report_date": "2026-05-28",
-    "today": "2026-05-28"
+    "report_date": "2026-08-10",
+    "today": "2026-08-10"
   },
   "location": "",
   "normalisation_hits": {

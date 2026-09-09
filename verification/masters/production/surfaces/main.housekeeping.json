@@ -1,11 +1,11 @@
 {
   "anon_location": "/auth/login?next=http://localhost/housekeeping",
   "anon_status": 302,
-  "body_bytes": 25817,
-  "body_sha256": "8a76dd31071f104a929d5ee498def4f1f985f6213e7cd89a1eae4ebc68337a4c",
+  "body_bytes": 26494,
+  "body_sha256": "d76858b4285a037893a82f14034cd0ce349a00ffbdc2ae02bb8aae3dc7ac2ce7",
   "category": "OPERATIONAL",
   "content_type": "text/html",
-  "duration_ms": 21,
+  "duration_ms": 40,
   "endpoint": "main.housekeeping",
   "error": "",
   "figure_source": "context",
@@ -20,7 +20,7 @@
     "floors[2]": "3",
     "floors[len]": "3",
     "floors[sum]": "6",
-    "g_business_date": "2026-05-28",
+    "g_business_date": "2026-08-10",
     "g_business_date_locked": "False",
     "pending_shift_count": "0",
     "pending_void_count": "0"

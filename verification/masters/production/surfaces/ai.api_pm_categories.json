@@ -5,7 +5,7 @@
   "body_sha256": "8bab0247f542619d4c200a201d16456756eb23daa88824fc66a5d49326103090",
   "category": "ADVISORY",
   "content_type": "application/json",
-  "duration_ms": 5,
+  "duration_ms": 4,
   "endpoint": "ai.api_pm_categories",
   "error": "",
   "figure_source": "json",

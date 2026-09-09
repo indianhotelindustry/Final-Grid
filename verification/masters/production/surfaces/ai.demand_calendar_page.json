@@ -1,17 +1,17 @@
 {
   "anon_location": "/auth/login?next=%2Fai%2Fdemand-calendar",
   "anon_status": 302,
-  "body_bytes": 34680,
-  "body_sha256": "39713a2dbcaf22b10f82e6b228925f1d6507c612a1f579dc65ba2cc4c7721568",
+  "body_bytes": 35343,
+  "body_sha256": "1f7b056abb4bda579484c148599e459cc6a8edbc469890704d1dfd0ba3e343ef",
   "category": "ADVISORY",
   "content_type": "text/html",
-  "duration_ms": 6,
+  "duration_ms": 23,
   "endpoint": "ai.demand_calendar_page",
   "error": "",
   "figure_source": "context",
   "figures": {
     "dev_seed_enabled": "False",
-    "g_business_date": "2026-05-28",
+    "g_business_date": "2026-08-10",
     "g_business_date_locked": "False",
     "pending_shift_count": "0",
     "pending_void_count": "0"

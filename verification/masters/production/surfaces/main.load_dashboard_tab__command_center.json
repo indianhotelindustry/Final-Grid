@@ -5,13 +5,13 @@
   "body_sha256": "e1d34b3cb3b9155cfd2fdcbe47966b357543933bc698d76373a4f52ef659727c",
   "category": "FINANCIAL",
   "content_type": "text/html",
-  "duration_ms": 16,
+  "duration_ms": 37,
   "endpoint": "main.load_dashboard_tab",
   "error": "",
   "figure_source": "context",
   "figures": {
     "dev_seed_enabled": "False",
-    "g_business_date": "2026-05-28",
+    "g_business_date": "2026-08-10",
     "g_business_date_locked": "False",
     "pending_shift_count": "0",
     "pending_void_count": "0"
