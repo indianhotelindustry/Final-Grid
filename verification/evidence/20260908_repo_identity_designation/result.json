@@ -1,0 +1,125 @@
+{
+  "directive": "FG-GOV-20260908-01",
+  "kind": "repository-identity-verification-and-authoritative-path-designation",
+  "verified_at": "2026-09-08T09:05:55+05:30",
+  "read_only_verified": true,
+  "verdict": "IDENTICAL",
+  "authoritative_path": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS",
+  "legacy_preserved_path": "C:\\Users\\SIPL Server\\Downloads\\DSS\\SukoonPMS\\SukoonPMS",
+  "legacy_modified": false,
+  "origin": "https://github.com/indianhotelindustry/Final-Grid.git",
+  "branch": "main",
+  "head_sha": "237db2ad0fa8df143f04aaca82441f0f54781969",
+  "head_tree": "2f42277615b092d1b1ac1074b4d0aa63a3b80b2e",
+  "commits_after_checkpoint": 0,
+  "ahead_behind_origin_main": {
+    "behind": 0,
+    "ahead": 0
+  },
+  "remote_ls_remote_head": "237db2ad0fa8df143f04aaca82441f0f54781969",
+  "version": "2.2.18",
+  "frozen_anchor": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "database": {
+    "path": "instance/pms.db",
+    "size_bytes": 733184,
+    "sha256": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+    "sha256_before": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+    "sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+    "anchor_matches": true,
+    "modified": false
+  },
+  "identity_comparison": {
+    "content_manifest_files": 1989,
+    "content_manifest_sha256_authoritative": "ee97d3ab10dd1f8f542da2b42ee4805c1aa28870ca0d2b60c0a9d7325c2e8618",
+    "content_manifest_sha256_legacy": "ee97d3ab10dd1f8f542da2b42ee4805c1aa28870ca0d2b60c0a9d7325c2e8618",
+    "content_manifest_excludes": [
+      ".git/",
+      "venv/",
+      "__pycache__/",
+      "*.pyc",
+      "logs/"
+    ],
+    "tracked_index_entries": 920,
+    "tracked_index_manifest_sha256": "fcc96b86bf47566e8cb721d49524437021dd5a3bc4a3d1eab5779b857ea2ee53",
+    "reflog_lines": 54,
+    "reflog_sha256": "412d4ab3788d2b27cd92cf2bf3fbfeefe1ed9020f8763faaec6adf77295691e5",
+    "refs_identical": true,
+    "tags_identical": true,
+    "byte_identical": true
+  },
+  "legacy_predirective_fingerprints": {
+    "content_manifest_sha256": "ee97d3ab10dd1f8f542da2b42ee4805c1aa28870ca0d2b60c0a9d7325c2e8618",
+    "git_logs_head_sha256": "412d4ab3788d2b27cd92cf2bf3fbfeefe1ed9020f8763faaec6adf77295691e5",
+    "git_index_sha256": "e914f6e86618ef38a537b5937d653b68ddba4449867ab248f25f68d88b22b380",
+    "show_ref_sha256": "38a448156671c5abe2709fa9a534eebec7ef93ef3efc781c3d65047790158812"
+  },
+  "working_tree": {
+    "entries": 46,
+    "deleted": 28,
+    "modified": 1,
+    "untracked": 17,
+    "preserved_unchanged": true,
+    "composition": {
+      "may_ledger_deleted": 28,
+      "ledger_index_modified": 1,
+      "audit_stage_src_tgz": 1,
+      "package_lock_json": 1,
+      "august_evidence_dirs": 4,
+      "august_ledger_dates": 10,
+      "founder_decisions_md": 1
+    }
+  },
+  "phase2a_chain": {
+    "evidence_dir": "verification/evidence/20260831_phase2a_folio_authz",
+    "unchanged": true,
+    "verdict": "PASS",
+    "cases_passed": 29,
+    "cases_total": 29,
+    "app_folio_py_unchanged": true,
+    "historical_production_db_path_preserved": true,
+    "historical_production_db_path": "C:\\Users\\SIPL Server\\Downloads\\DSS\\SukoonPMS\\SukoonPMS\\instance\\pms.db"
+  },
+  "d11_f2_population": {
+    "payments_null_folio_id": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "extra_charges_null_folio_id": [
+      1,
+      2
+    ],
+    "row_count": 8,
+    "total": 4776.19,
+    "untouched": true,
+    "matches_durable_record": true
+  },
+  "founder_decisions_reconciled": {
+    "D5": {
+      "ruling": "LEVEL 2",
+      "status": "CONFIRMED",
+      "recorded": true
+    },
+    "D10": {
+      "ruling": "RE-SCOPED TO UNIT 1.6 / FIRST PRODUCTION DATA MIGRATION",
+      "status": "CONFIRMED",
+      "recorded": true
+    },
+    "D11-F2": {
+      "ruling": "COMMISSIONING / TEST ACTIVITY",
+      "status": "RECONFIRMED_UNCHANGED",
+      "recorded": true
+    },
+    "D9": {
+      "deliverable": "Backup Restore Verification",
+      "status": "NOT COMPLETE",
+      "restore_rehearsal_performed": false
+    }
+  },
+  "authorizes_implementation": false,
+  "committed": false,
+  "pushed": false
+}

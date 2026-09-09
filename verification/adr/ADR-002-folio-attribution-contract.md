@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | **DRAFT** — not adopted |
+| Status | **ADOPTED** — 2026-09-08 under FG-P0-ADR-ADOPTION-20260908-01 (FD-011, AR-001, AR-002, AR-004, FD-010). Architecture adopted; implementation remains separately authorized work. |
 | Founder decision | FD-011 (Level 2 floor), FD-003 (folio = billing unit), FD-010 (the eight rows) |
 | Drafted | 2026-09-08 at HEAD `237db2ad` |
 | Provenance | Phase 0 unit 0.2, *Folio Ownership & Creation Contract*, artifact `ea374fdc-c1ec-4c7d-9385-af33e486df74` (2026-09-05) — the drafted specification; not repository authority |
@@ -61,3 +61,27 @@
 ## Implementation boundary
 
 None authorized. The Phase 1 directive (artifact `42e90c62…`) is the proposed implementation and requires its own authorization.
+
+## Architecture Resolution Round 1 reconciliation (2026-09-08)
+
+Source: `verification/evidence/20260908_architecture_resolution_round1/RECORD.md`.
+
+- **AR-001**: `INV-A02` stays universal; the eight D11 rows are a historical known exception in data, not an exemption. This resolves the last row of *Unresolved* above: **no population declaration or constitutional amendment** follows FD-010; U-1 and U-2 stand as written.
+- **AR-002**: room-revenue rows are folio financial transactions. **CD-2 is resolved: yes.** (Representation is ADR-003; its model label awaits Founder confirmation.)
+- **AR-004**: schema enforcement follows a staged strategy — attribution at every originating writer (R-1…R-6) → valid FK relationships (ADR-005) → authorized reconciliation of legitimate existing rows → proven preconditions → `NOT NULL`. This resolves the "schema enforcement" row of *Unresolved*: deferred by design, not indefinitely. Step 5 is unreachable while any row is NULL; the disposition of the eight FD-010 rows is a separate future Founder decision.
+- CD-1, CD-3, CD-4 remain Founder defaults to be confirmed when the Phase 1 directive is approved (AR-015).
+- Status moved DRAFT → PROPOSED FOR ADOPTION. Nothing implemented. The eight rows untouched.
+
+## Adoption record (2026-09-08)
+
+Adopted under `FG-P0-ADR-ADOPTION-20260908-01`, recorded in `verification/FOUNDER_DECISIONS.md`. Consistency established:
+
+- **D5 = Level 2** (FD-011): every `payments` and `extra_charges` row created after deployment carries a non-null `folio_id` — rules R-1…R-6, U-1, U-2.
+- **INV-A02 universal** (AR-001): no exempt class; the eight D11 rows are a historical known exception in data preserved under **FD-010 Option A** as commissioning/test activity; no historical folio attribution is authorized merely to satisfy the invariant; future writers must create correctly attributed transactions.
+- **Room revenue** rows are folio financial transactions (AR-002; ADR-003).
+- **Schema enforcement** is staged (AR-004): service-layer attribution first, `NOT NULL` last, mechanics tracked in `verification/adr/BACKLOG.md`.
+
+Contract decisions CD-1, CD-3, CD-4 carry their stated defaults (create-and-audit; refund to default folio; fixtures under contract in Phase 1) and remain overridable by the Founder when the Phase 1 directive is approved; CD-2 is resolved (yes) by AR-002.
+
+**Architecture adopted; implementation remains separately authorized work.** The 24 originating writers still leave `folio_id` NULL at this recording. From this point the ADR is append-only.
+

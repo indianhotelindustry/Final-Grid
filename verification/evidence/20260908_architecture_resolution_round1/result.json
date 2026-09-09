@@ -1,0 +1,81 @@
+{
+  "round": "FG-P0-ARCH-RESOLUTION-20260908-01",
+  "title": "FinalGrid Architecture Resolution Round 1",
+  "recorded_at": "2026-09-08",
+  "repository_path": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS",
+  "branch": "main",
+  "governed_head": "e69f2ac242f7fdc3e0c042ceb40dc0393280134b",
+  "checkpoint_parent": "237db2ad0fa8df143f04aaca82441f0f54781969",
+  "database": {
+    "path": "instance/pms.db",
+    "size_bytes": 733184,
+    "sha256": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+    "unchanged": true
+  },
+  "resolution_count": 15,
+  "resolutions": [
+    "AR-001", "AR-002", "AR-003", "AR-004", "AR-005", "AR-006", "AR-007", "AR-008",
+    "AR-009", "AR-010", "AR-011", "AR-012", "AR-013", "AR-014", "AR-015"
+  ],
+  "d11": {
+    "factual_classification": "D11-F2",
+    "accounting_treatment": "FD-010 Option A (preserve, no corrective entries)",
+    "architecture": "AR-001 INV-A02 universal; rows are historical known exception, not exemption",
+    "rows": {"payments": [1, 2, 3, 4, 5, 6], "extra_charges": [1, 2], "total": 4776.19},
+    "rows_untouched": true
+  },
+  "fd_015_list_folios_read_scope": {
+    "Admin": "Read", "Manager": "Read", "Accountant": "Read", "FrontDesk": "Read", "other": "No",
+    "implemented": false,
+    "code_at_recording": "('Admin','Manager')"
+  },
+  "recovered_rulings": {
+    "count_exact": 0,
+    "count_partial": 4,
+    "items": [
+      {"ruling": "FOUNDER-DIR-FINALGRID-BASELINE-RECON-003", "status": "NOT RECOVERED - REQUIRES FOUNDER CONFIRMATION", "fragments": "effects only (R7 presently reachable, commit 2765702)"},
+      {"ruling": "Master Plan Round 0 ruling", "status": "NOT RECOVERED - REQUIRES FOUNDER CONFIRMATION", "fragments": "one verbatim sentence (FOUNDER_DECISIONS.md L110-114); effects"},
+      {"ruling": "Phase 2a authorization", "status": "NOT RECOVERED - REQUIRES FOUNDER CONFIRMATION", "fragments": "one verbatim clause (COMPLETION_REPORT.md L33-34); commit authorization citations"},
+      {"ruling": "End-of-day checkpoint", "status": "NOT RECOVERED - REQUIRES FOUNDER CONFIRMATION", "fragments": "artefact 237db2a and its message; authorization wording absent"}
+    ]
+  },
+  "adr_status_summary": {
+    "ADOPTED": 0,
+    "PROPOSED_FOR_ADOPTION": ["ADR-001", "ADR-002", "ADR-004", "ADR-005", "ADR-007", "ADR-008"],
+    "PROPOSED": ["ADR-003", "ADR-006", "ADR-009", "ADR-010", "ADR-011", "ADR-012"],
+    "DRAFT": [],
+    "required_not_created": ["scheduler controls (AR-013)", "maker-checker operation matrix (AR-010)", "folio_id NOT NULL migration mechanics (AR-004)", "schema mechanism selection (AR-005)"]
+  },
+  "master_plan": {
+    "record": "verification/MASTER_PLAN.md",
+    "overlay_section": "14",
+    "phase_sequence_changed": false,
+    "phases_gated": ["1.6", "2b", "3", "4", "5", "6", "7", "8", "9"]
+  },
+  "unresolved_count": 12,
+  "unresolved": [
+    "AR-002 model label (Founder 'M3' vs ADR-003 M1/M3) - requires Founder confirmation",
+    "AR-014 four 2026-08-31 rulings not recovered verbatim",
+    "AR-004 step 5 unreachable while eight D11 rows NULL (FD-010)",
+    "AR-005 migration mechanism (inline registry vs Alembic)",
+    "PD-006 'verified state' definition",
+    "AR-007 retention design not designed/approved",
+    "AR-010 operation matrix ADR",
+    "AR-013 scheduler-controls ADR",
+    "MP-D1, MP-D3, MP-D4, MP-D6, MP-D7, MP-D8, MP-D9 open",
+    "FOUNDER-DIR-FINALGRID-REBRAND-001 text absent",
+    "AR-### namespace not adopted by FD-001",
+    "Phase 1 contract defaults CD-1, CD-3, CD-4"
+  ],
+  "flags": {
+    "stop_condition_ar014_met": true,
+    "label_conflict_ar002": true
+  },
+  "implementation_authorized": false,
+  "schema_changed": false,
+  "data_changed": false,
+  "code_changed": false,
+  "committed": false,
+  "pushed": false,
+  "legacy_repository_touched": false
+}

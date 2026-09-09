@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | **DRAFT** — not adopted |
+| Status | **PROPOSED FOR ADOPTION** — 2026-09-08 under FG-P0-ADR-ADOPTION-20260908-01 (AR-011). Architecture settled (reports are protected capabilities; classification-driven, fail-closed enforcement); **route/permission classification not settled and not invented**; readiness condition: MP-D9 and a route-by-route review. |
 | Founder decision | FD-016; context FD-003 (reports are derived, not a system of record) |
 | Drafted | 2026-09-08 at HEAD `237db2ad` |
 | Implements | Nothing. |
@@ -40,3 +40,16 @@ MP-D9 operator profile · whether report *generation* (writes to
 ## Implementation boundary
 
 None authorized. Master Plan Phase 4.
+
+## Architecture Resolution Round 1 reconciliation (2026-09-08)
+
+Source: `verification/evidence/20260908_architecture_resolution_round1/RECORD.md`.
+
+- **AR-011**: reports are protected application capabilities and must have appropriate authorization; the future model must explicitly cover report access rather than treating read-only reports as implicitly public. This adopts the *Decision* section of this ADR as principle.
+- Status moved DRAFT → PROPOSED. The material content — classification of each of the 49 routes and the default role sets — is unresolved and depends on MP-D9 and on a route-by-route review not yet performed (Master Plan Phase 4 unit 4.2).
+- Nothing implemented. ≥26 report routes remain readable by any authenticated role.
+
+## Adoption review (2026-09-08)
+
+Reviewed under `FG-P0-ADR-ADOPTION-20260908-01` and moved PROPOSED → **PROPOSED FOR ADOPTION**. Settled: AR-011's principle; the four classification categories; the enforcement shape inherited from ADR-008. Not settled, and **not invented here**: the classification of each of the 49 report routes and the default role sets, which depend on MP-D9 (operator profile) and on a route-by-route review that has not been performed. Adoption waits on those two conditions. Tracked in `verification/adr/BACKLOG.md` (implementation design needed; MP-D9 Founder decision needed).
+

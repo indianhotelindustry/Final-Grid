@@ -1,0 +1,62 @@
+{
+  "directive": "FG-P0-ADR-ADOPTION-20260908-01",
+  "recorded_at": "2026-09-08",
+  "repository_head": "e69f2ac242f7fdc3e0c042ceb40dc0393280134b",
+  "branch": "main",
+  "architecture_resolution_round": "FG-P0-ARCH-RESOLUTION-20260908-01",
+  "database_sha256": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "database_size_bytes": 733184,
+  "ar002_status": {
+    "status": "RESOLVED",
+    "architecture_name": "Reservation operational ownership + folio financial ownership",
+    "definition": "The reservation remains the operational source for determining the stay and room-rate entitlement; the resulting room-rent financial transaction belongs to the reservation's billing folio.",
+    "historical_labels": "M1/M2/M3 RETIRED; AR-002 letter 'M3' not equivalent to retired M3; no claim that retired M1 was approved",
+    "adr": "ADR-003",
+    "adr_status": "ADOPTED",
+    "level3_split_billing_implied": false
+  },
+  "ar014_status": {
+    "status": "CLOSED - HISTORICAL EVIDENCE GAP",
+    "statement": "Historical Founder ruling not recoverable from authoritative repository evidence. No reconstruction permitted.",
+    "items": [
+      {"ruling": "FOUNDER-DIR-FINALGRID-BASELINE-RECON-003", "status": "CLOSED - HISTORICAL EVIDENCE GAP", "governed_now_by": ["FG-GOV-20260908-01", "FD-002", "Phase 2a evidence"]},
+      {"ruling": "Master Plan Round 0 ruling", "status": "CLOSED - HISTORICAL EVIDENCE GAP", "governed_now_by": ["FD-002", "FD-010", "AR-001", "FD-005"]},
+      {"ruling": "Phase 2a authorization", "status": "CLOSED - HISTORICAL EVIDENCE GAP", "governed_now_by": ["FD-016", "AR-009", "FD-015"]},
+      {"ruling": "End-of-day checkpoint", "status": "CLOSED - HISTORICAL EVIDENCE GAP", "governed_now_by": ["FG-GOV-20260908-01", "e69f2ac"]}
+    ],
+    "observed_gap": "FOUNDER-DIR-FINALGRID-REBRAND-001 - content not in repository; not invented",
+    "principle": "Current authoritative Founder decisions govern current architecture. Missing historical wording must not be reconstructed merely to make the historical record appear complete."
+  },
+  "adr_status_summary": {
+    "ADOPTED": ["ADR-001", "ADR-002", "ADR-003", "ADR-004", "ADR-005", "ADR-007", "ADR-008"],
+    "PROPOSED_FOR_ADOPTION": ["ADR-009", "ADR-011"],
+    "PROPOSED": ["ADR-006", "ADR-010", "ADR-012"],
+    "DRAFT": [],
+    "SUPERSEDED": [],
+    "counts": {"ADOPTED": 7, "PROPOSED_FOR_ADOPTION": 2, "PROPOSED": 3, "DRAFT": 0, "SUPERSEDED": 0}
+  },
+  "adr_backlog": ["B-1 scheduler financial-action controls", "B-2 maker-checker operation matrix", "B-3 folio_id NOT NULL mechanics + eight-row disposition", "B-4 schema migration mechanism", "B-5 PD-006 verified-state definition", "B-6 audit retention design", "B-7 report route classification", "B-8 accountability storage", "B-9 FK prerequisites", "B-10 business-date implementation questions", "B-11 backup/restore mechanics", "B-12 Phase 1 contract defaults"],
+  "unresolved_decisions": [
+    "MP-D9 operator profile",
+    "MP-D4 persistence engine",
+    "MP-D1, MP-D3, MP-D6, MP-D7, MP-D8 (phase gates)",
+    "disposition of the eight D11 rows beyond FD-010 before any NOT NULL step",
+    "CD-1, CD-3, CD-4 confirmation at Phase 1 directive approval",
+    "AR-### namespace under FD-001",
+    "schema migration mechanism (B-4)",
+    "PD-006 verified-state definition (B-5)",
+    "audit retention design (B-6)",
+    "maker-checker operation matrix (B-2)",
+    "scheduler financial-action controls ADR (B-1)"
+  ],
+  "d11": {"factual": "D11-F2", "treatment": "FD-010 Option A", "architecture": "AR-001 INV-A02 universal", "rows_unaltered": true},
+  "fd_015": {"list_folios_read": ["Admin", "Manager", "Accountant", "FrontDesk"], "other_roles": "not allowed", "implemented": false},
+  "implementation_blockers": ["no restore capability (PD-006 unsatisfiable)", "no backup integrity record", "destructive audit pruning scheduled (~2026-11-07)", "migration mechanism undecided", "MP-D9 open", "no implementation directive"],
+  "gate": "ARCHITECTURE BASELINE READY FOR IMPLEMENTATION PLANNING",
+  "implementation_authorized": false,
+  "code_changed": false,
+  "schema_changed": false,
+  "data_changed": false,
+  "committed": false,
+  "pushed": false
+}

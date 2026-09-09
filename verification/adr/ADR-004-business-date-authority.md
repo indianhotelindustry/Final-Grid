@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | **DRAFT** — not adopted |
+| Status | **ADOPTED** — 2026-09-08 under FG-P0-ADR-ADOPTION-20260908-01 (FD-013, AR-008). Architecture adopted; implementation remains separately authorized work. |
 | Founder decision | FD-013 (2026-09-08) |
 | Drafted | 2026-09-08 at HEAD `237db2ad` |
 | Implements | Nothing. The refactor is explicitly not authorized (FD-013). |
@@ -53,3 +53,18 @@ date was 2026-08-10 at drafting, 29 days behind the calendar.
 ## Implementation boundary
 
 None authorized.
+
+## Architecture Resolution Round 1 reconciliation (2026-09-08)
+
+Source: `verification/evidence/20260908_architecture_resolution_round1/RECORD.md`.
+
+- **AR-008** restates FD-013 with the operative rule this ADR proposed: the controlled business date is authoritative for financial and operational accounting; system timestamps remain technical timestamps (event chronology, diagnostics, infrastructure logging, audit timing); financial/operational logic must not silently substitute `date.today()` where business-date semantics apply.
+- Status moved DRAFT → PROPOSED FOR ADOPTION. The five *Unresolved* items (invoice date rule, arrival/departure validation basis, shift-to-business-date mapping, a basis-checking invariant, staleness threshold) are Phase 3 gate items under AR-015 and do not block adoption of the principle.
+- Nothing implemented. `Payment.payment_date` / `ExtraCharge.charge_date` still default to `date.today` at the model.
+
+## Adoption record (2026-09-08)
+
+Adopted under `FG-P0-ADR-ADOPTION-20260908-01`, recorded in `verification/FOUNDER_DECISIONS.md`. The *Decision* is verbatim FD-013; AR-008 supplies the operative rule (no silent substitution of `date.today()` where business-date semantics apply; system timestamps remain technical). No conflicting architecture exists. The *Unresolved* items (invoice date rule, arrival/departure validation basis, shift-to-business-date mapping, basis-checking invariant, staleness threshold) are implementation-design questions for the Phase 3 gate and are tracked in `verification/adr/BACKLOG.md`.
+
+**Architecture adopted; implementation remains separately authorized work.** `Payment.payment_date` and `ExtraCharge.charge_date` still default to `date.today` at this recording. From this point the ADR is append-only.
+

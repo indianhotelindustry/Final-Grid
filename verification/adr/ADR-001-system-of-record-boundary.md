@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | **DRAFT** — not adopted |
+| Status | **ADOPTED** — 2026-09-08 under FG-P0-ADR-ADOPTION-20260908-01 (FD-003, AR-002). Architecture adopted; implementation remains separately authorized work. |
 | Founder decision | FD-003 (2026-09-08); context FD-011, FD-013 |
 | Drafted | 2026-09-08 at HEAD `237db2ad` |
 | Implements | Nothing. Architecture record only. |
@@ -61,3 +61,18 @@ De facto authority, from code at the checkpoint:
 ## Implementation boundary
 
 None authorized. This ADR changes no code and no data.
+
+## Architecture Resolution Round 1 reconciliation (2026-09-08)
+
+Source: `verification/evidence/20260908_architecture_resolution_round1/RECORD.md`.
+
+- **AR-002** confirms the boundary this ADR records: the reservation is the operational source for stay and rate; the folio owns the financial billing transaction, including room rent. FD-003 stands unchanged (invoice reservation-level; Level 3 out of scope; corporate billing reservation-level).
+- Status moved DRAFT → PROPOSED FOR ADOPTION. The boundary itself is settled; the items in *Unresolved* (MP-D4 persistence engine, OTA identity authority, `settings`/`.env` precedence, invoice date) are deferred to their phase gates under AR-015 and do not block adoption of the boundary.
+- Nothing implemented. Not adopted.
+
+## Adoption record (2026-09-08)
+
+Adopted under `FG-P0-ADR-ADOPTION-20260908-01`, recorded in `verification/FOUNDER_DECISIONS.md`. Basis: the *Decision* section is verbatim FD-003; AR-002 confirms folio financial ownership within that boundary. No conflicting Founder decision exists. Items under *Unresolved* are not architecture of the boundary itself and are tracked at their phase gates (AR-015): MP-D4 persistence engine, OTA identity authority, `settings`/`.env` precedence, invoice date (ADR-004).
+
+**Architecture adopted; implementation remains separately authorized work.** From this point the ADR is append-only.
+

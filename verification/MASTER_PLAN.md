@@ -348,3 +348,82 @@ One constraint acknowledged: §19 forbids broad refactoring; `routes.py` and `re
 - The verbatim 2026-08-31 rulings (BASELINE-RECON-003, Master Plan Round 0 ruling, Phase 2a authorization, end-of-day checkpoint). Their recorded effects appear above with provenance; the rulings themselves remain to be recorded under a Founder authorization.
 - The plan's per-phase "Phase 0.1 decision dossier" content beyond what `FOUNDER_DECISIONS.md` now records.
 - Any resolution of the open technical questions listed in the ADR drafts under `verification/adr/`.
+
+---
+
+## 14 Architecture Resolution Round 1 — status overlay (appended 2026-09-08)
+
+Source: `verification/evidence/20260908_architecture_resolution_round1/RECORD.md`
+(FG-P0-ARCH-RESOLUTION-20260908-01), recorded at governed HEAD `e69f2ac…`.
+**Architecture resolution is not implementation authorization.** Nothing
+below opens a phase, a unit or a migration. The eleven-phase sequence in
+§04–§05 is unchanged.
+
+### Architecture decisions now resolved, by phase
+
+| Phase | Resolved architecture (AR) | What the phase still needs before it can start |
+|---|---|---|
+| Phase 0 | AR-001 (INV-A02 universal), AR-002 (room rent → folio; **label M3/M1 pending confirmation**), AR-005 (repo migration files authoritative — mechanism open), AR-009 (authz chain), AR-010, AR-011, AR-012, AR-013 principles; AR-014 recovery outcome; AR-015 sequencing rule | Founder confirmation of the AR-002 label and of the four 2026-08-31 rulings; ADR adoption |
+| Phase 2a | AR-009 confirms frozen | — (COMPLETED) |
+| Phase 1 | AR-001, AR-002, AR-004 steps 1–2 | Phase 1 directive approval; ADR-002/003 adoption; CD-1/3/4 confirmation. **Unit 1.6 stays gated** (FD-010; AR-004 step 3 needs a separate Founder decision on the eight rows) |
+| Phase 2b | AR-010 principle | Phase 1 complete; MP-D9; maker-checker operation-matrix ADR |
+| Phase 3 | AR-008 (business date), AR-013 (scheduler) principles | Phase 1 complete; ADR-004 adoption; scheduler-controls ADR |
+| Phase 4 | AR-009, AR-011 | Phase 3 complete; MP-D4, MP-D9; ADR-008/009 adoption |
+| Phase 5 | AR-003 (FK on every connection), AR-004 steps 4–5, AR-005 | MP-D4, MP-D1; schema-mechanism selection (unit 5.1); PD-004/005/006; restore capability (PD-006) |
+| Phase 9 | AR-006 (recovery target), AR-007 (retention) | MP-D3; restore capability does not exist |
+
+### Implementation prerequisites that remain (unchanged by this round)
+
+No restore capability (PD-006 unsatisfiable) · `backup_logs` has no integrity record · destructive audit pruning still scheduled (FD-008/AR-007; ~2026-11-07) · FK enforcement off · both `folio_id` columns nullable with 8 NULL rows · originating writers unattributed · `date.today` model defaults · ≥26 report routes unrestricted · `list_folios` still `('Admin','Manager')` in code (FD-015 recorded only) · migration mechanism undecided.
+
+### Statement
+
+Resolved architecture ≠ implemented control ≠ verified production state. Every AR above is the first of the three. Implementation authorization will be issued separately after architecture review/adoption.
+
+---
+
+## 15 ADR adoption baseline — status overlay (appended 2026-09-08)
+
+Source: `verification/evidence/20260908_architecture_resolution_round1/ADR_ADOPTION_READINESS.md`
+(FG-P0-ADR-ADOPTION-20260908-01). The eleven-phase sequence in §04–§05 is
+unchanged. **Architecture adoption is not permission to begin Phase 1
+implementation**; a Phase 1 implementation directive must be separately
+approved.
+
+| Layer | Content |
+|---|---|
+| **Architecture adopted** | ADR-001 system-of-record boundary · ADR-002 folio attribution (Level 2) · ADR-003 room rent — *reservation operational ownership + folio financial ownership* · ADR-004 business-date authority · ADR-005 FK enforcement requirement · ADR-007 target recovery architecture · ADR-008 authorization chain (Phase 2a frozen) |
+| **Architecture proposed** | ADR-009 reporting authorization (PFA; awaits MP-D9, route review) · ADR-011 operator accountability (PFA; storage mechanics) · ADR-006 mutation-control mechanics · ADR-010 maker-checker matrix · ADR-012 audit retention design |
+| **Implementation prerequisites** (unchanged) | No restore capability (PD-006 unsatisfiable) · `backup_logs` has no integrity record · destructive audit pruning scheduled (~2026-11-07) · FK enforcement off · both `folio_id` columns nullable, 8 NULL rows preserved (FD-010) · originating writers unattributed · `date.today` model defaults · ≥26 report routes unrestricted · `list_folios` still `('Admin','Manager')` in code · migration mechanism undecided (B-4) |
+| **Implementation authorization** | **None issued.** Phase 1 directive: prepared (artifact), not approved. Unit 1.6: no authorized action. |
+
+Backlog of decisions the adopted architecture still requires:
+`verification/adr/BACKLOG.md` (B-1…B-12).
+
+Historical evidence gaps (AR-014) are **closed** as evidence-quality
+issues; §13 of this record remains accurate as a statement of what the
+repository does not contain.
+
+---
+
+## 16 Phase 1 implementation readiness — overlay (appended 2026-09-08)
+
+Source: `verification/evidence/20260908_phase1_implementation_readiness/`
+(FG-P1-IMPLEMENTATION-READINESS-20260908-01), recorded at governed HEAD
+`e69f2ac…`. State: **implementation planning only.**
+
+| Layer | Status |
+|---|---|
+| Plan completed | Yes — writer inventory (24 financial writers, all reservation-resolvable), execution plan (S0–S7 within Phase 1; S8–S9 outside), migration/data plan, recovery-gate plan, verification plan, Founder decision gate. |
+| Plan ready | **PHASE 1 NOT READY FOR EXECUTION AUTHORIZATION** — recovery gate unsatisfied (no restore capability); Founder questions Q-1…Q-6 open; no durable Phase 1 directive in the repository. |
+| Implementation authorized | **No.** Production mutation authorized: **No.** |
+
+Evidence that sharpened the plan: the live database's NULL-`folio_id`
+population is exactly the eight D11 rows (no other financial rows exist),
+so no data migration is required on this database and unit 1.6 has no
+authorized action; `PRAGMA foreign_key_check` reports zero orphans; an
+audit-atomicity gap is confirmed at every routes-level financial writer
+and at POS; eight writers date rows from the wall clock (Phase 3 scope
+unless ruled otherwise). The eleven-phase sequence is unchanged; the plan
+proposes one accepted-if-ruled deviation (Recovery Foundation before
+Phase 1 code, Q-6).

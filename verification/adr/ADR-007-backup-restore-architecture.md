@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | **DRAFT** — not adopted |
+| Status | **ADOPTED (target recovery architecture)** — 2026-09-08 under FG-P0-ADR-ADOPTION-20260908-01 (FD-005, FD-006, AR-006). **Restore capability is not yet implemented.** |
 | Founder decision | FD-005 (PD-006), FD-006 (D9 = Backup Restore Verification) |
 | Drafted | 2026-09-08 at HEAD `237db2ad` |
 | Implements | Nothing. No backup or restore was executed. |
@@ -51,3 +51,20 @@ different machine (`_get_backup_key`, `app/backup_manager.py:34`).
 
 None authorized. Building restore is Phase 9 unit 9.2/9.3 or an earlier
 bounded directive if the Founder so orders; not this ADR.
+
+## Architecture Resolution Round 1 reconciliation (2026-09-08)
+
+Source: `verification/evidence/20260908_architecture_resolution_round1/RECORD.md`.
+
+- **AR-006** enumerates the target: SQLite backup API or equivalent transactionally safe mechanism; integrity verification; cryptographic hash; **machine-readable backup manifest**; retained recovery artifact; rehearsed restore; documented restore verification; restore as a first-class capability. This matches items 1–4 of *Proposed architecture* and resolves the "checksum column vs manifest" question in favour of a manifest being **required** (a column is not excluded; it is an implementation choice).
+- Status moved DRAFT → PROPOSED FOR ADOPTION. Remaining items (retention exemption, where restore lives, encryption-key custody) are implementation mechanics.
+- Nothing implemented. As at recording: application backup still uses `shutil.copy2`; no checksum; no restore function; Wave 0 D9 remains Blocked/Not started; PD-006 remains unsatisfiable.
+
+## Adoption record (2026-09-08)
+
+Adopted under `FG-P0-ADR-ADOPTION-20260908-01`, recorded in `verification/FOUNDER_DECISIONS.md`. What is adopted is the **target recovery architecture** enumerated by AR-006: transactionally safe backup (SQLite backup API or equivalent); integrity verification; cryptographic hash; machine-readable backup manifest; retained recovery artifact; rehearsed restore; documented restore verification; restore as a first-class capability. Wave 0 D9 = Backup Restore Verification (FD-006) is the deliverable that evidences it.
+
+Not adopted, because they are implementation mechanics: manifest storage form (column vs file), retention exemption, where restore lives, encryption-key custody, and the "verified state" definition (ADR-006). Tracked in `verification/adr/BACKLOG.md`.
+
+**Target recovery architecture adopted; restore capability is not yet implemented.** At this recording no restore function exists, the application backup path uses `shutil.copy2`, and PD-006 is unsatisfiable. From this point the ADR is append-only.
+

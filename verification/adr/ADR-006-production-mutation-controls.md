@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | **DRAFT** — not adopted |
+| Status | **PROPOSED** — retained 2026-09-08 under FG-P0-ADR-ADOPTION-20260908-01. Controls PD-004/005/006 are Founder-defined (FD-005) and the schema-authority principle is resolved (AR-005); **migration mechanism and "verified state" definition remain unresolved**; not adopted. |
 | Founder decision | FD-005 (PD-004 / PD-005 / PD-006), FD-007 (migration authority), FD-019 (execution boundary), FD-004 (authority chain) |
 | Drafted | 2026-09-08 at HEAD `237db2ad` |
 | Implements | Nothing. **Records no authorization for any mutation.** |
@@ -61,3 +61,17 @@ identical `inv-run` verdicts. **UNRESOLVED** — needs Founder confirmation.
 ## Implementation boundary
 
 None authorized. No mutation is authorized by this ADR or by FD-005.
+
+## Architecture Resolution Round 1 reconciliation (2026-09-08)
+
+Source: `verification/evidence/20260908_architecture_resolution_round1/RECORD.md`.
+
+- **AR-005**: repository migration files are authoritative for schema evolution; the live SQLite database is evidence of current state, not the definition of future schema. Schema changes must be version-controlled, reproducible, reviewable, auditable and executed only through authorized migration procedures. This resolves the *principle* half of the "single schema authority" row.
+- **Still unresolved, not inferred:** which version-controlled artefact is the single authority — the inline registry in `app/__init__.py` (57 entries, live, executes unattended at boot) or the Alembic tree `migrations/versions/` (7 revisions, no caller). AR-005 does not choose; this ADR does not choose; Master Plan Phase 5 unit 5.1 is where it is chosen. Under AR-005, the current unattended boot-time execution is non-compliant with "authorized migration procedures" and is recorded as such.
+- **AR-004** adds the staged NOT NULL sequence as a future PD-004/005/006-governed migration; **AR-006** confirms PD-006 as a first-class capability requirement (see ADR-007).
+- "Verified state" definition remains proposed and unconfirmed. Status moved DRAFT → PROPOSED. Nothing implemented; no mutation authorized.
+
+## Adoption review (2026-09-08)
+
+Reviewed under `FG-P0-ADR-ADOPTION-20260908-01` and **kept at PROPOSED**. The controls themselves are already governance (FD-005, FD-007, FD-019) and need no ADR adoption to bind. What this ADR adds — how each PD-005 step is mechanised, the definition of "verified state", and the single schema-migration mechanism — is not settled. Adopting it now would present open mechanics as decided. Open items are tracked in `verification/adr/BACKLOG.md` (schema migration mechanism: architecture decision needed).
+

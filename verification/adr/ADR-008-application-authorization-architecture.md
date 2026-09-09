@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | **DRAFT** — not adopted |
+| Status | **ADOPTED (architecture)** — 2026-09-08 under FG-P0-ADR-ADOPTION-20260908-01 (FD-016, FD-015, AR-009). Chain: Authentication → Role/Permission → Operation → Audit. Phase 2a frozen. **FD-015 not implemented; route-by-route work remains future work.** |
 | Founder decision | FD-016 (identity vs authorization; Phase 2a frozen), FD-015 (`list_folios` read scope) |
 | Drafted | 2026-09-08 at HEAD `237db2ad` |
 | Implements | Nothing. Phase 2a code is unchanged; FD-015 is **not** implemented by this ADR. |
@@ -55,3 +55,22 @@ that make guard consolidation awkward (§19 forbids restructuring).
 ## Implementation boundary
 
 None authorized. Phase 2a is not reopened.
+
+## Architecture Resolution Round 1 reconciliation (2026-09-08)
+
+Source: `verification/evidence/20260908_architecture_resolution_round1/RECORD.md`.
+
+- **AR-009** fixes the chain **Authentication → Role/Permission → Operation → Audit**; authentication alone is not authorization; Phase 2a remains frozen; future work extends rather than bypasses the Phase 2a boundary. This is the shape *Proposed architecture* items 1, 4 and 5 already follow (fail-closed map, blueprint by blueprint, denial recording).
+- Status moved DRAFT → PROPOSED FOR ADOPTION. HTML refusal shape and central-vs-per-blueprint map remain implementation-level; MP-D9 (operator profile) is deferred under AR-015.
+- **FD-015** remains a recorded decision only: `_FOLIO_ROLES['folio.list_folios']` is still `('Admin','Manager')` at `app/folio.py:47-52`. Not changed. Phase 2a evidence and code untouched.
+
+## Adoption record (2026-09-08)
+
+Adopted under `FG-P0-ADR-ADOPTION-20260908-01`, recorded in `verification/FOUNDER_DECISIONS.md`. What is adopted: the authorization chain **Authentication → Role/Permission → Operation → Audit** (AR-009); authentication alone is not authorization (FD-016); the enforcement shape of *Proposed architecture* items 1, 4 and 5 (fail-closed, enumerable endpoint→roles map; blueprint-by-blueprint extension; denial recording); and that **Phase 2a remains frozen** and is extended, never bypassed or reopened.
+
+Recorded, not implemented: **FD-015** — `list_folios` read access for Admin, Manager, Accountant and Front Desk; no other role; read-only; mutation endpoints unchanged. *This is a Founder-approved authorization decision and is not yet implemented*: `app/folio.py:47-52` still reads `('Admin','Manager')`.
+
+Not adopted (implementation-level or deferred): HTML refusal shape, central vs per-blueprint map, Housekeeping scope (F13/MP-D6), operator profile (MP-D9).
+
+**Authorization architecture adopted; route-by-route implementation remains future work.** From this point the ADR is append-only.
+

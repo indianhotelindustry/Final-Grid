@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | **DRAFT** — not adopted; **enable/defer UNRESOLVED** |
+| Status | **ADOPTED (architecture requirement)** — 2026-09-08 under FG-P0-ADR-ADOPTION-20260908-01 (AR-003). FK enforcement is required on every application connection. **Not implemented; not enabled.** |
 | Founder decision | Context: FD-003, FD-011. No Founder decision yet addresses FK enforcement directly; MP-D4 (SQLite as system of record) is OPEN. |
 | Drafted | 2026-09-08 at HEAD `237db2ad` |
 | Implements | Nothing. FK enforcement is not enabled. |
@@ -48,3 +48,20 @@ Not chosen here. Depends on MP-D4 and on evidence (orphan scan) that does not ye
 ## Implementation boundary
 
 None authorized.
+
+## Architecture Resolution Round 1 reconciliation (2026-09-08)
+
+Source: `verification/evidence/20260908_architecture_resolution_round1/RECORD.md`.
+
+- **AR-003** resolves the *Options* table: enforcement must eventually be enabled on **every application database connection**, and the implementation must not rely on individual callers remembering to enable it — i.e. option **E1** (connection-level, e.g. a SQLAlchemy `connect` event), not E2 or E3.
+- Status moved DRAFT → PROPOSED FOR ADOPTION. The *Prerequisites for any enabling directive* (orphan scan on a copy, `ds-run`/`fault-run`/`inv-run` under ON, delete-path review, rollback note) are unchanged and are implementation-phase requirements.
+- AR-003 is an architecture requirement, not an implementation authorization. `PRAGMA foreign_keys` remains OFF in the application. Nothing changed.
+
+## Adoption record (2026-09-08)
+
+Adopted under `FG-P0-ADR-ADOPTION-20260908-01`, recorded in `verification/FOUNDER_DECISIONS.md`. What is adopted is the **architecture requirement** of AR-003 only: SQLite foreign-key enforcement must be enabled on every application database connection, by a mechanism that does not depend on individual callers (option E1). Options E2 and E3 are rejected.
+
+Not adopted, because they are implementation prerequisites: the orphan scan on a copy, the `ds-run`/`fault-run`/`inv-run` re-runs under ON, the delete-path review, the treatment of the initializer and dataset builders (which set OFF locally), and the rollback note. These are tracked in `verification/adr/BACKLOG.md`.
+
+**Architecture adopted; implementation remains separately authorized work.** `PRAGMA foreign_keys` remains OFF in the application at this recording. From this point the ADR is append-only.
+

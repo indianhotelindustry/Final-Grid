@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | **DRAFT** — not adopted |
+| Status | **PROPOSED** — retained 2026-09-08 under FG-P0-ADR-ADOPTION-20260908-01 (AR-010, FD-014). Principle resolved; **operation matrix not defined**; not adopted. |
 | Founder decision | FD-016, FD-014; context FD-011 |
 | Drafted | 2026-09-08 at HEAD `237db2ad` |
 | Implements | Nothing. |
@@ -41,3 +41,16 @@ stay separate · reason validation · MP-D9.
 ## Implementation boundary
 
 None authorized. Master Plan Phase 2b.
+
+## Architecture Resolution Round 1 reconciliation (2026-09-08)
+
+Source: `verification/evidence/20260908_architecture_resolution_round1/RECORD.md`.
+
+- **AR-010** adopts maker-checker as an architectural control principle for operations where separation of initiation and approval is required, and requires the detailed operation matrix to be defined in a dedicated ADR / implementation decision before implementation.
+- Status moved DRAFT → PROPOSED. *Proposed architecture* item 1 (the sensitive-mutation list) is therefore a candidate input to that dedicated ADR, not a decision. Materiality thresholds, self-approval policy (MP-D9), table convergence and reason validation remain unresolved.
+- Nothing implemented. The void/refund control (N2) is unchanged and remains the reference implementation.
+
+## Adoption review (2026-09-08)
+
+Reviewed under `FG-P0-ADR-ADOPTION-20260908-01` and **kept at PROPOSED**. AR-010 adopts maker-checker as a control principle and requires the detailed operation matrix to be defined in a dedicated ADR/implementation decision before implementation. That matrix — which operations, thresholds, self-approval policy for single-operator properties, table convergence, reason validation — does not exist. The existing void/refund control (N2) remains the unchanged reference implementation. Tracked in `verification/adr/BACKLOG.md` (architecture decision needed).
+

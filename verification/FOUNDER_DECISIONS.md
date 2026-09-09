@@ -865,3 +865,118 @@ Recorded so the remaining gaps stay visible.
 | Master Plan decisions MP-D1, MP-D3, MP-D4, MP-D6, MP-D7, MP-D8, MP-D9 | Open. MP-D2 partially answered by the accepted rebrand. |
 | Commit of the governance records | Not authorized by this directive. |
 | Neutralization / archive of the legacy repository copy | Not authorized; preserved untouched. |
+
+---
+
+# Architecture Resolution Round 1 — FG-P0-ARCH-RESOLUTION-20260908-01 (index entry)
+
+| | |
+|---|---|
+| Recorded | 2026-09-08 |
+| Governed HEAD | `e69f2ac242f7fdc3e0c042ceb40dc0393280134b` |
+| Record | `verification/evidence/20260908_architecture_resolution_round1/RECORD.md` and `result.json` |
+| Kind | Founder architecture resolutions AR-001…AR-015. **Not an implementation authorization.** |
+
+The fifteen resolutions are recorded verbatim in the record above and are
+not repeated here. Cross-references for this file:
+
+- **AR-001** keeps `INV-A02` universal; the eight D11 rows are a historical known exception in data, not an exemption. This closes the open item "Invariant population declaration / constitutional amendment following FD-010" in the Round 1 table above: **no declaration or amendment is made**; the production verdict remains FAIL by design.
+- **AR-002** room-rent ownership: substance recorded; the model label ("M3") does not match the ADR-003 candidate labels and **requires Founder confirmation**.
+- **AR-014**: the four 2026-08-31 rulings were searched for in repository and git history only. **None was recovered verbatim.** Fragments and effects are recorded with sources. The gap table above remains accurate. Each is marked NOT RECOVERED — REQUIRES FOUNDER CONFIRMATION.
+- **Namespace note:** the directive introduces the identifier `AR-###` (Architecture Resolution). FD-001 adopted `FD-###`, `PD-###` and `ADR-###` only. `AR-###` is used here exactly as issued and is not promoted to a namespace by this entry; the Founder may adopt it or fold future architecture resolutions into `FD-###`.
+- **ADR status changes:** six ADRs moved DRAFT → PROPOSED FOR ADOPTION (001, 002, 004, 005, 007, 008); six moved DRAFT → PROPOSED (003, 006, 009, 010, 011, 012). **None is ADOPTED.**
+- `verification/MASTER_PLAN.md` gains an appended §14 overlay; the eleven-phase sequence is unchanged.
+
+No application code, schema, database, migration, authorization,
+backup/restore, scheduler, reporting, folio, audit or financial change was
+made. No commit, no push.
+
+---
+
+# ADR Adoption Baseline — FG-P0-ADR-ADOPTION-20260908-01
+
+| | |
+|---|---|
+| Recorded | 2026-09-08 |
+| Governed HEAD | `e69f2ac242f7fdc3e0c042ceb40dc0393280134b` |
+| Record | `verification/evidence/20260908_architecture_resolution_round1/ADR_ADOPTION_READINESS.md` and `.json` |
+| Kind | Architecture closure and ADR adoption. **Not an implementation authorization.** |
+
+## AR-002 — final semantic architecture
+
+The Founder-approved room-rent architecture is authoritative by its
+definition: *the reservation remains the operational source for
+determining the stay and room-rate entitlement; the resulting room-rent
+financial transaction belongs to the reservation's billing folio.* It is
+named **Reservation operational ownership + folio financial ownership**.
+The historical option labels M1/M2/M3 in ADR-003 are **retired**; the
+letter "M3" in AR-002 is not equivalent to ADR-003's retired M3, and it is
+not claimed that the Founder approved the retired M1. Level 2 remains; no
+split billing is implied.
+
+## AR-014 — closure
+
+The four 2026-08-31 rulings (BASELINE-RECON-003; Master Plan Round 0
+ruling; Phase 2a authorization; end-of-day checkpoint) are each closed as
+**CLOSED — HISTORICAL EVIDENCE GAP**:
+
+> Historical Founder ruling not recoverable from authoritative repository evidence. No reconstruction permitted.
+
+The historical record is incomplete, but no unresolved present-day
+architecture depends on reconstructing the missing wording: their
+present-day substance is governed by FD-002 (plan adopted), FD-010/AR-001
+(D11), FD-015/FD-016/AR-009 (Phase 2a frozen; read scope), and
+FG-GOV-20260908-01 (repository designation). `FOUNDER-DIR-FINALGRID-REBRAND-001`
+remains an observed evidence gap; its content is not invented. The gap
+table above remains accurate as a record of absence.
+
+**Governance principle recorded:** *Current authoritative Founder
+decisions govern current architecture. Missing historical wording must not
+be reconstructed merely to make the historical record appear complete.*
+Historical provenance gaps are evidence-quality issues, not permission to
+manufacture history.
+
+## ADRs adopted
+
+Under the Founder's target baseline, subject to evidence consistency
+(verified in the readiness record):
+
+| ADR | Status | What is adopted |
+|---|---|---|
+| ADR-001 | **ADOPTED** | System-of-record boundary (FD-003) |
+| ADR-002 | **ADOPTED** | Level 2 folio attribution contract (FD-011, AR-001) |
+| ADR-003 | **ADOPTED** | Reservation operational ownership + folio financial ownership (AR-002) |
+| ADR-004 | **ADOPTED** | Business-date authority (FD-013, AR-008) |
+| ADR-005 | **ADOPTED** | Architecture requirement: FK enforcement on every application connection (AR-003) — not enabled |
+| ADR-007 | **ADOPTED** | Target recovery architecture (AR-006) — restore not implemented |
+| ADR-008 | **ADOPTED** | Authentication → Role/Permission → Operation → Audit (AR-009); Phase 2a frozen; FD-015 recorded, not implemented |
+| ADR-009 | PROPOSED FOR ADOPTION | awaits MP-D9 and route review |
+| ADR-011 | PROPOSED FOR ADOPTION | awaits storage/system-actor mechanics |
+| ADR-006, ADR-010, ADR-012 | PROPOSED | material choices open (see `verification/adr/BACKLOG.md`) |
+
+**Architecture adopted; implementation remains separately authorized
+work.** Adopted ADRs are append-only from this entry.
+
+## Final governance statements
+
+**D11 / INV-A02.** D5 = Level 2. `INV-A02` remains universal. The eight
+historical D11 rows are preserved under FD-010 Option A as historical
+commissioning/test activity; their existence creates no invariant
+exemption; no historical folio attribution is authorized merely to satisfy
+the invariant; future financial writers must create correctly attributed
+transactions. The rows are unaltered.
+
+**FD-015.** `list_folios` read-only access: Admin, Manager, Accountant,
+Front Desk — allowed; other roles — not allowed. *This is a Founder-approved
+authorization decision and is not yet implemented.* The endpoint is
+unchanged.
+
+## Boundary
+
+No application code, template, migration, schema, database, financial
+row, audit record, scheduler, authorization, report, backup/restore,
+business-date, maker-checker or posting behaviour changed. No commit, no
+push. Implementation authorization will be issued separately.
+
+---
+

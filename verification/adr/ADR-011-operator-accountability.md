@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | **DRAFT** — not adopted |
+| Status | **PROPOSED FOR ADOPTION** — 2026-09-08 under FG-P0-ADR-ADOPTION-20260908-01 (FD-014, AR-012). Accountability architecture settled; **storage location and system-actor mechanics open**; readiness condition: resolution of those mechanics at the relevant phase gate. |
 | Founder decision | FD-014 (2026-09-08); context FD-013, FD-016 |
 | Drafted | 2026-09-08 at HEAD `237db2ad` |
 | Implements | Nothing. |
@@ -48,3 +48,17 @@ shift is open) · MP-D9.
 ## Implementation boundary
 
 None authorized.
+
+## Architecture Resolution Round 1 reconciliation (2026-09-08)
+
+Source: `verification/evidence/20260908_architecture_resolution_round1/RECORD.md`.
+
+- **AR-012**: material actions must be attributable to operator identity, role, action, relevant business date and sufficient provenance; automated/system actions must have equivalent accountability through a controlled system identity/provenance. This confirms *Proposed architecture* items 1, 3 and 4 as requirements.
+- **AR-013** adds that any scheduler action capable of materially changing financial or operational state must carry explicit authorization, identifiable provenance, business-date authority, auditability, idempotency, failure handling and verification. A dedicated scheduler-controls ADR is required at the Phase 3/4 gate and is not created in this round (AR-015).
+- Status moved DRAFT → PROPOSED. Storage location (schema columns vs coupled audit row), system-actor representation, workstation identifier and mandatory `shift_id` remain unresolved.
+- Nothing implemented.
+
+## Adoption review (2026-09-08)
+
+Reviewed under `FG-P0-ADR-ADOPTION-20260908-01` and moved PROPOSED → **PROPOSED FOR ADOPTION**. Settled: the accountability elements (FD-014) and the requirement for equivalent system-actor provenance for automated actions (AR-012); the provenance envelope of *Proposed architecture* item 1; role snapshot at posting (item 3); write-once immutability (item 5). Open, and the reason adoption waits: where the envelope is stored (schema columns → PD-004/005/006, versus coupled audit row → ADR-012 retention), the system-actor representation, the workstation identifier, and whether `shift_id` is mandatory. Tracked in `verification/adr/BACKLOG.md`.
+

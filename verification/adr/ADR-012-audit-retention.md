@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | **DRAFT** — not adopted |
+| Status | **PROPOSED** — retained 2026-09-08 under FG-P0-ADR-ADOPTION-20260908-01 (FD-008, AR-007). No destructive pruning is authorized until archival/retention architecture is approved; **that architecture is not yet designed or approved**; pruning code unchanged. |
 | Founder decision | FD-008 (audit history must not be automatically deleted), FD-009 (unattended scheduler) |
 | Drafted | 2026-09-08 at HEAD `237db2ad` |
 | Implements | Nothing. **The pruning job is unchanged. No audit row was modified.** |
@@ -41,3 +41,15 @@ the detection invariant · whether the fix is a Phase 0 bounded exemption
 None authorized. Time-bound note: FD-008 becomes actively violated by the
 running system on or about 2026-11-07 unless an implementation directive
 precedes it.
+
+## Architecture Resolution Round 1 reconciliation (2026-09-08)
+
+Source: `verification/evidence/20260908_architecture_resolution_round1/RECORD.md`.
+
+- **AR-007**: no destructive audit-log pruning is authorized until an archival/retention design is established and approved; the current destructive 90-day pruning is an architecture concern that must be addressed **before production certification**. This confirms the *Decision* and makes the pruning behaviour a certification blocker.
+- Status moved DRAFT → PROPOSED. The retention design (classes, periods, archive format, custody, detection invariant) is exactly what AR-007 requires to be established and approved, and it is not yet.
+- Nothing implemented. `_prune_old_logs` remains scheduled and destructive; no audit row was modified or deleted; the ~2026-11-07 exposure stands.
+
+## Adoption review (2026-09-08)
+
+Reviewed under `FG-P0-ADR-ADOPTION-20260908-01` and **kept at PROPOSED**. The binding rule already exists as governance (FD-008, AR-007): no destructive audit-log pruning until an archival/retention design is established and approved, and the current 90-day pruning must be addressed before production certification. The retention design that would make this ADR adoptable — classes, periods, archive format and custody, detection invariant — has not been produced. `_prune_old_logs` remains scheduled and destructive at this recording; no audit row was modified. Tracked in `verification/adr/BACKLOG.md` (architecture decision needed; bounded implementation authorization needed before ~2026-11-07).
