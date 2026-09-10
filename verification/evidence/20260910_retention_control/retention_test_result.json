@@ -1,0 +1,257 @@
+{
+  "anchor_matches": true,
+  "cases_passed": 18,
+  "cases_total": 18,
+  "copy_method": "sqlite-backup-api",
+  "copy_path": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS\\verification\\_work\\retention_control.db",
+  "d11_extra_charges": [
+    1,
+    2
+  ],
+  "d11_payments": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "directive": "FinalGrid Phase 2 retention control (FD-P2-02)",
+  "finished_at": "2026-09-10T12:14:02",
+  "job_ids": [
+    "daily_backup_job",
+    "log_pruning_job",
+    "notification_queue_flush",
+    "predictive_maintenance_job"
+  ],
+  "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "production_sha256_before": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "read_only_verified": true,
+  "results": [
+    {
+      "case": "RC-01",
+      "expect": true,
+      "got": true,
+      "note": "jobs=['daily_backup_job', 'log_pruning_job', 'notification_queue_flush', 'predictive_maintenance_job']",
+      "pass": true,
+      "what": "log_pruning_job is registered"
+    },
+    {
+      "case": "RC-02",
+      "expect": [
+        "4",
+        "0"
+      ],
+      "got": [
+        "4",
+        "0"
+      ],
+      "note": "",
+      "pass": true,
+      "what": "job trigger unchanged: cron hour=4 minute=0"
+    },
+    {
+      "case": "RC-03",
+      "expect": 3600,
+      "got": 3600,
+      "note": "",
+      "pass": true,
+      "what": "job misfire_grace_time unchanged (3600)"
+    },
+    {
+      "case": "RC-04",
+      "expect": "_prune_old_logs",
+      "got": "_prune_old_logs",
+      "note": "",
+      "pass": true,
+      "what": "job function is the _prune_old_logs closure"
+    },
+    {
+      "case": "RC-05",
+      "expect": null,
+      "got": null,
+      "note": "",
+      "pass": true,
+      "what": "pruning job executes without raising"
+    },
+    {
+      "case": "RC-06",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "what": "audit_logs row older than 90 days SURVIVES the prune"
+    },
+    {
+      "case": "RC-07",
+      "expect": 25,
+      "got": 25,
+      "note": "",
+      "pass": true,
+      "what": "audit_logs row count unchanged by the prune"
+    },
+    {
+      "case": "RC-08",
+      "expect": "2026-06-02 06:44:02.578985",
+      "got": "2026-06-02 06:44:02.578985",
+      "note": "",
+      "pass": true,
+      "what": "MIN(audit_logs.timestamp) did not advance"
+    },
+    {
+      "case": "RC-09",
+      "expect": false,
+      "got": false,
+      "note": "",
+      "pass": true,
+      "what": "old webhook row is still pruned"
+    },
+    {
+      "case": "RC-10",
+      "expect": false,
+      "got": false,
+      "note": "",
+      "pass": true,
+      "what": "old notification row is still pruned"
+    },
+    {
+      "case": "RC-11",
+      "expect": [
+        true,
+        true,
+        true
+      ],
+      "got": [
+        true,
+        true,
+        true
+      ],
+      "note": "",
+      "pass": true,
+      "what": "recent rows all survive"
+    },
+    {
+      "case": "RC-12",
+      "expect": [
+        1,
+        6
+      ],
+      "got": [
+        1,
+        6
+      ],
+      "note": "",
+      "pass": true,
+      "what": "webhook / notification counts each dropped by exactly one"
+    },
+    {
+      "case": "RC-13",
+      "expect": [
+        200,
+        1
+      ],
+      "got": [
+        200,
+        1
+      ],
+      "note": "",
+      "pass": true,
+      "what": "strict audit coupling still writes its row (add_payment)"
+    },
+    {
+      "case": "RC-N1",
+      "expect": [
+        true,
+        false,
+        1
+      ],
+      "got": [
+        true,
+        false,
+        1
+      ],
+      "note": "proves RC-06 is capable of failing",
+      "pass": true,
+      "what": "NEGATIVE CONTROL: pre-change loop deletes the old audit row"
+    },
+    {
+      "case": "D11-01",
+      "expect": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "got": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "note": "",
+      "pass": true,
+      "what": "D11 id sets unchanged"
+    },
+    {
+      "case": "D11-02",
+      "expect": {
+        "c:1": 380.95,
+        "c:2": 95.24,
+        "p:1": 800.0,
+        "p:2": 400.0,
+        "p:3": 1500.0,
+        "p:4": 1000.0,
+        "p:5": 500.0,
+        "p:6": 100.0
+      },
+      "got": {
+        "c:1": 380.95,
+        "c:2": 95.24,
+        "p:1": 800.0,
+        "p:2": 400.0,
+        "p:3": 1500.0,
+        "p:4": 1000.0,
+        "p:5": 500.0,
+        "p:6": 100.0
+      },
+      "note": "",
+      "pass": true,
+      "what": "D11 amounts unchanged"
+    },
+    {
+      "case": "PROD-01",
+      "expect": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+      "got": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+      "note": "",
+      "pass": true,
+      "what": "production database unchanged"
+    },
+    {
+      "case": "PROD-02",
+      "expect": 733184,
+      "got": 733184,
+      "note": "",
+      "pass": true,
+      "what": "production size 733,184 B"
+    }
+  ],
+  "route_count": 298,
+  "started_at": "2026-09-10T12:13:58",
+  "verdict": "PASS"
+}

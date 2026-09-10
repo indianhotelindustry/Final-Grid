@@ -1,0 +1,60 @@
+2026-09-10 12:14:02 [WARNING] app: Running on SQLite — row-level locking (with_for_update) is not enforced. SQLite uses a database-wide write lock; concurrent writers will serialise. Move to PostgreSQL for true per-row locking and higher concurrency.
+2026-09-10 12:14:02 [INFO] app: ------- SECURITY MODE -------
+2026-09-10 12:14:02 [INFO] app:   env                : production
+2026-09-10 12:14:02 [INFO] app:   secret_key         : set (>=32 chars)
+2026-09-10 12:14:02 [INFO] app:   updater_signing    : ENFORCED
+2026-09-10 12:14:02 [INFO] app:   encryption         : available
+2026-09-10 12:14:02 [INFO] app:   lan_access         : disabled (127.0.0.1 only)
+2026-09-10 12:14:02 [INFO] app:   schema_drift_mode  : warn-only
+2026-09-10 12:14:02 [INFO] app: -----------------------------
+2026-09-10 12:14:02 [INFO] app: db.create_all() skipped in production. Use Alembic migrations for schema changes. Set DB_AUTO_CREATE=1 to force-enable at next boot.
+2026-09-10 12:14:02 [INFO] app: SQLite: ensured table credit_vouchers exists
+2026-09-10 12:14:02 [INFO] app: SQLite: ensured table credit_voucher_redemptions exists
+2026-09-10 12:14:02 [INFO] apscheduler.scheduler: Scheduler started
+2026-09-10 12:14:02 [INFO] apscheduler.scheduler: Added job "setup_backup_scheduler.<locals>._scheduled_backup" to job store "default"
+2026-09-10 12:14:02 [INFO] app.backup_manager: Daily backup scheduled at 03:00
+2026-09-10 12:14:02 [INFO] apscheduler.scheduler: Added job "flush_notification_queue" to job store "default"
+2026-09-10 12:14:02 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._prune_old_logs" to job store "default"
+2026-09-10 12:14:02 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._run_predictive_maintenance" to job store "default"
+C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\verification\evidence\20260910_retention_control\verify_retention.py:98: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  old = datetime.utcnow() - timedelta(days=100)
+C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\verification\evidence\20260910_retention_control\verify_retention.py:99: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  new = datetime.utcnow()
+2026-09-10 12:14:02 [INFO] app: Pruned 2 old log entries (older than 90 days)
+2026-09-10 12:14:02 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\verification\evidence\20260910_retention_control\verify_retention.py:190: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  cutoff = datetime.utcnow() - timedelta(days=90)
+==================================================================================================================================
+RETENTION CONTROL (FD-P2-02) - FOCUSED VERIFICATION
+==================================================================================================================================
+production        : C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\instance\pms.db
+sha256 before     : 51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2  (MATCHES anchor)
+disposable copy   : C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\verification\_work\retention_control.db  (sqlite-backup-api)
+----------------------------------------------------------------------------------------------------------------------------------
+routes            : 298
+D11 population    : payments=[1, 2, 3, 4, 5, 6] charges=[1, 2]   audit_logs baseline=23
+fixtures          : {'a_old': 24, 'a_new': 25, 'w_old': 1, 'w_new': 2, 'n_old': 6, 'n_new': 7}  counts={'audit': 25, 'webhook': 2, 'notification': 7}
+----------------------------------------------------------------------------------------------------------------------------------
+OK    RC-01    log_pruning_job is registered                                  expect=True                   got=True                   jobs=['daily_backup_job', 'log_pruning_job', 'notification_queue_flush', 'predictive_maintenance_job']
+OK    RC-02    job trigger unchanged: cron hour=4 minute=0                    expect=('4', '0')             got=('4', '0')             
+OK    RC-03    job misfire_grace_time unchanged (3600)                        expect=3600                   got=3600                   
+OK    RC-04    job function is the _prune_old_logs closure                    expect='_prune_old_logs'      got='_prune_old_logs'      
+OK    RC-05    pruning job executes without raising                           expect=None                   got=None                   
+OK    RC-06    audit_logs row older than 90 days SURVIVES the prune           expect=True                   got=True                   
+OK    RC-07    audit_logs row count unchanged by the prune                    expect=25                     got=25                     
+OK    RC-08    MIN(audit_logs.timestamp) did not advance                      expect=datetime.datetime(2026 got=datetime.datetime(2026 
+OK    RC-09    old webhook row is still pruned                                expect=False                  got=False                  
+OK    RC-10    old notification row is still pruned                           expect=False                  got=False                  
+OK    RC-11    recent rows all survive                                        expect=(True, True, True)     got=(True, True, True)     
+OK    RC-12    webhook / notification counts each dropped by exactly one      expect=(1, 6)                 got=(1, 6)                 
+OK    RC-13    strict audit coupling still writes its row (add_payment)       expect=(200, 1)               got=(200, 1)               
+OK    RC-N1    NEGATIVE CONTROL: pre-change loop deletes the old audit row    expect=(True, False, 1)       got=(True, False, 1)       proves RC-06 is capable of failing
+OK    D11-01   D11 id sets unchanged                                          expect=([1, 2, 3, 4, 5, 6], [ got=([1, 2, 3, 4, 5, 6], [ 
+OK    D11-02   D11 amounts unchanged                                          expect={'p:1': 800.0, 'p:2':  got={'p:1': 800.0, 'p:2':  
+OK    PROD-01  production database unchanged                                  expect='51dd83b7f0fa42a3e85af got='51dd83b7f0fa42a3e85af 
+OK    PROD-02  production size 733,184 B                                      expect=733184                 got=733184                 
+----------------------------------------------------------------------------------------------------------------------------------
+RESULT: 18 / 18 passed   routes=298
+==================================================================================================================================
+retention_test_result.json written
+2026-09-10 12:14:02 [INFO] apscheduler.scheduler: Scheduler has been shut down

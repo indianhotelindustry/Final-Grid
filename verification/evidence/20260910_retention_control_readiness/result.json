@@ -1,0 +1,29 @@
+{
+ "title": "Retention-control implementation readiness (FD-P2-02) - read-only inspection",
+ "prepared": "2026-09-10",
+ "authority": "FD-P2-02 (Founder Resolution Round 3); FD-008; AR-007; ADR-012 item 1",
+ "governance_checkpoint": {"commit": "805ee0d9cc6730255288b74fab61ba31c13940f7", "parent": "a84566ae471786955283d107a9f2ad9e800bfcd4", "subject": "FinalGrid governance: record Founder Resolution Round 3", "paths": 19, "modified": ["verification/FOUNDER_DECISIONS.md", "verification/MASTER_PLAN.md"], "added_dirs": ["verification/evidence/20260910_phase2_entry/ (7)", "verification/evidence/20260910_phase2_founder_decisions/ (5)", "verification/evidence/20260910_phase2_founder_resolution/ (5)"], "pushed": false, "ahead_of_origin": 1},
+ "production_anchor": {"sha256": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2", "size": 733184, "d11_total": 4776.19, "audit_logs": 23, "unchanged": true},
+ "deletion_paths": {
+  "P-1": {"path": "app/__init__.py:547-566 _prune_old_logs; job log_pruning_job cron 04:00 daily; no switch", "kind": "automatic", "tables": ["audit_logs", "webhook_logs", "notification_logs"], "deletes_audit_logs": true, "target_of_FD-P2-02": true, "since": "b5b2514 (2026-08-07)", "first_eligible_on_running_instance": "~2026-11-07"},
+  "P-2": {"path": "reset_transactional_data.py (root) via app/admin_reset.py /execute (Admin + confirmation phrase)", "kind": "deliberate wholesale reset", "deletes_audit_logs": true, "governance": "PD-004 / FD-007 / FD-019; outside FD-P2-02 scope"},
+  "P-3": {"path": "tools/production_initialize.py DELETE FROM per cleared class (dry-run default)", "kind": "deliberate commissioning tool", "deletes_audit_logs": true, "governance": "PD-004; authorization undefined in repository (ADR-006)"},
+  "P-4": {"path": "Alembic revisions c4d5e6f7a8b9, e6f7a8b9c0d1", "deletes_audit_logs": false},
+  "P-5": {"path": "inline migration registry", "deletes_audit_logs": false},
+  "P-6": {"path": "ORM cascades / user deletion", "deletes_audit_logs": false},
+  "P-7": {"path": "tools/test_restore_db.py:223 DROP TABLE on scratch db", "deletes_audit_logs": false, "production_path": false},
+  "P-8": {"path": "db.create_all()", "deletes_audit_logs": false},
+  "P-9": {"path": "harness in-process scheduler", "affects": "copies only", "deletes_audit_logs": "not production"}
+ },
+ "direct_automatic_deletion_paths": 1,
+ "tests_covering_pruning": 0,
+ "invariant_detecting_audit_loss": false,
+ "proposed_minimal_change": "remove (AuditLog, AuditLog.timestamp) from the model list in _prune_old_logs and drop the AuditLog import; WebhookLog/NotificationLog pruning, schedule, job id, grace time, logging and error handling unchanged; ~3 lines in one function",
+ "alternatives_rejected": ["settings switch / configurable retention", "remove whole job", "archive-then-delete now", "touch reset/initialize tools"],
+ "regression_risk": "none on figures/invariants/replay/GM; edit locality in app/__init__.py to be proven by diff",
+ "verification_plan": ["static diff confined to _prune_old_logs", "copy test: 100-day-old AuditLog survives, old webhook/notification rows pruned, negative control on pre-change function", "boot 298 routes; scheduler job ids unchanged", "gm-verify phase1_aa6d9e91 158/158; replay 10/10; inv-run identical", "anchor before/after", "evidence pack + one commit citing FD-P2-02; K-10 closure note; ADR-012 reconciliation", "Phase 6: detection invariant MIN(audit_logs.timestamp) never advances"],
+ "founder_attention": ["reset_transactional_data.py and production_initialize.py can wipe audit_logs by explicit action - PD-004 matter, not retention; record that neither may target instance/pms.db without a PD-004 directive", "no control detects audit-row loss; detection invariant recommended for Phase 6", "fix protects only deployed instances; release timing vs ~2026-11-07 (CF-9)"],
+ "implemented": false,
+ "carry_forwards_preserved": ["CF-5", "CF-6", "CF-9", "CF-10", "CF-11", "SR-1", "SR-2", "schema/FK/NOT NULL", "migration mechanism", "recovery implementation", "night-audit hardening", "deployment rehearsal", "final certification", "Q06 divergence", "W-20 hour"],
+ "evidence_dir": {"path": "verification/evidence/20260910_retention_control_readiness/", "tracked": false, "files": ["RETENTION_CONTROL_READINESS.md", "result.json"]}
+}

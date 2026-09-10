@@ -546,13 +546,12 @@ def create_app():
         # Log table pruning — daily at 04:00, keep 90 days of logs
         def _prune_old_logs():
             with app.app_context():
-                from app.models import db, AuditLog, WebhookLog, NotificationLog
+                from app.models import db, WebhookLog, NotificationLog
                 from datetime import datetime, timedelta
                 cutoff = datetime.utcnow() - timedelta(days=90)
                 try:
                     deleted = 0
                     for LogModel, ts_col in [
-                        (AuditLog, AuditLog.timestamp),
                         (WebhookLog, WebhookLog.received_at),
                         (NotificationLog, NotificationLog.sent_at),
                     ]:

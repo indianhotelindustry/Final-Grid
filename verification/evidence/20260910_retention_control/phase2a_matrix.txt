@@ -1,0 +1,80 @@
+2026-09-10 12:13:13 [WARNING] app: Running on SQLite — row-level locking (with_for_update) is not enforced. SQLite uses a database-wide write lock; concurrent writers will serialise. Move to PostgreSQL for true per-row locking and higher concurrency.
+2026-09-10 12:13:13 [INFO] app: ------- SECURITY MODE -------
+2026-09-10 12:13:13 [INFO] app:   env                : production
+2026-09-10 12:13:13 [INFO] app:   secret_key         : set (>=32 chars)
+2026-09-10 12:13:13 [INFO] app:   updater_signing    : ENFORCED
+2026-09-10 12:13:13 [INFO] app:   encryption         : available
+2026-09-10 12:13:13 [INFO] app:   lan_access         : disabled (127.0.0.1 only)
+2026-09-10 12:13:13 [INFO] app:   schema_drift_mode  : warn-only
+2026-09-10 12:13:13 [INFO] app: -----------------------------
+2026-09-10 12:13:13 [INFO] app: db.create_all() skipped in production. Use Alembic migrations for schema changes. Set DB_AUTO_CREATE=1 to force-enable at next boot.
+2026-09-10 12:13:13 [INFO] app: SQLite: ensured table credit_vouchers exists
+2026-09-10 12:13:13 [INFO] app: SQLite: ensured table credit_voucher_redemptions exists
+2026-09-10 12:13:13 [INFO] apscheduler.scheduler: Scheduler started
+2026-09-10 12:13:13 [INFO] apscheduler.scheduler: Added job "setup_backup_scheduler.<locals>._scheduled_backup" to job store "default"
+2026-09-10 12:13:13 [INFO] app.backup_manager: Daily backup scheduled at 03:00
+2026-09-10 12:13:13 [INFO] apscheduler.scheduler: Added job "flush_notification_queue" to job store "default"
+2026-09-10 12:13:13 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._prune_old_logs" to job store "default"
+2026-09-10 12:13:13 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._run_predictive_maintenance" to job store "default"
+====================================================================================================
+PHASE 2a — FOLIO AUTHORIZATION MATRIX
+====================================================================================================
+production        : C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\instance\pms.db
+sha256 before     : 51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2
+frozen anchor     : MATCHES
+disposable copy   : C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\verification\_work\phase2a_authz.db  (sqlite-backup-api)
+----------------------------------------------------------------------------------------------------
+pre-existing NULL folio_id  payments=6 charges=2  (D11 freeze — must be identical at the end)
+fixtures          : {'reservation': 1, 'folio_a': 1, 'folio_b': 5, 'charge': 3, 'payment': 7}
+----------------------------------------------------------------------------------------------------
+NEGATIVE MATRIX — 4 endpoints x 5 roles
+----------------------------------------------------------------------------------------------------
+OK    T01  list_folios              FrontDesk        expect=403 got=403  no-change
+OK    T02  list_folios              Accountant       expect=403 got=403  no-change
+OK    T03  list_folios              Housekeeping     expect=403 got=403  no-change
+OK    T04  create_folio             FrontDesk        expect=403 got=403  no-change
+OK    T05  create_folio             Accountant       expect=403 got=403  no-change
+OK    T06  create_folio             Housekeeping     expect=403 got=403  no-change
+OK    T07  transfer_charge          FrontDesk        expect=403 got=403  no-change
+OK    T08  transfer_charge          Accountant       expect=403 got=403  no-change
+OK    T09  transfer_charge          Housekeeping     expect=403 got=403  no-change
+OK    T10  transfer_payment         FrontDesk        expect=403 got=403  no-change
+OK    T11  transfer_payment         Accountant       expect=403 got=403  no-change
+OK    T12  transfer_payment         Housekeeping     expect=403 got=403  no-change
+----------------------------------------------------------------------------------------------------
+UNAUTHENTICATED — 4 cases
+----------------------------------------------------------------------------------------------------
+OK    T13  list_folios              unauthenticated  expect=401 got=401  no-change
+OK    T14  create_folio             unauthenticated  expect=401 got=401  no-change
+OK    T15  transfer_charge          unauthenticated  expect=401 got=401  no-change
+OK    T16  transfer_payment         unauthenticated  expect=401 got=401  no-change
+----------------------------------------------------------------------------------------------------
+AUTHORIZED PATHS — 8 cases (behaviour must be unchanged)
+----------------------------------------------------------------------------------------------------
+OK    T17  list_folios              Admin            expect=200 got=200  no-change
+OK    T18  list_folios              Manager          expect=200 got=200  no-change
+OK    T19  transfer_charge          Manager (authorized) expect=200 got=200  no-change
+OK    T20  transfer_charge          audit row written expect=True got=True  no-change
+OK    T21  transfer_payment         Manager (authorized) expect=200 got=200  no-change
+OK    T22  transfer_payment         audit row written expect=True got=True  no-change
+OK    T23  create_folio             Manager (authorized) expect=201 got=201  no-change
+----------------------------------------------------------------------------------------------------
+CONTROL PROPERTIES
+----------------------------------------------------------------------------------------------------
+OK    T24  denial recorded          Housekeeping     expect=True got=True  no-change
+OK    T25  fail-closed              Admin, endpoint unmapped expect=403 got=403  no-change
+OK    T26  guard commissioned       Housekeeping, guard relaxed expect=200 got=200  no-change
+OK    T27  audit coupling           audit fails -> rollback expect=500 got=500  no-change
+OK    T28  NULL-source transfer     Admin (authorized) expect=200 got=200  no-change
+----------------------------------------------------------------------------------------------------
+OK    T29  D11 freeze               pre-existing NULLs untouched expect=([1, 2, 3, 4, 5, 6], [1, 2]) got=([1, 2, 3, 4, 5, 6], [1, 2])  no-change
+  payment ids frozen NULL : [1, 2, 3, 4, 5, 6] -> [1, 2, 3, 4, 5, 6]
+  charge  ids frozen NULL : [1, 2] -> [1, 2]
+====================================================================================================
+sha256 after      : 51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2
+read-only         : VERIFIED — production byte-identical
+cases             : 29 passed / 29 total
+VERDICT           : PASS
+====================================================================================================
+wrote result.json
+2026-09-10 12:13:14 [INFO] apscheduler.scheduler: Scheduler has been shut down

@@ -1,0 +1,448 @@
+{
+  "anchor_matches": true,
+  "cases_passed": 29,
+  "cases_total": 29,
+  "copy_method": "sqlite-backup-api",
+  "finding": "R7",
+  "finished_at": "2026-09-10T12:13:14",
+  "frozen_anchor": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "phase": "2a",
+  "production_db": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS\\instance\\pms.db",
+  "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "production_sha256_before": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "read_only_verified": true,
+  "results": [
+    {
+      "actor": "FrontDesk",
+      "case": "T01",
+      "endpoint": "list_folios",
+      "expect_effect": [
+        null,
+        null
+      ],
+      "expect_status": 403,
+      "got_effect": [
+        null,
+        null
+      ],
+      "got_status": 403,
+      "pass": true
+    },
+    {
+      "actor": "Accountant",
+      "case": "T02",
+      "endpoint": "list_folios",
+      "expect_effect": [
+        null,
+        null
+      ],
+      "expect_status": 403,
+      "got_effect": [
+        null,
+        null
+      ],
+      "got_status": 403,
+      "pass": true
+    },
+    {
+      "actor": "Housekeeping",
+      "case": "T03",
+      "endpoint": "list_folios",
+      "expect_effect": [
+        null,
+        null
+      ],
+      "expect_status": 403,
+      "got_effect": [
+        null,
+        null
+      ],
+      "got_status": 403,
+      "pass": true
+    },
+    {
+      "actor": "FrontDesk",
+      "case": "T04",
+      "endpoint": "create_folio",
+      "expect_effect": [
+        null,
+        null
+      ],
+      "expect_status": 403,
+      "got_effect": [
+        null,
+        null
+      ],
+      "got_status": 403,
+      "pass": true
+    },
+    {
+      "actor": "Accountant",
+      "case": "T05",
+      "endpoint": "create_folio",
+      "expect_effect": [
+        null,
+        null
+      ],
+      "expect_status": 403,
+      "got_effect": [
+        null,
+        null
+      ],
+      "got_status": 403,
+      "pass": true
+    },
+    {
+      "actor": "Housekeeping",
+      "case": "T06",
+      "endpoint": "create_folio",
+      "expect_effect": [
+        null,
+        null
+      ],
+      "expect_status": 403,
+      "got_effect": [
+        null,
+        null
+      ],
+      "got_status": 403,
+      "pass": true
+    },
+    {
+      "actor": "FrontDesk",
+      "case": "T07",
+      "endpoint": "transfer_charge",
+      "expect_effect": [
+        null,
+        null
+      ],
+      "expect_status": 403,
+      "got_effect": [
+        null,
+        null
+      ],
+      "got_status": 403,
+      "pass": true
+    },
+    {
+      "actor": "Accountant",
+      "case": "T08",
+      "endpoint": "transfer_charge",
+      "expect_effect": [
+        null,
+        null
+      ],
+      "expect_status": 403,
+      "got_effect": [
+        null,
+        null
+      ],
+      "got_status": 403,
+      "pass": true
+    },
+    {
+      "actor": "Housekeeping",
+      "case": "T09",
+      "endpoint": "transfer_charge",
+      "expect_effect": [
+        null,
+        null
+      ],
+      "expect_status": 403,
+      "got_effect": [
+        null,
+        null
+      ],
+      "got_status": 403,
+      "pass": true
+    },
+    {
+      "actor": "FrontDesk",
+      "case": "T10",
+      "endpoint": "transfer_payment",
+      "expect_effect": [
+        null,
+        null
+      ],
+      "expect_status": 403,
+      "got_effect": [
+        null,
+        null
+      ],
+      "got_status": 403,
+      "pass": true
+    },
+    {
+      "actor": "Accountant",
+      "case": "T11",
+      "endpoint": "transfer_payment",
+      "expect_effect": [
+        null,
+        null
+      ],
+      "expect_status": 403,
+      "got_effect": [
+        null,
+        null
+      ],
+      "got_status": 403,
+      "pass": true
+    },
+    {
+      "actor": "Housekeeping",
+      "case": "T12",
+      "endpoint": "transfer_payment",
+      "expect_effect": [
+        null,
+        null
+      ],
+      "expect_status": 403,
+      "got_effect": [
+        null,
+        null
+      ],
+      "got_status": 403,
+      "pass": true
+    },
+    {
+      "actor": "unauthenticated",
+      "case": "T13",
+      "endpoint": "list_folios",
+      "expect_effect": [
+        null,
+        null
+      ],
+      "expect_status": 401,
+      "got_effect": [
+        null,
+        null
+      ],
+      "got_status": 401,
+      "pass": true
+    },
+    {
+      "actor": "unauthenticated",
+      "case": "T14",
+      "endpoint": "create_folio",
+      "expect_effect": [
+        null,
+        null
+      ],
+      "expect_status": 401,
+      "got_effect": [
+        null,
+        null
+      ],
+      "got_status": 401,
+      "pass": true
+    },
+    {
+      "actor": "unauthenticated",
+      "case": "T15",
+      "endpoint": "transfer_charge",
+      "expect_effect": [
+        null,
+        null
+      ],
+      "expect_status": 401,
+      "got_effect": [
+        null,
+        null
+      ],
+      "got_status": 401,
+      "pass": true
+    },
+    {
+      "actor": "unauthenticated",
+      "case": "T16",
+      "endpoint": "transfer_payment",
+      "expect_effect": [
+        null,
+        null
+      ],
+      "expect_status": 401,
+      "got_effect": [
+        null,
+        null
+      ],
+      "got_status": 401,
+      "pass": true
+    },
+    {
+      "actor": "Admin",
+      "case": "T17",
+      "endpoint": "list_folios",
+      "expect_effect": true,
+      "expect_status": 200,
+      "got_effect": true,
+      "got_status": 200,
+      "pass": true
+    },
+    {
+      "actor": "Manager",
+      "case": "T18",
+      "endpoint": "list_folios",
+      "expect_effect": true,
+      "expect_status": 200,
+      "got_effect": true,
+      "got_status": 200,
+      "pass": true
+    },
+    {
+      "actor": "Manager (authorized)",
+      "case": "T19",
+      "endpoint": "transfer_charge",
+      "expect_effect": true,
+      "expect_status": 200,
+      "got_effect": true,
+      "got_status": 200,
+      "pass": true
+    },
+    {
+      "actor": "audit row written",
+      "case": "T20",
+      "endpoint": "transfer_charge",
+      "expect_effect": true,
+      "expect_status": true,
+      "got_effect": true,
+      "got_status": true,
+      "pass": true
+    },
+    {
+      "actor": "Manager (authorized)",
+      "case": "T21",
+      "endpoint": "transfer_payment",
+      "expect_effect": true,
+      "expect_status": 200,
+      "got_effect": true,
+      "got_status": 200,
+      "pass": true
+    },
+    {
+      "actor": "audit row written",
+      "case": "T22",
+      "endpoint": "transfer_payment",
+      "expect_effect": true,
+      "expect_status": true,
+      "got_effect": true,
+      "got_status": true,
+      "pass": true
+    },
+    {
+      "actor": "Manager (authorized)",
+      "case": "T23",
+      "endpoint": "create_folio",
+      "expect_effect": true,
+      "expect_status": 201,
+      "got_effect": true,
+      "got_status": 201,
+      "pass": true
+    },
+    {
+      "actor": "Housekeeping",
+      "case": "T24",
+      "endpoint": "denial recorded",
+      "expect_effect": true,
+      "expect_status": true,
+      "got_effect": true,
+      "got_status": true,
+      "pass": true
+    },
+    {
+      "actor": "Admin, endpoint unmapped",
+      "case": "T25",
+      "endpoint": "fail-closed",
+      "expect_effect": true,
+      "expect_status": 403,
+      "got_effect": true,
+      "got_status": 403,
+      "pass": true
+    },
+    {
+      "actor": "Housekeeping, guard relaxed",
+      "case": "T26",
+      "endpoint": "guard commissioned",
+      "expect_effect": true,
+      "expect_status": 200,
+      "got_effect": true,
+      "got_status": 200,
+      "pass": true
+    },
+    {
+      "actor": "audit fails -> rollback",
+      "case": "T27",
+      "endpoint": "audit coupling",
+      "expect_effect": true,
+      "expect_status": 500,
+      "got_effect": true,
+      "got_status": 500,
+      "pass": true
+    },
+    {
+      "actor": "Admin (authorized)",
+      "case": "T28",
+      "endpoint": "NULL-source transfer",
+      "expect_effect": true,
+      "expect_status": 200,
+      "got_effect": true,
+      "got_status": 200,
+      "pass": true
+    },
+    {
+      "actor": "pre-existing NULLs untouched",
+      "case": "T29",
+      "endpoint": "D11 freeze",
+      "expect_effect": true,
+      "expect_status": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "got_effect": true,
+      "got_status": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "pass": true
+    }
+  ],
+  "role_map": {
+    "folio.create_folio": [
+      "Admin",
+      "Manager"
+    ],
+    "folio.list_folios": [
+      "Admin",
+      "Manager"
+    ],
+    "folio.transfer_charge": [
+      "Admin",
+      "Manager"
+    ],
+    "folio.transfer_payment": [
+      "Admin",
+      "Manager"
+    ]
+  },
+  "started_at": "2026-09-10T12:13:10",
+  "verdict": "PASS"
+}

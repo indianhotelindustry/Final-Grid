@@ -1,0 +1,30 @@
+{
+ "directive": "FinalGrid Phase 2 retention control implementation",
+ "authority": "FD-P2-02 (Founder Resolution Round 3); FD-008; AR-007; ADR-012 item 1",
+ "governance_checkpoint_parent": "805ee0d9cc6730255288b74fab61ba31c13940f7",
+ "baseline_commit_for_regression": "aa6d9e91e7294be731383f755d6998acf5f059fc",
+ "implemented": "2026-09-10",
+ "implementation_commit": "the single checkpoint commit containing this directory (hash in the final report)",
+ "files_changed_application": {"app/__init__.py": {"function": "create_app :: _prune_old_logs", "insertions": 1, "deletions": 2, "hunks": 1, "line_endings_changed": false, "other_references_to_AuditLog_in_module": 0}},
+ "behaviour_changed": "log_pruning_job (cron 04:00 daily, misfire_grace_time 3600) no longer deletes audit_logs rows; it still deletes webhook_logs (received_at < now-90d) and notification_logs (sent_at < now-90d); schedule, job id, transaction and error handling unchanged",
+ "not_done": ["retention redesign", "archival", "configurable retention settings", "removal of the pruning job", "changes to reset_transactional_data.py / admin_reset / production_initialize.py", "schema change", "data change"],
+ "focused_test": {"script": "verify_retention.py", "cases_total": 18, "cases_passed": 18, "verdict": "PASS", "routes": 298,
+                  "job_ids": ["daily_backup_job", "log_pruning_job", "notification_queue_flush", "predictive_maintenance_job"],
+                  "audit_row_older_than_90d_survives": true, "old_webhook_pruned": true, "old_notification_pruned": true,
+                  "job_executes": true, "job_identity_unchanged": true, "strict_audit_coupling_unaffected": true,
+                  "negative_control_pre_change_loop_deletes_audit_row": true, "output": ["retention_test.txt", "retention_test_result.json"]},
+ "existing_audit_tests": {"phase2a_matrix": {"cases_passed": 29, "cases_total": 29, "verdict": "PASS", "audit_cases": ["T20", "T22", "T27"], "output": ["phase2a_matrix.txt", "phase2a_result.json"]}},
+ "regression": {
+  "golden_master": {"tag": "phase1_aa6d9e91", "compared": 158, "clean": 158, "differences": 0, "verdict": "PASS", "pack": "20260910_064223_gm_verify_phase1_aa6d9e91"},
+  "replay": {"dates": 10, "clean": 10, "differences": 0, "verdict": "PASS", "pack": "20260910_064244_replay_verify_production"},
+  "invariants": {"registered": 26, "holds": 17, "vacuous": 7, "violated": 2, "violated_ids": ["INV-A02 (D11 8/8)", "INV-A03 (D11)"], "overall": "FAIL by design (FD-010)", "summary_identical_to_baseline_pack_20260909_013500": true, "pack": "20260910_064257_inv_run_production"},
+  "boot": {"routes": 298, "baseline_routes": 298}
+ },
+ "production_anchor": {"sha256": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2", "size": 733184, "d11_payments": [1, 2, 3, 4, 5, 6], "d11_extra_charges": [1, 2], "d11_total": 4776.19, "audit_logs": 23, "schema_objects": 144, "before_after_identical": true, "sidecar_files": false, "production_mutation": false},
+ "confirmations": {"audit_logs_automatic_pruning_disabled": true, "webhook_notification_pruning_active": true, "no_production_mutation": true, "no_unexplained_regression": true, "stop_condition_met": false},
+ "limitations": ["fix protects only deployed instances; exposure ~2026-11-07 stands until release (CF-9)", "audit_logs grows unbounded until ADR-012 archival design (~153 B/row)", "no invariant detects audit-row loss (Phase 6)", "reset/initialisation tools still able to delete audit_logs by explicit action (PD-004)", "K-10 closed by implementation; historical register text not rewritten"],
+ "governance": {"founder_decisions_modified": false, "adrs_modified": false, "architectural_contradiction_found": false, "pushed": false},
+ "carry_forwards_preserved": ["CF-5", "CF-6", "CF-9", "CF-10", "CF-11", "SR-1", "SR-2", "schema/FK/NOT NULL", "migration mechanism", "recovery implementation", "night-audit hardening", "deployment rehearsal", "final certification", "Q06 divergence", "W-20 hour"],
+ "future_controls_preserved": ["commissioning reset/initialisation tools remain governed by PD-004", "Phase 6 invariant detecting unexpected audit-row loss"],
+ "commit_scope_intended": ["app/__init__.py", "verification/evidence/20260910_retention_control/", "verification/evidence/20260910_retention_control_readiness/", "verification/evidence/20260910_064223_gm_verify_phase1_aa6d9e91/", "verification/evidence/20260910_064244_replay_verify_production/", "verification/evidence/20260910_064257_inv_run_production/"]
+}
