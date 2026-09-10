@@ -456,3 +456,26 @@ both `folio_id` columns nullable with the eight FD-010 rows preserved ·
 `date.today` model defaults (Q-3 → Phase 3) · destructive audit pruning
 scheduled (FD-008 / B-6) · `list_folios` scope (FD-015) not implemented ·
 migration mechanism undecided (B-4).
+
+---
+
+## 18 Founder Resolution Round 3 — Phase 2 production readiness — status overlay (appended 2026-09-10)
+
+Source: `verification/FOUNDER_DECISIONS.md` § "Founder Resolution Round 3 — Phase 2
+Production Readiness — FG-P2-FOUNDER-RESOLUTION-20260910-01"; evidence under
+`verification/evidence/20260910_phase2_founder_resolution/`. The eleven-phase
+sequence in §04–§05 is unchanged. **Decisions, not implementation authorization.**
+
+| Decision | Master Plan status effect |
+|---|---|
+| FD-P2-01 single-operator / Admin model for the first release | **MP-D9 interim question RULED for the first release**; MP-D9 full profile remains OPEN at the Phase 4 gate (AR-015). §03 matrix row MP-D9 is read with this overlay. |
+| FD-P2-02 stop destructive audit-log pruning | Phase 4/6 item (AR-007 / ADR-012) authorized as a **bounded retention-control directive** ahead of its phase; design remains Phase 4/6 |
+| FD-P2-03 D11 declared historical exception | certification (G12) rule; unit 1.6 and B-3 unchanged (Phase 5) |
+| FD-P2-04 twelve-condition PD-006 definition | §08 successor PD-006 now has an adopted acceptance criterion; **BACKLOG B-5 closed**; Phase 9 units 9.1–9.3 may be brought forward as a bounded recovery-hardening directive |
+| FD-P2-05 manual night-audit operation for the first release | Phase 3 scope: units 3.5 and 3.6 are first-release controls; scheduler automation deferred behind the AR-013 / B-1 ADR |
+| FD-P2-06 refine INV-B06 / INV-D02 | Phase 6 unit 6.5 family: a bounded constitutional/invariant amendment authorized in principle (§07 Layer 1 rule honoured — Founder ruling) |
+| FD-P2-07 maker-checker threshold ₹10,000; no self-approval | Phase 2b entry condition B-2 has its policy content; ADR-010 adoption pending; 2b still requires CF-10 |
+
+Open decisions unchanged: MP-D1, MP-D3, MP-D4, MP-D6, MP-D7, MP-D8, MP-D9 (full profile);
+B-1, B-2 (ADR text), B-3, B-4, B-6, B-7, B-8, B-9, B-10, B-11. Carry-forwards
+CF-5, CF-6, CF-9, CF-10, CF-11, SR-1/SR-2 (implementation) remain open.

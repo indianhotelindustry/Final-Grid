@@ -1,0 +1,43 @@
+{
+ "directive": "FG-P2-FOUNDER-DECISION-PACK-20260910-01",
+ "title": "FinalGrid Phase 2 Founder decision resolution pack",
+ "type": "read-only analysis",
+ "prepared": "2026-09-10",
+ "status": "PHASE 2 FOUNDER DECISION PACK PASS - DECISIONS READY FOR FOUNDER GATE",
+ "baseline": {"head": "a84566ae471786955283d107a9f2ad9e800bfcd4", "origin_main": "a84566ae471786955283d107a9f2ad9e800bfcd4", "tree_clean": true},
+ "production_anchor": {"sha256": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2", "size": 733184, "unchanged": true, "night_audit_enabled": false, "users": ["admin (Admin)"], "audit_logs": 23, "audit_row_avg_bytes": 153},
+ "actions": {"implementation": false, "database_changed": false, "schema_changed": false, "invariants_changed": false, "scheduler_changed": false, "d11_changed": false, "governance_changed": false, "commit": false, "push": false},
+ "evidence_sufficient_for_all_seven": true,
+ "decisions": {
+  "FD-P2-01": {"subject": "MP-D9 operator profile (distinct from Wave 0 D9 restore verification)", "recommendation": "B narrow interim extension (or C rule single-operator if factual)",
+               "conditions": ["roles in production use = Admin (+Manager) until MP-D9 ruled", "Admin self-approval only when no other approver-role account exists, reason mandatory, audit flagged", "creating any FrontDesk/Accountant/Housekeeping account before Phase 4 unit 4.2 re-opens the decision", "report/writer routes unchanged until Phase 4"],
+               "production_blocker": "CONDITIONAL", "blocks_phase2b": "YES", "blocks_phase3": "NO", "deferrable": "NO (interim ruling is the deferral)", "kind": "founder_choice"},
+  "FD-P2-02": {"subject": "audit-log pruning exemption", "recommendation": "remove audit_logs from _prune_old_logs; keep webhook/notification pruning; audit_logs pruning OFF pending ADR-012", "exposure": "~2026-11-07", "storage": "~153 B/row measured; ~27 MB/year at 500 rows/day",
+               "production_blocker": "YES", "blocks_phase2b": "NO", "blocks_phase3": "NO", "deferrable": "NO", "kind": "safe_default"},
+  "FD-P2-03": {"subject": "D11 certification verdict", "recommendation": "declared-exception register at the certification layer; PASS-WITH-DECLARED-EXCEPTION only when violation set == declared 8 objects; rows and invariants unchanged",
+               "rows": {"payments": [1, 2, 3, 4, 5, 6], "extra_charges": [1, 2], "total": 4776.19}, "rejected": ["attribute", "reverse/delete", "population declaration inside the invariant"],
+               "production_blocker": "YES (G12 readability)", "blocks_phase2b": "NO", "blocks_phase3": "NO", "deferrable": "NO (disposition itself stays deferred to Phase 5 / B-3)", "kind": "safe_default"},
+  "FD-P2-04": {"subject": "PD-006 verified state", "recommendation": "adopt twelve conditions", "conditions": ["backup identity (artifact + plaintext hash == manifest)", "restore completion into isolated path", "integrity_check ok", "foreign_key_check 0", "schema identity + release-tag fingerprint", "row counts + content digests + body bytes beyond header", "whole-file hash informational", "inv-run and gm-verify equivalence on a copy of the restored file", "evidence manifest committed", "operator/machine/directive accountability", "off-box restore of .enc under documented key custody", "artifact exempt from purge / retained"],
+               "minimum_for_production_mutation": "1-7, 9, 10", "minimum_for_D9_G8": "all twelve", "closes_backlog": "B-5",
+               "production_blocker": "YES (G8)", "blocks_phase2b": "NO", "blocks_phase3": "NO", "deferrable": "NO", "kind": "safe_default"},
+  "FD-P2-05": {"subject": "night-audit operating mode", "recommendation": "controlled manual invocation for first release (night_audit_enabled=false, current production setting); written daily-close procedure; automation only after AR-013/B-1 ADR",
+               "basis": ["FD-009 forbids unattended financially material mutation without controls", "scheduler run at 02:00 leaves blockers silent", "manual run records run_by_user_id; Admin/Manager/Accountant"],
+               "production_blocker": "YES (as a ruling for G9)", "blocks_phase2b": "NO", "blocks_phase3": "NO", "deferrable": "NO", "kind": "safe_default"},
+  "FD-P2-06": {"subject": "INV-B06 / INV-D02 semantics",
+               "INV-B06": {"expects": "arrival_date <= payment_date <= departure_date + 30 days; no leading window", "behaviour": "advance (purpose='advance') dated on the booking business date before arrival; refund at cancellation", "classification": "invariant design gap / semantics ambiguity", "gst": "none", "recommendation": "refine: admit purpose='advance' on/before arrival and cancellation refunds on/before cancellation; keep behaviour"},
+               "INV-D02": {"expects": "is_correction or is_reversal rows carry a resolving corrects_id", "behaviour": "cancellation refund is is_reversal=True, corrects_id NULL; link held in reservations.cancellation_refund_payment_id", "classification": "business-semantics ambiguity (refund reverses an advance balance, not one row)", "gst": "none", "recommendation": "refine: accept a reversal row referenced by reservations.cancellation_refund_payment_id; keep behaviour"},
+               "production_blocker": "YES (G3/G10 readability)", "blocks_phase2b": "NO", "blocks_phase3": "NO", "deferrable": "NO for the ruling; implementation Phase 6", "kind": "safe_default (constitutional amendment by Founder ruling)"},
+  "FD-P2-07": {"subject": "maker-checker operation matrix (B-2)", "recommendation": "four tiers: MC required / role authorization only / informational / emergency admin override; adopt ADR-010 with the assignment in the pack",
+               "mc_required": ["void/refund (exists)", "correction pair on audit-locked date", "folio transfer above T1", "folio close (future)", "billing-responsibility change", "night-audit reopen", "forfeit above threshold (exists)", "individual credit above threshold (exists)"],
+               "founder_choices": ["T1 rupee threshold for folio transfers", "self-approval policy for single operator", "whether reopen needs a checker"],
+               "production_blocker": "NO for single-operator (CONDITIONAL on MP-D9)", "blocks_phase2b": "YES", "blocks_phase3": "NO", "deferrable": "implementation yes; matrix no (2b entry)", "kind": "founder_choice"}
+ },
+ "recommend_now": {
+  "approve_immediately": ["FD-P2-02", "FD-P2-03", "FD-P2-04", "FD-P2-05", "FD-P2-06"],
+  "genuine_founder_choice": ["FD-P2-01", "FD-P2-07"],
+  "remain_deferred": ["D11 disposition (B-3, Phase 5)", "archival/retention design (ADR-012)", "night-audit automation ADR (B-1)", "scheduled restore service (Phase 9)", "approval-table convergence", "full MP-D9 profile / Phase 4 classification", "schema authority B-4 / FK / NOT NULL"]
+ },
+ "certification_path": ["decision resolution (one governance directive)", "bounded implementation (pre-2b package, invariant refinement, recovery hardening, Phase 3, then 2b)", "verification (per-directive packs; 24/24 writers; commissioned invariants; Q06 explained)", "regression (GM 0 undeclared, replay 0, datasets 5/5, matrix, Q14 declared)", "recovery rehearsal (off-box .enc, twelve conditions)", "deployment rehearsal (install, upgrade, launchers, day-one, N-day manual closes, rollback)", "final certification (G1-G11 packs, D11 declared-exception register, Founder entry)"],
+ "evidence_dir": {"path": "verification/evidence/20260910_phase2_founder_decisions/", "tracked": false, "files": ["FOUNDER_DECISION_PACK.md", "DECISION_SUMMARY.md", "PRODUCTION_IMPACT.md", "RECOMMENDATIONS.md", "result.json"]},
+ "implementation_authorized": false
+}

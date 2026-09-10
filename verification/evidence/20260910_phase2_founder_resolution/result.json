@@ -1,0 +1,28 @@
+{
+ "directive": "FG-P2-FOUNDER-RESOLUTION-20260910-01",
+ "title": "Founder Resolution Round 3 - Phase 2 Production Readiness",
+ "type": "governance recording only",
+ "recorded": "2026-09-10",
+ "status": "PHASE 2 FOUNDER RESOLUTION PASS - ROUND 3 RECORDED - IMPLEMENTATION NOT AUTHORIZED",
+ "baseline": {"head": "a84566ae471786955283d107a9f2ad9e800bfcd4", "origin_main": "a84566ae471786955283d107a9f2ad9e800bfcd4"},
+ "decisions": {
+  "FD-P2-01": {"subject": "initial staffing profile", "decision": "single-operator / Admin model for the first production release (bounded)", "closes": "MP-D9 interim question for the first release", "leaves_open": "MP-D9 full profile (Phase 4 gate)", "implementation_status": "none required"},
+  "FD-P2-02": {"subject": "audit retention", "decision": "stop destructive audit-log pruning until an archival design is adopted; non-audit log retention unchanged", "permits": "bounded retention-control directive", "implementation_status": "not implemented; pruning job unchanged"},
+  "FD-P2-03": {"subject": "D11 certification", "decision": "eight rows certified as a declared historical exception; preserved exactly; invariant not exempted; extra exception = certification failure", "rows": {"payments": [1, 2, 3, 4, 5, 6], "extra_charges": [1, 2], "total": 4776.19}, "implementation_status": "rows and invariants unchanged"},
+  "FD-P2-04": {"subject": "PD-006 verified state", "decision": "twelve-condition definition adopted", "closes": "BACKLOG B-5", "permits": "recovery-hardening directive", "implementation_status": "not implemented"},
+  "FD-P2-05": {"subject": "night-audit operating mode", "decision": "manual / controlled operator execution for the first release; scheduler automation not the operating model", "permits": "daily-close procedure; Phase 3 units 3.5/3.6 as first-release controls", "implementation_status": "no code or setting changed (night_audit_enabled=false)"},
+  "FD-P2-06": {"subject": "INV-B06 / INV-D02", "decision": "refine both invariants for legitimate advance payments and cancellation refunds; behaviour unchanged; detection preserved", "permits": "Phase 6 invariant-refinement directive (constitutional amendment with commissioning evidence)", "implementation_status": "invariants unchanged"},
+  "FD-P2-07": {"subject": "maker-checker", "decision": "initial threshold 10000 INR; no self-approval; operation-specific controls regardless of amount; auditable emergency/admin operations; minimum operation set named", "permits": "ADR-010 adoption with the operation matrix (B-2); Phase 2b entry with CF-10", "implementation_status": "not implemented"}
+ },
+ "governance_records": {
+  "FOUNDER_DECISIONS.md": {"section": "Founder Resolution Round 3 - Phase 2 Production Readiness - FG-P2-FOUNDER-RESOLUTION-20260910-01", "line": 1114, "lines_before": 1110, "lines_after": 1206, "insertions": 96, "deletions": 0, "append_only_proof": "HEAD content is a byte prefix; tail equals the drafted section; appears once; 0 CR bytes", "prior_resolutions_rewritten": false},
+  "MASTER_PLAN.md": {"section": "18 Founder Resolution Round 3 - Phase 2 production readiness - status overlay", "line": 462, "lines_before": 458, "lines_after": 481, "insertions": 23, "deletions": 0, "sequence_altered": false},
+  "ADRs": "not edited; ADR-006 (B-5 closed), ADR-010 (threshold / no-self-approval policy), ADR-012 (pruning ruling) reconciled at their next adoption review"
+ },
+ "carry_forwards_preserved_open": ["CF-5", "CF-6", "CF-9", "CF-10", "CF-11", "SR-1 implementation/verification", "SR-2 implementation/verification", "schema/FK/NOT NULL", "migration mechanism (B-4)", "recovery implementation", "night-audit implementation/hardening", "deployment rehearsal", "final certification", "Q06 GST divergence", "W-20 repeat-call hour"],
+ "closed_by_round3": ["BACKLOG B-5", "MP-D9 interim question (first release only)", "SR-1/SR-2 as review items", "entry-assessment open items FD-Q1..FD-Q7"],
+ "production_anchor": {"sha256": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2", "size": 733184, "d11_payments": [1, 2, 3, 4, 5, 6], "d11_extra_charges": [1, 2], "d11_total": 4776.19, "audit_logs": 23, "schema_objects": 144, "schema_unchanged": true, "verified_before_and_after": true},
+ "actions_not_taken": ["implementation", "schema change", "database change", "invariant change", "scheduler/night-audit change", "role change", "ADR edit", "deployment", "commit", "push"],
+ "evidence_dir": {"path": "verification/evidence/20260910_phase2_founder_resolution/", "tracked": false, "files": ["FOUNDER_RESOLUTION_ROUND3.md", "DECISION_REGISTER.md", "IMPLEMENTATION_CONSEQUENCES.md", "CARRY_FORWARD_REGISTER.md", "result.json"]},
+ "working_tree_after": {"modified_tracked": ["verification/FOUNDER_DECISIONS.md", "verification/MASTER_PLAN.md"], "untracked": ["verification/evidence/20260910_phase2_entry/", "verification/evidence/20260910_phase2_founder_decisions/", "verification/evidence/20260910_phase2_founder_resolution/"], "staged": 0, "committed": false, "pushed": false}
+}

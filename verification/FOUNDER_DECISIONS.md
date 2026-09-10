@@ -1108,3 +1108,99 @@ No deployment, rollout, production configuration change or production data mutat
 ## Consequence for the Phase 2 gate
 
 Phase 2b entry conditions (Master Plan §05: Phase 1 complete; MP-D9 and MP-D5 settled; maker-checker operation-matrix ADR B-2) are now met as to "Phase 1 complete" only. MP-D9 remains OPEN and B-2 remains undefined. Phase 2 implementation scope is unchanged and **not authorized** by this entry.
+
+---
+
+# Founder Resolution Round 3 — Phase 2 Production Readiness — FG-P2-FOUNDER-RESOLUTION-20260910-01
+
+| | |
+|---|---|
+| Recorded | 2026-09-10 |
+| Governed HEAD | `a84566ae471786955283d107a9f2ad9e800bfcd4` (Phase 1 accepted at `aa6d9e91`; Golden Master `phase1_aa6d9e91` adopted) |
+| Kind | Founder decisions FD-P2-01 … FD-P2-07, answering the seven open items of `verification/evidence/20260910_phase2_entry/` as analysed in `verification/evidence/20260910_phase2_founder_decisions/`. **Governance recording only.** No implementation, schema, database, invariant, scheduler, night-audit, role or deployment change is made or authorized by this entry; each decision names the *later* bounded directive it permits. |
+| Identifiers | `FD-P2-nn` as issued by the directive; no new `FD-###` numbers are assigned by this entry |
+| Evidence | `verification/evidence/20260910_phase2_founder_resolution/` |
+| Production | `instance/pms.db` `51dd83b7…30bc2`, 733,184 B, D11 rows and `audit_logs` (23) unchanged — verified read-only before and after recording |
+
+## FD-P2-01 — Initial staffing profile
+
+> **Decision:** SINGLE-OPERATOR / ADMIN MODEL FOR FIRST PRODUCTION RELEASE.
+>
+> The first production release is governed around the existing Admin-capable operator model. This is an initial release boundary, not a permanent statement that FinalGrid is single-role software. Multi-role staffing and authorization remain subject to the later authorization/maker-checker work. The Admin assumption is valid only within this explicitly defined first-release boundary.
+
+- **Rationale:** production holds one user (`admin`, Admin); the Phase 2a Admin/Manager interim default has been the working rule since 2026-08-31; broader route authorization is Phase 4 work (R6, ADR-009).
+- **Governance effect:** resolves the **MP-D9 interim question for the first release only**. MP-D9 as a full operator-profile decision remains OPEN for Phase 4 and later (AR-015). The interim default of Phase 2a is confirmed, bounded to this release.
+- **Implementation consequence:** permits Phase 2b scoping under the Admin model (with FD-P2-07); the day-one procedure must record that creating any FrontDesk, Accountant or Housekeeping account before Phase 4 unit 4.2 re-opens this boundary. Does not authorize any role, route or matrix change.
+- **Implementation status:** none required; no role change made.
+
+## FD-P2-02 — Audit retention
+
+> **Decision:** STOP DESTRUCTIVE AUDIT-LOG PRUNING.
+>
+> Until an archival design is formally adopted: audit records must not be destructively deleted; existing audit history must be preserved; other non-audit log retention is not changed by this ruling. This ruling authorizes a later bounded retention-control implementation.
+
+- **Rationale:** `_prune_old_logs` (`app/__init__.py:547-566`) deletes `audit_logs` rows older than 90 days daily at 04:00; first deletion ~2026-11-07; FD-008 and AR-007 already make this non-compliant; measured storage cost is negligible (~153 B per row).
+- **Implementation consequence:** permits a **bounded retention-control directive** — remove `AuditLog` from the prune loop, leave `WebhookLog`/`NotificationLog` pruning unchanged, test on a copy — the ADR-012 "immediate" item. Archival/retention design (ADR-012 classes, periods, archive custody, detection invariant) remains a separate later decision.
+- **Implementation status:** **not implemented**; the pruning job is unchanged at this recording; no audit row was read for modification.
+
+## FD-P2-03 — D11 certification
+
+> **Decision:** CERTIFY THE EIGHT D11 COMMISSIONING/TEST FINANCIAL ROWS AS A DECLARED HISTORICAL EXCEPTION.
+>
+> Preserve all eight rows exactly; do not delete, reverse or reattribute; do not alter invoices/GST history; do not exempt the universal invariant itself; certification must explicitly identify the eight-row D11 exception; any additional unexplained exception is a certification failure. This ruling does not authorize financial mutation.
+
+- **Rows governed:** `payments` 1–6 (800 / 400 / 1,500 / 1,000 / 500 / 100) and `extra_charges` 1–2 (380.95 / 95.24), ₹4,776.19, `folio_id NULL`, reservations 1–4, invoices INV-2026-000029…000032. D11-F2 (classification) and FD-010 Option A (treatment) stand unchanged; AR-001 (INV-A02 universal) stands unchanged; Q-2 (correction refused) stands unchanged.
+- **Rationale:** attribution, reversal, deletion and an in-invariant population declaration were each rejected as contradicting FD-010, Q-2 or AR-001; a declared-exception register at the certification layer keeps every ruling intact and keeps the control capable of failing.
+- **Implementation consequence:** the production certification pack (gate G12) carries a declared-exception register naming the eight objects and asserts that the `inv-run` violation set equals it; the verdict is then recordable as PASS-WITH-DECLARED-EXCEPTION. Until a certification engine exists the comparison is performed and evidenced manually. Disposition of the rows themselves remains the separate future decision reserved by FD-010 (BACKLOG B-3, Phase 5).
+- **Implementation status:** none required now; rows and invariants unchanged.
+
+## FD-P2-04 — PD-006 verified state
+
+> **Decision:** ADOPT THE TWELVE-CONDITION VERIFIED-STATE DEFINITION proposed in the Phase 2 Founder Decision Pack.
+>
+> The definition must distinguish "backup exists" from "backup has been successfully restored and verified", and must cover: backup identity; successful restoration; SQLite integrity; FK verification; schema identity; dataset/data checks; cryptographic identity where applicable; evidence manifest; timestamp; operator/accountability; encrypted-backup key custody; reproducible verification evidence.
+
+- **Definition adopted** (`20260910_phase2_founder_decisions/FOUNDER_DECISION_PACK.md`, FD-P2-04): (1) artifact and plaintext hash equal the values recorded at backup time and in the manifest; (2) restore completes into a fresh isolated path, never `instance/`; (3) `PRAGMA integrity_check` ok on source and restored; (4) `foreign_key_check` = 0 (or equal to source); (5) `sqlite_master` identical to source and equal to the release tag's fingerprint; (6) per-table row counts and content digests equal, body bytes identical beyond the 100-byte header, financial tables named; (7) whole-file hash recorded, informational; (8) `inv-run` on a copy of the restored file identical object-for-object to the pre-backup pack (declared-exception aware) and `gm-verify` 0 differences at the same frozen business date; (9) machine-readable manifest with run id, paths, hashes, UTC timestamps, app version, business date, all checks, retained and committed; (10) operator, machine and directive recorded; (11) encrypted artifacts restored on a different machine using only custody-held key material under a documented custody procedure, key never written into evidence; (12) the artifact exempt from purge or retained in the recovery store. Minimum for a production mutation (PD-005 step 3): conditions 1–7, 9, 10. Minimum for Wave 0 D9 / gate G8: all twelve on an application-made encrypted backup.
+- **Governance effect:** confirms and extends the ADR-006 proposal (integrity + manifest + `inv-run` equivalence, not whole-file hash); **closes BACKLOG B-5**. ADR-006 and ADR-007 reconciliation is recorded here and applied to those files at their next adoption review; they are not edited by this entry.
+- **Implementation consequence:** permits the **recovery-hardening directive** (operating backup path via backup API with manifest/hash, off-box encrypted restore rehearsal, key-custody procedure). Does not authorize any production mutation or a scheduled restore service.
+- **Implementation status:** not implemented; `tools/restore_db.py` (Recovery Foundation) already satisfies conditions 2–7 and 9 for tool-made artifacts (RR-20260908-01).
+
+## FD-P2-05 — Night audit
+
+> **Decision:** MANUAL / CONTROLLED OPERATOR EXECUTION FOR FIRST PRODUCTION RELEASE.
+>
+> An authorized operator initiates the close; business date is explicitly controlled; execution must be observable; financial mutations must be auditable; recovery must be available; unattended scheduler execution is NOT the first-release operating model. Automation may be considered later after unattended financial-action controls are implemented and verified.
+
+- **Rationale:** FD-009 forbids unattended financially material mutation without operator-equivalent controls and no AR-013 / B-1 scheduler ADR exists; a 02:00 unattended run leaves blockers silent; the manual route (`Admin`, `Manager`, `Accountant`) records `run_by_user_id`; production already has `night_audit_enabled=false`.
+- **Implementation consequence:** the first-release configuration keeps `night_audit_enabled=false`; a written daily-close procedure is required (deployment rehearsal G11); Phase 3 units 3.5 (interrupted-close recovery) and 3.6 (staleness escalation) are the controls that make manual mode safe and are scoped accordingly. Scheduler automation requires the B-1 ADR and its verification first.
+- **Implementation status:** no night-audit or scheduler code changed; setting unchanged.
+
+## FD-P2-06 — INV-B06 / INV-D02
+
+> **Decision:** REFINE THE INVARIANTS TO REPRESENT LEGITIMATE BUSINESS SEMANTICS.
+>
+> INV-B06 must not treat a legitimate business-dated advance payment as an automatic integrity failure. INV-D02 must not treat a legitimate cancellation refund as an automatic integrity failure. The underlying payment/refund/business-date financial behaviour is NOT changed by this ruling. The refinement must preserve detection of genuinely incorrect activity. This becomes a later bounded constitutional/invariant amendment and requires verification evidence.
+
+- **Findings ruled on:** INV-B06 (`rules_b.py:607-700`) bounds `payment_date` to `[arrival, departure+30d]` with no leading window, so a deposit (`payment_purpose='advance'`) dated on the booking business date before arrival is reported; INV-D02 (`rules_d.py:97-195`) requires `corrects_id` on every `is_reversal` row, so a cancellation refund (`is_reversal=True`, `corrects_id NULL`, linked instead through `reservations.cancellation_refund_payment_id`) is reported. Neither has a GST or revenue consequence.
+- **Governance effect:** a **constitutional amendment** under Master Plan §07 Layer 1 is authorized in principle for these two rules only; the amendment's exact text, negative seeds and commissioning are the content of the later directive. SR-1 and SR-2 move from "semantic review required" to "ruled — implementation and verification pending".
+- **Implementation consequence:** permits a **Phase 6 invariant-refinement directive** confined to `verification/invariants/` and dataset declarations (`DS-ACT-VOIDCN` expectation), with `inv-commission` proof that the refined rules still fail on genuinely wrong dates and on untraceable reversals. Does not authorize any change under `app/`.
+- **Implementation status:** invariants unchanged at this recording.
+
+## FD-P2-07 — Maker-checker
+
+> **Decision:** INITIAL CONTROL THRESHOLD = ₹10,000.
+>
+> No user may approve their own maker-checker action; transactions/operations meeting the applicable threshold require a second authorized person; operation-specific controls may require maker-checker regardless of amount; emergency/admin operations require explicit auditability. At minimum the operation matrix must separately consider: voids; closed-day corrections; reopening a closed business day; large transfers; large forfeits/credits; other financially material corrections. The ₹10,000 threshold is the initial release policy and may be refined later through a governed Founder decision.
+
+- **Rationale:** AR-010 adopts maker-checker as a control principle and requires the operation matrix in a dedicated ADR before implementation (BACKLOG B-2); the void/refund control (N2) and shift-close approval already exist as reference implementations.
+- **Governance effect:** the threshold and the no-self-approval rule are Founder policy for the first release; the four-tier structure proposed in the decision pack (maker-checker required / role authorization only / informational / emergency override with mandatory reason and audit) is the basis for ADR-010's adoption content. Read with FD-P2-01: under the single-operator model a maker-checker operation above threshold **cannot be completed by the sole Admin alone** — the second authorized person is required; where none exists the operation waits or proceeds only through the explicitly audited emergency/admin control defined by the matrix.
+- **Implementation consequence:** permits adoption of ADR-010 with the matrix (B-2) and, with CF-10 delivered, Phase 2b entry. Does not implement maker-checker; existing void/refund and shift-close controls are unchanged.
+- **Implementation status:** not implemented.
+
+## Carry-forward register — preserved open
+
+CF-5 unauthorized-role verification · CF-6 replay coverage of the reconciliation control · CF-9 deployment verification · **CF-10** audit-coupling normalization at the 12 non-strict writers · **CF-11** credit-path defects (`settle_credit`, `redeem_credit_voucher`) · SR-1 / SR-2 implementation and verification (now ruled, FD-P2-06) · schema / FK / `NOT NULL` work (Phase 4/5; B-3, B-4, B-9) · migration mechanism (B-4) · recovery implementation (FD-P2-04) · night-audit implementation and hardening (Phase 3; FD-P2-05) · deployment rehearsal (G11) · final certification (G12). None is closed by this entry. Closed by this entry: **BACKLOG B-5** ("verified state" definition) and the **MP-D9 interim question for the first release**.
+
+## Consequence for the Phase 2 gate
+
+Phase 2b entry now requires: CF-10 delivered and verified; ADR-010 adopted with the operation matrix under FD-P2-07; scope declared schema-free or a PD-004 authorization. Phase 3 entry conditions are met (Phase 1 complete) and Phase 3 is scoped under FD-P2-05. **No phase implementation is authorized by this entry.**
