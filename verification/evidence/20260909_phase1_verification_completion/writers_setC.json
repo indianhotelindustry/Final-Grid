@@ -1,0 +1,301 @@
+{
+  "anchor_matches": true,
+  "business_date_end": "2026-08-10",
+  "business_date_start": "2026-08-10",
+  "copy_method": "sqlite-backup-api",
+  "copy_path": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS\\verification\\_work\\p1vc_setC.db",
+  "d11_extra_charges": [
+    1,
+    2
+  ],
+  "d11_payments": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "d11_unchanged": true,
+  "directive": "FG-P1-VERIFICATION-COMPLETION-20260909-01",
+  "findings": [
+    {
+      "case": "W-16-05",
+      "expect": true,
+      "got": false,
+      "note": "A0: no audit row for the financial row at this writer",
+      "pass": false,
+      "severity": "finding",
+      "what": "financial-row audit present",
+      "writer": "W-16"
+    },
+    {
+      "case": "W-16-07",
+      "expect": "A-STRICT",
+      "got": "A0",
+      "note": "NightAuditReopenLog + NightAuditLog update; no per-row AuditLog by design (as W-21)",
+      "pass": false,
+      "severity": "finding",
+      "what": "audit coupling class vs Q-5 (A-STRICT expected)",
+      "writer": "W-16"
+    }
+  ],
+  "finished_at": "2026-09-09T21:20:20",
+  "gate_passed": 15,
+  "gate_total": 15,
+  "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "production_sha256_before": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "read_only_verified": true,
+  "results": [
+    {
+      "case": "W-16-00",
+      "expect": true,
+      "got": true,
+      "note": "Audit for 10 Aug 2026 re-run successfully. Posted 4 missing ",
+      "pass": true,
+      "severity": "gate",
+      "what": "rerun accepted",
+      "writer": "W-16"
+    },
+    {
+      "case": "W-16-01",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "ExtraCharge row created",
+      "writer": "W-16"
+    },
+    {
+      "case": "W-16-02",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id non-null",
+      "writer": "W-16"
+    },
+    {
+      "case": "W-16-03",
+      "expect": 5,
+      "got": 5,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id == reservation billing folio A",
+      "writer": "W-16"
+    },
+    {
+      "case": "W-16-04",
+      "expect": [
+        5,
+        "A"
+      ],
+      "got": [
+        5,
+        "A"
+      ],
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio belongs to this reservation, letter A",
+      "writer": "W-16"
+    },
+    {
+      "case": "W-16-05",
+      "expect": true,
+      "got": false,
+      "note": "A0: no audit row for the financial row at this writer",
+      "pass": false,
+      "severity": "finding",
+      "what": "financial-row audit present",
+      "writer": "W-16"
+    },
+    {
+      "case": "W-16-06",
+      "expect": "n/a",
+      "got": "n/a",
+      "note": "",
+      "pass": true,
+      "severity": "finding",
+      "what": "audit identity",
+      "writer": "W-16"
+    },
+    {
+      "case": "W-16-07",
+      "expect": "A-STRICT",
+      "got": "A0",
+      "note": "NightAuditReopenLog + NightAuditLog update; no per-row AuditLog by design (as W-21)",
+      "pass": false,
+      "severity": "finding",
+      "what": "audit coupling class vs Q-5 (A-STRICT expected)",
+      "writer": "W-16"
+    },
+    {
+      "case": "W-16-08",
+      "expect": true,
+      "got": true,
+      "note": "4 rows",
+      "pass": true,
+      "severity": "gate",
+      "what": "every recovered row attributed to its own reservation folio A",
+      "writer": "W-16"
+    },
+    {
+      "case": "W-16-09",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "NightAuditReopenLog written for the rerun",
+      "writer": "W-16"
+    },
+    {
+      "case": "W-16-10",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "recovered rows dated on the target business date",
+      "writer": "W-16"
+    },
+    {
+      "case": "D11-01",
+      "expect": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "got": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "NULL-folio payment id set unchanged",
+      "writer": "D11"
+    },
+    {
+      "case": "D11-02",
+      "expect": [
+        1,
+        2
+      ],
+      "got": [
+        1,
+        2
+      ],
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "NULL-folio charge id set unchanged",
+      "writer": "D11"
+    },
+    {
+      "case": "D11-03",
+      "expect": {
+        "1": 800.0,
+        "2": 400.0,
+        "3": 1500.0,
+        "4": 1000.0,
+        "5": 500.0,
+        "6": 100.0
+      },
+      "got": {
+        "1": 800.0,
+        "2": 400.0,
+        "3": 1500.0,
+        "4": 1000.0,
+        "5": 500.0,
+        "6": 100.0
+      },
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "D11 payment amounts unchanged",
+      "writer": "D11"
+    },
+    {
+      "case": "D11-04",
+      "expect": {
+        "1": 380.95,
+        "2": 95.24
+      },
+      "got": {
+        "1": 380.95,
+        "2": 95.24
+      },
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "D11 charge amounts unchanged",
+      "writer": "D11"
+    },
+    {
+      "case": "NEW-01",
+      "expect": [
+        [],
+        []
+      ],
+      "got": [
+        [],
+        []
+      ],
+      "note": "6 payments / 6 charges on copy",
+      "pass": true,
+      "severity": "gate",
+      "what": "no NEW unattributed row on the copy",
+      "writer": "ALL"
+    },
+    {
+      "case": "PROD-01",
+      "expect": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+      "got": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "production database unchanged",
+      "writer": "PROD"
+    },
+    {
+      "case": "PROD-02",
+      "expect": 733184,
+      "got": 733184,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "production size 733,184 B",
+      "writer": "PROD"
+    }
+  ],
+  "rows_on_copy": {
+    "extra_charges": 6,
+    "payments": 6
+  },
+  "set": "C",
+  "started_at": "2026-09-09T21:20:16",
+  "verdict": "PASS",
+  "writers": {
+    "W-16": {
+      "attribution": "R-2 resolve_billing_folio_id",
+      "audit": "NightAuditReopenLog/NightAuditLog (run-level); no per-row AuditLog by design",
+      "function": "_rerun_skipped_audit",
+      "module": "app/reports.py",
+      "notes": "",
+      "object": "ExtraCharge",
+      "runtime": "exercised (set C)"
+    }
+  }
+}

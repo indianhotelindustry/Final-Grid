@@ -1,0 +1,61 @@
+2026-09-09 21:20:19 [WARNING] app: Running on SQLite — row-level locking (with_for_update) is not enforced. SQLite uses a database-wide write lock; concurrent writers will serialise. Move to PostgreSQL for true per-row locking and higher concurrency.
+2026-09-09 21:20:19 [INFO] app: ------- SECURITY MODE -------
+2026-09-09 21:20:19 [INFO] app:   env                : production
+2026-09-09 21:20:19 [INFO] app:   secret_key         : set (>=32 chars)
+2026-09-09 21:20:19 [INFO] app:   updater_signing    : ENFORCED
+2026-09-09 21:20:19 [INFO] app:   encryption         : available
+2026-09-09 21:20:19 [INFO] app:   lan_access         : disabled (127.0.0.1 only)
+2026-09-09 21:20:19 [INFO] app:   schema_drift_mode  : warn-only
+2026-09-09 21:20:19 [INFO] app: -----------------------------
+2026-09-09 21:20:19 [INFO] app: db.create_all() skipped in production. Use Alembic migrations for schema changes. Set DB_AUTO_CREATE=1 to force-enable at next boot.
+2026-09-09 21:20:19 [INFO] app: SQLite: ensured table credit_vouchers exists
+2026-09-09 21:20:19 [INFO] app: SQLite: ensured table credit_voucher_redemptions exists
+2026-09-09 21:20:20 [INFO] apscheduler.scheduler: Scheduler started
+2026-09-09 21:20:20 [INFO] apscheduler.scheduler: Added job "setup_backup_scheduler.<locals>._scheduled_backup" to job store "default"
+2026-09-09 21:20:20 [INFO] app.backup_manager: Daily backup scheduled at 03:00
+2026-09-09 21:20:20 [INFO] apscheduler.scheduler: Added job "flush_notification_queue" to job store "default"
+2026-09-09 21:20:20 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._prune_old_logs" to job store "default"
+2026-09-09 21:20:20 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._run_predictive_maintenance" to job store "default"
+2026-09-09 21:20:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:20:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:20:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:20:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:20:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:20:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+==================================================================================================================================
+PHASE 1 VERIFICATION COMPLETION - RUNTIME WRITER VERIFICATION - SET C
+==================================================================================================================================
+production        : C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\instance\pms.db
+sha256 before     : 51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2  (MATCHES anchor)
+disposable copy   : C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\verification\_work\p1vc_setC.db  (sqlite-backup-api)
+----------------------------------------------------------------------------------------------------------------------------------
+D11 population    : payments=[1, 2, 3, 4, 5, 6] charges=[1, 2] audit_logs=23
+business date     : 2026-08-10   vacant rooms: 36   admin user id: 2
+----------------------------------------------------------------------------------------------------------------------------------
+W-16 _rerun_skipped_audit - recovered room rent for a Skipped night audit
+   rerun ok=True msg=Audit for 10 Aug 2026 re-run successfully. Posted 4 missing room_rent charge(s); status is now "Completed".; log status=Completed; reopen rows=1; in_house=[5, 2, 3, 4]; recovered rows=[(5, 5, 1100.0, '2026-08-10'), (2, 2, 1428.57, '2026-08-10'), (3, 3, 952.38, '2026-08-10'), (4, 4, 476.19, '2026-08-10')]
+OK    W-16-00   W-16    rerun accepted                                       expect=True                     got=True                     Audit for 10 Aug 2026 re-run successfully. Posted 4 missing 
+OK    W-16-01   W-16    ExtraCharge row created                              expect=True                     got=True                     
+OK    W-16-02   W-16    folio_id non-null                                    expect=True                     got=True                     
+OK    W-16-03   W-16    folio_id == reservation billing folio A              expect=5                        got=5                        
+OK    W-16-04   W-16    folio belongs to this reservation, letter A          expect=(5, 'A')                 got=(5, 'A')                 
+NOTE  W-16-05   W-16    financial-row audit present                          expect=True                     got=False                    A0: no audit row for the financial row at this writer
+OK    W-16-06   W-16    audit identity                                       expect='n/a'                    got='n/a'                    
+NOTE  W-16-07   W-16    audit coupling class vs Q-5 (A-STRICT expected)      expect='A-STRICT'               got='A0'                     NightAuditReopenLog + NightAuditLog update; no per-row AuditLog by design (as W-21)
+OK    W-16-08   W-16    every recovered row attributed to its own reservatio expect=True                     got=True                     4 rows
+OK    W-16-09   W-16    NightAuditReopenLog written for the rerun            expect=True                     got=True                     
+OK    W-16-10   W-16    recovered rows dated on the target business date     expect=True                     got=True                     
+----------------------------------------------------------------------------------------------------------------------------------
+D11 FREEZE AND PRODUCTION INTEGRITY
+OK    D11-01    D11     NULL-folio payment id set unchanged                  expect=[1, 2, 3, 4, 5, 6]       got=[1, 2, 3, 4, 5, 6]       
+OK    D11-02    D11     NULL-folio charge id set unchanged                   expect=[1, 2]                   got=[1, 2]                   
+OK    D11-03    D11     D11 payment amounts unchanged                        expect={1: 800.0, 2: 400.0, 3:  got={1: 800.0, 2: 400.0, 3:  
+OK    D11-04    D11     D11 charge amounts unchanged                         expect={1: 380.95, 2: 95.24}    got={1: 380.95, 2: 95.24}    
+OK    NEW-01    ALL     no NEW unattributed row on the copy                  expect=([], [])                 got=([], [])                 6 payments / 6 charges on copy
+OK    PROD-01   PROD    production database unchanged                        expect='51dd83b7f0fa42a3e85afb0 got='51dd83b7f0fa42a3e85afb0 
+OK    PROD-02   PROD    production size 733,184 B                            expect=733184                   got=733184                   
+----------------------------------------------------------------------------------------------------------------------------------
+RESULT SET C: 15 / 15 gate checks passed; 2 findings recorded (non-gating)
+==================================================================================================================================
+writers_setC.json written
+2026-09-09 21:20:20 [INFO] apscheduler.scheduler: Scheduler has been shut down

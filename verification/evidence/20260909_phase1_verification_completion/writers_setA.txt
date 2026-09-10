@@ -1,0 +1,246 @@
+2026-09-09 21:27:04 [WARNING] app: Running on SQLite — row-level locking (with_for_update) is not enforced. SQLite uses a database-wide write lock; concurrent writers will serialise. Move to PostgreSQL for true per-row locking and higher concurrency.
+2026-09-09 21:27:04 [INFO] app: ------- SECURITY MODE -------
+2026-09-09 21:27:04 [INFO] app:   env                : production
+2026-09-09 21:27:04 [INFO] app:   secret_key         : set (>=32 chars)
+2026-09-09 21:27:04 [INFO] app:   updater_signing    : ENFORCED
+2026-09-09 21:27:04 [INFO] app:   encryption         : available
+2026-09-09 21:27:04 [INFO] app:   lan_access         : disabled (127.0.0.1 only)
+2026-09-09 21:27:04 [INFO] app:   schema_drift_mode  : warn-only
+2026-09-09 21:27:04 [INFO] app: -----------------------------
+2026-09-09 21:27:04 [INFO] app: db.create_all() skipped in production. Use Alembic migrations for schema changes. Set DB_AUTO_CREATE=1 to force-enable at next boot.
+2026-09-09 21:27:04 [INFO] app: SQLite: ensured table credit_vouchers exists
+2026-09-09 21:27:04 [INFO] app: SQLite: ensured table credit_voucher_redemptions exists
+2026-09-09 21:27:04 [INFO] apscheduler.scheduler: Scheduler started
+2026-09-09 21:27:04 [INFO] apscheduler.scheduler: Added job "setup_backup_scheduler.<locals>._scheduled_backup" to job store "default"
+2026-09-09 21:27:04 [INFO] app.backup_manager: Daily backup scheduled at 03:00
+2026-09-09 21:27:04 [INFO] apscheduler.scheduler: Added job "flush_notification_queue" to job store "default"
+2026-09-09 21:27:04 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._prune_old_logs" to job store "default"
+2026-09-09 21:27:04 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._run_predictive_maintenance" to job store "default"
+2026-09-09 21:27:04 [INFO] app.rates: resolve_rate: base_rate fallback=1142.86 for rt=2
+2026-09-09 21:27:04 [INFO] app.routes: EXPRESS PRICING: total_tariff_raw=0.00 tariff_excl=0.00 nights=1 mode=standard rate_per_night=1142.86 std_rate=1142.86 modified=False
+2026-09-09 21:27:04 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:04 [INFO] app.nightly_rates: NIGHTLY_SYNC res=7 reason=new_booking nights=1 created=1 skipped_locked=0 mode=standard override=False
+2026-09-09 21:27:04 [ERROR] app.revenue_guard: apply_leakage_with_expected failed (non-fatal): 'Reservation' object has no attribute 'num_nights'
+2026-09-09 21:27:04 [INFO] app.rates: resolve_rate: base_rate fallback=1142.86 for rt=2
+2026-09-09 21:27:04 [INFO] app.routes: EXPRESS PRICING: total_tariff_raw=0.00 tariff_excl=0.00 nights=1 mode=standard rate_per_night=1142.86 std_rate=1142.86 modified=False
+2026-09-09 21:27:04 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:04 [INFO] app.nightly_rates: NIGHTLY_SYNC res=8 reason=new_booking nights=1 created=1 skipped_locked=0 mode=standard override=False
+2026-09-09 21:27:04 [ERROR] app.revenue_guard: apply_leakage_with_expected failed (non-fatal): 'Reservation' object has no attribute 'num_nights'
+==================================================================================================================================
+PHASE 1 VERIFICATION COMPLETION - RUNTIME WRITER VERIFICATION - SET A
+==================================================================================================================================
+production        : C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\instance\pms.db
+sha256 before     : 51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2  (MATCHES anchor)
+disposable copy   : C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\verification\_work\p1vc_setA.db  (sqlite-backup-api)
+----------------------------------------------------------------------------------------------------------------------------------
+D11 population    : payments=[1, 2, 3, 4, 5, 6] charges=[1, 2] audit_logs=23
+business date     : 2026-08-10   vacant rooms: 36   admin user id: 2
+----------------------------------------------------------------------------------------------------------------------------------
+W-02 new_reservation - advance payment via POST /reservations/new
+   HTTP 302  reservation=5 payments=[{'id': 7, 'folio_id': 5, 'amount': 300.0, 'purpose': 'advance', 'charge_type': None, 'description': None, 'is_reversal': False, 'mode': 1, 'date': '2026-08-10'}]
+OK    W-02-01   W-02    Payment row created                                  expect=True                     got=True                     
+OK    W-02-02   W-02    folio_id non-null                                    expect=True                     got=True                     
+OK    W-02-03   W-02    folio_id == reservation billing folio A              expect=5                        got=5                        
+OK    W-02-04   W-02    folio belongs to this reservation, letter A          expect=(5, 'A')                 got=(5, 'A')                 
+OK    W-02-05   W-02    audit row exists for this financial row              expect=True                     got=True                     
+OK    W-02-06   W-02    audit carries same folio and amount                  expect=(5, 300.0)               got=(5, 300.0)               action=posted
+OK    W-02-07   W-02    audit coupling class vs Q-5 (A-STRICT expected)      expect='A-STRICT'               got='A-STRICT'               
+OK    W-02-08   W-02    purpose is advance (arrival after business date)     expect='advance'                got='advance'                
+OK    W-02-A1   W-02    audit failure commits no payment                     expect=7                        got=7                        HTTP 500
+OK    W-02-A2   W-02    audit failure commits no reservation either          expect=5                        got=5                        same transaction
+----------------------------------------------------------------------------------------------------------------------------------
+W-01 bulk_booking_api - advance via POST /api/reservations/bulk-booking
+   HTTP 200 {'created': 1, 'success': True}  reservation=6 payments=[{'id': 8, 'folio_id': 6, 'amount': 400.0, 'purpose': 'advance', 'charge_type': None, 'description': None, 'is_reversal': False, 'mode': 1, 'date': '2026-08-10'}]
+OK    W-01-01   W-01    Payment row created                                  expect=True                     got=True                     
+OK    W-01-02   W-01    folio_id non-null                                    expect=True                     got=True                     
+OK    W-01-03   W-01    folio_id == reservation billing folio A              expect=6                        got=6                        
+OK    W-01-04   W-01    folio belongs to this reservation, letter A          expect=(6, 'A')                 got=(6, 'A')                 
+OK    W-01-05   W-01    audit row exists for this financial row              expect=True                     got=True                     
+OK    W-01-06   W-01    audit carries same folio and amount                  expect=(6, 400.0)               got=(6, 400.0)               action=posted
+OK    W-01-07   W-01    audit coupling class vs Q-5 (A-STRICT expected)      expect='A-STRICT'               got='A-STRICT'               
+OK    W-01-A1   W-01    audit failure commits no payment                     expect=8                        got=8                        HTTP 500
+----------------------------------------------------------------------------------------------------------------------------------
+W-06 walkin_search_express - settlement via POST /api/checkin/walkin-search-express
+   HTTP 200 {'reservation_id': 7, 'success': True}  reservation=7 payments=[{'id': 9, 'folio_id': 7, 'amount': 500.0, 'purpose': 'settlement', 'charge_type': None, 'description': None, 'is_reversal': False, 'mode': 1, 'date': '2026-08-10'}]
+OK    W-06-01   W-06    Payment row created                                  expect=True                     got=True                     
+OK    W-06-02   W-06    folio_id non-null                                    expect=True                     got=True                     
+OK    W-06-03   W-06    folio_id == reservation billing folio A              expect=7                        got=7                        
+OK    W-06-04   W-06    folio belongs to this reservation, letter A          expect=(7, 'A')                 got=(7, 'A')                 
+OK    W-06-05   W-06    audit row exists for this financial row              expect=True                     got=True                     
+OK    W-06-06   W-06    audit carries same folio and amount                  expect=(7, 500.0)               got=(7, 500.0)               action=posted
+OK    W-06-07   W-06    audit coupling class vs Q-5 (A-STRICT expected)      expect='A-STRICT'               got='A-STRICT'               
+OK    W-06-A1   W-06    audit failure commits no payment                     expect=9                        got=9                        HTTP 400
+----------------------------------------------------------------------------------------------------------------------------------
+W-12 CheckInService.complete_full_checkin - deposit payment (service, real caller shape)
+   payments=[{'id': 10, 'folio_id': 8, 'amount': 250.0, 'purpose': None, 'charge_type': None, 'description': None, 'is_reversal': False, 'mode': 1, 'date': '2026-08-10'}]
+OK    W-12-01   W-12    Payment row created                                  expect=True                     got=True                     
+OK    W-12-02   W-12    folio_id non-null                                    expect=True                     got=True                     
+OK    W-12-03   W-12    folio_id == reservation billing folio A              expect=8                        got=8                        
+OK    W-12-04   W-12    folio belongs to this reservation, letter A          expect=(8, 'A')                 got=(8, 'A')                 
+OK    W-12-05   W-12    audit row exists (Reservation level)                 expect=True                     got=True                     actions=['checkin_full']
+OK    W-12-06   W-12    audit carries the financial identity                 expect=True                     got=True                     after_state={"status": "CheckedIn", "room_id": 5, "mode": "FULL", "billing": "Guest", "depos
+NOTE  W-12-07   W-12    audit coupling class vs Q-5 (A-STRICT expected)      expect='A-STRICT'               got='A-NF-entity'            Reservation-level checkin_full row written AFTER commit (A-NF); no Payment-level audit
+----------------------------------------------------------------------------------------------------------------------------------
+W-14 process_reservation_noshow - no-show fee (service, night-audit caller shape)
+   result=NoShowResult(success=True, message='No-show posted successfully.', no_show_log=<NoShowLog 1>) charges=[{'id': 3, 'folio_id': 9, 'amount': 500.0, 'purpose': None, 'charge_type': None, 'description': 'No-Show Fee (fixed)', 'is_reversal': False, 'mode': None, 'date': '2026-08-10'}]
+OK    W-14-01   W-14    ExtraCharge row created                              expect=True                     got=True                     
+OK    W-14-02   W-14    folio_id non-null                                    expect=True                     got=True                     2026-09-09 21:27:04 [ERROR] app.routes: Credit settlement failed for res=10: 'notes' is an invalid keyword argument for Payment
+Traceback (most recent call last):
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\app\routes.py", line 9328, in settle_credit
+    payment = Payment(
+              ^^^^^^^^
+  File "<string>", line 4, in __init__
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 596, in _initialize_instance
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\venv\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 122, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\venv\Lib\site-packages\sqlalchemy\orm\state.py", line 594, in _initialize_instance
+    manager.original_init(*mixed[1:], **kwargs)
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\venv\Lib\site-packages\sqlalchemy\orm\decl_base.py", line 2179, in _declarative_constructor
+    raise TypeError(
+TypeError: 'notes' is an invalid keyword argument for Payment
+2026-09-09 21:27:04 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:04 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:04 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:04 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:04 [INFO] app: [CHECKOUT DEBUG] res=11  total_bill=1582.00  extra=582.00  disc=0.00  paid_before_checkout=0.00  paying_now_form=1650.00  final_paid=1650.00  final_outstanding=0.00  credit=0.00  override=False
+2026-09-09 21:27:04 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:04 [WARNING] app.notifications: Notification failed [whatsapp → 6265222595] checkout_thanks: ULTRAMSG_INSTANCE or ULTRAMSG_TOKEN not configured
+2026-09-09 21:27:04 [INFO] app.notifications: Queued whatsapp notification to 6265222595 for retry
+2026-09-09 21:27:04 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:04 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:04 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:04 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:04 [INFO] app: [CHECKOUT DEBUG] res=12  total_bill=1300.00  extra=300.00  disc=0.00  paid_before_checkout=0.00  paying_now_form=1350.00  final_paid=1350.00  final_outstanding=0.00  credit=0.00  override=False
+2026-09-09 21:27:04 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:04 [WARNING] app.notifications: Notification failed [whatsapp → 6265222595] checkout_thanks: ULTRAMSG_INSTANCE or ULTRAMSG_TOKEN not configured
+2026-09-09 21:27:04 [INFO] app.notifications: Queued whatsapp notification to 6265222595 for retry
+2026-09-09 21:27:04 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:04 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:04 [INFO] app.routes: OTA auto-settle: res=13 head=Other OTA Paid amount=1000.00 source=OTA
+2026-09-09 21:27:04 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:04 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:04 [INFO] app: [CHECKOUT DEBUG] res=13  total_bill=2200.00  extra=1200.00  disc=0.00  paid_before_checkout=0.00  paying_now_form=2250.00  final_paid=2250.00  final_outstanding=0.00  credit=0.00  override=False
+2026-09-09 21:27:04 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:04 [WARNING] app.notifications: Notification failed [whatsapp → 6265222595] checkout_thanks: ULTRAMSG_INSTANCE or ULTRAMSG_TOKEN not configured
+2026-09-09 21:27:04 [INFO] app.notifications: Queued whatsapp notification to 6265222595 for retry
+
+OK    W-14-03   W-14    folio_id == reservation billing folio A              expect=9                        got=9                        
+OK    W-14-04   W-14    folio belongs to this reservation, letter A          expect=(9, 'A')                 got=(9, 'A')                 
+OK    W-14-05   W-14    dedicated log row exists (no_show_logs)              expect=True                     got=True                     
+OK    W-14-06   W-14    dedicated log carries the amount                     expect=500.0                    got=500.0                    
+NOTE  W-14-07   W-14    audit coupling class vs Q-5 (A-STRICT expected)      expect='A-STRICT'               got='A-DED'                  NoShowLog + Reservation-level noshow_posted AuditLog in the same transaction as the charge
+OK    W-14-08   W-14    Reservation-level noshow_posted audit in same commit expect=True                     got=True                     
+----------------------------------------------------------------------------------------------------------------------------------
+W-07 settle_credit - credit recovery via POST /credit/<id>/settle
+   HTTP 302 payments=[]
+NOTE  W-07-01   W-07    Payment row created                                  expect=True                     got=False                    NOT EXERCISABLE: pre-existing defect - Payment() rejects notes= (TypeError), present since b5b2514, untouched by Phase 1
+----------------------------------------------------------------------------------------------------------------------------------
+W-04 / W-17 / W-18 checkout - settlement, extra charge, overpay-as-tip via POST /checkout/<id>
+   HTTP 302 status=CheckedOut due=1050.00 payments=[{'id': 11, 'folio_id': 11, 'amount': 1650.0, 'purpose': 'settlement', 'charge_type': None, 'description': None, 'is_reversal': False, 'mode': 1, 'date': '2026-08-10'}] charges=[{'id': 4, 'folio_id': 11, 'amount': 100.0, 'purpose': None, 'charge_type': None, 'description': 'VC extra', 'is_reversal': False, 'mode': None, 'date': '2026-09-09'}, {'id': 5, 'folio_id': 11, 'amount': 482.0, 'purpose': None, 'charge_type': 'tip', 'description': 'Tip — VC Waiter', 'is_reversal': False, 'mode': None, 'date': '2026-08-10'}]
+OK    W-04-00   W-04    checkout completed (status CheckedOut)               expect='CheckedOut'             got='CheckedOut'             
+OK    W-04-01   W-04    Payment row created                                  expect=True                     got=True                     
+OK    W-04-02   W-04    folio_id non-null                                    expect=True                     got=True                     
+OK    W-04-03   W-04    folio_id == reservation billing folio A              expect=11                       got=11                       
+OK    W-04-04   W-04    folio belongs to this reservation, letter A          expect=(11, 'A')                got=(11, 'A')                
+OK    W-04-05   W-04    audit row exists for this financial row              expect=True                     got=True                     
+OK    W-04-06   W-04    audit carries same folio and amount                  expect=(11, 1650.0)             got=(11, 1650.0)             action=posted
+OK    W-04-07   W-04    audit coupling class vs Q-5 (A-STRICT expected)      expect='A-STRICT'               got='A-STRICT'               
+OK    W-17-01   W-17    ExtraCharge row created                              expect=True                     got=True                     
+OK    W-17-02   W-17    folio_id non-null                                    expect=True                     got=True                     
+OK    W-17-03   W-17    folio_id == reservation billing folio A              expect=11                       got=11                       
+OK    W-17-04   W-17    folio belongs to this reservation, letter A          expect=(11, 'A')                got=(11, 'A')                
+OK    W-17-05   W-17    audit row exists for this financial row              expect=True                     got=True                     
+OK    W-17-06   W-17    audit carries same folio and amount                  expect=(11, 100.0)              got=(11, 100.0)              action=posted
+OK    W-17-07   W-17    audit coupling class vs Q-5 (A-STRICT expected)      expect='A-STRICT'               got='A-STRICT'               
+OK    W-18-01   W-18    ExtraCharge row created                              expect=True                     got=True                     
+OK    W-18-02   W-18    folio_id non-null                                    expect=True                     got=True                     
+OK    W-18-03   W-18    folio_id == reservation billing folio A              expect=11                       got=11                       
+OK    W-18-04   W-18    folio belongs to this reservation, letter A          expect=(11, 'A')                got=(11, 'A')                
+OK    W-18-05   W-18    audit row exists for this financial row              expect=True                     got=True                     
+OK    W-18-06   W-18    audit carries same folio and amount                  expect=(11, 482.0)              got=(11, 482.0)              action=posted
+OK    W-18-07   W-18    audit coupling class vs Q-5 (A-STRICT expected)      expect='A-STRICT'               got='A-STRICT'               
+----------------------------------------------------------------------------------------------------------------------------------
+W-19 checkout - overpay-as-other-income
+   HTTP 302 status=CheckedOut charges=[{'id': 6, 'folio_id': 12, 'amount': 300.0, 'purpose': None, 'charge_type': 'other_income', 'description': 'Other Income — VC income', 'is_reversal': False, 'mode': None, 'date': '2026-08-10'}]
+OK    W-19-01   W-19    ExtraCharge row created                              expect=True                     got=True                     
+OK    W-19-02   W-19    folio_id non-null                                    expect=True                     got=True                     
+OK    W-19-03   W-19    folio_id == reservation billing folio A              expect=12                       got=12                       
+OK    W-19-04   W-19    folio belongs to this reservation, letter A          expect=(12, 'A')                got=(12, 'A')                
+OK    W-19-05   W-19    audit row exists for this financial row              expect=True                     got=True                     
+OK    W-19-06   W-19    audit carries same folio and amount                  expect=(12, 300.0)              got=(12, 300.0)              action=posted
+OK    W-19-07   W-19    audit coupling class vs Q-5 (A-STRICT expected)      expect='A-STRICT'               got='A-STRICT'               
+----------------------------------------------------------------------------------------------------------------------------------
+W-03 checkout - OTA auto-settlement (paid_at_ota reservation)
+   HTTP 302 status=CheckedOut payments=[{'id': 13, 'folio_id': 13, 'amount': 1000.0, 'purpose': 'settlement', 'charge_type': None, 'description': None, 'is_reversal': False, 'mode': 12, 'date': '2026-08-10'}, {'id': 14, 'folio_id': 13, 'amount': 1250.0, 'purpose': 'settlement', 'charge_type': None, 'description': None, 'is_reversal': False, 'mode': 1, 'date': '2026-08-10'}]
+OK    W-03-01   W-03    Payment row created                                  expect=True                     got=True                     
+OK    W-03-02   W-03    folio_id non-null                                    expect=True                     got=True                     
+OK    W-03-03   W-03    folio_id == reservation billing folio A              expect=13                       got=13                       
+OK    W-03-04   W-03    folio belongs to this reservation, letter A          expect=(13, 'A')                got=(13, 'A')                
+OK    W-03-05   W-03    audit row exists for this financial row              expect=True                     got=True                     
+OK    W-03-06   W-03    audit carries same folio and amount                  expect=(13, 1000.0)             got=(13, 1000.0)             action=posted
+OK    W-03-07   W-03    audit coupling class vs Q-5 (A-STRICT expected)      expect='A-STRICT'               got='A-STRICT'               2026-09-09 21:27:04 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:04 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:04 [ERROR] app.routes: Checkout failed: injected audit failure
+Traceback (most recent call last):
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\app\routes.py", line 3340, in checkout
+    _write_audit_strict('Payment', pmt.id, 'posted', {},   # Q-5
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\app\routes.py", line 362, in _write_audit_strict
+    return audited_financial_write(entity_type, entity_id, action,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\verification\evidence\20260909_phase1_verification_completion\verify_writers.py", line 202, in exploding
+    raise svc.AuditCouplingError('injected audit failure')
+app.services.AuditCouplingError: injected audit failure
+2026-09-09 21:27:04 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:05 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:05 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:05 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:05 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:05 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:05 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:05 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:05 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:05 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:05 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:05 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:05 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:05 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:05 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:05 [INFO] app.services: Night audit for 2026-08-10 auto-completed. Business date advanced to 2026-08-11
+2026-09-09 21:27:05 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:05 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:05 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:27:05 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+
+----------------------------------------------------------------------------------------------------------------------------------
+checkout - audit-failure injection (W-04 path)
+OK    W-04-A1   W-04    audit failure commits no payment                     expect=14                       got=14                       HTTP 200
+OK    W-04-A2   W-04    audit failure leaves reservation CheckedIn           expect='CheckedIn'              got='CheckedIn'              
+----------------------------------------------------------------------------------------------------------------------------------
+W-21 (re-observed) night audit, then W-24 convert_overpayment_to_upsell (CASE A)
+   night audit for 2026-08-10 -> Completed; business date now 2026-08-11; room_rent rows=[{'id': 11, 'folio_id': 15, 'amount': 1200.0, 'purpose': None, 'charge_type': 'room_rent', 'description': 'Room Rent — 10 Aug (Room 112)', 'is_reversal': False, 'mode': None, 'date': '2026-08-10'}]
+OK    W-21-R1   W-21    night audit room rent attributed to folio A (re-obse expect=[15]                     got=[15]                     
+   add-payment HTTP 200 (total 1200.00 + 500); upsell result={'ok': True, 'branch': 'case_a_corrective_extracharge', 'error': None}; upsell rows=[{'id': 12, 'folio_id': 15, 'amount': 419.05, 'purpose': None, 'charge_type': 'room_upsell', 'description': 'Upsell Rate Adjustment — sold above tariff (VC upsell)', 'is_reversal': False, 'mode': None, 'date': '2026-08-11'}]
+OK    W-24-00   W-24    conversion took CASE A (corrective ExtraCharge)      expect='case_a_corrective_extra got='case_a_corrective_extra 
+OK    W-24-01   W-24    ExtraCharge row created                              expect=True                     got=True                     
+OK    W-24-02   W-24    folio_id non-null                                    expect=True                     got=True                     
+OK    W-24-03   W-24    folio_id == reservation billing folio A              expect=15                       got=15                       
+OK    W-24-04   W-24    folio belongs to this reservation, letter A          expect=(15, 'A')                got=(15, 'A')                
+NOTE  W-24-05   W-24    financial-row audit present                          expect=True                     got=False                    A0: no audit row for the financial row at this writer
+OK    W-24-06   W-24    audit identity                                       expect='n/a'                    got='n/a'                    
+NOTE  W-24-07   W-24    audit coupling class vs Q-5 (A-STRICT expected)      expect='A-STRICT'               got='A0'                     no AuditLog for the room_upsell row (A0 per inventory)
+----------------------------------------------------------------------------------------------------------------------------------
+D11 FREEZE AND PRODUCTION INTEGRITY
+OK    D11-01    D11     NULL-folio payment id set unchanged                  expect=[1, 2, 3, 4, 5, 6]       got=[1, 2, 3, 4, 5, 6]       
+OK    D11-02    D11     NULL-folio charge id set unchanged                   expect=[1, 2]                   got=[1, 2]                   
+OK    D11-03    D11     D11 payment amounts unchanged                        expect={1: 800.0, 2: 400.0, 3:  got={1: 800.0, 2: 400.0, 3:  
+OK    D11-04    D11     D11 charge amounts unchanged                         expect={1: 380.95, 2: 95.24}    got={1: 380.95, 2: 95.24}    
+OK    NEW-01    ALL     no NEW unattributed row on the copy                  expect=([], [])                 got=([], [])                 15 payments / 12 charges on copy
+OK    PROD-01   PROD    production database unchanged                        expect='51dd83b7f0fa42a3e85afb0 got='51dd83b7f0fa42a3e85afb0 
+OK    PROD-02   PROD    production size 733,184 B                            expect=733184                   got=733184                   
+----------------------------------------------------------------------------------------------------------------------------------
+RESULT SET A: 81 / 81 gate checks passed; 5 findings recorded (non-gating)
+==================================================================================================================================
+writers_setA.json written
+2026-09-09 21:27:05 [INFO] apscheduler.scheduler: Scheduler has been shut down

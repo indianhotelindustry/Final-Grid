@@ -1,0 +1,709 @@
+{
+  "anchor_matches": true,
+  "business_date_end": "2026-08-11",
+  "business_date_start": "2026-08-10",
+  "copy_method": "sqlite-backup-api",
+  "copy_path": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS\\verification\\_work\\p1vc_setD.db",
+  "d11_extra_charges": [
+    1,
+    2
+  ],
+  "d11_payments": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "d11_unchanged": true,
+  "directive": "FG-P1-VERIFICATION-COMPLETION-20260909-01",
+  "findings": [
+    {
+      "case": "W-12-07",
+      "expect": "A-STRICT",
+      "got": "A-NF-entity",
+      "note": "as set A",
+      "pass": false,
+      "severity": "finding",
+      "what": "audit coupling class vs Q-5 (A-STRICT expected)",
+      "writer": "W-12"
+    },
+    {
+      "case": "W-14-07",
+      "expect": "A-STRICT",
+      "got": "A-DED",
+      "note": "",
+      "pass": false,
+      "severity": "finding",
+      "what": "audit coupling class vs Q-5 (A-STRICT expected)",
+      "writer": "W-14"
+    }
+  ],
+  "finished_at": "2026-09-09T21:30:56",
+  "gate_passed": 46,
+  "gate_total": 46,
+  "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "production_sha256_before": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "read_only_verified": true,
+  "results": [
+    {
+      "case": "W-06-01",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "Payment row created (set D)",
+      "writer": "W-06"
+    },
+    {
+      "case": "W-06-02",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id non-null",
+      "writer": "W-06"
+    },
+    {
+      "case": "W-06-03",
+      "expect": 5,
+      "got": 5,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id == reservation billing folio A",
+      "writer": "W-06"
+    },
+    {
+      "case": "W-06-04",
+      "expect": [
+        5,
+        "A"
+      ],
+      "got": [
+        5,
+        "A"
+      ],
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio belongs to this reservation, letter A",
+      "writer": "W-06"
+    },
+    {
+      "case": "W-06-05",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "audit row exists for this financial row",
+      "writer": "W-06"
+    },
+    {
+      "case": "W-06-06",
+      "expect": [
+        5,
+        500.0
+      ],
+      "got": [
+        5,
+        500.0
+      ],
+      "note": "action=posted",
+      "pass": true,
+      "severity": "gate",
+      "what": "audit carries same folio and amount",
+      "writer": "W-06"
+    },
+    {
+      "case": "W-06-07",
+      "expect": "A-STRICT",
+      "got": "A-STRICT",
+      "note": "",
+      "pass": true,
+      "severity": "finding",
+      "what": "audit coupling class vs Q-5 (A-STRICT expected)",
+      "writer": "W-06"
+    },
+    {
+      "case": "W-12-01",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "Payment row created (set D)",
+      "writer": "W-12"
+    },
+    {
+      "case": "W-12-02",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id non-null",
+      "writer": "W-12"
+    },
+    {
+      "case": "W-12-03",
+      "expect": 6,
+      "got": 6,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id == reservation billing folio A",
+      "writer": "W-12"
+    },
+    {
+      "case": "W-12-04",
+      "expect": [
+        6,
+        "A"
+      ],
+      "got": [
+        6,
+        "A"
+      ],
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio belongs to this reservation, letter A",
+      "writer": "W-12"
+    },
+    {
+      "case": "W-12-05",
+      "expect": true,
+      "got": true,
+      "note": "actions=['checkin_full']",
+      "pass": true,
+      "severity": "gate",
+      "what": "audit row exists (Reservation level)",
+      "writer": "W-12"
+    },
+    {
+      "case": "W-12-06",
+      "expect": true,
+      "got": true,
+      "note": "after_state={\"status\": \"CheckedIn\", \"room_id\": 4, \"mode\": \"FULL\", \"billing\": \"Guest\", \"depos",
+      "pass": true,
+      "severity": "gate",
+      "what": "audit carries the financial identity",
+      "writer": "W-12"
+    },
+    {
+      "case": "W-12-07",
+      "expect": "A-STRICT",
+      "got": "A-NF-entity",
+      "note": "as set A",
+      "pass": false,
+      "severity": "finding",
+      "what": "audit coupling class vs Q-5 (A-STRICT expected)",
+      "writer": "W-12"
+    },
+    {
+      "case": "D-05",
+      "expect": [
+        7,
+        7,
+        7
+      ],
+      "got": [
+        7,
+        7,
+        7
+      ],
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "add_payment / POS / CICO rows attributed (re-observed)",
+      "writer": "W-05"
+    },
+    {
+      "case": "W-14-01",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "ExtraCharge row created (set D)",
+      "writer": "W-14"
+    },
+    {
+      "case": "W-14-02",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id non-null",
+      "writer": "W-14"
+    },
+    {
+      "case": "W-14-03",
+      "expect": 8,
+      "got": 8,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id == reservation billing folio A",
+      "writer": "W-14"
+    },
+    {
+      "case": "W-14-04",
+      "expect": [
+        8,
+        "A"
+      ],
+      "got": [
+        8,
+        "A"
+      ],
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio belongs to this reservation, letter A",
+      "writer": "W-14"
+    },
+    {
+      "case": "W-14-05",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "dedicated log row exists (no_show_logs)",
+      "writer": "W-14"
+    },
+    {
+      "case": "W-14-06",
+      "expect": 500.0,
+      "got": 500.0,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "dedicated log carries the amount",
+      "writer": "W-14"
+    },
+    {
+      "case": "W-14-07",
+      "expect": "A-STRICT",
+      "got": "A-DED",
+      "note": "",
+      "pass": false,
+      "severity": "finding",
+      "what": "audit coupling class vs Q-5 (A-STRICT expected)",
+      "writer": "W-14"
+    },
+    {
+      "case": "D-04",
+      "expect": "CheckedOut",
+      "got": "CheckedOut",
+      "note": "HTTP 302",
+      "pass": true,
+      "severity": "gate",
+      "what": "checkout completed (set D)",
+      "writer": "W-04"
+    },
+    {
+      "case": "W-04-01",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "Payment row created (set D)",
+      "writer": "W-04"
+    },
+    {
+      "case": "W-04-02",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id non-null",
+      "writer": "W-04"
+    },
+    {
+      "case": "W-04-03",
+      "expect": 9,
+      "got": 9,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id == reservation billing folio A",
+      "writer": "W-04"
+    },
+    {
+      "case": "W-04-04",
+      "expect": [
+        9,
+        "A"
+      ],
+      "got": [
+        9,
+        "A"
+      ],
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio belongs to this reservation, letter A",
+      "writer": "W-04"
+    },
+    {
+      "case": "W-04-05",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "audit row exists for this financial row",
+      "writer": "W-04"
+    },
+    {
+      "case": "W-04-06",
+      "expect": [
+        9,
+        1250.0
+      ],
+      "got": [
+        9,
+        1250.0
+      ],
+      "note": "action=posted",
+      "pass": true,
+      "severity": "gate",
+      "what": "audit carries same folio and amount",
+      "writer": "W-04"
+    },
+    {
+      "case": "W-04-07",
+      "expect": "A-STRICT",
+      "got": "A-STRICT",
+      "note": "",
+      "pass": true,
+      "severity": "finding",
+      "what": "audit coupling class vs Q-5 (A-STRICT expected)",
+      "writer": "W-04"
+    },
+    {
+      "case": "W-18-01",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "ExtraCharge row created (set D)",
+      "writer": "W-18"
+    },
+    {
+      "case": "W-18-02",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id non-null",
+      "writer": "W-18"
+    },
+    {
+      "case": "W-18-03",
+      "expect": 9,
+      "got": 9,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id == reservation billing folio A",
+      "writer": "W-18"
+    },
+    {
+      "case": "W-18-04",
+      "expect": [
+        9,
+        "A"
+      ],
+      "got": [
+        9,
+        "A"
+      ],
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio belongs to this reservation, letter A",
+      "writer": "W-18"
+    },
+    {
+      "case": "W-18-05",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "audit row exists for this financial row",
+      "writer": "W-18"
+    },
+    {
+      "case": "W-18-06",
+      "expect": [
+        9,
+        200.0
+      ],
+      "got": [
+        9,
+        200.0
+      ],
+      "note": "action=posted",
+      "pass": true,
+      "severity": "gate",
+      "what": "audit carries same folio and amount",
+      "writer": "W-18"
+    },
+    {
+      "case": "W-18-07",
+      "expect": "A-STRICT",
+      "got": "A-STRICT",
+      "note": "",
+      "pass": true,
+      "severity": "finding",
+      "what": "audit coupling class vs Q-5 (A-STRICT expected)",
+      "writer": "W-18"
+    },
+    {
+      "case": "W-19-01",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "ExtraCharge row created (set D)",
+      "writer": "W-19"
+    },
+    {
+      "case": "W-19-02",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id non-null",
+      "writer": "W-19"
+    },
+    {
+      "case": "W-19-03",
+      "expect": 10,
+      "got": 10,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id == reservation billing folio A",
+      "writer": "W-19"
+    },
+    {
+      "case": "W-19-04",
+      "expect": [
+        10,
+        "A"
+      ],
+      "got": [
+        10,
+        "A"
+      ],
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio belongs to this reservation, letter A",
+      "writer": "W-19"
+    },
+    {
+      "case": "W-19-05",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "audit row exists for this financial row",
+      "writer": "W-19"
+    },
+    {
+      "case": "W-19-06",
+      "expect": [
+        10,
+        150.0
+      ],
+      "got": [
+        10,
+        150.0
+      ],
+      "note": "action=posted",
+      "pass": true,
+      "severity": "gate",
+      "what": "audit carries same folio and amount",
+      "writer": "W-19"
+    },
+    {
+      "case": "W-19-07",
+      "expect": "A-STRICT",
+      "got": "A-STRICT",
+      "note": "",
+      "pass": true,
+      "severity": "finding",
+      "what": "audit coupling class vs Q-5 (A-STRICT expected)",
+      "writer": "W-19"
+    },
+    {
+      "case": "D-21",
+      "expect": [
+        true,
+        true
+      ],
+      "got": [
+        true,
+        true
+      ],
+      "note": "status=Completed business date now 2026-08-11 rows=3",
+      "pass": true,
+      "severity": "gate",
+      "what": "night audit closed the day and posted attributed room rent",
+      "writer": "W-21"
+    },
+    {
+      "case": "D11-01",
+      "expect": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "got": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "NULL-folio payment id set unchanged",
+      "writer": "D11"
+    },
+    {
+      "case": "D11-02",
+      "expect": [
+        1,
+        2
+      ],
+      "got": [
+        1,
+        2
+      ],
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "NULL-folio charge id set unchanged",
+      "writer": "D11"
+    },
+    {
+      "case": "D11-03",
+      "expect": {
+        "1": 800.0,
+        "2": 400.0,
+        "3": 1500.0,
+        "4": 1000.0,
+        "5": 500.0,
+        "6": 100.0
+      },
+      "got": {
+        "1": 800.0,
+        "2": 400.0,
+        "3": 1500.0,
+        "4": 1000.0,
+        "5": 500.0,
+        "6": 100.0
+      },
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "D11 payment amounts unchanged",
+      "writer": "D11"
+    },
+    {
+      "case": "D11-04",
+      "expect": {
+        "1": 380.95,
+        "2": 95.24
+      },
+      "got": {
+        "1": 380.95,
+        "2": 95.24
+      },
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "D11 charge amounts unchanged",
+      "writer": "D11"
+    },
+    {
+      "case": "NEW-01",
+      "expect": [
+        [],
+        []
+      ],
+      "got": [
+        [],
+        []
+      ],
+      "note": "11 payments / 10 charges on copy",
+      "pass": true,
+      "severity": "gate",
+      "what": "no NEW unattributed row on the copy",
+      "writer": "ALL"
+    },
+    {
+      "case": "PROD-01",
+      "expect": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+      "got": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "production database unchanged",
+      "writer": "PROD"
+    },
+    {
+      "case": "PROD-02",
+      "expect": 733184,
+      "got": 733184,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "production size 733,184 B",
+      "writer": "PROD"
+    }
+  ],
+  "rows_on_copy": {
+    "extra_charges": 10,
+    "payments": 11
+  },
+  "set": "D",
+  "started_at": "2026-09-09T21:30:54",
+  "verdict": "PASS",
+  "writers": {
+    "SET-D": {
+      "attribution": "-",
+      "audit": "-",
+      "function": "clean new-activity copy",
+      "module": "copy",
+      "notes": "",
+      "object": "-",
+      "runtime": "W-06, W-12, W-05, W-15, W-13, W-14, W-04, W-18, W-19, W-21 on one copy; used for inv-run / Q14 (E-9)"
+    }
+  }
+}

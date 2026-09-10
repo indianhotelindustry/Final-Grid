@@ -1,0 +1,63 @@
+2026-09-09 21:32:01 [WARNING] app: Running on SQLite — row-level locking (with_for_update) is not enforced. SQLite uses a database-wide write lock; concurrent writers will serialise. Move to PostgreSQL for true per-row locking and higher concurrency.
+2026-09-09 21:32:01 [INFO] app: ------- SECURITY MODE -------
+2026-09-09 21:32:01 [INFO] app:   env                : production
+2026-09-09 21:32:01 [INFO] app:   secret_key         : set (>=32 chars)
+2026-09-09 21:32:01 [INFO] app:   updater_signing    : ENFORCED
+2026-09-09 21:32:01 [INFO] app:   encryption         : available
+2026-09-09 21:32:01 [INFO] app:   lan_access         : disabled (127.0.0.1 only)
+2026-09-09 21:32:01 [INFO] app:   schema_drift_mode  : warn-only
+2026-09-09 21:32:01 [INFO] app: -----------------------------
+2026-09-09 21:32:01 [INFO] app: db.create_all() skipped in production. Use Alembic migrations for schema changes. Set DB_AUTO_CREATE=1 to force-enable at next boot.
+2026-09-09 21:32:01 [INFO] app: SQLite: ensured table credit_vouchers exists
+2026-09-09 21:32:01 [INFO] app: SQLite: ensured table credit_voucher_redemptions exists
+2026-09-09 21:32:01 [INFO] apscheduler.scheduler: Scheduler started
+2026-09-09 21:32:01 [INFO] apscheduler.scheduler: Added job "setup_backup_scheduler.<locals>._scheduled_backup" to job store "default"
+2026-09-09 21:32:01 [INFO] app.backup_manager: Daily backup scheduled at 03:00
+2026-09-09 21:32:01 [INFO] apscheduler.scheduler: Added job "flush_notification_queue" to job store "default"
+2026-09-09 21:32:01 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._prune_old_logs" to job store "default"
+2026-09-09 21:32:01 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._run_predictive_maintenance" to job store "default"
+2026-09-09 21:32:02 [WARNING] app.ai_anomaly: Cash ratio check skipped: name 'Reservation' is not defined
+2026-09-09 21:32:05 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:32:05 [ERROR] app.performance_service: compute_daily_performance failed: type object 'Reservation' has no attribute 'checkin_date'
+2026-09-09 21:32:05 [WARNING] app.encryption: PII_ENCRYPTION_KEY not set -- deriving encryption key from SECRET_KEY. Set PII_ENCRYPTION_KEY in production for best security.
+2026-09-09 21:32:06 [INFO] app.rates: resolve_rate: base_rate fallback=1142.86 for rt=2
+2026-09-09 21:32:06 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:32:06 [INFO] app.gst: generate_room_tax_lines: res=1 source=nightly_rows nights=1 lines=0
+2026-09-09 21:32:06 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:32:07 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:32:08 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:32:08 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:32:08 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:32:08 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:32:10 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:32:10 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:32:10 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:32:10 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:32:10 [INFO] apscheduler.scheduler: Scheduler has been shut down
+
+====================================================================================================
+FINALGRID — GOLDEN MASTER VERIFICATION
+Production Verification Framework, Wave 0 Deliverable 2
+====================================================================================================
+Master set      : phase1_aa6d9e91
+Master captured : 2026-09-09T16:01:49 (app v2.2.18)
+Current run     : 2026-09-09T16:01:58 (app v2.2.18)
+Master clock    : 2026-08-10T12:00:00
+Current clock   : 2026-08-10T12:00:00
+Read-only       : VERIFIED
+
+Surfaces compared : 158
+Surfaces clean    : 158
+Differences       : 0
+Blocking          : 0
+
+VERDICT           : PASS
+
+  No differences. Every captured surface renders exactly what it
+  rendered when the master was taken.
+
+====================================================================================================
+END OF REPORT
+====================================================================================================
+
+[gm] evidence pack: C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\verification\evidence\20260909_160158_gm_verify_phase1_aa6d9e91

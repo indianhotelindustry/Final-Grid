@@ -1,0 +1,208 @@
+{
+  "business_date": "2026-08-11",
+  "commissioning_gaps": [
+    {
+      "invariant_id": "INV-R01",
+      "reason": "declared but not yet commissioned",
+      "status": "NOT_COMMISSIONED"
+    }
+  ],
+  "counts": {
+    "ERROR": 0,
+    "HOLDS": 16,
+    "NOT_APPLICABLE": 0,
+    "VACUOUS": 4,
+    "VIOLATED": 6
+  },
+  "determinism_proven": true,
+  "evidence_pack": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS\\verification\\evidence\\20260909_155816_inv_run_phase1_vc_setA",
+  "invariants": {
+    "INV-A01": {
+      "affected": [],
+      "population": 15,
+      "status": "HOLDS",
+      "violations": 0
+    },
+    "INV-A02": {
+      "affected": [
+        "extra_charge:1",
+        "extra_charge:2",
+        "payment:1",
+        "payment:2",
+        "payment:3",
+        "payment:4",
+        "payment:5",
+        "payment:6"
+      ],
+      "population": 27,
+      "status": "VIOLATED",
+      "violations": 8
+    },
+    "INV-A03": {
+      "affected": [
+        "extra_charge:1",
+        "extra_charge:2"
+      ],
+      "population": 12,
+      "status": "VIOLATED",
+      "violations": 2
+    },
+    "INV-A04": {
+      "affected": [],
+      "population": 15,
+      "status": "HOLDS",
+      "violations": 0
+    },
+    "INV-A05": {
+      "affected": [],
+      "population": 12,
+      "status": "HOLDS",
+      "violations": 0
+    },
+    "INV-A06": {
+      "affected": [],
+      "population": 0,
+      "status": "VACUOUS",
+      "violations": 0
+    },
+    "INV-B01": {
+      "affected": [],
+      "population": 24,
+      "status": "HOLDS",
+      "violations": 0
+    },
+    "INV-B02": {
+      "affected": [],
+      "population": 2,
+      "status": "HOLDS",
+      "violations": 0
+    },
+    "INV-B03": {
+      "affected": [
+        "night_audit:2026-08-09 / accrual revenue",
+        "night_audit:2026-08-09 / outstanding",
+        "night_audit:2026-08-09 / room revenue",
+        "night_audit:2026-08-10 / accrual revenue",
+        "night_audit:2026-08-10 / outstanding",
+        "night_audit:2026-08-10 / room revenue"
+      ],
+      "population": 16,
+      "status": "VIOLATED",
+      "violations": 6
+    },
+    "INV-B04": {
+      "affected": [
+        "extra_charge:4"
+      ],
+      "population": 1,
+      "status": "VIOLATED",
+      "violations": 1
+    },
+    "INV-B05": {
+      "affected": [],
+      "population": 2,
+      "status": "HOLDS",
+      "violations": 0
+    },
+    "INV-B06": {
+      "affected": [
+        "payment:7",
+        "payment:8"
+      ],
+      "population": 15,
+      "status": "VIOLATED",
+      "violations": 2
+    },
+    "INV-C01": {
+      "affected": [],
+      "population": 1,
+      "status": "HOLDS",
+      "violations": 0
+    },
+    "INV-C02": {
+      "affected": [
+        "reservation:10"
+      ],
+      "population": 8,
+      "status": "VIOLATED",
+      "violations": 1
+    },
+    "INV-C03": {
+      "affected": [],
+      "population": 39,
+      "status": "HOLDS",
+      "violations": 0
+    },
+    "INV-C04": {
+      "affected": [],
+      "population": 11,
+      "status": "HOLDS",
+      "violations": 0
+    },
+    "INV-C05": {
+      "affected": [],
+      "population": 1,
+      "status": "HOLDS",
+      "violations": 0
+    },
+    "INV-C06": {
+      "affected": [],
+      "population": 0,
+      "status": "VACUOUS",
+      "violations": 0
+    },
+    "INV-D01": {
+      "affected": [],
+      "population": 15,
+      "status": "HOLDS",
+      "violations": 0
+    },
+    "INV-D02": {
+      "affected": [],
+      "population": 0,
+      "status": "VACUOUS",
+      "violations": 0
+    },
+    "INV-D03": {
+      "affected": [],
+      "population": 15,
+      "status": "HOLDS",
+      "violations": 0
+    },
+    "INV-D04": {
+      "affected": [],
+      "population": 12,
+      "status": "HOLDS",
+      "violations": 0
+    },
+    "INV-D05": {
+      "affected": [],
+      "population": 0,
+      "status": "VACUOUS",
+      "violations": 0
+    },
+    "INV-D06": {
+      "affected": [],
+      "population": 5,
+      "status": "HOLDS",
+      "violations": 0
+    },
+    "INV-D07": {
+      "affected": [],
+      "population": 3,
+      "status": "HOLDS",
+      "violations": 0
+    },
+    "INV-R01": {
+      "affected": [],
+      "population": 2,
+      "status": "HOLDS",
+      "violations": 0
+    }
+  },
+  "order_independence_proven": true,
+  "overall": "FAIL",
+  "read_only_verified": true,
+  "source": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS\\verification\\_work\\p1vc_setA.db",
+  "tag": "phase1_vc_setA"
+}

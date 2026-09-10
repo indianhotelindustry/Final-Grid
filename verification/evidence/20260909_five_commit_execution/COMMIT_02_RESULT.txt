@@ -1,0 +1,47 @@
+COMMIT 02 — GOVERNANCE / ADR
+directive: FG-COMMIT-EXECUTION-20260909-01
+commit: 34307c37858991c21ec2a13d995db8416819bf69
+parent: d15d848e2694adbe2560aabd359a9f9c85fdb6d2
+subject: FinalGrid governance: adopt architecture baseline
+author: SIPL Server <sukoondigitalmarketing@gmail.com>
+date: 2026-09-09 17:20:16 +0530
+tree: e1000a8905daea5c810218eceb3cb6ae3e81d113
+paths in commit: 30 (target 30) — staged-set vs manifest IDENTICAL
+status codes:  15 A; 15 M;
+FOUNDER_DECISIONS.md: PARTIAL — blob ab3e3aed640035a3094b9bcb4bd54e3234f63a5a, 982 lines, hunk @@ -865,3 +865,118 @@ (+115/-0); Round 2 = 0; Q-1..Q-6 = 0 each; Architecture Resolution Round 1 = 1; ADR Adoption Baseline = 1
+MASTER_PLAN.md: WHOLE (intentional)
+index after commit: empty
+production db: UNCHANGED (sha 51dd83b7..., 733184 bytes, D11 4776.19, schema fp e38454ba..., audit_logs 23)
+origin/main: e69f2ac2... (unmoved)
+
+--- paths ---
+A	verification/adr/BACKLOG.md
+A	verification/evidence/20260908_architecture_resolution_round1/ADR_ADOPTION_READINESS.json
+A	verification/evidence/20260908_architecture_resolution_round1/ADR_ADOPTION_READINESS.md
+A	verification/evidence/20260908_architecture_resolution_round1/RECORD.md
+A	verification/evidence/20260908_architecture_resolution_round1/result.json
+A	verification/evidence/20260908_phase1_implementation_readiness/FINANCIAL_WRITER_INVENTORY.md
+A	verification/evidence/20260908_phase1_implementation_readiness/FOUNDER_DECISION_GATE.md
+A	verification/evidence/20260908_phase1_implementation_readiness/MIGRATION_AND_DATA_PLAN.md
+A	verification/evidence/20260908_phase1_implementation_readiness/PHASE1_EXECUTION_PLAN.md
+A	verification/evidence/20260908_phase1_implementation_readiness/READINESS_REPORT.md
+A	verification/evidence/20260908_phase1_implementation_readiness/RECOVERY_GATE_PLAN.md
+A	verification/evidence/20260908_phase1_implementation_readiness/VERIFICATION_PLAN.md
+A	verification/evidence/20260908_phase1_implementation_readiness/result.json
+A	verification/evidence/20260908_repo_identity_designation/RECORD.md
+A	verification/evidence/20260908_repo_identity_designation/result.json
+M	verification/FOUNDER_DECISIONS.md
+M	verification/MASTER_PLAN.md
+M	verification/adr/ADR-001-system-of-record-boundary.md
+M	verification/adr/ADR-002-folio-attribution-contract.md
+M	verification/adr/ADR-003-room-rent-ownership.md
+M	verification/adr/ADR-004-business-date-authority.md
+M	verification/adr/ADR-005-sqlite-foreign-key-enforcement.md
+M	verification/adr/ADR-006-production-mutation-controls.md
+M	verification/adr/ADR-007-backup-restore-architecture.md
+M	verification/adr/ADR-008-application-authorization-architecture.md
+M	verification/adr/ADR-009-reporting-authorization.md
+M	verification/adr/ADR-010-maker-checker-architecture.md
+M	verification/adr/ADR-011-operator-accountability.md
+M	verification/adr/ADR-012-audit-retention.md
+M	verification/adr/README.md

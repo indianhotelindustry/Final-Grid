@@ -1,0 +1,52 @@
+COMMIT 05 — PHASE 1 + W-20
+directive: FG-COMMIT-EXECUTION-20260909-01
+commit: aa6d9e91e7294be731383f755d6998acf5f059fc
+parent: 9508399500be7d5051ddd4a73b0d53b12ac59d40
+subject: FinalGrid: implement Phase 1 financial foundation
+author: SIPL Server <sukoondigitalmarketing@gmail.com>
+date: 2026-09-09 17:21:55 +0530
+tree: fa34000ec53ec2a3f12be33e69d7a85b8037f4f3
+paths in commit: 34 (target 34) — staged-set vs manifest IDENTICAL
+status codes:  26 A; 8 M;
+app diff:  8 files changed, 554 insertions(+), 45 deletions(-)
+app/folio.py: NOT staged, NOT in commit (verified 0)
+pyc/__pycache__: 0
+index after commit: empty; working tree clean (porcelain 0)
+production db: UNCHANGED (sha 51dd83b7..., 733184 bytes, D11 4776.19, schema fp e38454ba..., audit_logs 23)
+origin/main: e69f2ac2... (unmoved)
+
+--- paths ---
+A	verification/evidence/20260909_013001_inv_run_production/report.txt
+A	verification/evidence/20260909_013001_inv_run_production/result.json
+A	verification/evidence/20260909_013003_gm_verify_production/report.txt
+A	verification/evidence/20260909_013003_gm_verify_production/result.json
+A	verification/evidence/20260909_013008_replay_verify_production/report.txt
+A	verification/evidence/20260909_013008_replay_verify_production/result.json
+A	verification/evidence/20260909_013158_replay_verify_production/report.txt
+A	verification/evidence/20260909_013158_replay_verify_production/result.json
+A	verification/evidence/20260909_013200_inv_run_production/report.txt
+A	verification/evidence/20260909_013200_inv_run_production/result.json
+A	verification/evidence/20260909_013202_gm_verify_production/report.txt
+A	verification/evidence/20260909_013202_gm_verify_production/result.json
+A	verification/evidence/20260909_013458_replay_verify_production/report.txt
+A	verification/evidence/20260909_013458_replay_verify_production/result.json
+A	verification/evidence/20260909_013500_inv_run_production/report.txt
+A	verification/evidence/20260909_013500_inv_run_production/result.json
+A	verification/evidence/20260909_013502_gm_verify_production/report.txt
+A	verification/evidence/20260909_013502_gm_verify_production/result.json
+A	verification/evidence/20260909_phase1_execution/COMPLETION_REPORT.md
+A	verification/evidence/20260909_phase1_execution/existing_data_classification.json
+A	verification/evidence/20260909_phase1_execution/result.json
+A	verification/evidence/20260909_phase1_execution/verify.py
+A	verification/evidence/20260909_w20_runtime/W20_RUNTIME_VERIFICATION.md
+A	verification/evidence/20260909_w20_runtime/result.json
+A	verification/evidence/20260909_w20_runtime/test_results.txt
+A	verification/evidence/20260909_w20_runtime/verify.py
+M	app/cico_service.py
+M	app/night_audit_service.py
+M	app/noshow_service.py
+M	app/pos.py
+M	app/reports.py
+M	app/routes.py
+M	app/seed.py
+M	app/services.py

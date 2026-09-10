@@ -1,0 +1,3018 @@
+{
+  "all_pass": true,
+  "datasets": [
+    {
+      "activated_invariants": [],
+      "description": "",
+      "duration_s": 9.5,
+      "error": "",
+      "events": [],
+      "facts": {
+        "audit_actions": {},
+        "audit_logs": 0,
+        "business_date": "2026-09-09",
+        "extra_charges": 0,
+        "null_folio_charges": [],
+        "null_folio_payments": [],
+        "payments": 2,
+        "reconciliation": {
+          "folio_view": 0.0,
+          "misrouted_charges": 0,
+          "misrouted_payments": 0,
+          "reservation_view": 0.0,
+          "unattributed": 0.0,
+          "views_agree": true
+        }
+      },
+      "invariants": {
+        "INV-A02": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-A05": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-C01": [
+          "VACUOUS",
+          "VACUOUS",
+          "MET"
+        ],
+        "INV-C02": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-C03": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-C04": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-D01": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-D03": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-D04": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-D06": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ]
+      },
+      "key": "DS-ACT-INHOUSE@1.0",
+      "layers_run": [
+        "D1_PARITY",
+        "D2_GOLDEN",
+        "D4_INVARIANTS"
+      ],
+      "materialisation": {
+        "business_date": "2026-06-15",
+        "production_unchanged": true,
+        "rows_inserted": 19,
+        "rows_removed": 112,
+        "tables_touched": [
+          "guests",
+          "reservations",
+          "reservations",
+          "reservation_rooms",
+          "folios",
+          "reservation_night_rates",
+          "tax_lines",
+          "payments"
+        ]
+      },
+      "met": 59,
+      "not_run": 0,
+      "outcomes": [
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "3150.00",
+          "observed": "3150.00",
+          "status": "MET",
+          "target": "charges_net"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "corporate_bookings"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "corporate_credit_used"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "credit_note_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "credit_note_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "extra_charges_net"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "extra_charges_non_room_rent"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "extra_charges_non_room_rent_net"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "extra_charges_reversals"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "extra_charges_room_rent"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "extra_charges_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "2",
+          "observed": "2",
+          "status": "MET",
+          "target": "folios_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "2",
+          "observed": "2",
+          "status": "MET",
+          "target": "guests_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "invoice_round_off_rows"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "invoice_round_off_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1050.00",
+          "observed": "1050.00",
+          "status": "MET",
+          "target": "invoice_rounded_grand_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1050.00",
+          "observed": "1050.00",
+          "status": "MET",
+          "target": "invoice_unrounded_grand_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1100.00",
+          "observed": "1100.00",
+          "status": "MET",
+          "target": "net_receivable"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1100.00",
+          "observed": "1100.00",
+          "status": "MET",
+          "target": "outstanding"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "overpayment_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "overpayment_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "payments_corrections"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "2",
+          "observed": "2",
+          "status": "MET",
+          "target": "payments_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "2050.00",
+          "observed": "2050.00",
+          "status": "MET",
+          "target": "payments_gross"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "2050.00",
+          "observed": "2050.00",
+          "status": "MET",
+          "target": "payments_net"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "payments_reversals"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "payments_voided"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "2",
+          "observed": "2",
+          "status": "MET",
+          "target": "reservations_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "room_discount"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "3000.00",
+          "observed": "3000.00",
+          "status": "MET",
+          "target": "room_revenue"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "3",
+          "observed": "3",
+          "status": "MET",
+          "target": "tax_base_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "6",
+          "observed": "6",
+          "status": "MET",
+          "target": "tax_lines_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "150.00",
+          "observed": "150.00",
+          "status": "MET",
+          "target": "tax_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "3000.00",
+          "observed": "3000.00",
+          "status": "MET",
+          "target": "taxable_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "void_request_count"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-A02"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-A05"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "VACUOUS",
+          "observed": "VACUOUS",
+          "status": "MET",
+          "target": "INV-C01"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-C02"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-C03"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-C04"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-D01"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-D03"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-D04"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-D06"
+        },
+        {
+          "detail": "",
+          "element": "golden",
+          "expected": "UNRESOLVED",
+          "observed": "UNRESOLVED",
+          "status": "MET",
+          "target": "groups.detail__any_group"
+        },
+        {
+          "detail": "",
+          "element": "golden",
+          "expected": "RESOLVED",
+          "observed": "RESOLVED",
+          "status": "MET",
+          "target": "main.checkout__inhouse_reservation"
+        },
+        {
+          "detail": "",
+          "element": "golden",
+          "expected": "UNRESOLVED",
+          "observed": "UNRESOLVED",
+          "status": "MET",
+          "target": "main.company_detail__any_company"
+        },
+        {
+          "detail": "",
+          "element": "golden",
+          "expected": "UNRESOLVED",
+          "observed": "UNRESOLVED",
+          "status": "MET",
+          "target": "main.get_company_credit__any_company"
+        },
+        {
+          "detail": "",
+          "element": "golden",
+          "expected": "RESOLVED",
+          "observed": "RESOLVED",
+          "status": "MET",
+          "target": "main.reservation_folio__inhouse_reservation"
+        },
+        {
+          "detail": "",
+          "element": "golden",
+          "expected": "RESOLVED",
+          "observed": "RESOLVED",
+          "status": "MET",
+          "target": "pos.room_charges_api__inhouse_reservation"
+        },
+        {
+          "detail": "",
+          "element": "golden",
+          "expected": "UNRESOLVED",
+          "observed": "UNRESOLVED",
+          "status": "MET",
+          "target": "reports.night_audit_snapshot__night_audit_log"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q12"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q13"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q14"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q17"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q18"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q20"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q22"
+        }
+      ],
+      "parity": {
+        "Q12": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q13": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q14": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q17": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q18": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q20": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q22": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ]
+      },
+      "purpose": "BASELINE",
+      "still_vacuous": [],
+      "title": "One guest in house part paid, one departed and settled",
+      "unmet": 0,
+      "unmet_detail": [],
+      "verdict": "PASS"
+    },
+    {
+      "activated_invariants": [
+        "INV-D02"
+      ],
+      "description": "",
+      "duration_s": 2.9,
+      "error": "",
+      "events": [],
+      "facts": {
+        "audit_actions": {},
+        "audit_logs": 0,
+        "business_date": "2026-09-09",
+        "extra_charges": 3,
+        "null_folio_charges": [],
+        "null_folio_payments": [],
+        "payments": 3,
+        "reconciliation": {
+          "folio_view": 1200.0,
+          "misrouted_charges": 0,
+          "misrouted_payments": 0,
+          "reservation_view": 1200.0,
+          "unattributed": 0.0,
+          "views_agree": true
+        }
+      },
+      "invariants": {
+        "INV-A02": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-A03": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-A05": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-C01": [
+          "VACUOUS",
+          "VACUOUS",
+          "MET"
+        ],
+        "INV-C02": [
+          "VIOLATED",
+          "VIOLATED",
+          "MET"
+        ],
+        "INV-C03": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-C04": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-D01": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-D02": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-D03": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-D04": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-D06": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ]
+      },
+      "key": "DS-ACT-CORRECTION@1.0",
+      "layers_run": [
+        "D1_PARITY",
+        "D4_INVARIANTS"
+      ],
+      "materialisation": {
+        "business_date": "2026-07-11",
+        "production_unchanged": true,
+        "rows_inserted": 15,
+        "rows_removed": 112,
+        "tables_touched": [
+          "guests",
+          "reservations",
+          "reservation_rooms",
+          "folios",
+          "reservation_night_rates",
+          "tax_lines",
+          "extra_charges",
+          "payments"
+        ]
+      },
+      "met": 55,
+      "not_run": 0,
+      "outcomes": [
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1286.00",
+          "observed": "1286.00",
+          "status": "MET",
+          "target": "charges_net"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "corporate_bookings"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "corporate_credit_used"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "credit_note_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "credit_note_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "200.00",
+          "observed": "200.00",
+          "status": "MET",
+          "target": "extra_charges_net"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1200.00",
+          "observed": "1200.00",
+          "status": "MET",
+          "target": "extra_charges_non_room_rent"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "200.00",
+          "observed": "200.00",
+          "status": "MET",
+          "target": "extra_charges_non_room_rent_net"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "500.00",
+          "observed": "500.00",
+          "status": "MET",
+          "target": "extra_charges_reversals"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "extra_charges_room_rent"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1200.00",
+          "observed": "1200.00",
+          "status": "MET",
+          "target": "extra_charges_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1",
+          "observed": "1",
+          "status": "MET",
+          "target": "folios_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1",
+          "observed": "1",
+          "status": "MET",
+          "target": "guests_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "invoice_round_off_rows"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "invoice_round_off_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1286.00",
+          "observed": "1286.00",
+          "status": "MET",
+          "target": "invoice_rounded_grand_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1286.00",
+          "observed": "1286.00",
+          "status": "MET",
+          "target": "invoice_unrounded_grand_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "net_receivable"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "outstanding"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "overpayment_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "overpayment_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "2286.00",
+          "observed": "2286.00",
+          "status": "MET",
+          "target": "payments_corrections"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "3",
+          "observed": "3",
+          "status": "MET",
+          "target": "payments_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "3286.00",
+          "observed": "3286.00",
+          "status": "MET",
+          "target": "payments_gross"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1286.00",
+          "observed": "1286.00",
+          "status": "MET",
+          "target": "payments_net"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1000.00",
+          "observed": "1000.00",
+          "status": "MET",
+          "target": "payments_reversals"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "payments_voided"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1",
+          "observed": "1",
+          "status": "MET",
+          "target": "reservations_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "room_discount"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1000.00",
+          "observed": "1000.00",
+          "status": "MET",
+          "target": "room_revenue"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "2",
+          "observed": "2",
+          "status": "MET",
+          "target": "tax_base_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "4",
+          "observed": "4",
+          "status": "MET",
+          "target": "tax_lines_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "86.00",
+          "observed": "86.00",
+          "status": "MET",
+          "target": "tax_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1200.00",
+          "observed": "1200.00",
+          "status": "MET",
+          "target": "taxable_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "void_request_count"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-A02"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-A03"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-A05"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "VACUOUS",
+          "observed": "VACUOUS",
+          "status": "MET",
+          "target": "INV-C01"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "VIOLATED",
+          "observed": "VIOLATED",
+          "status": "MET",
+          "target": "INV-C02"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-C03"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-C04"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-D01"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-D02"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-D03"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-D04"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-D06"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "DIVERGED",
+          "observed": "DIVERGED",
+          "status": "MET",
+          "target": "Q02"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "DIVERGED",
+          "observed": "DIVERGED",
+          "status": "MET",
+          "target": "Q07"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "DIVERGED",
+          "observed": "DIVERGED",
+          "status": "MET",
+          "target": "Q09"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q12"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q13"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q14"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q17"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q22"
+        }
+      ],
+      "parity": {
+        "Q02": [
+          "DIVERGED",
+          "DIVERGED",
+          "MET"
+        ],
+        "Q07": [
+          "DIVERGED",
+          "DIVERGED",
+          "MET"
+        ],
+        "Q09": [
+          "DIVERGED",
+          "DIVERGED",
+          "MET"
+        ],
+        "Q12": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q13": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q14": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q17": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q22": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ]
+      },
+      "purpose": "ACTIVATE_INVARIANT",
+      "still_vacuous": [],
+      "title": "A charge and a payment, each corrected the way the audit requires",
+      "unmet": 0,
+      "unmet_detail": [],
+      "verdict": "PASS"
+    },
+    {
+      "activated_invariants": [
+        "INV-D05",
+        "INV-D02"
+      ],
+      "description": "",
+      "duration_s": 2.8,
+      "error": "",
+      "events": [],
+      "facts": {
+        "audit_actions": {},
+        "audit_logs": 0,
+        "business_date": "2026-09-09",
+        "extra_charges": 1,
+        "null_folio_charges": [],
+        "null_folio_payments": [],
+        "payments": 3,
+        "reconciliation": {
+          "folio_view": 200.0,
+          "misrouted_charges": 0,
+          "misrouted_payments": 0,
+          "reservation_view": 200.0,
+          "unattributed": 0.0,
+          "views_agree": true
+        }
+      },
+      "invariants": {
+        "INV-A02": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-A03": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-A05": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-C01": [
+          "VACUOUS",
+          "VACUOUS",
+          "MET"
+        ],
+        "INV-C03": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-C04": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-D01": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-D02": [
+          "VIOLATED",
+          "VIOLATED",
+          "MET"
+        ],
+        "INV-D03": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-D04": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-D05": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-D06": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ]
+      },
+      "key": "DS-ACT-VOIDCN@1.0",
+      "layers_run": [
+        "D1_PARITY",
+        "D4_INVARIANTS"
+      ],
+      "materialisation": {
+        "business_date": "2026-08-03",
+        "production_unchanged": true,
+        "rows_inserted": 15,
+        "rows_removed": 112,
+        "tables_touched": [
+          "guests",
+          "reservations",
+          "reservation_rooms",
+          "folios",
+          "reservation_night_rates",
+          "extra_charges",
+          "tax_lines",
+          "payments",
+          "void_requests",
+          "credit_notes"
+        ]
+      },
+      "met": 54,
+      "not_run": 0,
+      "outcomes": [
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1286.00",
+          "observed": "1286.00",
+          "status": "MET",
+          "target": "charges_net"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "corporate_bookings"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "corporate_credit_used"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1",
+          "observed": "1",
+          "status": "MET",
+          "target": "credit_note_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "236.00",
+          "observed": "236.00",
+          "status": "MET",
+          "target": "credit_note_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "200.00",
+          "observed": "200.00",
+          "status": "MET",
+          "target": "extra_charges_net"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "200.00",
+          "observed": "200.00",
+          "status": "MET",
+          "target": "extra_charges_non_room_rent"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "200.00",
+          "observed": "200.00",
+          "status": "MET",
+          "target": "extra_charges_non_room_rent_net"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "extra_charges_reversals"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "extra_charges_room_rent"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "200.00",
+          "observed": "200.00",
+          "status": "MET",
+          "target": "extra_charges_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1",
+          "observed": "1",
+          "status": "MET",
+          "target": "folios_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1",
+          "observed": "1",
+          "status": "MET",
+          "target": "guests_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "invoice_round_off_rows"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "invoice_round_off_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1286.00",
+          "observed": "1286.00",
+          "status": "MET",
+          "target": "invoice_rounded_grand_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1286.00",
+          "observed": "1286.00",
+          "status": "MET",
+          "target": "invoice_unrounded_grand_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "net_receivable"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "236.00",
+          "observed": "236.00",
+          "status": "MET",
+          "target": "outstanding"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "overpayment_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "overpayment_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "payments_corrections"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "3",
+          "observed": "3",
+          "status": "MET",
+          "target": "payments_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "2808.00",
+          "observed": "2808.00",
+          "status": "MET",
+          "target": "payments_gross"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1050.00",
+          "observed": "1050.00",
+          "status": "MET",
+          "target": "payments_net"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "236.00",
+          "observed": "236.00",
+          "status": "MET",
+          "target": "payments_reversals"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1286.00",
+          "observed": "1286.00",
+          "status": "MET",
+          "target": "payments_voided"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1",
+          "observed": "1",
+          "status": "MET",
+          "target": "reservations_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "room_discount"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1000.00",
+          "observed": "1000.00",
+          "status": "MET",
+          "target": "room_revenue"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "2",
+          "observed": "2",
+          "status": "MET",
+          "target": "tax_base_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "4",
+          "observed": "4",
+          "status": "MET",
+          "target": "tax_lines_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "86.00",
+          "observed": "86.00",
+          "status": "MET",
+          "target": "tax_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1200.00",
+          "observed": "1200.00",
+          "status": "MET",
+          "target": "taxable_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1",
+          "observed": "1",
+          "status": "MET",
+          "target": "void_request_count"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-A02"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-A03"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-A05"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "VACUOUS",
+          "observed": "VACUOUS",
+          "status": "MET",
+          "target": "INV-C01"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-C03"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-C04"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-D01"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "VIOLATED",
+          "observed": "VIOLATED",
+          "status": "MET",
+          "target": "INV-D02"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-D03"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-D04"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-D05"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-D06"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "DIVERGED",
+          "observed": "DIVERGED",
+          "status": "MET",
+          "target": "Q09"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "DIVERGED",
+          "observed": "DIVERGED",
+          "status": "MET",
+          "target": "Q11"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q12"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q13"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q14"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q17"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q22"
+        }
+      ],
+      "parity": {
+        "Q09": [
+          "DIVERGED",
+          "DIVERGED",
+          "MET"
+        ],
+        "Q11": [
+          "DIVERGED",
+          "DIVERGED",
+          "MET"
+        ],
+        "Q12": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q13": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q14": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q17": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q22": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ]
+      },
+      "purpose": "ACTIVATE_INVARIANT",
+      "still_vacuous": [],
+      "title": "A duplicate payment voided, and a disputed charge credited",
+      "unmet": 0,
+      "unmet_detail": [],
+      "verdict": "PASS"
+    },
+    {
+      "activated_invariants": [],
+      "description": "",
+      "duration_s": 11.5,
+      "error": "",
+      "events": [],
+      "facts": {
+        "audit_actions": {},
+        "audit_logs": 0,
+        "business_date": "2026-09-09",
+        "extra_charges": 1,
+        "null_folio_charges": [],
+        "null_folio_payments": [],
+        "payments": 2,
+        "reconciliation": {
+          "folio_view": 500.0,
+          "misrouted_charges": 0,
+          "misrouted_payments": 0,
+          "reservation_view": 500.0,
+          "unattributed": 0.0,
+          "views_agree": true
+        }
+      },
+      "invariants": {
+        "INV-A02": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-A03": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-A05": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-C01": [
+          "VACUOUS",
+          "VACUOUS",
+          "MET"
+        ],
+        "INV-C02": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-C03": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-C04": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-D01": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-D03": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-D04": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-D06": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ]
+      },
+      "key": "DS-ACT-GROUP@1.0",
+      "layers_run": [
+        "D1_PARITY",
+        "D2_GOLDEN",
+        "D4_INVARIANTS"
+      ],
+      "materialisation": {
+        "business_date": "2026-09-21",
+        "production_unchanged": true,
+        "rows_inserted": 20,
+        "rows_removed": 112,
+        "tables_touched": [
+          "group_blocks",
+          "guests",
+          "reservations",
+          "reservation_rooms",
+          "folios",
+          "reservation_night_rates",
+          "extra_charges",
+          "tax_lines",
+          "payments"
+        ]
+      },
+      "met": 56,
+      "not_run": 0,
+      "outcomes": [
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "2690.00",
+          "observed": "2690.00",
+          "status": "MET",
+          "target": "charges_net"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "corporate_bookings"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "corporate_credit_used"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "credit_note_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "credit_note_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "500.00",
+          "observed": "500.00",
+          "status": "MET",
+          "target": "extra_charges_net"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "500.00",
+          "observed": "500.00",
+          "status": "MET",
+          "target": "extra_charges_non_room_rent"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "500.00",
+          "observed": "500.00",
+          "status": "MET",
+          "target": "extra_charges_non_room_rent_net"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "extra_charges_reversals"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "extra_charges_room_rent"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "500.00",
+          "observed": "500.00",
+          "status": "MET",
+          "target": "extra_charges_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "2",
+          "observed": "2",
+          "status": "MET",
+          "target": "folios_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "2",
+          "observed": "2",
+          "status": "MET",
+          "target": "guests_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "invoice_round_off_rows"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "invoice_round_off_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "2690.00",
+          "observed": "2690.00",
+          "status": "MET",
+          "target": "invoice_rounded_grand_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "2690.00",
+          "observed": "2690.00",
+          "status": "MET",
+          "target": "invoice_unrounded_grand_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "net_receivable"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "outstanding"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "overpayment_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "overpayment_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "payments_corrections"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "2",
+          "observed": "2",
+          "status": "MET",
+          "target": "payments_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "2690.00",
+          "observed": "2690.00",
+          "status": "MET",
+          "target": "payments_gross"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "2690.00",
+          "observed": "2690.00",
+          "status": "MET",
+          "target": "payments_net"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "payments_reversals"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "payments_voided"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "2",
+          "observed": "2",
+          "status": "MET",
+          "target": "reservations_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "room_discount"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "2000.00",
+          "observed": "2000.00",
+          "status": "MET",
+          "target": "room_revenue"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "3",
+          "observed": "3",
+          "status": "MET",
+          "target": "tax_base_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "6",
+          "observed": "6",
+          "status": "MET",
+          "target": "tax_lines_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "190.00",
+          "observed": "190.00",
+          "status": "MET",
+          "target": "tax_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "2500.00",
+          "observed": "2500.00",
+          "status": "MET",
+          "target": "taxable_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "void_request_count"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-A02"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-A03"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-A05"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "VACUOUS",
+          "observed": "VACUOUS",
+          "status": "MET",
+          "target": "INV-C01"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-C02"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-C03"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-C04"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-D01"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-D03"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-D04"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-D06"
+        },
+        {
+          "detail": "",
+          "element": "golden",
+          "expected": "RESOLVED",
+          "observed": "RESOLVED",
+          "status": "MET",
+          "target": "groups.detail__any_group"
+        },
+        {
+          "detail": "",
+          "element": "golden",
+          "expected": "UNRESOLVED",
+          "observed": "UNRESOLVED",
+          "status": "MET",
+          "target": "main.checkout__inhouse_reservation"
+        },
+        {
+          "detail": "",
+          "element": "golden",
+          "expected": "UNRESOLVED",
+          "observed": "UNRESOLVED",
+          "status": "MET",
+          "target": "main.company_detail__any_company"
+        },
+        {
+          "detail": "",
+          "element": "golden",
+          "expected": "UNRESOLVED",
+          "observed": "UNRESOLVED",
+          "status": "MET",
+          "target": "main.get_company_credit__any_company"
+        },
+        {
+          "detail": "",
+          "element": "golden",
+          "expected": "UNRESOLVED",
+          "observed": "UNRESOLVED",
+          "status": "MET",
+          "target": "reports.night_audit_snapshot__night_audit_log"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q12"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q13"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q14"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "DIVERGED",
+          "observed": "DIVERGED",
+          "status": "MET",
+          "target": "Q17"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q22"
+        }
+      ],
+      "parity": {
+        "Q12": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q13": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q14": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q17": [
+          "DIVERGED",
+          "DIVERGED",
+          "MET"
+        ],
+        "Q22": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ]
+      },
+      "purpose": "BASELINE",
+      "still_vacuous": [],
+      "title": "A two-room group block settling room by room",
+      "unmet": 0,
+      "unmet_detail": [],
+      "verdict": "PASS"
+    },
+    {
+      "activated_invariants": [],
+      "description": "",
+      "duration_s": 11.5,
+      "error": "",
+      "events": [],
+      "facts": {
+        "audit_actions": {},
+        "audit_logs": 0,
+        "business_date": "2026-09-09",
+        "extra_charges": 0,
+        "null_folio_charges": [],
+        "null_folio_payments": [],
+        "payments": 1,
+        "reconciliation": {
+          "folio_view": 0.0,
+          "misrouted_charges": 0,
+          "misrouted_payments": 0,
+          "reservation_view": 0.0,
+          "unattributed": 0.0,
+          "views_agree": true
+        }
+      },
+      "invariants": {
+        "INV-A02": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-A03": [
+          "VACUOUS",
+          "VACUOUS",
+          "MET"
+        ],
+        "INV-A05": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-C01": [
+          "VACUOUS",
+          "VACUOUS",
+          "MET"
+        ],
+        "INV-C02": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-C03": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-C04": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-D01": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-D03": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-D04": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ],
+        "INV-D06": [
+          "HOLDS",
+          "HOLDS",
+          "MET"
+        ]
+      },
+      "key": "DS-ACT-SHIFT@1.0",
+      "layers_run": [
+        "D1_PARITY",
+        "D2_GOLDEN",
+        "D4_INVARIANTS"
+      ],
+      "materialisation": {
+        "business_date": "2026-10-05",
+        "production_unchanged": true,
+        "rows_inserted": 10,
+        "rows_removed": 112,
+        "tables_touched": [
+          "guests",
+          "reservations",
+          "reservation_rooms",
+          "folios",
+          "reservation_night_rates",
+          "tax_lines",
+          "payments",
+          "shifts",
+          "shift_adjustments"
+        ]
+      },
+      "met": 57,
+      "not_run": 0,
+      "outcomes": [
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1050.00",
+          "observed": "1050.00",
+          "status": "MET",
+          "target": "charges_net"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "corporate_bookings"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "corporate_credit_used"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "credit_note_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "credit_note_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "extra_charges_net"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "extra_charges_non_room_rent"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "extra_charges_non_room_rent_net"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "extra_charges_reversals"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "extra_charges_room_rent"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "extra_charges_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1",
+          "observed": "1",
+          "status": "MET",
+          "target": "folios_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1",
+          "observed": "1",
+          "status": "MET",
+          "target": "guests_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "invoice_round_off_rows"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "invoice_round_off_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1050.00",
+          "observed": "1050.00",
+          "status": "MET",
+          "target": "invoice_rounded_grand_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1050.00",
+          "observed": "1050.00",
+          "status": "MET",
+          "target": "invoice_unrounded_grand_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "net_receivable"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "outstanding"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "overpayment_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "overpayment_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "payments_corrections"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1",
+          "observed": "1",
+          "status": "MET",
+          "target": "payments_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1050.00",
+          "observed": "1050.00",
+          "status": "MET",
+          "target": "payments_gross"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1050.00",
+          "observed": "1050.00",
+          "status": "MET",
+          "target": "payments_net"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "payments_reversals"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "payments_voided"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1",
+          "observed": "1",
+          "status": "MET",
+          "target": "reservations_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0.00",
+          "observed": "0.00",
+          "status": "MET",
+          "target": "room_discount"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1000.00",
+          "observed": "1000.00",
+          "status": "MET",
+          "target": "room_revenue"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1",
+          "observed": "1",
+          "status": "MET",
+          "target": "tax_base_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "2",
+          "observed": "2",
+          "status": "MET",
+          "target": "tax_lines_count"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "50.00",
+          "observed": "50.00",
+          "status": "MET",
+          "target": "tax_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "1000.00",
+          "observed": "1000.00",
+          "status": "MET",
+          "target": "taxable_total"
+        },
+        {
+          "detail": "",
+          "element": "financial",
+          "expected": "0",
+          "observed": "0",
+          "status": "MET",
+          "target": "void_request_count"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-A02"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "VACUOUS",
+          "observed": "VACUOUS",
+          "status": "MET",
+          "target": "INV-A03"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-A05"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "VACUOUS",
+          "observed": "VACUOUS",
+          "status": "MET",
+          "target": "INV-C01"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-C02"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-C03"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-C04"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-D01"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-D03"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-D04"
+        },
+        {
+          "detail": "",
+          "element": "invariants",
+          "expected": "HOLDS",
+          "observed": "HOLDS",
+          "status": "MET",
+          "target": "INV-D06"
+        },
+        {
+          "detail": "",
+          "element": "golden",
+          "expected": "UNRESOLVED",
+          "observed": "UNRESOLVED",
+          "status": "MET",
+          "target": "groups.detail__any_group"
+        },
+        {
+          "detail": "",
+          "element": "golden",
+          "expected": "UNRESOLVED",
+          "observed": "UNRESOLVED",
+          "status": "MET",
+          "target": "main.checkout__inhouse_reservation"
+        },
+        {
+          "detail": "",
+          "element": "golden",
+          "expected": "UNRESOLVED",
+          "observed": "UNRESOLVED",
+          "status": "MET",
+          "target": "reports.night_audit_snapshot__night_audit_log"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q12"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q13"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q14"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q17"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q18"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q20"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q21"
+        },
+        {
+          "detail": "",
+          "element": "parity",
+          "expected": "AGREED",
+          "observed": "AGREED",
+          "status": "MET",
+          "target": "Q22"
+        }
+      ],
+      "parity": {
+        "Q12": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q13": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q14": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q17": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q18": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q20": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q21": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ],
+        "Q22": [
+          "AGREED",
+          "AGREED",
+          "MET"
+        ]
+      },
+      "purpose": "ACTIVATE_INVARIANT",
+      "still_vacuous": [],
+      "title": "One front-desk shift, opened, transacted and balanced",
+      "unmet": 0,
+      "unmet_detail": [],
+      "verdict": "PASS"
+    }
+  ],
+  "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "production_sha256_before": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "production_unchanged": true
+}

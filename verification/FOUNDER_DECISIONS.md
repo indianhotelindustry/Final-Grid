@@ -1049,3 +1049,62 @@ Executed under this directive: `tools/restore_db.py` and `tools/test_restore_db.
 ## Consequence for the Phase 1 gate
 
 `PHASE 1 NOT READY FOR EXECUTION AUTHORIZATION` (readiness report, 2026-09-08) had three conversion conditions: Q-1…Q-6 ruled (**done**); a Slice 1 directive with a rehearsal record (**done, pending review**); adoption of `PHASE1_EXECUTION_PLAN.md` as the Phase 1 implementation directive (**not yet done**). Per this directive's next-step rule, Phase 1 financial implementation does **not** begin until: Recovery Foundation is reviewed; PD-006 is verified; the golden-master requirement (Q-4) is reviewed; a separate Phase 1 execution authorization is issued.
+
+---
+
+# Phase 1 Formal Acceptance — FG-P1-ACCEPTANCE-20260910-01
+
+| | |
+|---|---|
+| Recorded | 2026-09-10 |
+| Governed HEAD | `aa6d9e91e7294be731383f755d6998acf5f059fc` — the published Phase 1 baseline (`e69f2ac2` → `d15d848e` → `34307c37` → `6cd2ac6d` → `95083995` → `aa6d9e91`, `origin/main` aligned) |
+| Kind | Founder decisions: **formal acceptance of Phase 1** and the carry-forward dispositions below. Identifiers are those of the acceptance package (`P1-ACC`, `Q5-P1`, `GM-TAG`, `CF-nn`, `SR-n`, `DEF-n`); no new FD numbers are assigned by this entry. |
+| Evidence | `verification/evidence/20260909_phase1_completion_review/` · `20260909_phase1_verification_completion/` · `20260909_phase1_acceptance_prep/` · `20260909_five_commit_execution/` · `20260910_phase1_acceptance/` |
+| Not authorized by this entry | production deployment or activation · Phase 2 implementation · closure of any open carry-forward, pre-existing defect or semantic review item · any code, schema, data or ADR change |
+
+## P1-ACC — Phase 1 formally accepted
+
+> FORMALLY ACCEPT:
+> Phase 1 implementation = COMPLETE
+> Phase 1 verification = COMPLETE WITH DOCUMENTED LIMITATIONS
+> Phase 1 acceptance = ACCEPTED
+>
+> Phase 1 is accepted as a completed implementation phase at published baseline aa6d9e91, with documented carry-forward items. Acceptance does NOT mean production deployment, production activation, closure of all future carry-forward items, closure of pre-existing defects, closure of semantic review items, or authorization for Phase 2 implementation.
+
+State at recording: implementation units 1.1–1.5, 1.7, 1.8 delivered at `aa6d9e91` (unit 1.6 has no action under FD-010); verification: 22 of 24 financial writers runtime-exercised with no attribution failure, 33/33 constructor sites attributed statically, five registered datasets PASS, Q14 AGREED on datasets and diverging elsewhere by exactly the D11 ₹476.19, Phase 2a matrix 29/29, no Phase 1 attribution regression on any population; production `instance/pms.db` unchanged at `51dd83b7…30bc2` / 733,184 B; D11 rows unchanged. **Phase 1 is accepted, not deployed.**
+
+## Q5-P1 — Audit coupling retained universally
+
+> ALL FINANCIAL MUTATIONS SHOULD SATISFY STRICT AUDIT COUPLING. Do NOT weaken Q-5.
+
+Q-5 (Round 2) stands unchanged as the architectural requirement for every financial mutation. Delivered at `aa6d9e91`: strict coupling proven at 12 of 24 writers (routes-level writers and POS). The 12 non-strict writers (W-08, W-09, W-10, W-22, W-23 caller-supplied; W-11, W-12 entity-level; W-13, W-14 dedicated log; W-16, W-21 run-level; W-24 none) become **CF-10 — Financial Mutation Audit-Coupling Normalization**, carried forward to the bounded pre-Phase-2b work. **Not implemented under this directive.**
+
+## GM-TAG — Post-Phase-1 Golden Master adopted
+
+> ADOPT `phase1_aa6d9e91` as the authoritative post-Phase-1 Golden Master baseline. Do NOT delete or replace the historical Golden Master; it remains provenance for the before/after comparison.
+
+State at recording: `verification/masters/phase1_aa6d9e91/` — 158 surfaces, `gm-verify` 158/158 clean (packs `20260909_160149_gm_capture_phase1_aa6d9e91`, `20260909_160158_gm_verify_phase1_aa6d9e91`); historical `verification/masters/production/` untouched and still reporting the four declared E-6 differences (`20260909_160212_gm_verify_production`). The adopted master set and its packs are not within the commit scope authorized by §11 of this directive and remain untracked pending a separate commit authorization (see `20260910_phase1_acceptance/GOLDEN_MASTER_ADOPTION.md`).
+
+## CF-11 — Pre-existing credit defects deferred
+
+> Keep `settle_credit` and `redeem_credit_voucher` as pre-existing defects. They are NOT Phase 1 regressions. Do NOT fix them now. They require a separate bounded defect directive later.
+
+State at recording: both pass `notes=` to `Payment(...)`, which has no such column (`TypeError`); present since baseline commit `b5b2514` (2026-08-07); untouched by Phase 1; surfaced by bounded runtime verification (W-07, W-11). No code prepared.
+
+## SR-1 / SR-2 — Semantic reviews retained
+
+> INV-B06 (advance-payment / business-date semantics) and INV-D02 (cancellation-refund semantics): SEMANTIC REVIEW REQUIRED — NO PHASE 1 REGRESSION ESTABLISHED. Do NOT modify INV-B06, INV-D02, payment behaviour, refund behaviour, business-date behaviour or cancellation behaviour until resolved. Assigned to the architecture/business-semantics review track.
+
+## Carry-forward register — preserved
+
+Open, exactly as established by the completion review and the verification completion: **CF-5** unauthorized-role verification · **CF-6** replay coverage of the new reconciliation control · **CF-9** deployment verification · **CF-10** strict audit-coupling normalization · **CF-11** pre-existing credit defects · **SR-1** INV-B06 · **SR-2** INV-D02. None is closed by this entry. **CF-7** (governance acceptance entry) is closed by this entry. CF-1, CF-2, CF-3, CF-4 and CF-8 were closed by the verification completion, each with retained evidence.
+
+## Deployment
+
+> Phase 1 is ACCEPTED but NOT RELEASED/DEPLOYED. Release timing remains a separate operational decision.
+
+No deployment, rollout, production configuration change or production data mutation was performed or authorized.
+
+## Consequence for the Phase 2 gate
+
+Phase 2b entry conditions (Master Plan §05: Phase 1 complete; MP-D9 and MP-D5 settled; maker-checker operation-matrix ADR B-2) are now met as to "Phase 1 complete" only. MP-D9 remains OPEN and B-2 remains undefined. Phase 2 implementation scope is unchanged and **not authorized** by this entry.

@@ -1,0 +1,134 @@
+{
+ "directive": "FG-P1-COMPLETION-REVIEW-20260909-01",
+ "title": "FinalGrid Phase 1 completion / review gate",
+ "kind": "read-only review",
+ "reviewed": "2026-09-09",
+ "repository": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS",
+ "baseline": {
+  "head": "aa6d9e91e7294be731383f755d6998acf5f059fc",
+  "origin_main": "aa6d9e91e7294be731383f755d6998acf5f059fc",
+  "pushed": true,
+  "phase1_commits": [
+   "d15d848e2694adbe2560aabd359a9f9c85fdb6d2",
+   "34307c37858991c21ec2a13d995db8416819bf69",
+   "6cd2ac6d2f90c59cae5070236d614c717659bc04",
+   "9508399500be7d5051ddd4a73b0d53b12ac59d40",
+   "aa6d9e91e7294be731383f755d6998acf5f059fc"
+  ]
+ },
+ "status": "PHASE 1 COMPLETION REVIEW PASS - BASELINE aa6d9e91 ASSESSED",
+ "determination": "PHASE 1 COMPLETE WITH CARRY-FORWARD ITEMS",
+ "determination_option": "B",
+ "actions": {
+  "code_changed": false, "schema_changed": false, "database_changed": false, "fixtures_changed": false,
+  "ledgers_changed": false, "golden_master_changed": false, "governance_changed": false, "adr_changed": false,
+  "git_history_changed": false, "commit": false, "push": false, "harness_commands_executed": false
+ },
+ "independent_checks": {
+  "ast_constructor_scan_at_head": {
+   "sites": 33, "with_folio_id": 33, "without": 0,
+   "by_file": {"app/routes.py": 11, "app/services.py": 9, "app/seed.py": 5, "app/dev_seed.py": 4,
+               "app/cico_service.py": 1, "app/noshow_service.py": 1, "app/pos.py": 1, "app/reports.py": 1}
+  },
+  "app_diff_e69f2ac_to_aa6d9e91": {"files": 8, "insertions": 554, "deletions": 45},
+  "boundary": {
+   "models_py_changed": false, "folio_py_changed": false, "migrations_changed": false, "templates_changed": false,
+   "folio_id_nullable": true, "pragma_foreign_keys_in_app": false, "list_folios_roles": ["Admin", "Manager"],
+   "prune_old_logs_present": true, "files_outside_app_tools_verification": 0
+  },
+  "inv_run_summary_identical_to_gm_baseline": true,
+  "attribution_control_in_replay_NAS_SECTIONS": false
+ },
+ "scope_matrix": {
+  "requirements_assessed": 18, "delivered": 18, "delivered_qualified": 4, "not_delivered": 0,
+  "qualified": [
+   "all 24 writers (runtime breadth CF-1)",
+   "strict audit coupling (injection at 3 writers)",
+   "skipped-audit recovery / upsell (static only)",
+   "verification gate (CF-2, CF-3, CF-4)"
+  ],
+  "writers_runtime_exercised": ["W-05", "W-08", "W-13", "W-15", "W-20", "W-21"],
+  "writers_static_only": ["W-01", "W-02", "W-03", "W-04", "W-06", "W-07", "W-09", "W-10", "W-11", "W-12",
+                          "W-14", "W-16", "W-17", "W-18", "W-19", "W-22", "W-23", "W-24"]
+ },
+ "golden_master": {
+  "surfaces": 158, "clean": 157, "differences": 4, "surface": "main.night_audit",
+  "differences_detail": ["panel_ui.attribution[len] -> 8", "panel_ui[len] 24->25",
+                         "panel_ui.warn_conditions 1->2", "panel_ui.total_issues 1->2"],
+  "expected_delta": "E-6", "classification": "EXPECTED - correctly classified", "unexpected_differences": 0,
+  "recaptured_by_this_review": false,
+  "note": "declared differences persist until re-baselined at/after aa6d9e91 (gate G-3)"
+ },
+ "replay": {
+  "final": "PASS 10/10, 0 differences",
+  "intermediate_fail": "pack 013008: 320 differences, control initially inside folio_control; corrected before commit; pinned by T-N02b/c"
+ },
+ "invariants": {
+  "registered": 26, "holds": 17, "vacuous": 7, "violated": 2, "not_commissioned": ["INV-R01"], "overall": "FAIL",
+  "identical_to_pre_phase1_baseline": true,
+  "classification": {
+   "INV-A02": {"value": 4776.19, "population": 8, "category": "A expected baseline (FD-010, AR-001); disposition deferred to Phase 5 / B-3", "new_regression": false},
+   "INV-A03": {"value": 476.19, "population": 2, "category": "A expected baseline; same cause", "new_regression": false},
+   "INV-R01": {"category": "A / C - NOT_COMMISSIONED, Phase 6", "new_regression": false},
+   "vacuous_7": {"category": "A - empty populations, Phase 6", "new_regression": false}
+  },
+  "phase1_unfinished_work_in_failures": [],
+  "new_phase1_regressions": []
+ },
+ "d11": {"payments": [1, 2, 3, 4, 5, 6], "extra_charges": [1, 2], "total": 4776.19, "unchanged": true, "correction_refused_in_code": true},
+ "production_db": {"sha256": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2", "size": 733184, "unchanged": true, "schema_unchanged": true},
+ "boundary_violations_found": [],
+ "regressions_found": [],
+ "w20": {
+  "assessed_separately": true, "cases": "23/23", "code_changed": false, "vacuous_gap_closed": true,
+  "recorded_limitations": [
+   "repeat call bills newly elapsed hour (pre-existing product semantics)",
+   "waive path audit-after-commit untouched (non-financial)",
+   "charge date wall-clock (K-7, Q-3)"
+  ]
+ },
+ "recovery_regression": {
+  "tests": "19/19 OK", "rehearsal": "RR-20260908-01 PASS 16/16",
+  "open": ["B-11 encrypted restore not rehearsed", "B-5 PD-006 verified-state definition"]
+ },
+ "known_defects": {
+  "closed_by_phase1": ["K-4", "K-5 (financial writers)", "K-6", "K-8 (attribution)"],
+  "no_action_required": ["K-1", "K-2", "K-3", "K-18", "K-19", "K-20"],
+  "deferred_phase3": ["K-7", "K-9", "K-11"],
+  "deferred_phase4_5": ["K-12", "K-13", "K-14", "K-15"],
+  "remains_open": ["K-10 (time-bound ~2026-11-07)", "K-16 (FD-015 implementation)", "K-17 (B-11)"],
+  "deferred_phase2b": ["maker-checker (B-2)"],
+  "founder_decision_required_now": []
+ },
+ "carry_forward": [
+  {"id": "CF-1", "item": "runtime cases for 18 static-only writers; injection beyond W-05/W-15/W-20", "gate": "G-1"},
+  {"id": "CF-2", "item": "inv-run on new-activity copy (A02/A03, B01-B03 HOLD)", "gate": "G-1"},
+  {"id": "CF-3", "item": "ds-run/ds-coverage six datasets; Q14 parity", "gate": "G-1"},
+  {"id": "CF-4", "item": "Phase 2a 29-case matrix re-run at aa6d9e91", "gate": "G-1"},
+  {"id": "CF-5", "item": "T-N02 unauthorized-role negative cases", "gate": "G-1"},
+  {"id": "CF-6", "item": "attribution_control outside replay ledger", "gate": "Phase 6"},
+  {"id": "CF-7", "item": "governance index not extended past Round 2; Phase 1 acceptance unrecorded", "gate": "G-2"},
+  {"id": "CF-8", "item": "Golden Master carries 4 declared differences until re-baselined", "gate": "G-3"},
+  {"id": "CF-9", "item": "Phase 1 code committed/pushed, not deployed; pre-release live activity would create non-D11 NULL rows", "gate": "release decision (MP-D3)"}
+ ],
+ "phase2_gates": {
+  "G-1": "Phase 1 verification completion (or Founder acceptance of the delivered standard)",
+  "G-2": "Phase 1 acceptance recorded durably in FOUNDER_DECISIONS.md / MASTER_PLAN.md",
+  "G-3": "Golden Master re-baseline at/after aa6d9e91 (verification-only, Q-4 precedent) or explicit declared-difference ruling",
+  "G-4": "Phase 2b entry: MP-D9 ruled or interim default extended; maker-checker operation-matrix ADR (B-2)"
+ },
+ "founder_attention": [
+  "Phase 1 committed and pushed, not deployed (CF-9)",
+  "Verification breadth CF-1..CF-5: accept delivered standard or run a bounded verification-completion directive (recommended)",
+  "Golden Master re-baseline at aa6d9e91 (verification-only)",
+  "Audit-log pruning exposure ~2026-11-07 (B-6, no implementation directive yet)",
+  "W-20 repeat-call billing semantics (product rule, pre-existing)",
+  "Governance index / Phase 1 acceptance entry (CF-7)"
+ ],
+ "phase2_authorized": false,
+ "evidence_dir": {
+  "path": "verification/evidence/20260909_phase1_completion_review/",
+  "tracked": false,
+  "files": ["COMPLETION_REVIEW.md", "REQUIREMENT_MATRIX.md", "DEFERRED_ITEMS.md", "PHASE2_READINESS.md", "result.json"]
+ }
+}

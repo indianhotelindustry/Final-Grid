@@ -1,0 +1,27 @@
+COMMIT 03 — RECOVERY FOUNDATION
+directive: FG-COMMIT-EXECUTION-20260909-01
+commit: 6cd2ac6d2f90c59cae5070236d614c717659bc04
+parent: 34307c37858991c21ec2a13d995db8416819bf69
+subject: FinalGrid: establish recovery foundation
+author: SIPL Server <sukoondigitalmarketing@gmail.com>
+date: 2026-09-09 17:21:07 +0530
+tree: 20a43909c3791a7fada37136f41da46edc73c75e
+paths in commit: 10 (9 whole + FOUNDER_DECISIONS.md partial increment) — 10-vs-9 deviation is intentional and approved
+status codes:  9 A; 1 M;
+recovery tools: tools/restore_db.py (43f41194), tools/test_restore_db.py (8e726338) PRESENT
+FOUNDER_DECISIONS.md: blob 8a5a36569d29f19f09f4b386230437a3a96c5f99, 1051 lines = working tree; increment over commit 2 = hunk @@ -980,3 +980,72 @@ (+69/-0); Round 2 = 1; Q-1..Q-6 = 1 each; Architecture Resolution Round 1 = 1; ADR Adoption Baseline = 1 (no governance duplication); FD-xxx headings 19 = 19 at commit 2
+index after commit: empty; FOUNDER_DECISIONS.md now clean vs HEAD
+production db: UNCHANGED (sha 51dd83b7..., 733184 bytes, D11 4776.19, schema fp e38454ba..., audit_logs 23)
+origin/main: e69f2ac2... (unmoved)
+
+--- paths ---
+A	tools/restore_db.py
+A	tools/test_restore_db.py
+A	verification/evidence/20260908_recovery_foundation/IMPLEMENTATION_RECORD.md
+A	verification/evidence/20260908_recovery_foundation/RESTORE_REHEARSAL.md
+A	verification/evidence/20260908_recovery_foundation/backup_manifest.json
+A	verification/evidence/20260908_recovery_foundation/production_snapshot_byte_diff.json
+A	verification/evidence/20260908_recovery_foundation/restore_manifest.json
+A	verification/evidence/20260908_recovery_foundation/result.json
+A	verification/evidence/20260908_recovery_foundation/test_results.txt
+M	verification/FOUNDER_DECISIONS.md

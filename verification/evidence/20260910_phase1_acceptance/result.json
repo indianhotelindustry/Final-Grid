@@ -1,0 +1,40 @@
+{
+ "directive": "FG-P1-ACCEPTANCE-20260910-01",
+ "title": "FinalGrid Phase 1 formal acceptance and baseline freeze",
+ "kind": "Founder decision - approved; bounded governance recording",
+ "recorded": "2026-09-10",
+ "baseline_accepted": "aa6d9e91e7294be731383f755d6998acf5f059fc",
+ "phase1": {"implementation": "COMPLETE", "verification": "COMPLETE WITH DOCUMENTED LIMITATIONS", "acceptance": "ACCEPTED"},
+ "acceptance_does_not_mean": ["production deployment", "production activation", "closure of future carry-forward items", "closure of pre-existing defects", "closure of semantic review items", "authorization for Phase 2 implementation"],
+ "decisions": {
+  "P1-ACC": "Phase 1 formally accepted at aa6d9e91 with documented carry-forward items",
+  "Q5-P1": "Q-5 retained universally (all financial mutations should satisfy strict audit coupling); not weakened; 12 non-strict writers -> CF-10, bounded pre-Phase-2b work; not implemented",
+  "GM-TAG": "phase1_aa6d9e91 adopted as authoritative post-Phase-1 Golden Master; historical production set retained as provenance, not deleted or replaced",
+  "CF-11": "settle_credit and redeem_credit_voucher remain pre-existing defects, not Phase 1 regressions, not fixed; separate bounded defect directive later",
+  "SR-1_SR-2": "INV-B06 and INV-D02 remain SEMANTIC REVIEW REQUIRED; nothing modified; assigned to the architecture/business-semantics review track",
+  "deployment": "accepted but NOT released/deployed; release timing is a separate operational decision"
+ },
+ "carry_forwards": {
+  "open": ["CF-5", "CF-6", "CF-9", "CF-10", "CF-11", "SR-1", "SR-2"],
+  "closed_by_this_directive": ["CF-7"],
+  "closed_earlier": {"CF-1": "verification completion", "CF-2": "verification completion", "CF-3": "verification completion", "CF-4": "verification completion", "CF-8": "verification completion (adoption by GM-TAG)"}
+ },
+ "governance_records": {
+  "FOUNDER_DECISIONS.md": "appended section 'Phase 1 Formal Acceptance - FG-P1-ACCEPTANCE-20260910-01' (append-only; prior content byte-identical)",
+  "MASTER_PLAN.md": "appended section 17 'Phase 1 formal acceptance - status overlay' (append-only; eleven-phase sequence unchanged)",
+  "ADRs": "untouched; ADR-001..ADR-012 not reopened",
+  "Phase 2 scope": "unchanged; implementation not authorized"
+ },
+ "evidence_preserved": ["verification/evidence/20260909_phase1_completion_review/", "verification/evidence/20260909_phase1_verification_completion/", "verification/evidence/20260909_phase1_acceptance_prep/", "verification/evidence/20260909_five_commit_execution/"],
+ "evidence_created": "verification/evidence/20260910_phase1_acceptance/ (ACCEPTANCE_RECORD.md, CARRY_FORWARD_REGISTER.md, GOLDEN_MASTER_ADOPTION.md, result.json)",
+ "commit": {
+  "authorized": "exactly one local governance/evidence commit (section 11)",
+  "scope": ["verification/FOUNDER_DECISIONS.md", "verification/MASTER_PLAN.md", "verification/evidence/20260909_phase1_completion_review/", "verification/evidence/20260909_phase1_verification_completion/", "verification/evidence/20260909_phase1_acceptance_prep/", "verification/evidence/20260909_five_commit_execution/", "verification/evidence/20260910_phase1_acceptance/"],
+  "excluded": ["app/", "schema", "instance/pms.db", "ledgers", ".env", "archives", ".pyc", "__pycache__", "verification/masters/phase1_aa6d9e91/ (adopted, outside section-11 scope - separate authorization needed)", "eleven 2026-09-09 harness packs (outside section-11 scope)"],
+  "hash": "cannot be embedded in a file the commit contains; reported in the directive's final report",
+  "parent_must_be": "aa6d9e91e7294be731383f755d6998acf5f059fc",
+  "push": false
+ },
+ "production_anchor": {"sha256": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2", "size": 733184, "d11_payments": [1, 2, 3, 4, 5, 6], "d11_extra_charges": [1, 2], "d11_total": 4776.19, "audit_logs": 23, "schema_objects": 144, "verified": "read-only scratch copy before and after"},
+ "actions_not_taken": ["deploy", "production rollout", "production configuration change", "production data mutation", "code change", "schema change", "ADR change", "reset", "rebase", "amend", "force push", "push"]
+}

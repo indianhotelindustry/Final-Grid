@@ -1,0 +1,239 @@
+{
+ "directive": "FG-COMMIT-EXECUTION-20260909-01",
+ "basis": "FG-PRECOMMIT-STAGE-20260909-01 (PASS)",
+ "title": "FinalGrid five-commit release history execution",
+ "executed": "2026-09-09",
+ "repository": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS",
+ "branch": "main",
+ "status": "FIVE-COMMIT EXECUTION PASS - LOCAL HISTORY ESTABLISHED - PUSH NOT AUTHORIZED",
+ "head": {
+  "starting": "e69f2ac242f7fdc3e0c042ceb40dc0393280134b",
+  "final": "aa6d9e91e7294be731383f755d6998acf5f059fc",
+  "first_commit_parent_is_starting_head": true,
+  "origin_main": "e69f2ac242f7fdc3e0c042ceb40dc0393280134b",
+  "origin_main_unmoved": true,
+  "ahead_behind_origin": "0 behind / 5 ahead",
+  "unpushed_commits": 5,
+  "unpushed_expected": 5
+ },
+ "actions": {
+  "commits_created": 5,
+  "push_performed": false,
+  "amend": false,
+  "reset": false,
+  "rebase": false,
+  "squash": false,
+  "checkout_restore_clean": false,
+  "application_code_changed": false,
+  "production_data_changed": false,
+  "schema_changed": false,
+  "sixth_commit_created": false,
+  "evidence_dir_inserted_into_commits": false
+ },
+ "commits": [
+  {
+   "n": 1,
+   "name": "Ledger recapture",
+   "commit": "d15d848e2694adbe2560aabd359a9f9c85fdb6d2",
+   "parent": "e69f2ac242f7fdc3e0c042ceb40dc0393280134b",
+   "parent_count": 1,
+   "tree": "701c10cdc5af222693df078bf7433699221bb413",
+   "subject": "FinalGrid: recapture production ledger baseline",
+   "committed": "2026-09-09 17:19:10 +0530",
+   "paths": 55,
+   "target": 55,
+   "match": true,
+   "status_counts": {
+    "A": 26,
+    "D": 28,
+    "M": 1
+   },
+   "manifest_diff_empty": true,
+   "manifest": "20260909_precommit_staging/COMMIT_01_MANIFEST.txt",
+   "note": "47 ledger/evidence + 8 precommit-staging evidence files (approved to ride with commit 1)"
+  },
+  {
+   "n": 2,
+   "name": "Governance / ADR",
+   "commit": "34307c37858991c21ec2a13d995db8416819bf69",
+   "parent": "d15d848e2694adbe2560aabd359a9f9c85fdb6d2",
+   "parent_count": 1,
+   "tree": "e1000a8905daea5c810218eceb3cb6ae3e81d113",
+   "subject": "FinalGrid governance: adopt architecture baseline",
+   "committed": "2026-09-09 17:20:16 +0530",
+   "paths": 30,
+   "target": 30,
+   "match": true,
+   "status_counts": {
+    "M": 15,
+    "A": 15
+   },
+   "manifest_diff_empty": true,
+   "manifest": "20260909_precommit_staging/COMMIT_02_MANIFEST.txt",
+   "founder_decisions": "partial: blob ab3e3aed640035a3094b9bcb4bd54e3234f63a5a, 982 lines, hunk @@ -865,3 +865,118 @@, Q-1..Q-6 = 0",
+   "master_plan": "whole (intentional)"
+  },
+  {
+   "n": 3,
+   "name": "Recovery foundation",
+   "commit": "6cd2ac6d2f90c59cae5070236d614c717659bc04",
+   "parent": "34307c37858991c21ec2a13d995db8416819bf69",
+   "parent_count": 1,
+   "tree": "20a43909c3791a7fada37136f41da46edc73c75e",
+   "subject": "FinalGrid: establish recovery foundation",
+   "committed": "2026-09-09 17:21:07 +0530",
+   "paths": 10,
+   "target": 10,
+   "match": true,
+   "status_counts": {
+    "A": 9,
+    "M": 1
+   },
+   "manifest_diff_empty": true,
+   "manifest": "20260909_precommit_staging/COMMIT_03_MANIFEST.txt",
+   "founder_decisions": "increment: blob 8a5a36569d29f19f09f4b386230437a3a96c5f99, 1051 lines, hunk @@ -980,3 +980,72 @@ (+69/-0), Q-1..Q-6 = 1 each, no governance duplication",
+   "note": "10 vs 9: FOUNDER_DECISIONS.md appears in commits 2 and 3 by the authorized split (approved)"
+  },
+  {
+   "n": 4,
+   "name": "Golden master",
+   "commit": "9508399500be7d5051ddd4a73b0d53b12ac59d40",
+   "parent": "6cd2ac6d2f90c59cae5070236d614c717659bc04",
+   "parent_count": 1,
+   "tree": "f5abd0e48224f30894909e7fb154fd4f1274d6cd",
+   "subject": "FinalGrid: freeze Phase 1 golden master",
+   "committed": "2026-09-09 17:21:31 +0530",
+   "paths": 184,
+   "target": 184,
+   "match": true,
+   "status_counts": {
+    "A": 27,
+    "M": 151,
+    "D": 6
+   },
+   "manifest_diff_empty": true,
+   "manifest": "20260909_precommit_staging/COMMIT_04_MANIFEST.txt"
+  },
+  {
+   "n": 5,
+   "name": "Phase 1 + W-20",
+   "commit": "aa6d9e91e7294be731383f755d6998acf5f059fc",
+   "parent": "9508399500be7d5051ddd4a73b0d53b12ac59d40",
+   "parent_count": 1,
+   "tree": "fa34000ec53ec2a3f12be33e69d7a85b8037f4f3",
+   "subject": "FinalGrid: implement Phase 1 financial foundation",
+   "committed": "2026-09-09 17:21:55 +0530",
+   "paths": 34,
+   "target": 34,
+   "match": true,
+   "status_counts": {
+    "M": 8,
+    "A": 26
+   },
+   "manifest_diff_empty": true,
+   "manifest": "20260909_precommit_staging/COMMIT_05_MANIFEST.txt",
+   "folio_py_staged": false,
+   "pyc_staged": 0,
+   "app_diff": "8 files changed, 554 insertions(+), 45 deletions(-)"
+  }
+ ],
+ "path_accounting": {
+  "sum_path_entries": 313,
+  "distinct_paths": 312,
+  "expected_distinct": 312,
+  "staged_twice": [
+   "verification/FOUNDER_DECISIONS.md"
+  ],
+  "folio_py_in_new_commits": 0,
+  "tracked_junk_in_head": 0,
+  "preexisting_pem_note": "installer/update_pubkey.pem: public key tracked since b5b2514 (2026-08-07), untouched, out of scope"
+ },
+ "working_tree_after_commit5": {
+  "porcelain": 0,
+  "porcelain_uall": 0,
+  "index_staged": 0,
+  "diff_head": 0,
+  "dotenv": {
+   "exists": true,
+   "tracked": false
+  },
+  "pms_db": {
+   "exists": true,
+   "tracked": false
+  }
+ },
+ "production": {
+  "path": "instance/pms.db",
+  "sha256": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "sha256_expected": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "sha256_ok": true,
+  "size": 733184,
+  "size_expected": 733184,
+  "size_ok": true,
+  "d11_payments": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "d11_payment_amounts": {
+   "1": 800.0,
+   "2": 400.0,
+   "3": 1500.0,
+   "4": 1000.0,
+   "5": 500.0,
+   "6": 100.0
+  },
+  "d11_extra_charges": [
+   1,
+   2
+  ],
+  "d11_charge_amounts": {
+   "1": 380.95,
+   "2": 95.24
+  },
+  "d11_total": 4776.19,
+  "d11_unchanged": true,
+  "schema_objects": 144,
+  "schema_fingerprint": "e38454ba3c4ad27f7d6ef24168aefd30facf21ba8c68a1feab461063f2390fb0",
+  "schema_unchanged": true,
+  "integrity_check": "ok",
+  "audit_logs": 23,
+  "readings_taken": 7,
+  "no_drift_across_readings": {
+   "sha256": true,
+   "size": true,
+   "d11_payment_amounts": true,
+   "d11_charge_amounts": true,
+   "d11_total": true,
+   "schema_fingerprint": true,
+   "schema_objects": true,
+   "audit_logs": true,
+   "integrity": true
+  },
+  "method": "file copied to scratch and inspected read-only (mode=ro); production file never opened by sqlite; sha256/size read from original before each copy"
+ },
+ "fsck": "git fsck --no-dangling exit 0",
+ "evidence_dir": {
+  "path": "verification/evidence/20260909_five_commit_execution/",
+  "created_after_commit_5": true,
+  "tracked": false,
+  "files": [
+   "EXECUTION_RECORD.md",
+   "COMMIT_01_RESULT.txt",
+   "COMMIT_02_RESULT.txt",
+   "COMMIT_03_RESULT.txt",
+   "COMMIT_04_RESULT.txt",
+   "COMMIT_05_RESULT.txt",
+   "FINAL_VERIFICATION.md",
+   "result.json"
+  ]
+ },
+ "limitations": [
+  "Git execution only; no inv-run, gm-verify, replay-verify or test suite re-executed.",
+  "Push forbidden and not performed; origin/main remains e69f2ac2 with 5 local commits ahead.",
+  "This evidence directory is untracked; committing it is a Founder decision."
+ ]
+}

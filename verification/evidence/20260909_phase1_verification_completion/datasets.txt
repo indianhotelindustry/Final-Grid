@@ -1,0 +1,19 @@
+registered datasets: ['DS-ACT-INHOUSE@1.0', 'DS-ACT-CORRECTION@1.0', 'DS-ACT-VOIDCN@1.0', 'DS-ACT-GROUP@1.0', 'DS-ACT-SHIFT@1.0']
+====================================================================================================
+[ds] DS-ACT-INHOUSE@1.0 - One guest in house part paid, one departed and settled
+  verdict=PASS met=59 unmet=0 not_run=0  A02=('HOLDS', 'HOLDS', 'MET') A03=None Q14=('AGREED', 'AGREED', 'MET')  null_folio=[]/[]  recon={'reservation_view': 0.0, 'folio_view': 0.0, 'unattributed': 0.0, 'views_agree': True, 'misrouted_charges': 0, 'misrouted_payments': 0}
+====================================================================================================
+[ds] DS-ACT-CORRECTION@1.0 - A charge and a payment, each corrected the way the audit requires
+  verdict=PASS met=55 unmet=0 not_run=0  A02=('HOLDS', 'HOLDS', 'MET') A03=('HOLDS', 'HOLDS', 'MET') Q14=('AGREED', 'AGREED', 'MET')  null_folio=[]/[]  recon={'reservation_view': 1200.0, 'folio_view': 1200.0, 'unattributed': 0.0, 'views_agree': True, 'misrouted_charges': 0, 'misrouted_payments': 0}
+====================================================================================================
+[ds] DS-ACT-VOIDCN@1.0 - A duplicate payment voided, and a disputed charge credited
+  verdict=PASS met=54 unmet=0 not_run=0  A02=('HOLDS', 'HOLDS', 'MET') A03=('HOLDS', 'HOLDS', 'MET') Q14=('AGREED', 'AGREED', 'MET')  null_folio=[]/[]  recon={'reservation_view': 200.0, 'folio_view': 200.0, 'unattributed': 0.0, 'views_agree': True, 'misrouted_charges': 0, 'misrouted_payments': 0}
+====================================================================================================
+[ds] DS-ACT-GROUP@1.0 - A two-room group block settling room by room
+  verdict=PASS met=56 unmet=0 not_run=0  A02=('HOLDS', 'HOLDS', 'MET') A03=('HOLDS', 'HOLDS', 'MET') Q14=('AGREED', 'AGREED', 'MET')  null_folio=[]/[]  recon={'reservation_view': 500.0, 'folio_view': 500.0, 'unattributed': 0.0, 'views_agree': True, 'misrouted_charges': 0, 'misrouted_payments': 0}
+====================================================================================================
+[ds] DS-ACT-SHIFT@1.0 - One front-desk shift, opened, transacted and balanced
+  verdict=PASS met=57 unmet=0 not_run=0  A02=('HOLDS', 'HOLDS', 'MET') A03=('VACUOUS', 'VACUOUS', 'MET') Q14=('AGREED', 'AGREED', 'MET')  null_folio=[]/[]  recon={'reservation_view': 0.0, 'folio_view': 0.0, 'unattributed': 0.0, 'views_agree': True, 'misrouted_charges': 0, 'misrouted_payments': 0}
+====================================================================================================
+ALL PASS: True   production unchanged: True
+datasets.json written

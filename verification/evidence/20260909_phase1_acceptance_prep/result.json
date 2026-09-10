@@ -1,0 +1,58 @@
+{
+ "directive": "FG-P1-ACCEPTANCE-PREP-20260909-01",
+ "title": "FinalGrid Phase 1 acceptance and carry-forward resolution pack",
+ "type": "read-only governance preparation",
+ "prepared": "2026-09-10",
+ "baseline": {"head": "aa6d9e91e7294be731383f755d6998acf5f059fc", "origin_main": "aa6d9e91e7294be731383f755d6998acf5f059fc", "tracked_modifications": 0},
+ "status": "PHASE 1 ACCEPTANCE PREPARATION PASS - FOUNDER GATE PENDING",
+ "phase1_status": {
+  "implementation": "COMPLETE",
+  "verification": "COMPLETE WITH DOCUMENTED LIMITATIONS",
+  "formal_acceptance": "PENDING FOUNDER RESOLUTION",
+  "declared_accepted_here": false
+ },
+ "actions": {"implementation_changed": false, "schema_changed": false, "database_changed": false, "deployment": false, "commit": false, "push": false,
+             "founder_decisions_md_modified": false, "master_plan_md_modified": false, "adrs_modified": false},
+ "production_anchor": {"sha256": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2", "size": 733184, "unchanged": true},
+ "settled_facts": [
+  "Phase 1 implementation committed and published at aa6d9e91",
+  "22 of 24 financial writers runtime-exercised; 0 attribution failures; 0 new unattributed rows on any copy",
+  "2 writers not runtime-exercised due to pre-existing TypeError defects: settle_credit (W-07), redeem_credit_voucher (W-11)",
+  "static proof covers the remaining writers (33/33 constructor sites)",
+  "five registered datasets passed",
+  "DS-CORE-WALKIN is not a declared dataset",
+  "Q14 AGREED on all five datasets",
+  "Q14 divergence on production / new-activity copies is exactly the D11 476.19; not a Phase 1 attribution regression",
+  "Phase 2a matrix 29/29",
+  "Golden Master phase1_aa6d9e91 158/158 clean; historical production set intact with the 4 expected E-6 differences",
+  "production DB unchanged",
+  "D11 unchanged (payments 1-6, extra_charges 1-2, 4776.19, folio_id NULL)",
+  "no Phase 1 attribution regression found"
+ ],
+ "issues": {
+  "issue_1_q5": {"item": "Q5-P1", "strict_writers": 12, "non_strict_writers": 12,
+                 "non_strict": {"A-NF-caller": ["W-08", "W-09", "W-10", "W-22", "W-23"], "A-NF-entity": ["W-11", "W-12"], "A-DED": ["W-13", "W-14"], "run-level": ["W-16", "W-21"], "A0": ["W-24"]},
+                 "recommendation": "RETAIN Q-5 AS THE ARCHITECTURAL TARGET FOR ALL FINANCIAL MUTATIONS; do not weaken; carry the 12 non-strict writers forward as CF-10 for a later bounded implementation (suggested: pre-Phase-2b)", "implemented_now": false},
+  "issue_2_inv_b06": {"item": "SR-1", "classification": "SEMANTIC REVIEW REQUIRED - NO PHASE 1 REGRESSION ESTABLISHED", "changed": false, "suggested_owner": "Phase 3 (ADR-004 / B-10) + Phase 6 invariant declaration"},
+  "issue_3_inv_d02": {"item": "SR-2", "classification": "SEMANTIC REVIEW REQUIRED - NO PHASE 1 REGRESSION ESTABLISHED", "changed": false, "suggested_owner": "Phase 6 invariant review, or Phase 2b if B-2 covers refunds"},
+  "issue_4_credit_defects": {"items": ["DEF-1 settle_credit", "DEF-2 redeem_credit_voucher"], "classification": "pre-existing defects surfaced by bounded runtime verification; not Phase 1 regressions; not fixed under Phase 1", "origin_commit": "b5b2514 (2026-08-07)", "carried_as": "CF-11", "candidate_known_defect_id": "K-21"},
+  "issue_5_carry_forwards_preserved": ["CF-5", "CF-6", "CF-7", "CF-9"]
+ },
+ "carry_forward_register": {
+  "closed": {"CF-1": "16 writers at runtime, injection at 8 (residual -> CF-11)", "CF-2": "clean copy holds all but D11 exception", "CF-3": "5/5 datasets, Q14 AGREED on datasets (DS-CORE-WALKIN -> Phase 6)", "CF-4": "29/29", "CF-8": "phase1_aa6d9e91 158/158 (adoption -> GM-TAG)"},
+  "open": {"CF-5": "unauthorized-role cases not run (low risk)", "CF-6": "replay coverage of attribution_control (Phase 6, deliberate)", "CF-7": "governance acceptance entry (closed by P1-ACC)", "CF-9": "deployment / post-release verification (decision REL)", "CF-10": "Q-5 coupling at 12 non-strict writers (decision Q5-P1)", "CF-11": "pre-existing credit defects (decision DEF-FIX)"}
+ },
+ "founder_decision_items": [
+  {"item": "P1-ACC", "subject": "Phase 1 formal acceptance", "recommendation": "ACCEPT with documented limitations; authorize the acceptance entry (append to FOUNDER_DECISIONS.md + MASTER_PLAN.md overlay) which closes CF-7"},
+  {"item": "Q5-P1", "subject": "financial mutation audit coupling scope", "recommendation": "retain Q-5 as target for all financial mutations; CF-10 to a bounded pre-Phase-2b directive; acceptance not conditional on it"},
+  {"item": "GM-TAG", "subject": "post-Phase-1 Golden Master adoption", "recommendation": "adopt phase1_aa6d9e91 as Phase 2 Gate G reference; commit master set and packs; keep production tag as historical"},
+  {"item": "EV-COMMIT", "subject": "untracked evidence", "recommendation": "commit all Phase 1 evidence with the acceptance entry in one governance commit"},
+  {"item": "DEF-FIX", "subject": "pre-existing credit defects", "recommendation": "bounded defect-fix directive outside Phase 1, before any live use of credit recovery / vouchers"},
+  {"item": "REL", "subject": "deployment of aa6d9e91 (CF-9)", "recommendation": "release timing per MP-D3 / PD controls; decide together with DEF-FIX; pre-release live NULL rows need section-3 classification"},
+  {"item": "SR-ASSIGN", "subject": "semantic reviews SR-1 / SR-2", "recommendation": "assign owners/phases; no ruling on semantics requested now"}
+ ],
+ "not_reopened": ["D11 (FD-010, Q-2, AR-001, MP-D11)", "Q14 divergence = FD-010 consequence", "wall-clock dating (Q-3 -> Phase 3)", "FK / NOT NULL / migration mechanism (Phase 4/5; B-3, B-4, B-9)", "FD-015 (decided; implementation pending)", "scheduler / retention / maker-checker / reporting authorization (B-1, B-6, B-2, B-7)", "MP-D9 (Phase 2b entry condition)", "DS-CORE-WALKIN (Phase 6)", "W-20 repeat-call billing (recorded)"],
+ "evidence_dir": {"path": "verification/evidence/20260909_phase1_acceptance_prep/", "tracked": false,
+  "files": ["ACCEPTANCE_RECOMMENDATION.md", "FOUNDER_DECISION_ITEMS.md", "CARRY_FORWARD_REGISTER.md", "SEMANTIC_REVIEW_REGISTER.md", "result.json"]},
+ "inputs": ["verification/evidence/20260909_phase1_completion_review/", "verification/evidence/20260909_phase1_verification_completion/", "verification/evidence/20260909_five_commit_execution/", "verification/evidence/20260909_phase1_execution/", "verification/evidence/20260908_golden_master/", "verification/evidence/20260909_w20_runtime/", "verification/evidence/20260908_recovery_foundation/"]
+}

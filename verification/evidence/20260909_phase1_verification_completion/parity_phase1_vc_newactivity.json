@@ -1,0 +1,621 @@
+{
+  "Q14": {
+    "detail": {
+      "folio_count": 15,
+      "folio_paid": "8400.0",
+      "reservation_paid": "12700.0",
+      "total_charges": 12,
+      "total_payments": 15,
+      "unrouted_charges": 2,
+      "unrouted_payments": 6
+    },
+    "divergences": 1,
+    "implementations": {
+      "sum over folios (charges)": "2582.0",
+      "sum over reservations (charges)": "3058.19"
+    },
+    "verdict": "DIVERGED"
+  },
+  "evidence_pack": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS\\verification\\evidence\\20260909_155829_phase1_vc_newactivity",
+  "overall": "FAIL",
+  "quantities": {
+    "Q01": {
+      "detail": {
+        "by_source": {
+          "OTA": 1,
+          "Walk-in": 14
+        },
+        "by_status": {
+          "CheckedIn": 4,
+          "CheckedOut": 8,
+          "Confirmed": 1,
+          "NoShow": 1,
+          "Reserved": 1
+        }
+      },
+      "divergences": 0,
+      "implementations": {
+        "reservations.count": "15"
+      },
+      "verdict": "SINGLE_SOURCE"
+    },
+    "Q02": {
+      "detail": {
+        "by_category": {
+          "Other Income": "1500.00",
+          "Room": "4761.91",
+          "Tip": "482.00",
+          "UNCLASSIFIED": "600.00",
+          "late_checkout": "476.19"
+        },
+        "count": 12,
+        "reversal_rows": 0
+      },
+      "divergences": 0,
+      "implementations": {
+        "raw sum(amount)": "7820.10",
+        "signed sum (correction-aware)": "7820.10"
+      },
+      "verdict": "AGREED"
+    },
+    "Q03": {
+      "detail": {
+        "D2_single_night_total": "15380.95",
+        "per_reservation": {
+          "1": {
+            "d1_canonical": "761.90",
+            "d2_single_night": "761.90",
+            "d3_rate_x_nights": "761.90",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "10": {
+            "d1_canonical": "1000.00",
+            "d2_single_night": "1000.00",
+            "d3_rate_x_nights": "1000.00",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "11": {
+            "d1_canonical": "1000.00",
+            "d2_single_night": "1000.00",
+            "d3_rate_x_nights": "1000.00",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "12": {
+            "d1_canonical": "1000.00",
+            "d2_single_night": "1000.00",
+            "d3_rate_x_nights": "1000.00",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "13": {
+            "d1_canonical": "1000.00",
+            "d2_single_night": "1000.00",
+            "d3_rate_x_nights": "1000.00",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "14": {
+            "d1_canonical": "1000.00",
+            "d2_single_night": "1000.00",
+            "d3_rate_x_nights": "1000.00",
+            "has_room_rent": true,
+            "nights": 1
+          },
+          "15": {
+            "d1_canonical": "1619.05",
+            "d2_single_night": "1619.05",
+            "d3_rate_x_nights": "1619.05",
+            "has_room_rent": true,
+            "nights": 1
+          },
+          "2": {
+            "d1_canonical": "1428.57",
+            "d2_single_night": "1428.57",
+            "d3_rate_x_nights": "1428.57",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "3": {
+            "d1_canonical": "952.38",
+            "d2_single_night": "952.38",
+            "d3_rate_x_nights": "952.38",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "4": {
+            "d1_canonical": "476.19",
+            "d2_single_night": "476.19",
+            "d3_rate_x_nights": "476.19",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "5": {
+            "d1_canonical": "1000.00",
+            "d2_single_night": "1000.00",
+            "d3_rate_x_nights": "1000.00",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "6": {
+            "d1_canonical": "1000.00",
+            "d2_single_night": "1000.00",
+            "d3_rate_x_nights": "1000.00",
+            "has_room_rent": false,
+            "nights": 1
+          },
+          "7": {
+            "d1_canonical": "1142.86",
+            "d2_single_night": "1142.86",
+            "d3_rate_x_nights": "1142.86",
+            "has_room_rent": true,
+            "nights": 1
+          },
+          "8": {
+            "d1_canonical": "1000.00",
+            "d2_single_night": "1000.00",
+            "d3_rate_x_nights": "1000.00",
+            "has_room_rent": true,
+            "nights": 1
+          },
+          "9": {
+            "d1_canonical": "1000.00",
+            "d2_single_night": "1000.00",
+            "d3_rate_x_nights": "1000.00",
+            "has_room_rent": false,
+            "nights": 1
+          }
+        },
+        "reservations_with_room_rent_rows": 4
+      },
+      "divergences": 0,
+      "implementations": {
+        "D1 canonical (get_room_revenue)": "15380.95",
+        "D3 report style (rate x nights)": "15380.95"
+      },
+      "verdict": "AGREED"
+    },
+    "Q04": {
+      "detail": {
+        "per_date": {
+          "2026-08-09": {
+            "kpi_helpers": "1761.9",
+            "night_audit": "1761.9",
+            "posted_room_rent": "0.0"
+          },
+          "2026-08-10": {
+            "kpi_helpers": "10619.05",
+            "night_audit": "10619.05",
+            "posted_room_rent": "4342.86"
+          },
+          "2026-08-11": {
+            "kpi_helpers": "0.0",
+            "night_audit": "0.0",
+            "posted_room_rent": "0.0"
+          },
+          "2026-09-09": {
+            "kpi_helpers": "0.0",
+            "night_audit": "0.0",
+            "posted_room_rent": "0.0"
+          }
+        },
+        "posted_room_rent_total": "4342.86"
+      },
+      "divergences": 2,
+      "implementations": {
+        "NightAuditService.revenue_summary": "12380.95",
+        "kpi_helpers.get_accrual_room_revenue": "12380.95",
+        "sum(posted room_rent charges)": "4342.86"
+      },
+      "verdict": "DIVERGED"
+    },
+    "Q05": {
+      "detail": {
+        "category_source_counts": {
+          "charge_category": 8,
+          "description_parsed": 4
+        },
+        "per_date": {
+          "2026-08-09": {
+            "kpi_helpers": "380.95",
+            "night_audit": "380.95",
+            "night_audit_by_category": {
+              "Late Check-out \u2014 02": "380.95"
+            }
+          },
+          "2026-08-10": {
+            "kpi_helpers": "2577.24",
+            "night_audit": "2577.24",
+            "night_audit_by_category": {
+              "Late Check-out \u2014 12": "95.24",
+              "No-Show Fee (fixed)": "500.0",
+              "Other Income \u2014 VC OTA income": "1200.0",
+              "Other Income \u2014 VC income": "300.0",
+              "Tip \u2014 VC Waiter": "482.0"
+            }
+          },
+          "2026-08-11": {
+            "kpi_helpers": "419.05",
+            "night_audit": "419.05",
+            "night_audit_by_category": {
+              "Upsell Rate Adjustment \u2014 sold above tariff (VC upsell)": "419.05"
+            }
+          },
+          "2026-09-09": {
+            "kpi_helpers": "100.0",
+            "night_audit": "100.0",
+            "night_audit_by_category": {
+              "VC extra": "100.0"
+            }
+          }
+        }
+      },
+      "divergences": 0,
+      "implementations": {
+        "NightAuditService.revenue_summary": "3477.24",
+        "kpi_helpers.get_accrual_extras": "3477.24"
+      },
+      "verdict": "AGREED"
+    },
+    "Q06": {
+      "detail": {
+        "distinct_sources": 6,
+        "inflation_factor": "2.00",
+        "per_date": {
+          "2026-08-09": {
+            "gst_report_deduped": "1142.85",
+            "night_audit_raw": "2285.7"
+          },
+          "2026-08-10": {
+            "gst_report_deduped": "2952.38",
+            "night_audit_raw": "5904.76"
+          },
+          "2026-08-11": {
+            "gst_report_deduped": "0.00",
+            "night_audit_raw": "0.0"
+          },
+          "2026-09-09": {
+            "gst_report_deduped": "0.00",
+            "night_audit_raw": "0.0"
+          }
+        },
+        "tax_line_count": 12
+      },
+      "divergences": 2,
+      "implementations": {
+        "deduplicated by charge source": "4095.23",
+        "raw sum of all tax lines": "8190.46"
+      },
+      "verdict": "DIVERGED"
+    },
+    "Q07": {
+      "detail": {
+        "by_component": {
+          "CGST": "102.37",
+          "SGST": "102.37"
+        }
+      },
+      "divergences": 1,
+      "implementations": {
+        "live compute_stay_gst": "900.86",
+        "stored TaxLine rows": "204.74"
+      },
+      "verdict": "DIVERGED"
+    },
+    "Q08": {
+      "detail": {
+        "reservations_with_discount": 0,
+        "suppressed_by_csa": []
+      },
+      "divergences": 0,
+      "implementations": {
+        "NightAuditService.discount_total": "0.0",
+        "calculate_stay_amount.discount": "0.0",
+        "reservations.discount_amount field": "0.00"
+      },
+      "verdict": "AGREED"
+    },
+    "Q09": {
+      "detail": {
+        "payment_count": 15,
+        "reversal_rows": 0,
+        "voided_count": 0
+      },
+      "divergences": 0,
+      "implementations": {
+        "raw ORM sum": "12700.00",
+        "raw SQL func.sum": "12700.00",
+        "signed (signed_payment_amount)": "12700.0",
+        "via calculate_stay_amount": "12700.0"
+      },
+      "verdict": "AGREED"
+    },
+    "Q10": {
+      "detail": {
+        "by_category": {
+          "direct_payment": "11700.00",
+          "ota_receivable": "1000.00"
+        },
+        "by_mode": {
+          "Card": "500.00",
+          "Cash": "10200.00",
+          "Other OTA Paid": "1000.00",
+          "UPI": "1000.00"
+        },
+        "by_purpose": {
+          "advance": "700.00",
+          "settlement": "12000.00"
+        }
+      },
+      "divergences": 0,
+      "implementations": {
+        "ORM by category (direct_payment)": "11700.00",
+        "kpi_helpers.get_cash_revenue summed": "11700.0"
+      },
+      "verdict": "AGREED"
+    },
+    "Q11": {
+      "detail": {
+        "night_audit_total_refunds": "0.0",
+        "refund_row_count": 0,
+        "void_count": 0
+      },
+      "divergences": 0,
+      "implementations": {
+        "payment_purpose = refund (true refunds)": "0",
+        "voided payments (what night audit calls refunds)": "0"
+      },
+      "verdict": "VACUOUS"
+    },
+    "Q12": {
+      "detail": {
+        "cases": [],
+        "reservations_disagreeing": 0
+      },
+      "divergences": 0,
+      "implementations": {
+        "balance (unrounded grand total)": "6640.0",
+        "settlement_balance (invoiced total)": "6640.0"
+      },
+      "verdict": "AGREED"
+    },
+    "Q13": {
+      "detail": {
+        "by_balance": {
+          "owing": 7,
+          "settled": 8
+        },
+        "by_settlement": {
+          "owing": 7,
+          "settled": 8
+        }
+      },
+      "divergences": 0,
+      "implementations": {
+        "by balance basis": "{'owing': 7, 'settled': 8}",
+        "by settlement basis": "{'owing': 7, 'settled': 8}"
+      },
+      "verdict": "AGREED"
+    },
+    "Q14": {
+      "detail": {
+        "folio_count": 15,
+        "folio_paid": "8400.0",
+        "reservation_paid": "12700.0",
+        "total_charges": 12,
+        "total_payments": 15,
+        "unrouted_charges": 2,
+        "unrouted_payments": 6
+      },
+      "divergences": 1,
+      "implementations": {
+        "sum over folios (charges)": "2582.0",
+        "sum over reservations (charges)": "3058.19"
+      },
+      "verdict": "DIVERGED"
+    },
+    "Q15": {
+      "detail": {
+        "audit_log_count": 2,
+        "fields_compared_per_date": [
+          "total_revenue",
+          "accrual_revenue",
+          "occupancy_count",
+          "reconciliation_difference"
+        ],
+        "per_date": {
+          "2026-08-09": {
+            "accrual_revenue": {
+              "recomputed": "2142.85",
+              "stored": "1142.85"
+            },
+            "occupancy_count": {
+              "recomputed": "1.0",
+              "stored": "1.0"
+            },
+            "reconciliation_difference": {
+              "recomputed": "0.0",
+              "stored": "-0.01"
+            },
+            "snapshot_valid": true,
+            "status": "Completed",
+            "total_revenue (cash)": {
+              "recomputed": "1200.0",
+              "stored": "1200.00"
+            }
+          },
+          "2026-08-10": {
+            "accrual_revenue": {
+              "recomputed": "13196.29",
+              "stored": "12777.24"
+            },
+            "occupancy_count": {
+              "recomputed": "10.0",
+              "stored": "4.0"
+            },
+            "reconciliation_difference": {
+              "recomputed": "0.0",
+              "stored": "0.00"
+            },
+            "snapshot_valid": true,
+            "status": "Completed",
+            "total_revenue (cash)": {
+              "recomputed": "8800.0",
+              "stored": "8800.00"
+            }
+          }
+        }
+      },
+      "divergences": 3,
+      "implementations": {
+        "recomputed NightAuditService (\u03a3 compared fields)": "25350.14",
+        "stored NightAuditLog (\u03a3 compared fields)": "23925.08"
+      },
+      "verdict": "DIVERGED"
+    },
+    "Q16": {
+      "detail": {
+        "business_date": "2026-08-11",
+        "concepts_compared": 7,
+        "surface": "/reports/flash?date=2026-08-11"
+      },
+      "divergences": 0,
+      "implementations": {
+        "ADR::kpi_helpers.get_adr": "1190.48",
+        "ADR::reports.flash.arr": "1190.48",
+        "RevPAR::kpi_helpers.get_revpar": "128.57",
+        "RevPAR::reports.flash.revpar": "128.57",
+        "accrual revenue::kpi_helpers.get_accrual_revenue": "419.05",
+        "accrual revenue::reports.flash.accrual_net": "419.05",
+        "daily collections::kpi_helpers.get_daily_revenue": "1700.0",
+        "daily collections::reports.flash.day_revenue": "1700.0",
+        "month-to-date collections::kpi_helpers.get_monthly_revenue": "11700.0",
+        "month-to-date collections::reports.flash.mtd_revenue": "11700.0",
+        "occupancy pct::kpi_helpers.get_occupancy": "10.8",
+        "occupancy pct::reports.flash.occ_pct": "10.8",
+        "sellable rooms::kpi_helpers.get_occupancy.total": "39",
+        "sellable rooms::reports.flash.total_rooms": "39"
+      },
+      "verdict": "AGREED"
+    },
+    "Q17": {
+      "detail": {
+        "concepts_compared": 6,
+        "range_days": 1,
+        "surface": "/reports/front-office-mis?from_date=2026-08-11&to_date=2026-08-11"
+      },
+      "divergences": 3,
+      "implementations": {
+        "ADR::kpi_helpers.get_adr": "1190.48",
+        "ADR::reports.mis.business.arr": "0.0",
+        "daily collections (report-to-report)::reports.flash.day_revenue": "1700.0",
+        "daily collections (report-to-report)::reports.mis.billing.total_collected": "1700.0",
+        "daily collections::kpi_helpers.get_daily_revenue": "1700.0",
+        "daily collections::reports.mis.billing.total_collected": "1700.0",
+        "departures completed::reports.flash.departures_done": "6",
+        "departures completed::reports.mis.movement.departures_done": "0",
+        "occupancy pct::kpi_helpers.get_occupancy": "10.8",
+        "occupancy pct::reports.mis.business.occupancy_pct": "0.0",
+        "occupied rooms::kpi_helpers.get_occupancy.occupied": "4",
+        "occupied rooms::reports.mis.business.occupied_rooms": "4"
+      },
+      "verdict": "DIVERGED"
+    },
+    "Q18": {
+      "detail": {
+        "business_date": "2026-08-11",
+        "concepts_compared": 6,
+        "surface": "/dashboard"
+      },
+      "divergences": 3,
+      "implementations": {
+        "arrivals completed::dashboard.checked_in_today": "2",
+        "arrivals completed::reports.flash.arrivals_done": "0",
+        "daily collections (tile-to-report)::dashboard.cash_collected_today": "1700.0",
+        "daily collections (tile-to-report)::reports.flash.day_revenue": "1700.0",
+        "daily collections (tile-to-summary)::dashboard.cash_collected_today": "1700.0",
+        "daily collections (tile-to-summary)::dashboard.daily_financial_summary.total_collected": "1700.0",
+        "daily collections::dashboard.cash_collected_today": "1700.0",
+        "daily collections::kpi_helpers.get_daily_revenue": "1700.0",
+        "departures completed::dashboard.checked_out_today": "3",
+        "departures completed::reports.flash.departures_done": "6",
+        "rooms available::dashboard.available_rooms": "33",
+        "rooms available::kpi_helpers.get_occupancy.sellable": "37"
+      },
+      "verdict": "DIVERGED"
+    },
+    "Q19": {
+      "detail": {
+        "occupied_room_nights_over_activity_window": 11,
+        "room_status_occupied_count": 4,
+        "sellable_rooms": 37,
+        "snapshot": {
+          "anomaly": false,
+          "occupied": 4,
+          "orphan_checked_in": 0,
+          "pct": 10.8,
+          "sellable": 37,
+          "total": 39
+        }
+      },
+      "divergences": 0,
+      "implementations": {
+        "kpi_helpers.get_occupied_count": "4",
+        "occupancy_engine.occupied_rooms": "4"
+      },
+      "verdict": "AGREED"
+    },
+    "Q20": {
+      "detail": {
+        "night_audit_adr_by_date": {
+          "2026-08-09": "1761.90",
+          "2026-08-10": "1061.90",
+          "2026-08-11": "0",
+          "2026-09-09": "0"
+        },
+        "revpar_from_kpi_helpers": "128.57"
+      },
+      "divergences": 1,
+      "implementations": {
+        "kpi_helpers.get_adr (AVG rate_per_night, no date scope)": "1190.48",
+        "room revenue / occupied room-nights (date-scoped)": "1125.54"
+      },
+      "verdict": "DIVERGED"
+    },
+    "Q21": {
+      "detail": {
+        "shift_count": 0,
+        "shifts": [],
+        "total_declared": "0",
+        "total_variance": "0"
+      },
+      "divergences": 0,
+      "implementations": {
+        "recomputed calculate_expected_cash": "0",
+        "stored Shift.expected_cash": "0"
+      },
+      "verdict": "VACUOUS"
+    },
+    "Q22": {
+      "detail": {
+        "company_credit_used_total": "0.0",
+        "get_ota_pending_error": "",
+        "individual_credit_outstanding": "400.00",
+        "misclassified_ota_head_count": 0,
+        "misclassified_ota_head_total": "0",
+        "misclassified_rows": [],
+        "ota_payout_rows": 0
+      },
+      "divergences": 0,
+      "implementations": {
+        "compute_ota_outstanding (gross)": "1000.00",
+        "get_ota_pending (net of payouts)": "1000.0"
+      },
+      "verdict": "AGREED"
+    }
+  },
+  "source": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS\\verification\\_work\\p1vc_setA.db",
+  "tag": "phase1_vc_newactivity"
+}

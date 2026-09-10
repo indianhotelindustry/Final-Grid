@@ -1,0 +1,585 @@
+2026-09-09 21:28:17 [WARNING] app: Running on SQLite — row-level locking (with_for_update) is not enforced. SQLite uses a database-wide write lock; concurrent writers will serialise. Move to PostgreSQL for true per-row locking and higher concurrency.
+2026-09-09 21:28:17 [INFO] app: ------- SECURITY MODE -------
+2026-09-09 21:28:17 [INFO] app:   env                : production
+2026-09-09 21:28:17 [INFO] app:   secret_key         : set (>=32 chars)
+2026-09-09 21:28:17 [INFO] app:   updater_signing    : ENFORCED
+2026-09-09 21:28:17 [INFO] app:   encryption         : available
+2026-09-09 21:28:17 [INFO] app:   lan_access         : disabled (127.0.0.1 only)
+2026-09-09 21:28:17 [INFO] app:   schema_drift_mode  : warn-only
+2026-09-09 21:28:17 [INFO] app: -----------------------------
+2026-09-09 21:28:17 [INFO] app: db.create_all() skipped in production. Use Alembic migrations for schema changes. Set DB_AUTO_CREATE=1 to force-enable at next boot.
+2026-09-09 21:28:17 [INFO] app: SQLite: ensured table credit_vouchers exists
+2026-09-09 21:28:17 [INFO] app: SQLite: ensured table credit_voucher_redemptions exists
+2026-09-09 21:28:18 [INFO] app: Backfilled ota_channel on 1 legacy OTA reservations.
+2026-09-09 21:28:18 [INFO] apscheduler.scheduler: Scheduler started
+2026-09-09 21:28:18 [INFO] apscheduler.scheduler: Added job "setup_backup_scheduler.<locals>._scheduled_backup" to job store "default"
+2026-09-09 21:28:18 [INFO] app.backup_manager: Daily backup scheduled at 03:00
+2026-09-09 21:28:18 [INFO] apscheduler.scheduler: Added job "flush_notification_queue" to job store "default"
+2026-09-09 21:28:18 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._prune_old_logs" to job store "default"
+2026-09-09 21:28:18 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._run_predictive_maintenance" to job store "default"
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:18 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:19 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:28:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+====================================================================================================
+FINALGRID — FINANCIAL INVARIANT ENGINE
+Production Verification Framework, Wave 0 Deliverable 4
+====================================================================================================
+Started           : 2026-09-09T15:58:16
+Duration          : 3.2s
+Application       : v2.2.18
+PVF               : v0.5.0
+Mode / scope      : ENTIRE_DATABASE
+Business date     : 2026-08-11
+Clock frozen at   : 2026-08-11T12:00:00
+
+----------------------------------------------------------------------------------------------------
+CONTROLS (Principle 11 — positive evidence, not silence)
+----------------------------------------------------------------------------------------------------
+Source database   : C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\verification\_work\p1vc_setA.db
+Copy method       : sqlite-backup-api
+SHA-256 before    : c30bd5a891faf6feb83ccecc41ad72796769c427161a8c3fe628d647d9c9b5c1
+SHA-256 after     : c30bd5a891faf6feb83ccecc41ad72796769c427161a8c3fe628d647d9c9b5c1
+  read-only       : VERIFIED — production byte-identical after run
+  zero writes     : VERIFIED — 0 write statements counted across the whole registry
+  frozen clock    : proven
+  repeatable      : VERIFIED — a second evaluation produced identical findings
+  order independent: VERIFIED — reverse-order evaluation produced identical findings
+  commissioning   : VERIFIED — every COMMISSIONED claim is backed by 20260808_074606_inv_commission
+
+----------------------------------------------------------------------------------------------------
+SUMMARY
+----------------------------------------------------------------------------------------------------
+  Registered        : 26
+  HOLDS             : 16
+  VIOLATED          : 6
+  VACUOUS           : 4
+  NOT_APPLICABLE    : 0
+  ERROR             : 0
+  Violations found  : 20
+  Uncommissioned    : 1  (reported, but excluded from the verdict)
+
+  OVERALL VERDICT   : FAIL
+  Release blocking  : 3
+  Cert. blocking    : 5
+
+====================================================================================================
+FAILURE REPORT — 6 invariant(s) violated
+====================================================================================================
+
+----------------------------------------------------------------------------------------------------
+INV-B03  [CRITICAL / RELEASE_BLOCKING]  Recomputing a closed day reproduces the figures it reported
+----------------------------------------------------------------------------------------------------
+  What it means:
+      A closed day no longer computes the figures it reported. History has changed.
+  Why it matters:
+      This is the whole point of closing a day. If recomputing 27 May today gives a different
+      answer from the one reported on the night of 27 May, then the accounts and the system
+      disagree about a period that is supposed to be settled, and every downstream consumer of
+      that figure is now wrong.
+  Financial impact  : 5148.099999999999 (sum of the amounts carried by the violating rows)
+  Population        : 16
+  Violations        : 6
+  Confidence        : PROVEN
+  Observed          : closed-day figures: 6 of 16 row(s) violate the rule
+  Constitutional    : P2, P4, P7, P8, P12
+  Reports affected  :
+      - night audit
+      - reports.revenue
+      - reports.daily_reconciliation
+  Root cause candidates:
+      - A present-tense field — Reservation.status, Room.status, a credit balance — used inside a date-scoped report
+      - Data posted into the period after it closed (see INV-B01)
+      - A change to a canonical engine that was never replayed against history
+  Recommended investigation:
+      - Run the D3 replay for the date; it attributes the movement to a dotted path
+      - Check INV-B01 for the same date first — a back-dated posting explains this without any code being at fault
+      - Look for query filters that use the reservation status rather than the stay span
+  Affected objects:
+      night_audit 2026-08-09 / accrual revenue
+          expected 1142.85 (frozen at close)
+          observed 2142.85 (recomputed today)   (amount 1000.00)
+      night_audit 2026-08-09 / room revenue
+          expected 761.90 (frozen at close)
+          observed 1761.90 (recomputed today)   (amount 1000.0)
+      night_audit 2026-08-09 / outstanding
+          expected 0.00 (frozen at close)
+          observed 1050.00 (recomputed today)   (amount 1050.0)
+      night_audit 2026-08-10 / accrual revenue
+          expected 12777.24 (frozen at close)
+          observed 13196.29 (recomputed today)   (amount 419.049999999999)
+      night_audit 2026-08-10 / room revenue
+          expected 10200.00 (frozen at close)
+          observed 10619.05 (recomputed today)   (amount 419.05)
+      night_audit 2026-08-10 / outstanding
+          expected 4860.00 (frozen at close)
+          observed 3600.00 (recomputed today)   (amount 1260.0)
+
+----------------------------------------------------------------------------------------------------
+INV-B04  [CRITICAL / RELEASE_BLOCKING]  Exactly one business date exists and no activity is dated beyond it
+----------------------------------------------------------------------------------------------------
+  What it means:
+      The system does not have a single unambiguous business date, or money is dated beyond
+      it.
+  Why it matters:
+      The business date is the single temporal basis the whole system agrees on: reports,
+      night audit, shift close and every "today" tile. Two of them, or financial activity
+      dated past it, means different parts of the system are trading on different days.
+  Financial impact  : 100 (sum of the amounts carried by the violating rows)
+  Population        : 1
+  Violations        : 1
+  Confidence        : PROVEN
+  Observed          : 1 business_date row(s); canonical date 2026-08-11
+  Constitutional    : P8, P11
+  Reports affected  :
+      - every date-scoped report
+      - night audit
+      - main.dashboard
+  Root cause candidates:
+      - A second business_date row inserted by a migration or a reset
+      - A night audit that advanced the date without committing
+      - A posting route that uses the wall clock rather than the business date
+  Recommended investigation:
+      - SELECT * FROM business_date — there should be exactly one row
+      - Compare the offending rows' created_at against the business date
+      - Check whether the posting path calls get_business_date()
+  Affected objects:
+      extra_charge 4
+          expected dated on or before 2026-08-11
+          observed dated 2026-09-09   (amount 100)
+
+----------------------------------------------------------------------------------------------------
+INV-A02  [HIGH / CERTIFICATION_BLOCKING]  Every financial row belongs to a folio
+----------------------------------------------------------------------------------------------------
+  What it means:
+      Financial rows exist that belong to no folio. The money is real and its attribution is
+      not.
+  Why it matters:
+      A folio is the unit a bill is issued against and the unit a company or an OTA is
+      invoiced on. A payment or a charge that belongs to no folio still moves the hotel's
+      money, but it cannot be attributed to anything, cannot appear on a split bill, and
+      cannot be reconciled by anyone downstream.
+  Financial impact  : 4776.19 (sum of the amounts carried by the violating rows)
+  Population        : 27
+  Violations        : 8
+  Confidence        : PROVEN
+  Observed          : 6/15 payments and 2/12 charges are unrouted, carrying 4776.19
+  Variance          : 4776.19
+  Constitutional    : P1, P5
+  Reports affected  :
+      - main.reservation_folio
+      - billing.gst_report
+      - reports.daily_reconciliation
+      - night audit folio control
+  Root cause candidates:
+      - Posting paths that write a payment before a folio exists
+      - A folio-creation step that runs only on the check-in route
+      - Legacy rows predating the folio model, never backfilled
+  Recommended investigation:
+      - Group the unrouted rows by created_at to see whether they are legacy or still being produced today
+      - Trace the posting path for the most recent unrouted row
+      - Check whether folio creation is conditional on booking_type
+  Affected objects:
+      payment 1
+          expected folio_id set
+          observed folio_id NULL   (amount 800)
+      payment 2
+          expected folio_id set
+          observed folio_id NULL   (amount 400)
+      payment 3
+          expected folio_id set
+          observed folio_id NULL   (amount 1500)
+      payment 4
+          expected folio_id set
+          observed folio_id NULL   (amount 1000)
+      payment 5
+          expected folio_id set
+          observed folio_id NULL   (amount 500)
+      payment 6
+          expected folio_id set
+          observed folio_id NULL   (amount 100)
+      extra_charge 1
+          expected folio_id set
+          observed folio_id NULL   (amount 380.95)
+      extra_charge 2
+          expected folio_id set
+          observed folio_id NULL   (amount 95.24)
+
+----------------------------------------------------------------------------------------------------
+INV-A03  [HIGH / RELEASE_BLOCKING]  Charges summed over folios equal charges summed over reservations
+----------------------------------------------------------------------------------------------------
+  What it means:
+      The folio and reservation views of the same charges disagree.
+  Why it matters:
+      The same money must total the same whichever way it is sliced. If the folio view and the
+      reservation view of the same charges differ, then at least one report in the system is
+      showing a number that does not exist.
+  Financial impact  : 476.19 (sum of the amounts carried by the violating rows)
+  Population        : 12
+  Violations        : 2
+  Confidence        : PROVEN
+  Observed          : reservation view 7820.10, folio view 7343.91
+  Variance          : -476.19
+  Constitutional    : P1, P5
+  Reports affected  :
+      - main.reservation_folio
+      - reports.revenue
+      - night audit folio control
+  Root cause candidates:
+      - A charge whose folio belongs to a different reservation
+      - Charges with folio_id NULL falling out of the folio view
+      - A folio whose reservation_id was repointed
+  Recommended investigation:
+      - List charges whose folio.reservation_id differs from their own reservation_id
+      - Check INV-A02 first — unrouted rows are the usual cause
+  Affected objects:
+      extra_charge 1
+          expected reachable through a folio
+          observed folio missing or unset   (amount 380.95)
+      extra_charge 2
+          expected reachable through a folio
+          observed folio missing or unset   (amount 95.24)
+
+----------------------------------------------------------------------------------------------------
+INV-C02  [HIGH / CERTIFICATION_BLOCKING]  A checked-out reservation is settled, or its balance is explained
+----------------------------------------------------------------------------------------------------
+  What it means:
+      Guests have departed with an unexplained outstanding balance.
+  Why it matters:
+      Letting a guest leave with money outstanding is a decision — a credit arrangement, a
+      company account, a write-off. It is never an accident, and it must leave a trace. An
+      unexplained outstanding balance on a departed guest is money the hotel has stopped being
+      able to collect and has not decided to lose.
+  Financial impact  : 0 (sum of the amounts carried by the violating rows)
+  Population        : 8
+  Violations        : 1
+  Confidence        : PROVEN
+  Observed          : checked-out reservations: 1 of 8 row(s) violate the rule
+  Constitutional    : P5, P11
+  Reports affected  :
+      - reports.ar_aging
+      - main.reservation_folio
+      - night audit folio control
+  Root cause candidates:
+      - A checkout route that warns about a balance but does not require a reason
+      - A credit arrangement agreed verbally and never recorded
+      - Charges posted after the guest departed
+  Recommended investigation:
+      - Compare the last charge's created_at against checked_out_at
+      - Check whether the checkout route blocks or merely warns
+      - Look for a matching credit_note issued later
+  Affected objects:
+      reservation 10
+          expected checked_out_at set on a CheckedOut reservation
+          observed checked_out_at is NULL
+
+----------------------------------------------------------------------------------------------------
+INV-B06  [MEDIUM / OPERATIONAL_WARNING]  A payment is never dated outside the stay it belongs to
+----------------------------------------------------------------------------------------------------
+  What it means:
+      A payment is booked to a business date outside the stay it settles.
+  Why it matters:
+      A payment carries two times: the business date it is booked to and the wall-clock moment
+      it was created. When the two disagree wildly, or when a payment is booked to a day far
+      outside the stay it settles, the day's cash figure stops describing the day's trading,
+      and the shift it is reconciled against is the wrong one.
+  Financial impact  : 700 (sum of the amounts carried by the violating rows)
+  Population        : 15
+  Violations        : 2
+  Confidence        : PROVEN
+  Observed          : payments: 2 of 15 row(s) violate the rule
+  Constitutional    : P8, P10
+  Reports affected  :
+      - reports.flash
+      - reports.payment_collection
+      - shift close
+      - night audit
+  Root cause candidates:
+      - A posting route defaulting the date to the wall clock rather than the business date
+      - A back-dated correction entered by hand
+      - A long-running credit recovery beyond the declared tail
+  Recommended investigation:
+      - Compare payment_date against created_at for the offending rows
+      - Check payment_purpose — credit_recovery legitimately lags the stay
+      - Confirm the 30-day tail is still the right business assumption
+  Affected objects:
+      payment 7
+          expected dated between 2026-09-11 and 2026-10-12
+          observed dated 2026-08-10   (amount 300)
+      payment 8
+          expected dated between 2026-08-13 and 2026-09-13
+          observed dated 2026-08-10   (amount 400)
+
+====================================================================================================
+NOT PROVEN — evaluated but not exercised
+====================================================================================================
+These invariants did not fail. They also did not pass: the
+population was empty, or the mode does not apply. Under P10
+absence of data is not evidence of correctness, and reporting
+them as green would make the engine exactly the kind of control
+that cannot fail.
+  [VACUOUS        ] INV-A06  A guest who has paid more than they owe has an overpayment record
+      overpaid reservations: no rows in scope
+  [VACUOUS        ] INV-C06  Corporate credit is backed by a company account that exists
+      no folio names a company and no reservation is flagged corporate; the rule was not exercised
+  [VACUOUS        ] INV-D02  Every correction and reversal references the transaction it corrects
+      no correction or reversal rows exist, so the rule was not exercised. The signing logic in signed_extra_charge_amount is therefore also untested by live data
+  [VACUOUS        ] INV-D05  Every void request and credit note references what it cancels
+      no void requests and no credit notes exist, so the rule was not exercised
+
+====================================================================================================
+PERFORMANCE AND SAFETY
+====================================================================================================
+ID        STATUS              POP  VIOL     ms   reads  writes    rows  peak KB  TITLE
+----------------------------------------------------------------------------------------------------
+INV-A01   HOLDS                15     0    111      85       0       0     1080  Settlement identity: grand total -
+INV-A02   VIOLATED             27     8      1       4       0      10        6  Every financial row belongs to a f
+INV-A03   VIOLATED             12     2      0       1       0      12        2  Charges summed over folios equal c
+INV-A04   HOLDS                15     0      4       7       0      18       77  Daily collections equal the direct
+INV-A05   HOLDS                12     0      0       1       0      12        4  Every stored tax line equals its t
+INV-A06   VACUOUS               0     0     66      87       0       4      205  A guest who has paid more than the
+INV-B01   HOLDS                24     0      0       5       0      26        6  No financial row was created into 
+INV-B02   HOLDS                 2     0      5       1       0       0      164  Every frozen night-audit snapshot 
+INV-B03   VIOLATED             16     6    538     127       0       0     5557  Recomputing a closed day reproduce
+INV-B04   VIOLATED              1     1      1       4       0       2       11  Exactly one business date exists a
+INV-B05   HOLDS                 2     0      0       2       0       3        1  Night audits form an unbroken sequ
+INV-B06   VIOLATED             15     2      0       1       0      15        6  A payment is never dated outside t
+INV-C01   HOLDS                 1     0      0       1       0       1        1  A walk-in reservation is never set
+INV-C02   VIOLATED              8     1     36      25       0       1      466  A checked-out reservation is settl
+INV-C03   HOLDS                39     0      0       9       0       6        4  Every financial event belongs to a
+INV-C04   HOLDS                11     0      0       1       0      11        4  No room is occupied by two reserva
+INV-C05   HOLDS                 1     0      0       1       0       1        1  An OTA settlement identifies the a
+INV-C06   VACUOUS               0     0      0       4       0       2        1  Corporate credit is backed by a co
+INV-D01   HOLDS                15     0      0       2       0       1        1  Every folio references a reservati
+INV-D02   VACUOUS               0     0      0       4       0       2        1  Every correction and reversal refe
+INV-D03   HOLDS                15     0      0       3       0      13        4  Every payment references a payment
+INV-D04   HOLDS                12     0      0      13       0      24        5  Every tax line names the charge it
+INV-D05   VACUOUS               0     0      0       6       0       4        4  Every void request and credit note
+INV-D06   HOLDS                 5     0      0       2       0       6        2  Every priced room night belongs to
+INV-D07   HOLDS                 3     0      6      12       0       4       21  Every overpayment record correspon
+INV-R01   HOLDS                 2     0    203     129       0       0      982  A day reconciles gross accrual aga
+----------------------------------------------------------------------------------------------------
+TOTAL                                20    971     537       0     178     5557
+
+====================================================================================================
+COMMISSIONING GAPS (1)
+====================================================================================================
+An invariant that has never been shown to fail is not yet a
+control. These are reported by the engine and excluded from its
+verdict until commissioning demonstrates the failure.
+  INV-R01    NOT_COMMISSIONED
+      declared but not yet commissioned
+
+====================================================================================================
+END OF REPORT
+====================================================================================================
+
+[inv] evidence pack: C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\verification\evidence\20260909_155816_inv_run_phase1_vc_setA
+inv_phase1_vc_setA.json written
+2026-09-09 21:28:20 [INFO] apscheduler.scheduler: Scheduler has been shut down

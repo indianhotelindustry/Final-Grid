@@ -1,0 +1,121 @@
+2026-09-09 21:30:55 [WARNING] app: Running on SQLite — row-level locking (with_for_update) is not enforced. SQLite uses a database-wide write lock; concurrent writers will serialise. Move to PostgreSQL for true per-row locking and higher concurrency.
+2026-09-09 21:30:55 [INFO] app: ------- SECURITY MODE -------
+2026-09-09 21:30:55 [INFO] app:   env                : production
+2026-09-09 21:30:55 [INFO] app:   secret_key         : set (>=32 chars)
+2026-09-09 21:30:55 [INFO] app:   updater_signing    : ENFORCED
+2026-09-09 21:30:55 [INFO] app:   encryption         : available
+2026-09-09 21:30:55 [INFO] app:   lan_access         : disabled (127.0.0.1 only)
+2026-09-09 21:30:55 [INFO] app:   schema_drift_mode  : warn-only
+2026-09-09 21:30:55 [INFO] app: -----------------------------
+2026-09-09 21:30:56 [INFO] app: db.create_all() skipped in production. Use Alembic migrations for schema changes. Set DB_AUTO_CREATE=1 to force-enable at next boot.
+2026-09-09 21:30:56 [INFO] app: SQLite: ensured table credit_vouchers exists
+2026-09-09 21:30:56 [INFO] app: SQLite: ensured table credit_voucher_redemptions exists
+2026-09-09 21:30:56 [INFO] apscheduler.scheduler: Scheduler started
+2026-09-09 21:30:56 [INFO] apscheduler.scheduler: Added job "setup_backup_scheduler.<locals>._scheduled_backup" to job store "default"
+2026-09-09 21:30:56 [INFO] app.backup_manager: Daily backup scheduled at 03:00
+2026-09-09 21:30:56 [INFO] apscheduler.scheduler: Added job "flush_notification_queue" to job store "default"
+2026-09-09 21:30:56 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._prune_old_logs" to job store "default"
+2026-09-09 21:30:56 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._run_predictive_maintenance" to job store "default"
+2026-09-09 21:30:56 [INFO] app.rates: resolve_rate: base_rate fallback=1142.86 for rt=2
+2026-09-09 21:30:56 [INFO] app.routes: EXPRESS PRICING: total_tariff_raw=0.00 tariff_excl=0.00 nights=1 mode=standard rate_per_night=1142.86 std_rate=1142.86 modified=False
+2026-09-09 21:30:56 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:30:56 [INFO] app.nightly_rates: NIGHTLY_SYNC res=5 reason=new_booking nights=1 created=1 skipped_locked=0 mode=standard override=False
+2026-09-09 21:30:56 [ERROR] app.revenue_guard: apply_leakage_with_expected failed (non-fatal): 'Reservation' object has no attribute 'num_nights'
+2026-09-09 21:30:56 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:30:56 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:30:56 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:30:56 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:30:56 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:30:56 [INFO] app: [CHECKOUT DEBUG] res=9  total_bill=1200.00  extra=200.00  disc=0.00  paid_before_checkout=0.00  paying_now_form=1250.00  final_paid=1250.00  final_outstanding=0.00  credit=0.00  override=False
+2026-09-09 21:30:56 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:30:56 [WARNING] app.notifications: Notification failed [whatsapp → 6265222595] checkout_thanks: ULTRAMSG_INSTANCE or ULTRAMSG_TOKEN not configured
+2026-09-09 21:30:56 [INFO] app.notifications: Queued whatsapp notification to 6265222595 for retry
+2026-09-09 21:30:56 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:30:56 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:30:56 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:30:56 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:30:56 [INFO] app: [CHECKOUT DEBUG] res=10  total_bill=1150.00  extra=150.00  disc=0.00  paid_before_checkout=0.00  paying_now_form=1200.00  final_paid=1200.00  final_outstanding=0.00  credit=0.00  override=False
+2026-09-09 21:30:56 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:30:56 [WARNING] app.notifications: Notification failed [whatsapp → 6265222595] checkout_thanks: ULTRAMSG_INSTANCE or ULTRAMSG_TOKEN not configured
+2026-09-09 21:30:56 [INFO] app.notifications: Queued whatsapp notification to 6265222595 for retry
+2026-09-09 21:30:56 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:30:56 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:30:56 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:30:56 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:30:56 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:30:56 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:30:56 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:30:56 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:30:56 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:30:56 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:30:56 [INFO] app.services: Night audit for 2026-08-10 auto-completed. Business date advanced to 2026-08-11
+==================================================================================================================================
+PHASE 1 VERIFICATION COMPLETION - RUNTIME WRITER VERIFICATION - SET D
+==================================================================================================================================
+production        : C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\instance\pms.db
+sha256 before     : 51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2  (MATCHES anchor)
+disposable copy   : C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\verification\_work\p1vc_setD.db  (sqlite-backup-api)
+----------------------------------------------------------------------------------------------------------------------------------
+D11 population    : payments=[1, 2, 3, 4, 5, 6] charges=[1, 2] audit_logs=23
+business date     : 2026-08-10   vacant rooms: 36   admin user id: 2
+----------------------------------------------------------------------------------------------------------------------------------
+SET D - clean new-activity copy (business-date writers only; night audit closes last)
+OK    W-06-01   W-06    Payment row created (set D)                          expect=True                     got=True                     
+OK    W-06-02   W-06    folio_id non-null                                    expect=True                     got=True                     
+OK    W-06-03   W-06    folio_id == reservation billing folio A              expect=5                        got=5                        
+OK    W-06-04   W-06    folio belongs to this reservation, letter A          expect=(5, 'A')                 got=(5, 'A')                 
+OK    W-06-05   W-06    audit row exists for this financial row              expect=True                     got=True                     
+OK    W-06-06   W-06    audit carries same folio and amount                  expect=(5, 500.0)               got=(5, 500.0)               action=posted
+OK    W-06-07   W-06    audit coupling class vs Q-5 (A-STRICT expected)      expect='A-STRICT'               got='A-STRICT'               
+OK    W-12-01   W-12    Payment row created (set D)                          expect=True                     got=True                     
+OK    W-12-02   W-12    folio_id non-null                                    expect=True                     got=True                     
+OK    W-12-03   W-12    folio_id == reservation billing folio A              expect=6                        got=6                        
+OK    W-12-04   W-12    folio belongs to this reservation, letter A          expect=(6, 'A')                 got=(6, 'A')                 
+OK    W-12-05   W-12    audit row exists (Reservation level)                 expect=True                     got=True                     actions=['checkin_full']
+OK    W-12-06   W-12    audit carries the financial identity                 expect=True                     got=True                     after_state={"status": "CheckedIn", "room_id": 4, "mode": "FULL", "billing": "Guest", "depos
+NOTE  W-12-07   W-12    audit coupling class vs Q-5 (A-STRICT expected)      expect='A-STRICT'               got='A-NF-entity'            as set A
+OK    D-05      W-05    add_payment / POS / CICO rows attributed (re-observe expect=[7, 7, 7]                got=[7, 7, 7]                
+OK    W-14-01   W-14    ExtraCharge row created (set D)                      expect=True                     got=True                     
+OK    W-14-02   W-14    folio_id non-null                                    expect=True                     got=True                     
+OK    W-14-03   W-14    folio_id == reservation billing folio A              expect=8                        got=8                        
+OK    W-14-04   W-14    folio belongs to this reservation, letter A          expect=(8, 'A')                 got=(8, 'A')                 
+OK    W-14-05   W-14    dedicated log row exists (no_show_logs)              expect=True                     got=True                     
+OK    W-14-06   W-14    dedicated log carries the amount                     expect=500.0                    got=500.0                    
+NOTE  W-14-07   W-14    audit coupling class vs Q-5 (A-STRICT expected)      expect='A-STRICT'               got='A-DED'                  
+OK    D-04      W-04    checkout completed (set D)                           expect='CheckedOut'             got='CheckedOut'             HTTP 302
+OK    W-04-01   W-04    Payment row created (set D)                          expect=True                     got=True                     
+OK    W-04-02   W-04    folio_id non-null                                    expect=True                     got=True                     
+OK    W-04-03   W-04    folio_id == reservation billing folio A              expect=9                        got=9                        
+OK    W-04-04   W-04    folio belongs to this reservation, letter A          expect=(9, 'A')                 got=(9, 'A')                 
+OK    W-04-05   W-04    audit row exists for this financial row              expect=True                     got=True                     
+OK    W-04-06   W-04    audit carries same folio and amount                  expect=(9, 1250.0)              got=(9, 1250.0)              action=posted
+OK    W-04-07   W-04    audit coupling class vs Q-5 (A-STRICT expected)      expect='A-STRICT'               got='A-STRICT'               
+OK    W-18-01   W-18    ExtraCharge row created (set D)                      expect=True                     got=True                     
+OK    W-18-02   W-18    folio_id non-null                                    expect=True                     got=True                     
+OK    W-18-03   W-18    folio_id == reservation billing folio A              expect=9                        got=9                        
+OK    W-18-04   W-18    folio belongs to this reservation, letter A          expect=(9, 'A')                 got=(9, 'A')                 
+OK    W-18-05   W-18    audit row exists for this financial row              expect=True                     got=True                     
+OK    W-18-06   W-18    audit carries same folio and amount                  expect=(9, 200.0)               got=(9, 200.0)               action=posted
+OK    W-18-07   W-18    audit coupling class vs Q-5 (A-STRICT expected)      expect='A-STRICT'               got='A-STRICT'               
+OK    W-19-01   W-19    ExtraCharge row created (set D)                      expect=True                     got=True                     
+OK    W-19-02   W-19    folio_id non-null                                    expect=True                     got=True                     
+OK    W-19-03   W-19    folio_id == reservation billing folio A              expect=10                       got=10                       
+OK    W-19-04   W-19    folio belongs to this reservation, letter A          expect=(10, 'A')                got=(10, 'A')                
+OK    W-19-05   W-19    audit row exists for this financial row              expect=True                     got=True                     
+OK    W-19-06   W-19    audit carries same folio and amount                  expect=(10, 150.0)              got=(10, 150.0)              action=posted
+OK    W-19-07   W-19    audit coupling class vs Q-5 (A-STRICT expected)      expect='A-STRICT'               got='A-STRICT'               
+OK    D-21      W-21    night audit closed the day and posted attributed roo expect=(True, True)             got=(True, True)             status=Completed business date now 2026-08-11 rows=3
+----------------------------------------------------------------------------------------------------------------------------------
+D11 FREEZE AND PRODUCTION INTEGRITY
+OK    D11-01    D11     NULL-folio payment id set unchanged                  expect=[1, 2, 3, 4, 5, 6]       got=[1, 2, 3, 4, 5, 6]       
+OK    D11-02    D11     NULL-folio charge id set unchanged                   expect=[1, 2]                   got=[1, 2]                   
+OK    D11-03    D11     D11 payment amounts unchanged                        expect={1: 800.0, 2: 400.0, 3:  got={1: 800.0, 2: 400.0, 3:  
+OK    D11-04    D11     D11 charge amounts unchanged                         expect={1: 380.95, 2: 95.24}    got={1: 380.95, 2: 95.24}    
+OK    NEW-01    ALL     no NEW unattributed row on the copy                  expect=([], [])                 got=([], [])                 11 payments / 10 charges on copy
+OK    PROD-01   PROD    production database unchanged                        expect='51dd83b7f0fa42a3e85afb0 got='51dd83b7f0fa42a3e85afb0 
+OK    PROD-02   PROD    production size 733,184 B                            expect=733184                   got=733184                   
+----------------------------------------------------------------------------------------------------------------------------------
+RESULT SET D: 46 / 46 gate checks passed; 2 findings recorded (non-gating)
+==================================================================================================================================
+writers_setD.json written
+2026-09-09 21:30:56 [INFO] apscheduler.scheduler: Scheduler has been shut down

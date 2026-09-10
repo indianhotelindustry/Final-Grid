@@ -1,0 +1,591 @@
+2026-09-09 21:31:50 [WARNING] app: Running on SQLite — row-level locking (with_for_update) is not enforced. SQLite uses a database-wide write lock; concurrent writers will serialise. Move to PostgreSQL for true per-row locking and higher concurrency.
+2026-09-09 21:31:50 [INFO] app: ------- SECURITY MODE -------
+2026-09-09 21:31:50 [INFO] app:   env                : production
+2026-09-09 21:31:50 [INFO] app:   secret_key         : set (>=32 chars)
+2026-09-09 21:31:50 [INFO] app:   updater_signing    : ENFORCED
+2026-09-09 21:31:50 [INFO] app:   encryption         : available
+2026-09-09 21:31:50 [INFO] app:   lan_access         : disabled (127.0.0.1 only)
+2026-09-09 21:31:50 [INFO] app:   schema_drift_mode  : warn-only
+2026-09-09 21:31:50 [INFO] app: -----------------------------
+2026-09-09 21:31:50 [INFO] app: db.create_all() skipped in production. Use Alembic migrations for schema changes. Set DB_AUTO_CREATE=1 to force-enable at next boot.
+2026-09-09 21:31:50 [INFO] app: SQLite: ensured table credit_vouchers exists
+2026-09-09 21:31:50 [INFO] app: SQLite: ensured table credit_voucher_redemptions exists
+2026-09-09 21:31:50 [INFO] apscheduler.scheduler: Scheduler started
+2026-09-09 21:31:50 [INFO] apscheduler.scheduler: Added job "setup_backup_scheduler.<locals>._scheduled_backup" to job store "default"
+2026-09-09 21:31:50 [INFO] app.backup_manager: Daily backup scheduled at 03:00
+2026-09-09 21:31:50 [INFO] apscheduler.scheduler: Added job "flush_notification_queue" to job store "default"
+2026-09-09 21:31:50 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._prune_old_logs" to job store "default"
+2026-09-09 21:31:50 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._run_predictive_maintenance" to job store "default"
+2026-09-09 21:31:50 [WARNING] app.ai_anomaly: Cash ratio check skipped: name 'Reservation' is not defined
+2026-09-09 21:31:52 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:31:52 [ERROR] app.performance_service: compute_daily_performance failed: type object 'Reservation' has no attribute 'checkin_date'
+2026-09-09 21:31:53 [WARNING] app.encryption: PII_ENCRYPTION_KEY not set -- deriving encryption key from SECRET_KEY. Set PII_ENCRYPTION_KEY in production for best security.
+2026-09-09 21:31:53 [INFO] app.rates: resolve_rate: base_rate fallback=1142.86 for rt=2
+2026-09-09 21:31:53 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:31:53 [INFO] app.gst: generate_room_tax_lines: res=1 source=nightly_rows nights=1 lines=0
+2026-09-09 21:31:53 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:31:53 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:31:54 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:31:54 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:31:54 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:31:54 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:31:55 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:31:55 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:31:55 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-09 21:31:55 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+
+====================================================================================================
+FINALGRID — GOLDEN MASTER CAPTURE
+Production Verification Framework, Wave 0 Deliverable 2
+====================================================================================================
+Started         : 2026-09-09T16:01:49
+Duration        : 5.7s
+Application     : v2.2.18
+PVF             : v0.5.0
+Business date   : 2026-08-10
+Clock frozen at : 2026-08-10T12:00:00
+Identity        : admin (Admin)
+
+----------------------------------------------------------------------------------------------------
+READ-ONLY GUARANTEE
+----------------------------------------------------------------------------------------------------
+Source database : C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\instance\pms.db
+Copy method     : sqlite-backup-api
+SHA-256 before  : 51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2
+SHA-256 after   : 51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2
+Guarantee       : VERIFIED — production byte-identical after run
+
+----------------------------------------------------------------------------------------------------
+DETERMINISTIC CLOCK (Principle 11 — positive evidence)
+----------------------------------------------------------------------------------------------------
+Frozen to       : 2026-08-10T12:00:00
+Names rebound   : 0
+  PASS  app_services_binding
+  PASS  fresh_import_date_today
+  PASS  fresh_import_datetime_now
+  PASS  isinstance_real_date_still_true
+  PASS  isinstance_real_datetime_still_true
+  PASS  module_attr_datetime_now
+  PASS  module_attr_datetime_utcnow
+  PASS  sqlite_binds_frozen_date
+  PASS  sqlite_binds_frozen_datetime
+Proven          : True
+
+----------------------------------------------------------------------------------------------------
+COVERAGE
+----------------------------------------------------------------------------------------------------
+  Surfaces captured : 158
+  Healthy           : 153
+  Unhealthy         : 5
+  FINANCIAL         : 80
+  OPERATIONAL       : 49
+  ADVISORY          : 23
+  PUBLIC            : 6
+  Declared gaps     : 150  (listed below — nothing is dropped silently)
+
+====================================================================================================
+UNHEALTHY SURFACES — 5
+====================================================================================================
+These surfaces do not render. They are captured as-is so that any
+change in their behaviour is still detected, but a golden master
+over a 500 is a record of a defect, not evidence of correctness.
+
+  [INFO ] 400  /book/api/availability
+          endpoint booking.availability_api   category PUBLIC
+  [WARN ] 400  /api/cico/preview
+          endpoint main.api_cico_preview   category OPERATIONAL
+  [WARN ] 404  /api/tab/booking
+          endpoint main.load_tab   category OPERATIONAL
+  [WARN ] 404  /setup
+          endpoint main.setup_wizard   category OPERATIONAL
+  [BLOCK] 400  /api/voucher/lookup
+          endpoint main.voucher_lookup   category FINANCIAL
+
+====================================================================================================
+SURFACES
+====================================================================================================
+STATUS ANON  CAT           FIGURES      ms  SURFACE
+----------------------------------------------------------------------------------------------------
+200    302   ADVISORY            5      35  /ai/anomalies
+200    302   ADVISORY           11      32  /api/ai/insights
+200    302   ADVISORY           15      27  /api/ai/anomalies
+200    302   ADVISORY           64     103  /api/ceo/kpi-pack
+200    302   ADVISORY          302      42  /api/ai/demand-calendar
+200    302   ADVISORY            4      52  /api/ai/demand-spikes
+200    302   ADVISORY          483      45  /api/ai/forecast
+200    302   ADVISORY           38      66  /api/ai/forecast/monthly
+200    302   ADVISORY            2      13  /api/ai/predictive-maintenance/categories
+200    302   ADVISORY            2       3  /api/ai/predictive-maintenance/equipment
+200    302   ADVISORY          275      22  /api/ai/predictive-maintenance/health
+200    302   ADVISORY            3       2  /api/ai/predictive-maintenance/predictions
+200    302   ADVISORY            2       3  /api/ai/predictive-maintenance/schedules
+200    302   ADVISORY          287      25  /api/ai/predictive-maintenance
+200    302   ADVISORY           15       3  /api/ai/sentiment
+200    302   ADVISORY            5       6  /ai/demand-calendar
+200    302   ADVISORY            5       6  /ai/forecast
+200    302   ADVISORY            5       6  /ai/predictive-maintenance
+200    302   ADVISORY            5       5  /ai/sentiment
+200    302   ADVISORY          984     573  /ai/pricing/dashboard
+200    302   ADVISORY           15       2  /ai/pricing/settings
+200    302   ADVISORY          725     508  /ai/pricing/recommendations
+200    302   OPERATIONAL         5       6  /auth/change-password
+302    200   OPERATIONAL         0       8  /auth/login
+200    302   OPERATIONAL         6      10  /auth/shifts/pending-approvals
+200    302   OPERATIONAL         6      12  /auth/shifts
+200    302   OPERATIONAL         9      13  /auth/users
+200    302   OPERATIONAL        10      11  /backup/
+200    302   FINANCIAL           6      12  /billing/credit-notes
+200    302   FINANCIAL          33      24  /billing/gst-report
+200    302   FINANCIAL          24      34  /billing/invoice-register
+200    302   FINANCIAL           2       5  /billing/void/eligible/1
+200    302   FINANCIAL           7      13  /billing/void/history/1
+200    302   FINANCIAL           6      11  /billing/void/pending
+400    400   PUBLIC              1       1  /book/api/availability
+200    200   PUBLIC             11      10  /book/
+200    200   PUBLIC             13       5  /book/api/rates
+200    200   PUBLIC              6       6  /feedback/complete
+200    302   OPERATIONAL        17      12  /feedback/dashboard
+200    401   FINANCIAL          11       6  /api/reservation/1/folios
+200    302   OPERATIONAL        27      31  /grc/1/preview
+200    302   OPERATIONAL         6      12  /groups/
+200    302   OPERATIONAL       120      12  /groups/new
+200    302   OPERATIONAL         3       2  /loyalty/api/balance/1
+200    302   FINANCIAL           9       8  /loyalty/config
+200    302   OPERATIONAL        18     109  /loyalty/
+200    302   OPERATIONAL        11       9  /loyalty/members
+200    302   FINANCIAL           9       7  /loyalty/milestones
+200    302   FINANCIAL           6      11  /loyalty/transactions
+200    302   OPERATIONAL         6      12  /admin/duplicate-checkins
+200    302   OPERATIONAL         8       7  /admin/lan-access
+302    302   FINANCIAL           0       2  /advance-receipt/1
+200    302   ADVISORY           28      20  /api/ai/housekeeping-schedule
+200    302   FINANCIAL         152       7  /api/analytics/data
+200    302   OPERATIONAL         7       2  /api/alerts/live
+400    302   OPERATIONAL         1       2  /api/cico/preview
+200    302   OPERATIONAL         3       3  /api/staff/performance/today
+200    302   OPERATIONAL         5       7  /owner/app-branding
+200    302   FINANCIAL           5       6  /ceo
+200    302   FINANCIAL         183      79  /api/dashboard/command-center/data
+200    302   FINANCIAL         171     146  /dashboard
+200    302   FINANCIAL           9       3  /dashboard/alerts-summary
+302    302   OPERATIONAL         0       2  /reservation/1/edit
+200    302   OPERATIONAL        11       7  /api/guests/duplicates
+200    302   OPERATIONAL         6       2  /api/reservation/1
+200    302   OPERATIONAL        10       4  /api/room/1/tariff
+200    302   OPERATIONAL       239       3  /api/rooms/vacant
+302    302   OPERATIONAL         0       1  /guest-database
+200    302   FINANCIAL          13      73  /guest/1
+200    302   OPERATIONAL         7      15  /guest/1/history
+200    302   OPERATIONAL        10      54  /guests
+200    302   OPERATIONAL         1       2  /api/companies
+200    302   PUBLIC              1       1  /health
+200    200   PUBLIC              2       1  /api/health
+200    302   OPERATIONAL        52      16  /hk
+200    302   OPERATIONAL        14      12  /housekeeping
+302    302   OPERATIONAL         0       1  /
+200    302   FINANCIAL          47      81  /invoice/1
+200    302   FINANCIAL          29      14  /api/invoice-detail/1
+200    302   FINANCIAL          58     157  /invoice-manager
+200    302   FINANCIAL           5       5  /api/dashboard/analytics
+200    302   FINANCIAL           5      10  /api/dashboard/command-center
+404    302   OPERATIONAL         0       1  /api/tab/booking
+200    302   OPERATIONAL        35      41  /api/tab/overview
+200    302   OPERATIONAL        64      62  /api/tab/reservations
+200    302   OPERATIONAL        89      56  /masters
+200    302   OPERATIONAL        22       7  /reservations/new
+200    302   FINANCIAL         312     112  /night-audit
+200    302   OPERATIONAL        20      13  /reservations/1/nightly-rates
+200    302   FINANCIAL          20      19  /folio/1
+200    302   OPERATIONAL       101      20  /reservations
+200    302   OPERATIONAL       116      38  /room-grid
+200    302   OPERATIONAL        50      11  /rooms
+200    302   OPERATIONAL         1       1  /api/search-guests
+404    404   OPERATIONAL         5       7  /setup
+400    302   FINANCIAL           1       2  /api/voucher/lookup
+200    302   OPERATIONAL        99      43  /checkin/new
+200    302   OPERATIONAL        51      20  /maintenance/
+200    302   OPERATIONAL         7      15  /noshow/pending
+200    302   FINANCIAL          13       9  /noshow/report
+200    302   FINANCIAL          14      16  /ota/bookings
+200    302   FINANCIAL          20      21  /ota/
+200    302   FINANCIAL           7       7  /ota/settings
+200    302   FINANCIAL           6      11  /ota/webhook/logs
+302    302   OPERATIONAL         0       3  /portal/submissions/1
+200    302   FINANCIAL          20      15  /pos/
+200    302   FINANCIAL          14       7  /pos/items
+200    302   OPERATIONAL        10      14  /rates/
+200    302   OPERATIONAL        11      15  /rates/notification-logs
+200    302   FINANCIAL           9       2  /reports/api/ota-reconciliation/summary
+200    302   FINANCIAL          13      15  /reports/ar-aging
+200    302   FINANCIAL           8      16  /reports/arrivals
+200    302   FINANCIAL           8      12  /reports/cancellations
+200    302   FINANCIAL           9      13  /reports/company-billing
+200    302   FINANCIAL          27      15  /reports/credit-aging
+200    302   FINANCIAL          14      18  /reports/credit-ledger
+200    302   FINANCIAL          52      39  /reports/daily-profit-snapshot
+200    302   FINANCIAL          33      18  /reports/daily-reconciliation
+200    302   FINANCIAL          33       5  /reports/daily-reconciliation?date=2026-08-10
+200    302   FINANCIAL           9      22  /reports/departures
+200    302   FINANCIAL          41      34  /reports/flash
+200    302   FINANCIAL          41      12  /reports/flash?date=2026-08-10
+200    302   FINANCIAL         111     205  /reports/front-office-mis
+200    302   FINANCIAL         111      20  /reports/front-office-mis?from_date=2026-08-01&to_date=2026-08-10
+200    302   FINANCIAL           9      15  /reports/future-bookings
+200    302   FINANCIAL           7       6  /reports/gstr1-export
+200    302   FINANCIAL          38      22  /reports/guest-history
+200    302   FINANCIAL          24      26  /reports/guest-report
+200    302   FINANCIAL          49      26  /reports/housekeeping
+200    302   FINANCIAL           6      26  /reports/
+200    302   FINANCIAL           9      18  /reports/inhouse
+200    302   FINANCIAL          50      38  /reports/leakage
+200    302   FINANCIAL           7      15  /reports/maintenance
+200    302   FINANCIAL          39      70  /reports/money-at-risk
+302    302   FINANCIAL           0      56  /reports/night-audit
+200    302   FINANCIAL           7      20  /reports/night-audit/history
+200    302   FINANCIAL         242      34  /reports/night-audit/1
+200    302   FINANCIAL          52      28  /reports/occupancy
+200    302   FINANCIAL          52      18  /reports/occupancy?start_date=2026-08-01&end_date=2026-08-10
+200    302   FINANCIAL          22      14  /reports/ota-receivables
+200    302   FINANCIAL          17      13  /reports/ota-reconciliation
+200    302   FINANCIAL           9      12  /reports/other-income-report
+200    302   FINANCIAL          17      24  /reports/overstay-control
+200    302   FINANCIAL          33      27  /reports/payments
+200    302   FINANCIAL          33       8  /reports/payments?start_date=2026-08-01&end_date=2026-08-10
+200    302   FINANCIAL           7      23  /reports/pending-payments
+200    302   FINANCIAL           9       9  /reports/refund-report
+200    302   FINANCIAL          26      24  /reports/revenue
+200    302   FINANCIAL          26       6  /reports/revenue?start_date=2026-08-01&end_date=2026-08-10
+200    302   FINANCIAL         135      31  /reports/room-revenue
+200    302   FINANCIAL          89      11  /reports/room-status
+200    302   FINANCIAL           7      10  /reports/shift-reconciliation
+200    302   FINANCIAL          14      16  /reports/source-analysis
+200    302   FINANCIAL           9       8  /reports/tip-report
+200    302   FINANCIAL          10      12  /reports/void-adjustments
+200    302   FINANCIAL          15      16  /reports/voucher-ledger
+200    302   FINANCIAL          10      12  /reports/walkin
+200    302   OPERATIONAL         6       6  /webhook/logs
+
+====================================================================================================
+DECLARED GAPS — discovered but not captured
+====================================================================================================
+  /admin/duplicate-checkins/action
+      not a GET surface
+  /admin/reservation/<int:reservation_id>/convert-overpay-to-upsell
+      not a GET surface
+  /admin/reset-transactional-data/
+      Destructive by design. Never exercised by the harness, even against a copy, so that a path confusion bug can never destroy data.
+  /admin/reset-transactional-data/execute
+      not a GET surface
+  /admin/update/
+      Updater. Reaches the network and can stage a release; exercising it from a verification harness is unsafe.
+  /admin/update/apply
+      not a GET surface
+  /admin/update/backup
+      not a GET surface
+  /admin/update/inspect
+      not a GET surface
+  /admin/update/restart
+      not a GET surface
+  /admin/voucher/<int:voucher_id>/expire
+      not a GET surface
+  /ai/pricing/rate/<int:room_type_id>/<target_date>
+      parameterised and not declared in DECLARED_PARAMETERISED
+  /ai/pricing/settings
+      not a GET surface
+  /api/ai/anomalies/risk/<int:user_id>
+      parameterised and not declared in DECLARED_PARAMETERISED
+  /api/ai/guest-profile/<int:guest_id>
+      parameterised and not declared in DECLARED_PARAMETERISED
+  /api/ai/insights/refresh
+      not a GET surface
+  /api/ai/predictive-maintenance/health/<int:room_id>
+      parameterised and not declared in DECLARED_PARAMETERISED
+  /api/ai/predictive-maintenance/schedules/<int:sched_id>/complete
+      not a GET surface
+  /api/ai/predictive-maintenance/schedules/<int:sched_id>/skip
+      not a GET surface
+  /api/ai/predictive-maintenance/schedules/generate
+      not a GET surface
+  /api/ai/voice
+      not a GET surface
+  /api/alerts/<int:alert_id>/resolve
+      not a GET surface
+  /api/checkin/company/{id}
+      UNRESOLVED — no entity matches: lowest company id
+  /api/checkin/express/<int:reservation_id>
+      not a GET surface
+  /api/checkin/walkin-search-express
+      not a GET surface
+  /api/companies/<int:company_id>/adjust-credit
+      not a GET surface
+  /api/companies/{id}
+      UNRESOLVED — no entity matches: lowest company id
+  /api/dashboard/card-preview/<card_type>
+      parameterised and not declared in DECLARED_PARAMETERISED
+  /api/dashboard/rooms/<int:room_id>/mark-clean
+      not a GET surface
+  /api/dashboard/rooms/mark-all-clean
+      not a GET surface
+  /api/folio/<int:folio_id>/transfer-charge
+      not a GET surface
+  /api/folio/<int:folio_id>/transfer-payment
+      not a GET surface
+  /api/guest/<int:guest_id>/id-document
+      not a GET surface
+  /api/guest/<int:guest_id>/update
+      not a GET surface
+  /api/guests/merge
+      not a GET surface
+  /api/reservation/<int:reservation_id>/add-payment
+      not a GET surface
+  /api/reservation/<int:reservation_id>/available-rooms
+      parameterised and not declared in DECLARED_PARAMETERISED
+  /api/reservation/<int:reservation_id>/folios
+      not a GET surface
+  /api/reservation/<int:reservation_id>/upsell
+      parameterised and not declared in DECLARED_PARAMETERISED
+  /api/reservation/move
+      not a GET surface
+  /api/reservation/resize
+      not a GET surface
+  /api/reservations/bulk-booking
+      not a GET surface
+  /api/voucher/<int:voucher_id>/redeem
+      not a GET surface
+  /auth/logout
+      not a GET surface
+  /auth/shift/<int:shift_id>/approve
+      not a GET surface
+  /auth/shift/<int:shift_id>/handover
+      parameterised and not declared in DECLARED_PARAMETERISED
+  /auth/shift/adjustment
+      not a GET surface
+  /auth/shift/close
+      GET handler with a side effect (closes the open shift). Excluded to keep capture free of state change; shift closure figures are covered by Q21 and by /reports/shift-reconciliation.
+  /auth/shift/start
+      not a GET surface
+  /auth/users/<int:user_id>/edit
+      not a GET surface
+  /auth/users/<int:user_id>/toggle
+      not a GET surface
+  /auth/users/new
+      not a GET surface
+  /backup/delete/<filename>
+      not a GET surface
+  /backup/download/<filename>
+      Streams a file; content is the backup, not application output. Covered instead by D9 (Backup Restore Verification).
+  /backup/run
+      not a GET surface
+  /billing/credit-note/<int:reservation_id>
+      not a GET surface
+  /billing/void/approve/<int:void_request_id>
+      not a GET surface
+  /billing/void/direct/<int:payment_id>
+      not a GET surface
+  /billing/void/reject/<int:void_request_id>
+      not a GET surface
+  /billing/void/request/<int:payment_id>
+      not a GET surface
+  /book/check-availability
+      not a GET surface
+  /book/confirmation/<ref>
+      Requires a booking reference issued by the public engine. Deferred to D6.
+  /book/create
+      not a GET surface
+  /checkout/{id}
+      UNRESOLVED — no entity matches: lowest reservation id with status CheckedIn
+  /credit/<int:reservation_id>/settle
+      parameterised and not declared in DECLARED_PARAMETERISED
+  /dev/seed
+      not a GET surface
+  /dev/seed/reset
+      not a GET surface
+  /feedback/send/<int:reservation_id>
+      not a GET surface
+  /feedback/submit/<token>
+      Requires a single-use guest token. Deferred to D6 (Regression Dataset Framework), which can mint one.
+  /folio/{id}
+      UNRESOLVED — no entity matches: lowest reservation id with status CheckedIn
+  /grc/<int:reservation_id>/form-c
+      parameterised and not declared in DECLARED_PARAMETERISED
+  /grc/<int:reservation_id>/pdf
+      parameterised and not declared in DECLARED_PARAMETERISED
+  /grc/<int:reservation_id>/save-foreign-info
+      not a GET surface
+  /groups/<int:group_id>/add-room
+      not a GET surface
+  /groups/<int:group_id>/batch-checkin
+      not a GET surface
+  /groups/<int:group_id>/update-status
+      not a GET surface
+  /groups/{id}
+      UNRESOLVED — no entity matches: lowest group block id
+  /housekeeping/<int:room_id>/clean
+      not a GET surface
+  /invoice/<int:reservation_id>/pdf
+      parameterised and not declared in DECLARED_PARAMETERISED
+  /loyalty/api/available-perks/<int:guest_id>
+      parameterised and not declared in DECLARED_PARAMETERISED
+  /loyalty/api/redeem
+      not a GET surface
+  /loyalty/enroll/<int:guest_id>
+      not a GET surface
+  /loyalty/member/<int:guest_id>
+      parameterised and not declared in DECLARED_PARAMETERISED
+  /loyalty/member/<int:guest_id>/adjust
+      not a GET surface
+  /maintenance/<int:req_id>/resolve
+      not a GET surface
+  /maintenance/<int:req_id>/update
+      not a GET surface
+  /maintenance/create
+      not a GET surface
+  /masters/cico-rules
+      not a GET surface
+  /masters/invoice-settings
+      not a GET surface
+  /masters/payment-mode
+      not a GET surface
+  /masters/payment-mode/<int:pm_id>/delete
+      not a GET surface
+  /masters/payment-mode/<int:pm_id>/edit
+      not a GET surface
+  /masters/property
+      not a GET surface
+  /masters/room
+      not a GET surface
+  /masters/room-type
+      not a GET surface
+  /masters/room-type/<int:rt_id>/delete
+      not a GET surface
+  /masters/room-type/<int:rt_id>/edit
+      not a GET surface
+  /masters/room/<int:room_id>/delete
+      not a GET surface
+  /masters/room/<int:room_id>/edit
+      not a GET surface
+  /masters/room/<int:room_id>/toggle
+      not a GET surface
+  /masters/rooms/bulk-add
+      not a GET surface
+  /masters/settings
+      not a GET surface
+  /night-audit/mark-receivable
+      not a GET surface
+  /night-audit/run
+      not a GET surface
+  /night-audit/settings
+      not a GET surface
+  /noshow/exempt/<int:reservation_id>
+      not a GET surface
+  /noshow/manual/<int:reservation_id>
+      not a GET surface
+  /noshow/unexempt/<int:reservation_id>
+      not a GET surface
+  /ota/bookings/<int:reservation_id>/cancel
+      not a GET surface
+  /ota/bookings/manual
+      not a GET surface
+  /ota/test-ping
+      not a GET surface
+  /ota/webhook/retry/<int:log_id>
+      not a GET surface
+  /owner/app-branding
+      not a GET surface
+  /payment/<int:payment_id>/void
+      not a GET surface
+  /portal/<token_str>
+      Requires a pre-check-in token. Deferred to D6.
+  /portal/<token_str>/complete
+      Requires a pre-check-in token. Deferred to D6.
+  /portal/<token_str>/submit
+      not a GET surface
+  /portal/send/<int:reservation_id>
+      not a GET surface
+  /portal/submissions
+      Requires a pre-check-in token. Deferred to D6.
+  /pos/api/room-charges/{id}
+      UNRESOLVED — no entity matches: lowest reservation id with status CheckedIn
+  /pos/items/<int:item_id>/delete
+      not a GET surface
+  /pos/items/<int:item_id>/toggle
+      not a GET surface
+  /pos/items/create
+      not a GET surface
+  /pos/post
+      not a GET surface
+  /private-uploads/<path:filepath>
+      Serves uploaded guest documents. Excluded so that guest identity documents are never written into an evidence pack.
+  /rates/<int:plan_id>/delete
+      not a GET surface
+  /rates/<int:plan_id>/edit
+      not a GET surface
+  /rates/<int:plan_id>/toggle
+      not a GET surface
+  /rates/create
+      not a GET surface
+  /reports/night-audit/advance-date
+      not a GET surface
+  /reports/night-audit/complete
+      not a GET surface
+  /reports/night-audit/reopen
+      not a GET surface
+  /reports/night-audit/rerun-skipped
+      not a GET surface
+  /reports/night-audit/run
+      not a GET surface
+  /reports/ota-payouts/<int:payout_id>/delete
+      not a GET surface
+  /reports/ota-payouts/add
+      not a GET surface
+  /reservation/<int:reservation_id>/block-room
+      not a GET surface
+  /reservation/<int:reservation_id>/cancel
+      not a GET surface
+  /reservation/<int:reservation_id>/extend
+      not a GET surface
+  /reservation/<int:reservation_id>/extend-hourly
+      not a GET surface
+  /reservation/<int:reservation_id>/overstay-charge
+      not a GET surface
+  /reservation/<int:reservation_id>/room-change
+      not a GET surface
+  /reservation/<int:reservation_id>/shorten-stay
+      not a GET surface
+  /reservations/<int:reservation_id>/checkin
+      parameterised and not declared in DECLARED_PARAMETERISED
+  /reservations/block-rooms
+      not a GET surface
+  /reservations/bulk-booking
+      not a GET surface
+  /rooms/<int:room_id>/status
+      not a GET surface
+  /static/<path:filename>
+      Static assets. Not application output.
+  /walkin-full-checkin
+      not a GET surface
+  /webhook/booking
+      not a GET surface
+  /webhook/ping
+      Liveness probe for an external channel manager.
+
+====================================================================================================
+NORMALISATION RULES APPLIED
+====================================================================================================
+  csp_nonce_attr
+      pattern: nonce="[A-Za-z0-9+/=_-]{8,}"
+      why    : Content-Security-Policy nonce, regenerated per request by app.__init__._generate_csp_nonce. Carries no application state.
+  csrf_meta
+      pattern: (<meta[^>]*name="csrf-token"[^>]*content=")[^"]+(")
+      why    : Flask-WTF CSRF token in the page meta tag. Signed and timestamped, so it differs every render.
+  csrf_input
+      pattern: (name="csrf_token"[^>]*value=")[^"]+(")
+      why    : Flask-WTF CSRF token in a hidden form input.
+
+====================================================================================================
+END OF REPORT
+====================================================================================================
+2026-09-09 21:31:55 [INFO] apscheduler.scheduler: Scheduler has been shut down
+
+[gm] evidence pack: C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\verification\evidence\20260909_160149_gm_capture_phase1_aa6d9e91
+[gm] masters written: C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\verification\masters\phase1_aa6d9e91

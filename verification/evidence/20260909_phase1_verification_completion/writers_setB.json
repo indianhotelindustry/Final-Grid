@@ -1,0 +1,716 @@
+{
+  "anchor_matches": true,
+  "business_date_end": "2026-08-10",
+  "business_date_start": "2026-08-10",
+  "copy_method": "sqlite-backup-api",
+  "copy_path": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS\\verification\\_work\\p1vc_setB.db",
+  "d11_extra_charges": [
+    1,
+    2
+  ],
+  "d11_payments": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "d11_unchanged": true,
+  "directive": "FG-P1-VERIFICATION-COMPLETION-20260909-01",
+  "findings": [
+    {
+      "case": "W-08-07",
+      "expect": "A-STRICT",
+      "got": "A-NF-caller",
+      "note": "audit via caller-supplied _write_audit (route void_payment); inherits folio (R-3)",
+      "pass": false,
+      "severity": "finding",
+      "what": "audit coupling class vs Q-5 (A-STRICT expected)",
+      "writer": "W-08"
+    },
+    {
+      "case": "W-09-07",
+      "expect": "A-STRICT",
+      "got": "A-NF-caller",
+      "note": "audit via caller-supplied _write_audit; service swallows audit exceptions",
+      "pass": false,
+      "severity": "finding",
+      "what": "audit coupling class vs Q-5 (A-STRICT expected)",
+      "writer": "W-09"
+    },
+    {
+      "case": "W-10-07",
+      "expect": "A-STRICT",
+      "got": "A-NF-caller",
+      "note": "audit via caller-supplied _write_audit (cancel route); service swallows audit exceptions",
+      "pass": false,
+      "severity": "finding",
+      "what": "audit coupling class vs Q-5 (A-STRICT expected)",
+      "writer": "W-10"
+    },
+    {
+      "case": "W-11-01",
+      "expect": true,
+      "got": false,
+      "note": "NOT EXERCISABLE: pre-existing defect - Payment() rejects notes= (TypeError), present since b5b2514, untouched by Phase 1; HTTP 500",
+      "pass": false,
+      "severity": "finding",
+      "what": "Payment row created",
+      "writer": "W-11"
+    },
+    {
+      "case": "W-22-07",
+      "expect": "A-STRICT",
+      "got": "A-NF-caller",
+      "note": "caller-supplied audit_writer; no route caller exists in app/",
+      "pass": false,
+      "severity": "finding",
+      "what": "audit coupling class vs Q-5 (A-STRICT expected)",
+      "writer": "W-22"
+    },
+    {
+      "case": "W-23-07",
+      "expect": "A-STRICT",
+      "got": "A-NF-caller",
+      "note": "caller-supplied audit_writer; no route caller exists in app/",
+      "pass": false,
+      "severity": "finding",
+      "what": "audit coupling class vs Q-5 (A-STRICT expected)",
+      "writer": "W-23"
+    }
+  ],
+  "finished_at": "2026-09-09T21:33:16",
+  "gate_passed": 42,
+  "gate_total": 42,
+  "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "production_sha256_before": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "read_only_verified": true,
+  "results": [
+    {
+      "case": "W-09-00",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "fixture payment sits on an audit-locked date",
+      "writer": "W-09"
+    },
+    {
+      "case": "W-08-01",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "Payment row created (reversal, re-observed)",
+      "writer": "W-08"
+    },
+    {
+      "case": "W-08-02",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id non-null",
+      "writer": "W-08"
+    },
+    {
+      "case": "W-08-03",
+      "expect": 5,
+      "got": 5,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id == reservation billing folio A",
+      "writer": "W-08"
+    },
+    {
+      "case": "W-08-04",
+      "expect": [
+        5,
+        "A"
+      ],
+      "got": [
+        5,
+        "A"
+      ],
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio belongs to this reservation, letter A",
+      "writer": "W-08"
+    },
+    {
+      "case": "W-08-05",
+      "expect": true,
+      "got": true,
+      "note": "caller-supplied _write_audit (never raises)",
+      "pass": true,
+      "severity": "gate",
+      "what": "audit row exists for this financial row",
+      "writer": "W-08"
+    },
+    {
+      "case": "W-08-06",
+      "expect": 300.0,
+      "got": 300.0,
+      "note": "action=payment_reversed keys=['by_user_id', 'reason', 'reversal_amount', 'reversal_payment_id']",
+      "pass": true,
+      "severity": "gate",
+      "what": "audit carries the financial identity",
+      "writer": "W-08"
+    },
+    {
+      "case": "W-08-07",
+      "expect": "A-STRICT",
+      "got": "A-NF-caller",
+      "note": "audit via caller-supplied _write_audit (route void_payment); inherits folio (R-3)",
+      "pass": false,
+      "severity": "finding",
+      "what": "audit coupling class vs Q-5 (A-STRICT expected)",
+      "writer": "W-08"
+    },
+    {
+      "case": "W-09-01",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "Payment row created",
+      "writer": "W-09"
+    },
+    {
+      "case": "W-09-02",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id non-null",
+      "writer": "W-09"
+    },
+    {
+      "case": "W-09-03",
+      "expect": 5,
+      "got": 5,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id == reservation billing folio A",
+      "writer": "W-09"
+    },
+    {
+      "case": "W-09-04",
+      "expect": [
+        5,
+        "A"
+      ],
+      "got": [
+        5,
+        "A"
+      ],
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio belongs to this reservation, letter A",
+      "writer": "W-09"
+    },
+    {
+      "case": "W-09-05",
+      "expect": true,
+      "got": true,
+      "note": "caller-supplied _write_audit (never raises)",
+      "pass": true,
+      "severity": "gate",
+      "what": "audit row exists for this financial row",
+      "writer": "W-09"
+    },
+    {
+      "case": "W-09-06",
+      "expect": 250.0,
+      "got": 250.0,
+      "note": "action=payment_corrected keys=['by_user_id', 'reason', 'replacement_amount', 'replacement_mode_id', 'replacement_payment_id']",
+      "pass": true,
+      "severity": "gate",
+      "what": "audit carries the financial identity",
+      "writer": "W-09"
+    },
+    {
+      "case": "W-09-07",
+      "expect": "A-STRICT",
+      "got": "A-NF-caller",
+      "note": "audit via caller-supplied _write_audit; service swallows audit exceptions",
+      "pass": false,
+      "severity": "finding",
+      "what": "audit coupling class vs Q-5 (A-STRICT expected)",
+      "writer": "W-09"
+    },
+    {
+      "case": "W-09-08",
+      "expect": 5,
+      "got": 5,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "replacement inherits the original folio (R-3)",
+      "writer": "W-09"
+    },
+    {
+      "case": "W-10-01",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "Payment row created",
+      "writer": "W-10"
+    },
+    {
+      "case": "W-10-02",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id non-null",
+      "writer": "W-10"
+    },
+    {
+      "case": "W-10-03",
+      "expect": 6,
+      "got": 6,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id == reservation billing folio A",
+      "writer": "W-10"
+    },
+    {
+      "case": "W-10-04",
+      "expect": [
+        6,
+        "A"
+      ],
+      "got": [
+        6,
+        "A"
+      ],
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio belongs to this reservation, letter A",
+      "writer": "W-10"
+    },
+    {
+      "case": "W-10-05",
+      "expect": true,
+      "got": true,
+      "note": "caller-supplied _write_audit (never raises)",
+      "pass": true,
+      "severity": "gate",
+      "what": "audit row exists for this financial row",
+      "writer": "W-10"
+    },
+    {
+      "case": "W-10-06",
+      "expect": 300.0,
+      "got": 300.0,
+      "note": "action=cancellation_refund keys=['by_user_id', 'reason', 'refund_amount', 'refund_mode_id']",
+      "pass": true,
+      "severity": "gate",
+      "what": "audit carries the financial identity",
+      "writer": "W-10"
+    },
+    {
+      "case": "W-10-07",
+      "expect": "A-STRICT",
+      "got": "A-NF-caller",
+      "note": "audit via caller-supplied _write_audit (cancel route); service swallows audit exceptions",
+      "pass": false,
+      "severity": "finding",
+      "what": "audit coupling class vs Q-5 (A-STRICT expected)",
+      "writer": "W-10"
+    },
+    {
+      "case": "W-10-08",
+      "expect": [
+        true,
+        "refund"
+      ],
+      "got": [
+        true,
+        "refund"
+      ],
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "refund row is a reversal with purpose refund",
+      "writer": "W-10"
+    },
+    {
+      "case": "W-11-01",
+      "expect": true,
+      "got": false,
+      "note": "NOT EXERCISABLE: pre-existing defect - Payment() rejects notes= (TypeError), present since b5b2514, untouched by Phase 1; HTTP 500",
+      "pass": false,
+      "severity": "finding",
+      "what": "Payment row created",
+      "writer": "W-11"
+    },
+    {
+      "case": "W-22-01",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "ExtraCharge row created",
+      "writer": "W-22"
+    },
+    {
+      "case": "W-22-02",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id non-null",
+      "writer": "W-22"
+    },
+    {
+      "case": "W-22-03",
+      "expect": 8,
+      "got": 8,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id == reservation billing folio A",
+      "writer": "W-22"
+    },
+    {
+      "case": "W-22-04",
+      "expect": [
+        8,
+        "A"
+      ],
+      "got": [
+        8,
+        "A"
+      ],
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio belongs to this reservation, letter A",
+      "writer": "W-22"
+    },
+    {
+      "case": "W-22-05",
+      "expect": true,
+      "got": true,
+      "note": "caller-supplied _write_audit (never raises)",
+      "pass": true,
+      "severity": "gate",
+      "what": "audit row exists for this financial row",
+      "writer": "W-22"
+    },
+    {
+      "case": "W-22-06",
+      "expect": 300.0,
+      "got": 300.0,
+      "note": "action=charge_reversed keys=['by_user_id', 'reason', 'reversal_amount', 'reversal_charge_id']",
+      "pass": true,
+      "severity": "gate",
+      "what": "audit carries the financial identity",
+      "writer": "W-22"
+    },
+    {
+      "case": "W-22-07",
+      "expect": "A-STRICT",
+      "got": "A-NF-caller",
+      "note": "caller-supplied audit_writer; no route caller exists in app/",
+      "pass": false,
+      "severity": "finding",
+      "what": "audit coupling class vs Q-5 (A-STRICT expected)",
+      "writer": "W-22"
+    },
+    {
+      "case": "W-23-01",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "ExtraCharge row created",
+      "writer": "W-23"
+    },
+    {
+      "case": "W-23-02",
+      "expect": true,
+      "got": true,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id non-null",
+      "writer": "W-23"
+    },
+    {
+      "case": "W-23-03",
+      "expect": 8,
+      "got": 8,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio_id == reservation billing folio A",
+      "writer": "W-23"
+    },
+    {
+      "case": "W-23-04",
+      "expect": [
+        8,
+        "A"
+      ],
+      "got": [
+        8,
+        "A"
+      ],
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "folio belongs to this reservation, letter A",
+      "writer": "W-23"
+    },
+    {
+      "case": "W-23-05",
+      "expect": true,
+      "got": true,
+      "note": "caller-supplied _write_audit (never raises)",
+      "pass": true,
+      "severity": "gate",
+      "what": "audit row exists for this financial row",
+      "writer": "W-23"
+    },
+    {
+      "case": "W-23-06",
+      "expect": 150.0,
+      "got": 150.0,
+      "note": "action=charge_corrected keys=['by_user_id', 'reason', 'replacement_amount', 'replacement_charge_id', 'replacement_desc']",
+      "pass": true,
+      "severity": "gate",
+      "what": "audit carries the financial identity",
+      "writer": "W-23"
+    },
+    {
+      "case": "W-23-07",
+      "expect": "A-STRICT",
+      "got": "A-NF-caller",
+      "note": "caller-supplied audit_writer; no route caller exists in app/",
+      "pass": false,
+      "severity": "finding",
+      "what": "audit coupling class vs Q-5 (A-STRICT expected)",
+      "writer": "W-23"
+    },
+    {
+      "case": "W-22-08",
+      "expect": 8,
+      "got": 8,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "reversal inherits the original folio (R-3)",
+      "writer": "W-22"
+    },
+    {
+      "case": "W-23-08",
+      "expect": 8,
+      "got": 8,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "replacement inherits the original folio (R-3)",
+      "writer": "W-23"
+    },
+    {
+      "case": "D11-01",
+      "expect": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "got": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "NULL-folio payment id set unchanged",
+      "writer": "D11"
+    },
+    {
+      "case": "D11-02",
+      "expect": [
+        1,
+        2
+      ],
+      "got": [
+        1,
+        2
+      ],
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "NULL-folio charge id set unchanged",
+      "writer": "D11"
+    },
+    {
+      "case": "D11-03",
+      "expect": {
+        "1": 800.0,
+        "2": 400.0,
+        "3": 1500.0,
+        "4": 1000.0,
+        "5": 500.0,
+        "6": 100.0
+      },
+      "got": {
+        "1": 800.0,
+        "2": 400.0,
+        "3": 1500.0,
+        "4": 1000.0,
+        "5": 500.0,
+        "6": 100.0
+      },
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "D11 payment amounts unchanged",
+      "writer": "D11"
+    },
+    {
+      "case": "D11-04",
+      "expect": {
+        "1": 380.95,
+        "2": 95.24
+      },
+      "got": {
+        "1": 380.95,
+        "2": 95.24
+      },
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "D11 charge amounts unchanged",
+      "writer": "D11"
+    },
+    {
+      "case": "NEW-01",
+      "expect": [
+        [],
+        []
+      ],
+      "got": [
+        [],
+        []
+      ],
+      "note": "11 payments / 5 charges on copy",
+      "pass": true,
+      "severity": "gate",
+      "what": "no NEW unattributed row on the copy",
+      "writer": "ALL"
+    },
+    {
+      "case": "PROD-01",
+      "expect": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+      "got": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "production database unchanged",
+      "writer": "PROD"
+    },
+    {
+      "case": "PROD-02",
+      "expect": 733184,
+      "got": 733184,
+      "note": "",
+      "pass": true,
+      "severity": "gate",
+      "what": "production size 733,184 B",
+      "writer": "PROD"
+    }
+  ],
+  "rows_on_copy": {
+    "extra_charges": 5,
+    "payments": 11
+  },
+  "set": "B",
+  "started_at": "2026-09-09T21:33:14",
+  "verdict": "PASS",
+  "writers": {
+    "W-08": {
+      "attribution": "R-3 inherit_billing_folio_id",
+      "audit": "A-NF caller-supplied audit_writer (swallowed on failure)",
+      "function": "post_payment_correction (reversal)",
+      "module": "app/services.py",
+      "notes": "",
+      "object": "Payment",
+      "runtime": "already verified (T-W08, T-Q02); re-observed via route (set B)"
+    },
+    "W-09": {
+      "attribution": "R-3 inherit_billing_folio_id",
+      "audit": "A-NF caller-supplied audit_writer (swallowed on failure)",
+      "function": "post_payment_correction (replacement)",
+      "module": "app/services.py",
+      "notes": "dated from wall clock (K-7)",
+      "object": "Payment",
+      "runtime": "exercised via route (set B)"
+    },
+    "W-10": {
+      "attribution": "R-4/CD-3 resolve_billing_folio_id",
+      "audit": "A-NF caller-supplied audit_writer (swallowed on failure)",
+      "function": "post_cancellation_disposition",
+      "module": "app/services.py",
+      "notes": "dated from wall clock (K-7)",
+      "object": "Payment",
+      "runtime": "exercised (set B)"
+    },
+    "W-11": {
+      "attribution": "R-1 resolve_billing_folio_id",
+      "audit": "A-NF entity-level (CreditVoucher voucher_used) via caller audit_writer - static",
+      "function": "redeem_credit_voucher",
+      "module": "app/services.py",
+      "notes": "voucher redemption cannot create its payment on this codebase; static proof only; dated from wall clock (K-7)",
+      "object": "Payment",
+      "runtime": "BLOCKED - pre-existing runtime defect (TypeError: notes kwarg on Payment)"
+    },
+    "W-22": {
+      "attribution": "R-3 inherit_billing_folio_id",
+      "audit": "A-NF caller-supplied audit_writer; no application caller",
+      "function": "post_extra_charge_correction (reversal)",
+      "module": "app/services.py",
+      "notes": "dated from wall clock (K-7)",
+      "object": "ExtraCharge",
+      "runtime": "exercised (set B, service)"
+    },
+    "W-23": {
+      "attribution": "R-3 inherit_billing_folio_id",
+      "audit": "A-NF caller-supplied audit_writer; no application caller",
+      "function": "post_extra_charge_correction (replacement)",
+      "module": "app/services.py",
+      "notes": "dated from wall clock (K-7)",
+      "object": "ExtraCharge",
+      "runtime": "exercised (set B, service)"
+    }
+  }
+}

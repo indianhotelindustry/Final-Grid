@@ -427,3 +427,32 @@ and at POS; eight writers date rows from the wall clock (Phase 3 scope
 unless ruled otherwise). The eleven-phase sequence is unchanged; the plan
 proposes one accepted-if-ruled deviation (Recovery Foundation before
 Phase 1 code, Q-6).
+
+---
+
+## 17 Phase 1 formal acceptance — status overlay (appended 2026-09-10)
+
+Source: `verification/FOUNDER_DECISIONS.md` § "Phase 1 Formal Acceptance —
+FG-P1-ACCEPTANCE-20260910-01"; evidence under
+`verification/evidence/20260909_phase1_completion_review/`,
+`20260909_phase1_verification_completion/`, `20260909_phase1_acceptance_prep/`,
+`20260909_five_commit_execution/`, `20260910_phase1_acceptance/`.
+The eleven-phase sequence in §04–§05 is unchanged. **Acceptance is not
+deployment and is not Phase 2 implementation authorization.**
+
+| Layer | Status |
+|---|---|
+| Phase 1 implementation | **COMPLETE** at published baseline `aa6d9e91` (units 1.1–1.5, 1.7, 1.8; unit 1.6 no action under FD-010) |
+| Phase 1 verification | **COMPLETE WITH DOCUMENTED LIMITATIONS** — 22/24 writers at runtime, 33/33 sites statically, five datasets PASS, Q14 AGREED on datasets, Phase 2a 29/29, no attribution regression |
+| Phase 1 acceptance | **ACCEPTED** (Founder, 2026-09-10) |
+| Golden Master | `phase1_aa6d9e91` adopted as the post-Phase-1 Gate G reference (158/158); historical `production` set retained as provenance |
+| Deployment | **NOT released / not deployed**; separate operational decision |
+| Q-5 | retained universally; **CF-10** audit-coupling normalization at 12 writers → bounded pre-Phase-2b work |
+| Open carry-forwards | CF-5, CF-6, CF-9, CF-10, CF-11, SR-1, SR-2 (register: `20260910_phase1_acceptance/CARRY_FORWARD_REGISTER.md`) |
+| Phase 2b entry | "Phase 1 complete" satisfied; MP-D9 and B-2 still open; **no Phase 2 scope change and no implementation authorization** |
+
+Implementation prerequisites unchanged by this overlay: FK enforcement off ·
+both `folio_id` columns nullable with the eight FD-010 rows preserved ·
+`date.today` model defaults (Q-3 → Phase 3) · destructive audit pruning
+scheduled (FD-008 / B-6) · `list_folios` scope (FD-015) not implemented ·
+migration mechanism undecided (B-4).
