@@ -1,0 +1,35 @@
+{
+  "anon_location": "/auth/login?next=%2Fai%2Fdemand-calendar",
+  "anon_status": 302,
+  "body_bytes": 35343,
+  "body_sha256": "1f7b056abb4bda579484c148599e459cc6a8edbc469890704d1dfd0ba3e343ef",
+  "category": "ADVISORY",
+  "content_type": "text/html",
+  "duration_ms": 6,
+  "endpoint": "ai.demand_calendar_page",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 5,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "INFO",
+  "status": 200,
+  "surface_id": "ai.demand_calendar_page",
+  "templates": [
+    "ai/demand_calendar.html"
+  ],
+  "truncations": [],
+  "url": "/ai/demand-calendar"
+}

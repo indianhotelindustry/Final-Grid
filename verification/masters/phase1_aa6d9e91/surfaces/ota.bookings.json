@@ -1,0 +1,44 @@
+{
+  "anon_location": "/auth/login?next=%2Fota%2Fbookings",
+  "anon_status": 302,
+  "body_bytes": 31952,
+  "body_sha256": "65c5a0e9d84794aea86831e10ae5cd23c65db518412514ec665dea454182d632",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 16,
+  "endpoint": "ota.bookings",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "from_date": "2026-07-12",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "ota_sources[len]": "9",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "records[len]": "0",
+    "room_types[0][type]": "RoomType",
+    "room_types[1][type]": "RoomType",
+    "room_types[2][type]": "RoomType",
+    "room_types[len]": "3",
+    "to_date": "2026-08-10",
+    "today": "2026-08-10"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "ota.bookings",
+  "templates": [
+    "ota/bookings.html"
+  ],
+  "truncations": [],
+  "url": "/ota/bookings"
+}

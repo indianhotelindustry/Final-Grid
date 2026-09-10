@@ -1,0 +1,35 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/owner/app-branding",
+  "anon_status": 302,
+  "body_bytes": 24405,
+  "body_sha256": "25588d8270a5cc5d0f80a9832aee7788b86f9d9e60517fb8232c42c46ea4a57f",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 7,
+  "endpoint": "main.app_branding",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "main.app_branding",
+  "templates": [
+    "app_branding.html"
+  ],
+  "truncations": [],
+  "url": "/owner/app-branding"
+}

@@ -1,0 +1,35 @@
+{
+  "anon_location": "",
+  "anon_status": 404,
+  "body_bytes": 22834,
+  "body_sha256": "b9a5a0dc215fde08698aa8c1352d53f2595e826751edde43f71417c4b071c9ce",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 7,
+  "endpoint": "main.setup_wizard",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "WARN",
+  "status": 404,
+  "surface_id": "main.setup_wizard",
+  "templates": [
+    "errors/404.html"
+  ],
+  "truncations": [],
+  "url": "/setup"
+}

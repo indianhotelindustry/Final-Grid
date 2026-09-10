@@ -1,0 +1,39 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/api/room/1/tariff",
+  "anon_status": 302,
+  "body_bytes": 295,
+  "body_sha256": "d2e16163681958cd8d9e31365b668e827b9769a93b4d63c9c3f73dba7a526edf",
+  "category": "OPERATIONAL",
+  "content_type": "application/json",
+  "duration_ms": 4,
+  "endpoint": "main.get_room_tariff",
+  "error": "",
+  "figure_source": "json",
+  "figures": {
+    "$.base_rate": "1142.86",
+    "$.display_rate": "1200",
+    "$.gst_exempted": "False",
+    "$.gst_rate": "5",
+    "$.is_gst_inclusive": "True",
+    "$.resolved_rate": "1142.86",
+    "$.room_id": "1",
+    "$.room_type_id": "2",
+    "$.used_fallback": "True",
+    "$[len]": "14"
+  },
+  "location": "",
+  "normalisation_hits": {},
+  "note": "Tariff lookup used when a rate is applied.",
+  "origin": "declared",
+  "params": {
+    "id": 1,
+    "resolver": "any_room",
+    "rule": "lowest room id"
+  },
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "main.get_room_tariff__any_room",
+  "templates": [],
+  "truncations": [],
+  "url": "/api/room/1/tariff"
+}

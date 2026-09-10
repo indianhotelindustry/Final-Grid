@@ -1,0 +1,43 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Far-aging",
+  "anon_status": 302,
+  "body_bytes": 25469,
+  "body_sha256": "1f745dde22c10daa7e383a044eaa1479ba1d9cf1b99115ab2725bc7386f80ca4",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 15,
+  "endpoint": "reports.ar_aging",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "rows[len]": "0",
+    "today": "2026-08-10",
+    "totals.current": "0",
+    "totals.days_30": "0",
+    "totals.days_60": "0",
+    "totals.days_90": "0",
+    "totals.total": "0",
+    "totals[len]": "5"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.ar_aging",
+  "templates": [
+    "reports/ar_aging.html"
+  ],
+  "truncations": [],
+  "url": "/reports/ar-aging"
+}

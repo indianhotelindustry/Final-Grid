@@ -1,0 +1,35 @@
+{
+  "anon_location": "/auth/login?next=%2Fai%2Fanomalies",
+  "anon_status": 302,
+  "body_bytes": 33624,
+  "body_sha256": "24d58ae1c3acfe4f81615afe0b360a13eb67bded199b6f95fad08a152c9b6279",
+  "category": "ADVISORY",
+  "content_type": "text/html",
+  "duration_ms": 35,
+  "endpoint": "ai.anomaly_dashboard",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "INFO",
+  "status": 200,
+  "surface_id": "ai.anomaly_dashboard",
+  "templates": [
+    "ai/anomaly_dashboard.html"
+  ],
+  "truncations": [],
+  "url": "/ai/anomalies"
+}

@@ -1,0 +1,37 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Fshift-reconciliation",
+  "anon_status": 302,
+  "body_bytes": 23532,
+  "body_sha256": "041d57f85db035928687ed8d89e1e3f7c1c0b9cf21ae405e556518bdae98b289",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 10,
+  "endpoint": "reports.shift_reconciliation",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "reconciliation[len]": "0",
+    "report_date": "2026-08-10"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.shift_reconciliation",
+  "templates": [
+    "reports/shift_reconciliation.html"
+  ],
+  "truncations": [],
+  "url": "/reports/shift-reconciliation"
+}

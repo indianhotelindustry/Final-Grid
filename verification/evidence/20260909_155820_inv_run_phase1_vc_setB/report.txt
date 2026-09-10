@@ -1,0 +1,433 @@
+====================================================================================================
+FINALGRID — FINANCIAL INVARIANT ENGINE
+Production Verification Framework, Wave 0 Deliverable 4
+====================================================================================================
+Started           : 2026-09-09T15:58:20
+Duration          : 2.3s
+Application       : v2.2.18
+PVF               : v0.5.0
+Mode / scope      : ENTIRE_DATABASE
+Business date     : 2026-08-10
+Clock frozen at   : 2026-08-10T12:00:00
+
+----------------------------------------------------------------------------------------------------
+CONTROLS (Principle 11 — positive evidence, not silence)
+----------------------------------------------------------------------------------------------------
+Source database   : C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\verification\_work\p1vc_setB.db
+Copy method       : sqlite-backup-api
+SHA-256 before    : e2d84a1b2285290501f2bd5f7827c80794bf6bb61ba40ff63dc1bf18941b00ba
+SHA-256 after     : e2d84a1b2285290501f2bd5f7827c80794bf6bb61ba40ff63dc1bf18941b00ba
+  read-only       : VERIFIED — production byte-identical after run
+  zero writes     : VERIFIED — 0 write statements counted across the whole registry
+  frozen clock    : proven
+  repeatable      : VERIFIED — a second evaluation produced identical findings
+  order independent: VERIFIED — reverse-order evaluation produced identical findings
+  commissioning   : VERIFIED — every COMMISSIONED claim is backed by 20260808_074606_inv_commission
+
+----------------------------------------------------------------------------------------------------
+SUMMARY
+----------------------------------------------------------------------------------------------------
+  Registered        : 26
+  HOLDS             : 12
+  VIOLATED          : 8
+  VACUOUS           : 6
+  NOT_APPLICABLE    : 0
+  ERROR             : 0
+  Violations found  : 23
+  Uncommissioned    : 1  (reported, but excluded from the verdict)
+
+  OVERALL VERDICT   : FAIL
+  Release blocking  : 5
+  Cert. blocking    : 6
+
+====================================================================================================
+FAILURE REPORT — 8 invariant(s) violated
+====================================================================================================
+
+----------------------------------------------------------------------------------------------------
+INV-B01  [CRITICAL / RELEASE_BLOCKING]  No financial row was created into a business date after that date closed
+----------------------------------------------------------------------------------------------------
+  What it means:
+      A financial row was posted into a business date after that date was closed. The closed
+      period is not append-only.
+  Why it matters:
+      Once a night audit completes, the day has been reported. Someone has read the figure,
+      banked against it and possibly filed it. A row inserted into that day afterwards changes
+      a number that has already been relied upon, and nothing on any screen says so.
+  Financial impact  : 300 (sum of the amounts carried by the violating rows)
+  Population        : 4
+  Violations        : 1
+  Confidence        : PROVEN
+  Observed          : rows in closed periods: 1 of 4 row(s) violate the rule
+  Constitutional    : P2, P7, P12
+  Reports affected  :
+      - night audit
+      - reports.daily_reconciliation
+      - billing.gst_report
+      - reports.revenue
+  Root cause candidates:
+      - A posting route that takes the business date without checking whether it is closed
+      - A night audit reopened, posted into, and not re-run
+      - Manual data correction against the live database
+  Recommended investigation:
+      - Read night_audit_reopen_logs for the date
+      - Check whether the posting route validates against NightAuditLog.status before writing
+      - Re-run the D3 replay for the date and compare against the frozen snapshot
+  Affected objects:
+      payment 7
+          expected created on or before 2026-08-11 12:42:48.458686
+          observed created 2026-09-09 15:51:47.169909   (amount 300)
+
+----------------------------------------------------------------------------------------------------
+INV-B03  [CRITICAL / RELEASE_BLOCKING]  Recomputing a closed day reproduces the figures it reported
+----------------------------------------------------------------------------------------------------
+  What it means:
+      A closed day no longer computes the figures it reported. History has changed.
+  Why it matters:
+      This is the whole point of closing a day. If recomputing 27 May today gives a different
+      answer from the one reported on the night of 27 May, then the accounts and the system
+      disagree about a period that is supposed to be settled, and every downstream consumer of
+      that figure is now wrong.
+  Financial impact  : 301.0 (sum of the amounts carried by the violating rows)
+  Population        : 8
+  Violations        : 2
+  Confidence        : PROVEN
+  Observed          : closed-day figures: 2 of 8 row(s) violate the rule
+  Constitutional    : P2, P4, P7, P8, P12
+  Reports affected  :
+      - night audit
+      - reports.revenue
+      - reports.daily_reconciliation
+  Root cause candidates:
+      - A present-tense field — Reservation.status, Room.status, a credit balance — used inside a date-scoped report
+      - Data posted into the period after it closed (see INV-B01)
+      - A change to a canonical engine that was never replayed against history
+  Recommended investigation:
+      - Run the D3 replay for the date; it attributes the movement to a dotted path
+      - Check INV-B01 for the same date first — a back-dated posting explains this without any code being at fault
+      - Look for query filters that use the reservation status rather than the stay span
+  Affected objects:
+      night_audit 2026-08-09 / collected cash
+          expected 1200.00 (frozen at close)
+          observed 1500.00 (recomputed today)   (amount 300.0)
+      night_audit 2026-08-09 / payment count
+          expected 2.00 (frozen at close)
+          observed 3.00 (recomputed today)   (amount 1)
+
+----------------------------------------------------------------------------------------------------
+INV-B04  [CRITICAL / RELEASE_BLOCKING]  Exactly one business date exists and no activity is dated beyond it
+----------------------------------------------------------------------------------------------------
+  What it means:
+      The system does not have a single unambiguous business date, or money is dated beyond
+      it.
+  Why it matters:
+      The business date is the single temporal basis the whole system agrees on: reports,
+      night audit, shift close and every "today" tile. Two of them, or financial activity
+      dated past it, means different parts of the system are trading on different days.
+  Financial impact  : 1300 (sum of the amounts carried by the violating rows)
+  Population        : 1
+  Violations        : 5
+  Confidence        : PROVEN
+  Observed          : 1 business_date row(s); canonical date 2026-08-10
+  Constitutional    : P8, P11
+  Reports affected  :
+      - every date-scoped report
+      - night audit
+      - main.dashboard
+  Root cause candidates:
+      - A second business_date row inserted by a migration or a reset
+      - A night audit that advanced the date without committing
+      - A posting route that uses the wall clock rather than the business date
+  Recommended investigation:
+      - SELECT * FROM business_date — there should be exactly one row
+      - Compare the offending rows' created_at against the business date
+      - Check whether the posting path calls get_business_date()
+  Affected objects:
+      payment 8
+          expected dated on or before 2026-08-10
+          observed dated 2026-09-09   (amount 300)
+      payment 9
+          expected dated on or before 2026-08-10
+          observed dated 2026-09-09   (amount 250)
+      payment 11
+          expected dated on or before 2026-08-10
+          observed dated 2026-09-09   (amount 300)
+      extra_charge 4
+          expected dated on or before 2026-08-10
+          observed dated 2026-09-09   (amount 300)
+      extra_charge 5
+          expected dated on or before 2026-08-10
+          observed dated 2026-09-09   (amount 150)
+
+----------------------------------------------------------------------------------------------------
+INV-D02  [CRITICAL / RELEASE_BLOCKING]  Every correction and reversal references the transaction it corrects
+----------------------------------------------------------------------------------------------------
+  What it means:
+      A correction or reversal exists with no traceable original.
+  Why it matters:
+      A correction is only auditable if you can see what it corrected. A reversal with no
+      original is indistinguishable from a new negative transaction invented from nothing, and
+      it is the classic shape of a concealed adjustment.
+  Financial impact  : 300 (sum of the amounts carried by the violating rows)
+  Population        : 5
+  Violations        : 1
+  Confidence        : PROVEN
+  Observed          : correction rows: 1 of 5 row(s) violate the rule
+  Constitutional    : P1, P5, P14, P11
+  Reports affected  :
+      - reports.revenue
+      - billing.gst_report
+      - night audit payment summary
+  Root cause candidates:
+      - A correction UI that sets the flag but not the link
+      - The original deleted after the correction was raised
+      - A bulk adjustment written directly to the database
+  Recommended investigation:
+      - Read correction_reason on the affected rows
+      - Check whether the correction path is transactional
+      - Confirm signed_extra_charge_amount treats these rows as intended
+  Affected objects:
+      payment 11
+          expected is_reversal row carries a corrects_id
+          observed corrects_id is NULL   (amount 300)
+
+----------------------------------------------------------------------------------------------------
+INV-R01  [CRITICAL / RELEASE_BLOCKING]  A day reconciles gross accrual against gross payments
+----------------------------------------------------------------------------------------------------
+  What it means:
+      A day does not reconcile when gross accrual is compared against gross payments. If the
+      difference equals the day's tax, the accounting basis has regressed; otherwise money is
+      genuinely unaccounted for.
+  Why it matters:
+      Revenue is reported net of tax and cash is received gross of it. Comparing the two
+      directly makes every taxable day appear short by its own tax, which blocks the night
+      audit over an arithmetic fault rather than a financial one, and teaches operators to
+      override a control that is wrong by construction. The purpose of this invariant is that
+      the comparison stays like-for-like.
+  Financial impact  : 300.01 (sum of the amounts carried by the violating rows)
+  Population        : 1
+  Violations        : 1
+  Confidence        : PROVEN
+  Observed          : audited dates: 1 of 1 row(s) violate the rule
+  Constitutional    : P1, P2, P11
+  Reports affected  :
+      - night audit
+      - reports.night_audit
+      - dashboard
+  Root cause candidates:
+      - final_control compares accrual_net against cash instead of accrual_gross (the W1-R9 regression)
+      - A payment posted against the wrong business date
+      - A charge posted after the day was closed
+      - Tax lines regenerated at a different rate than the ones billed
+  Recommended investigation:
+      - Read the diagnostic code before reading the amount
+      - Compare the difference against revenue_summary.tax_amount
+      - Check whether both operands in final_control are on the gross basis
+      - Read the _meta.recon_algorithm_version of the date's snapshot
+  NOTE: this invariant is not yet commissioned. Its finding is reported
+        but excluded from the verdict — it has never been shown to be
+        capable of failing, so it cannot be relied on to have passed.
+  Affected objects:
+      night_audit 2026-08-09
+          expected |gross accrual - cash - outstanding| <= 1.00
+          observed RECONCILIATION_GAP: 300.01   (amount 300.01)
+
+----------------------------------------------------------------------------------------------------
+INV-A02  [HIGH / CERTIFICATION_BLOCKING]  Every financial row belongs to a folio
+----------------------------------------------------------------------------------------------------
+  What it means:
+      Financial rows exist that belong to no folio. The money is real and its attribution is
+      not.
+  Why it matters:
+      A folio is the unit a bill is issued against and the unit a company or an OTA is
+      invoiced on. A payment or a charge that belongs to no folio still moves the hotel's
+      money, but it cannot be attributed to anything, cannot appear on a split bill, and
+      cannot be reconciled by anyone downstream.
+  Financial impact  : 4776.19 (sum of the amounts carried by the violating rows)
+  Population        : 16
+  Violations        : 8
+  Confidence        : PROVEN
+  Observed          : 6/11 payments and 2/5 charges are unrouted, carrying 4776.19
+  Variance          : 4776.19
+  Constitutional    : P1, P5
+  Reports affected  :
+      - main.reservation_folio
+      - billing.gst_report
+      - reports.daily_reconciliation
+      - night audit folio control
+  Root cause candidates:
+      - Posting paths that write a payment before a folio exists
+      - A folio-creation step that runs only on the check-in route
+      - Legacy rows predating the folio model, never backfilled
+  Recommended investigation:
+      - Group the unrouted rows by created_at to see whether they are legacy or still being produced today
+      - Trace the posting path for the most recent unrouted row
+      - Check whether folio creation is conditional on booking_type
+  Affected objects:
+      payment 1
+          expected folio_id set
+          observed folio_id NULL   (amount 800)
+      payment 2
+          expected folio_id set
+          observed folio_id NULL   (amount 400)
+      payment 3
+          expected folio_id set
+          observed folio_id NULL   (amount 1500)
+      payment 4
+          expected folio_id set
+          observed folio_id NULL   (amount 1000)
+      payment 5
+          expected folio_id set
+          observed folio_id NULL   (amount 500)
+      payment 6
+          expected folio_id set
+          observed folio_id NULL   (amount 100)
+      extra_charge 1
+          expected folio_id set
+          observed folio_id NULL   (amount 380.95)
+      extra_charge 2
+          expected folio_id set
+          observed folio_id NULL   (amount 95.24)
+
+----------------------------------------------------------------------------------------------------
+INV-A03  [HIGH / RELEASE_BLOCKING]  Charges summed over folios equal charges summed over reservations
+----------------------------------------------------------------------------------------------------
+  What it means:
+      The folio and reservation views of the same charges disagree.
+  Why it matters:
+      The same money must total the same whichever way it is sliced. If the folio view and the
+      reservation view of the same charges differ, then at least one report in the system is
+      showing a number that does not exist.
+  Financial impact  : 476.19 (sum of the amounts carried by the violating rows)
+  Population        : 5
+  Violations        : 2
+  Confidence        : PROVEN
+  Observed          : reservation view 1226.19, folio view 750.00
+  Variance          : -476.19
+  Constitutional    : P1, P5
+  Reports affected  :
+      - main.reservation_folio
+      - reports.revenue
+      - night audit folio control
+  Root cause candidates:
+      - A charge whose folio belongs to a different reservation
+      - Charges with folio_id NULL falling out of the folio view
+      - A folio whose reservation_id was repointed
+  Recommended investigation:
+      - List charges whose folio.reservation_id differs from their own reservation_id
+      - Check INV-A02 first — unrouted rows are the usual cause
+  Affected objects:
+      extra_charge 1
+          expected reachable through a folio
+          observed folio missing or unset   (amount 380.95)
+      extra_charge 2
+          expected reachable through a folio
+          observed folio missing or unset   (amount 95.24)
+
+----------------------------------------------------------------------------------------------------
+INV-B06  [MEDIUM / OPERATIONAL_WARNING]  A payment is never dated outside the stay it belongs to
+----------------------------------------------------------------------------------------------------
+  What it means:
+      A payment is booked to a business date outside the stay it settles.
+  Why it matters:
+      A payment carries two times: the business date it is booked to and the wall-clock moment
+      it was created. When the two disagree wildly, or when a payment is booked to a day far
+      outside the stay it settles, the day's cash figure stops describing the day's trading,
+      and the shift it is reconciled against is the wrong one.
+  Financial impact  : 900 (sum of the amounts carried by the violating rows)
+  Population        : 11
+  Violations        : 3
+  Confidence        : PROVEN
+  Observed          : payments: 3 of 11 row(s) violate the rule
+  Constitutional    : P8, P10
+  Reports affected  :
+      - reports.flash
+      - reports.payment_collection
+      - shift close
+      - night audit
+  Root cause candidates:
+      - A posting route defaulting the date to the wall clock rather than the business date
+      - A back-dated correction entered by hand
+      - A long-running credit recovery beyond the declared tail
+  Recommended investigation:
+      - Compare payment_date against created_at for the offending rows
+      - Check payment_purpose — credit_recovery legitimately lags the stay
+      - Confirm the 30-day tail is still the right business assumption
+  Affected objects:
+      payment 7
+          expected dated between 2026-08-10 and 2026-09-10
+          observed dated 2026-08-09   (amount 300)
+      payment 10
+          expected dated between 2026-09-11 and 2026-10-12
+          observed dated 2026-08-10   (amount 300)
+      payment 11
+          expected dated between 2026-09-11 and 2026-10-12
+          observed dated 2026-09-09   (amount 300)
+
+====================================================================================================
+NOT PROVEN — evaluated but not exercised
+====================================================================================================
+These invariants did not fail. They also did not pass: the
+population was empty, or the mode does not apply. Under P10
+absence of data is not evidence of correctness, and reporting
+them as green would make the engine exactly the kind of control
+that cannot fail.
+  [VACUOUS        ] INV-A06  A guest who has paid more than they owe has an overpayment record
+      overpaid reservations: no rows in scope
+  [VACUOUS        ] INV-C01  A walk-in reservation is never settled through an OTA receivable
+      0 of 0 OTA posting(s) sit on walk-in bookings, carrying 0.00
+  [VACUOUS        ] INV-C05  An OTA settlement identifies the agent it will be collected from
+      reservations with OTA postings: no rows in scope
+  [VACUOUS        ] INV-C06  Corporate credit is backed by a company account that exists
+      no folio names a company and no reservation is flagged corporate; the rule was not exercised
+  [VACUOUS        ] INV-D05  Every void request and credit note references what it cancels
+      no void requests and no credit notes exist, so the rule was not exercised
+  [VACUOUS        ] INV-D07  Every overpayment record corresponds to a real overpayment
+      overpayment log rows: no rows in scope
+
+====================================================================================================
+PERFORMANCE AND SAFETY
+====================================================================================================
+ID        STATUS              POP  VIOL     ms   reads  writes    rows  peak KB  TITLE
+----------------------------------------------------------------------------------------------------
+INV-A01   HOLDS                 8     0     79      49       0       0     1006  Settlement identity: grand total -
+INV-A02   VIOLATED             16     8      1       4       0      10        6  Every financial row belongs to a f
+INV-A03   VIOLATED              5     2      0       1       0       5        2  Charges summed over folios equal c
+INV-A04   HOLDS                11     0      5       7       0      14       77  Daily collections equal the direct
+INV-A05   HOLDS                12     0      0       1       0      12        4  Every stored tax line equals its t
+INV-A06   VACUOUS               0     0     52      51       0       1      132  A guest who has paid more than the
+INV-B01   VIOLATED              4     1      0       3       0       5        3  No financial row was created into 
+INV-B02   HOLDS                 1     0      6       1       0       0      144  Every frozen night-audit snapshot 
+INV-B03   VIOLATED              8     2    306      44       0       0     4462  Recomputing a closed day reproduce
+INV-B04   VIOLATED              1     5      1       4       0       6       11  Exactly one business date exists a
+INV-B05   HOLDS                 1     0      0       2       0       2        1  Night audits form an unbroken sequ
+INV-B06   VIOLATED             11     3      0       1       0      11        5  A payment is never dated outside t
+INV-C01   VACUOUS               0     0      0       1       0       0        1  A walk-in reservation is never set
+INV-C02   HOLDS                 4     0    110      27       0       1      508  A checked-out reservation is settl
+INV-C03   HOLDS                28     0      0       9       0       6        4  Every financial event belongs to a
+INV-C04   HOLDS                 7     0      0       1       0       7        2  No room is occupied by two reserva
+INV-C05   VACUOUS               0     0      0       1       0       0        1  An OTA settlement identifies the a
+INV-C06   VACUOUS               0     0      0       4       0       2        1  Corporate credit is backed by a co
+INV-D01   HOLDS                 8     0      0       2       0       1        1  Every folio references a reservati
+INV-D02   VIOLATED              5     1      0       4       0       7        2  Every correction and reversal refe
+INV-D03   HOLDS                11     0      0       3       0      13        4  Every payment references a payment
+INV-D04   HOLDS                12     0      0      13       0      24        5  Every tax line names the charge it
+INV-D05   VACUOUS               0     0      0       6       0       4        4  Every void request and credit note
+INV-D06   HOLDS                 4     0      0       2       0       5        1  Every priced room night belongs to
+INV-D07   VACUOUS               0     0      0       2       0       1        1  Every overpayment record correspon
+INV-R01   VIOLATED              1     1     93      42       0       0      650  A day reconciles gross accrual aga
+----------------------------------------------------------------------------------------------------
+TOTAL                                23    653     285       0     137     4462
+
+====================================================================================================
+COMMISSIONING GAPS (1)
+====================================================================================================
+An invariant that has never been shown to fail is not yet a
+control. These are reported by the engine and excluded from its
+verdict until commissioning demonstrates the failure.
+  INV-R01    NOT_COMMISSIONED
+      declared but not yet commissioned
+
+====================================================================================================
+END OF REPORT
+====================================================================================================

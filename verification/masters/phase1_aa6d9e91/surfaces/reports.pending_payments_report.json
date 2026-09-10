@@ -1,0 +1,37 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Fpending-payments",
+  "anon_status": 302,
+  "body_bytes": 24946,
+  "body_sha256": "77e51d874f0816426b005830c51290f75687b88a9a0656bff84cdfce17cce966",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 23,
+  "endpoint": "reports.pending_payments_report",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "rows[len]": "0",
+    "total_outstanding": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.pending_payments_report",
+  "templates": [
+    "reports/pending_payments.html"
+  ],
+  "truncations": [],
+  "url": "/reports/pending-payments"
+}

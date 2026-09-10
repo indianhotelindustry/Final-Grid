@@ -1,0 +1,44 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Fcredit-ledger",
+  "anon_status": 302,
+  "body_bytes": 26573,
+  "body_sha256": "36b8e5466be5ac0093e5096dfe0387918b7808d0971d9af6b8c22efd83781da9",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 18,
+  "endpoint": "reports.credit_ledger",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "count_open": "0",
+    "count_overdue": "0",
+    "count_partial": "0",
+    "count_settled": "0",
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "grand_open": "0",
+    "grand_recovered": "0",
+    "include_settled": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "records[len]": "0",
+    "today": "2026-08-10"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.credit_ledger",
+  "templates": [
+    "reports/credit_ledger.html"
+  ],
+  "truncations": [],
+  "url": "/reports/credit-ledger"
+}

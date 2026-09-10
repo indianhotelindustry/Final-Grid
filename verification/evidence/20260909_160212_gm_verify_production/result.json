@@ -1,0 +1,64 @@
+{
+  "blocking_count": 4,
+  "by_kind": {
+    "FIGURE_ADDED": 1,
+    "FIGURE_CHANGED": 3
+  },
+  "current_app_version": "2.2.18",
+  "current_frozen_at": "2026-08-10T12:00:00",
+  "difference_count": 4,
+  "differences": [
+    {
+      "category": "FINANCIAL",
+      "current": "8",
+      "delta": "",
+      "key": "panel_ui.attribution[len]",
+      "kind": "FIGURE_ADDED",
+      "master": "",
+      "severity": "BLOCK",
+      "surface_id": "main.night_audit",
+      "url": "/night-audit"
+    },
+    {
+      "category": "FINANCIAL",
+      "current": "2",
+      "delta": "+1",
+      "key": "panel_ui.total_issues",
+      "kind": "FIGURE_CHANGED",
+      "master": "1",
+      "severity": "BLOCK",
+      "surface_id": "main.night_audit",
+      "url": "/night-audit"
+    },
+    {
+      "category": "FINANCIAL",
+      "current": "2",
+      "delta": "+1",
+      "key": "panel_ui.warn_conditions",
+      "kind": "FIGURE_CHANGED",
+      "master": "1",
+      "severity": "BLOCK",
+      "surface_id": "main.night_audit",
+      "url": "/night-audit"
+    },
+    {
+      "category": "FINANCIAL",
+      "current": "25",
+      "delta": "+1",
+      "key": "panel_ui[len]",
+      "kind": "FIGURE_CHANGED",
+      "master": "24",
+      "severity": "BLOCK",
+      "surface_id": "main.night_audit",
+      "url": "/night-audit"
+    }
+  ],
+  "master_app_version": "2.2.18",
+  "master_captured_at": "2026-09-09T00:56:05",
+  "master_frozen_at": "2026-08-10T12:00:00",
+  "read_only_verified": true,
+  "surfaces_clean": 157,
+  "surfaces_compared": 158,
+  "tag": "production",
+  "verdict": "FAIL"
+}

@@ -1,0 +1,35 @@
+{
+  "anon_location": "/auth/login?next=%2Fai%2Fforecast",
+  "anon_status": 302,
+  "body_bytes": 34032,
+  "body_sha256": "89bd0f690649dd1c2a8fe1847a6e5f054206a32b7069084b28e54bc12bed1701",
+  "category": "ADVISORY",
+  "content_type": "text/html",
+  "duration_ms": 6,
+  "endpoint": "ai.forecast_dashboard",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 5,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "INFO",
+  "status": 200,
+  "surface_id": "ai.forecast_dashboard",
+  "templates": [
+    "ai/forecast_dashboard.html"
+  ],
+  "truncations": [],
+  "url": "/ai/forecast"
+}

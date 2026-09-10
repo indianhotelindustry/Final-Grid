@@ -1,0 +1,41 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/guest/1/history",
+  "anon_status": 302,
+  "body_bytes": 28163,
+  "body_sha256": "877ccb348b7b6d33b22a6b0cca65b4359be60a8850bb699b0c75c25a1029458b",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 15,
+  "endpoint": "main.guest_history",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "guest[type]": "Guest",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "rows[len]": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "Guest stay history.",
+  "origin": "declared",
+  "params": {
+    "id": 1,
+    "resolver": "any_guest",
+    "rule": "lowest guest id"
+  },
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "main.guest_history__any_guest",
+  "templates": [
+    "guest_history.html"
+  ],
+  "truncations": [],
+  "url": "/guest/1/history"
+}

@@ -1,0 +1,36 @@
+{
+  "anon_location": "/auth/login?next=%2Floyalty%2Ftransactions",
+  "anon_status": 302,
+  "body_bytes": 24601,
+  "body_sha256": "8ad1b9f297a65938fa0fc8a1f1f31a5da7c25b81e77df11aa0c1244353c5eec4",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 11,
+  "endpoint": "loyalty.transactions",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "txns[type]": "QueryPagination"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "loyalty.transactions",
+  "templates": [
+    "loyalty/transactions.html"
+  ],
+  "truncations": [],
+  "url": "/loyalty/transactions"
+}

@@ -1,0 +1,44 @@
+{
+  "anon_location": "/auth/login?next=%2Fpos%2Fitems",
+  "anon_status": 302,
+  "body_bytes": 34460,
+  "body_sha256": "c6ea79cf7e52077af711a504829158c2094e636a960ccc21e9ceb2eaeaff731b",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 7,
+  "endpoint": "pos.items",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "items[0][type]": "POSItem",
+    "items[1][type]": "POSItem",
+    "items[2][type]": "POSItem",
+    "items[3][type]": "POSItem",
+    "items[4][type]": "POSItem",
+    "items[5][type]": "POSItem",
+    "items[6][type]": "POSItem",
+    "items[7][type]": "POSItem",
+    "items[len]": "8",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "pos.items",
+  "templates": [
+    "pos/items.html"
+  ],
+  "truncations": [],
+  "url": "/pos/items"
+}

@@ -1,0 +1,47 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/guest/1",
+  "anon_status": 302,
+  "body_bytes": 89259,
+  "body_sha256": "2ca62fd43d67245b9b4f3f0d86c266563203e816ae65e5afec7aa84a186b4cb3",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 73,
+  "endpoint": "main.guest_folio",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "companies[len]": "0",
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "guest[type]": "Guest",
+    "history_rows[len]": "0",
+    "lifetime_spend": "0",
+    "outstanding_bal": "0",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "reservations[len]": "0",
+    "total_paid_all": "0",
+    "total_visits": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 5,
+    "csrf_meta": 1
+  },
+  "note": "Guest-level folio.",
+  "origin": "declared",
+  "params": {
+    "id": 1,
+    "resolver": "any_guest",
+    "rule": "lowest guest id"
+  },
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "main.guest_folio__any_guest",
+  "templates": [
+    "guest_folio.html"
+  ],
+  "truncations": [],
+  "url": "/guest/1"
+}

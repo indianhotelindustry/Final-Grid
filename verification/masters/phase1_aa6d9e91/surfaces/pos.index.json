@@ -1,0 +1,50 @@
+{
+  "anon_location": "/auth/login?next=%2Fpos%2F",
+  "anon_status": 302,
+  "body_bytes": 38348,
+  "body_sha256": "ca4b7f1d37205e3e36942404b49d3c7aacbf6dc6f610e8a9aebcdca6842fde6f",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 15,
+  "endpoint": "pos.index",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "business_date": "2026-08-10",
+    "categories.Laundry[0][type]": "POSItem",
+    "categories.Laundry[1][type]": "POSItem",
+    "categories.Laundry[2][type]": "POSItem",
+    "categories.Laundry[len]": "3",
+    "categories.Minibar[0][type]": "POSItem",
+    "categories.Minibar[1][type]": "POSItem",
+    "categories.Minibar[len]": "2",
+    "categories.Other[0][type]": "POSItem",
+    "categories.Other[len]": "1",
+    "categories.Restaurant[0][type]": "POSItem",
+    "categories.Restaurant[1][type]": "POSItem",
+    "categories.Restaurant[len]": "2",
+    "categories[len]": "4",
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "occupied[len]": "0",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 5,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "pos.index",
+  "templates": [
+    "pos/index.html"
+  ],
+  "truncations": [],
+  "url": "/pos/"
+}

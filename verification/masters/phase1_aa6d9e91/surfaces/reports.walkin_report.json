@@ -1,0 +1,40 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Fwalkin",
+  "anon_status": 302,
+  "body_bytes": 25649,
+  "body_sha256": "b7f79040c2a4c8b440cd358a9e332b113a6c4ad4b04f4d883344113d46505c83",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 12,
+  "endpoint": "reports.walkin_report",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "records[0][type]": "Reservation",
+    "records[1][type]": "Reservation",
+    "records[2][type]": "Reservation",
+    "records[len]": "3",
+    "report_date": "2026-08-10"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.walkin_report",
+  "templates": [
+    "reports/walkin_report.html"
+  ],
+  "truncations": [],
+  "url": "/reports/walkin"
+}

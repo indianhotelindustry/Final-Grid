@@ -1,0 +1,31 @@
+{
+  "anon_location": "/auth/login?next=%2Fbilling%2Fvoid%2Feligible%2F1",
+  "anon_status": 302,
+  "body_bytes": 129,
+  "body_sha256": "a3a0254e3743fccdd15a2b2fdd84b380d4e80b4bf9ca67e83d93d005af616051",
+  "category": "FINANCIAL",
+  "content_type": "application/json",
+  "duration_ms": 5,
+  "endpoint": "billing.void_eligible",
+  "error": "",
+  "figure_source": "json",
+  "figures": {
+    "$.eligible": "False",
+    "$[len]": "2"
+  },
+  "location": "",
+  "normalisation_hits": {},
+  "note": "Whether a payment may still be voided \u2014 the gate on reversals.",
+  "origin": "declared",
+  "params": {
+    "id": 1,
+    "resolver": "any_payment",
+    "rule": "lowest payment id"
+  },
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "billing.void_eligible__any_payment",
+  "templates": [],
+  "truncations": [],
+  "url": "/billing/void/eligible/1"
+}

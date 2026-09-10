@@ -1,0 +1,29 @@
+{
+  "anon_location": "/auth/login?next=%2Fapi%2Fai%2Fdemand-spikes",
+  "anon_status": 302,
+  "body_bytes": 60,
+  "body_sha256": "018be1ba0b87421e5b6f6a471d556c0c5f5d3b05d231756835ea993491929261",
+  "category": "ADVISORY",
+  "content_type": "application/json",
+  "duration_ms": 52,
+  "endpoint": "ai.api_demand_spikes",
+  "error": "",
+  "figure_source": "json",
+  "figures": {
+    "$.days": "90",
+    "$.potential_events[len]": "0",
+    "$.spikes[len]": "0",
+    "$[len]": "4"
+  },
+  "location": "",
+  "normalisation_hits": {},
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "INFO",
+  "status": 200,
+  "surface_id": "ai.api_demand_spikes",
+  "templates": [],
+  "truncations": [],
+  "url": "/api/ai/demand-spikes"
+}

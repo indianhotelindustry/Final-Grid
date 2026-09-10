@@ -1,0 +1,28 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/reservation/1/edit",
+  "anon_status": 302,
+  "body_bytes": 213,
+  "body_sha256": "2b8f71ef103db0d41f1217118bb41a37f68c8bf1b4cd7fb58072db325f1cfa91",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 2,
+  "endpoint": "main.edit_reservation",
+  "error": "",
+  "figure_source": "none",
+  "figures": {},
+  "location": "/reservations",
+  "normalisation_hits": {},
+  "note": "Reservation edit screen, where tariffs are changed.",
+  "origin": "declared",
+  "params": {
+    "id": 1,
+    "resolver": "any_reservation",
+    "rule": "lowest reservation id"
+  },
+  "severity": "WARN",
+  "status": 302,
+  "surface_id": "main.edit_reservation__any_reservation",
+  "templates": [],
+  "truncations": [],
+  "url": "/reservation/1/edit"
+}

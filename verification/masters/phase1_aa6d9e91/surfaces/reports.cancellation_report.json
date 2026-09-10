@@ -1,0 +1,38 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Fcancellations",
+  "anon_status": 302,
+  "body_bytes": 24645,
+  "body_sha256": "ad81e36dbb0e22be4732015582c9b4254eaa7f6c5c99204ebaf3fd81bea80b3c",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 12,
+  "endpoint": "reports.cancellation_report",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "from_date": "2026-08-01",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "records[len]": "0",
+    "to_date": "2026-08-10"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.cancellation_report",
+  "templates": [
+    "reports/cancellation_report.html"
+  ],
+  "truncations": [],
+  "url": "/reports/cancellations"
+}

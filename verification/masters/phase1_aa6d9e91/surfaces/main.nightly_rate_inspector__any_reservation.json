@@ -1,0 +1,54 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/reservations/1/nightly-rates",
+  "anon_status": 302,
+  "body_bytes": 25318,
+  "body_sha256": "3b9e8787b288dd9697a2f046b980b0b216e8e4bed2ead81724657deb0631ce0b",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 13,
+  "endpoint": "main.nightly_rate_inspector",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "nights": "1",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "reservation[type]": "Reservation",
+    "rows[0][type]": "ReservationNightRate",
+    "rows[len]": "1",
+    "summary.avg_final": "761.9",
+    "summary.expected_nights": "1",
+    "summary.res_adjustment": "380.96",
+    "summary.res_discount": "0",
+    "summary.res_rate_per_night": "761.9",
+    "summary.row_count": "1",
+    "summary.total_discount": "0",
+    "summary.total_final": "761.9",
+    "summary.total_standard": "1142.86",
+    "summary[len]": "9",
+    "warnings[len]": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "Per-night rate breakdown.",
+  "origin": "declared",
+  "params": {
+    "id": 1,
+    "resolver": "any_reservation",
+    "rule": "lowest reservation id"
+  },
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "main.nightly_rate_inspector__any_reservation",
+  "templates": [
+    null
+  ],
+  "truncations": [],
+  "url": "/reservations/1/nightly-rates"
+}

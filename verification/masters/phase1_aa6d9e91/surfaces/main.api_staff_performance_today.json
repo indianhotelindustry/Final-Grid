@@ -1,0 +1,28 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/api/staff/performance/today",
+  "anon_status": 302,
+  "body_bytes": 34,
+  "body_sha256": "974e4feba60d3637e5fbe38bad7bc2cabf395e61486ada685d677ac1d7ca68a4",
+  "category": "OPERATIONAL",
+  "content_type": "application/json",
+  "duration_ms": 3,
+  "endpoint": "main.api_staff_performance_today",
+  "error": "",
+  "figure_source": "json",
+  "figures": {
+    "$.performance[len]": "0",
+    "$.success": "True",
+    "$[len]": "2"
+  },
+  "location": "",
+  "normalisation_hits": {},
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "main.api_staff_performance_today",
+  "templates": [],
+  "truncations": [],
+  "url": "/api/staff/performance/today"
+}

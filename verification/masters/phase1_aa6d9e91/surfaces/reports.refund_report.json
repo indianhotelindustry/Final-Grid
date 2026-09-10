@@ -1,0 +1,39 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Frefund-report",
+  "anon_status": 302,
+  "body_bytes": 26226,
+  "body_sha256": "8cb8151a82c59c78e59e439b951b1a3ef16016778f1e2e32e5f2d60084d9c83f",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 9,
+  "endpoint": "reports.refund_report",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "from_date": "2026-08-01",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "rows[len]": "0",
+    "to_date": "2026-08-10",
+    "total": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.refund_report",
+  "templates": [
+    "reports/refund_report.html"
+  ],
+  "truncations": [],
+  "url": "/reports/refund-report"
+}

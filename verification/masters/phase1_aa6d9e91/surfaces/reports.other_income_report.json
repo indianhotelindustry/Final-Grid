@@ -1,0 +1,39 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Fother-income-report",
+  "anon_status": 302,
+  "body_bytes": 26241,
+  "body_sha256": "6a03fa1ee629246ab0335f17c6eaba386f7a1937ca5b532fa12b2a22630ccff9",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 12,
+  "endpoint": "reports.other_income_report",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "from_date": "2026-08-01",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "rows[len]": "0",
+    "to_date": "2026-08-10",
+    "total": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.other_income_report",
+  "templates": [
+    "reports/other_income_report.html"
+  ],
+  "truncations": [],
+  "url": "/reports/other-income-report"
+}

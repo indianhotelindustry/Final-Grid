@@ -1,0 +1,52 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Fota-receivables",
+  "anon_status": 302,
+  "body_bytes": 25756,
+  "body_sha256": "e9747bc07c5179db9e9fad2538d63cd90159271ba6933c718296d31ed59ebaa2",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 14,
+  "endpoint": "reports.ota_receivables",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "from_date": "2026-08-10",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "ota_heads[0][type]": "PaymentMode",
+    "ota_heads[1][type]": "PaymentMode",
+    "ota_heads[2][type]": "PaymentMode",
+    "ota_heads[3][type]": "PaymentMode",
+    "ota_heads[4][type]": "PaymentMode",
+    "ota_heads[5][type]": "PaymentMode",
+    "ota_heads[6][type]": "PaymentMode",
+    "ota_heads[7][type]": "PaymentMode",
+    "ota_heads[8][type]": "PaymentMode",
+    "ota_heads[len]": "9",
+    "ota_payments[len]": "0",
+    "outstanding[len]": "0",
+    "outstanding_total": "0",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "settled_by_head[len]": "0",
+    "settled_total": "0",
+    "to_date": "2026-08-10"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.ota_receivables",
+  "templates": [
+    "reports/ota_receivables.html"
+  ],
+  "truncations": [],
+  "url": "/reports/ota-receivables"
+}

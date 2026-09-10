@@ -1,0 +1,35 @@
+{
+  "anon_location": "/auth/login?next=http://localhost/api/reservation/1",
+  "anon_status": 302,
+  "body_bytes": 368,
+  "body_sha256": "3fe713a14036464bab3c319daef03c7497d936dd114248e2f3e0292afff1f8ec",
+  "category": "OPERATIONAL",
+  "content_type": "application/json",
+  "duration_ms": 2,
+  "endpoint": "main.get_reservation",
+  "error": "",
+  "figure_source": "json",
+  "figures": {
+    "$.adults": "2",
+    "$.children": "0",
+    "$.folio_no": "29",
+    "$.guest_id": "29",
+    "$.room_type_id": "2",
+    "$[len]": "16"
+  },
+  "location": "",
+  "normalisation_hits": {},
+  "note": "Reservation as served to the UI.",
+  "origin": "declared",
+  "params": {
+    "id": 1,
+    "resolver": "any_reservation",
+    "rule": "lowest reservation id"
+  },
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "main.get_reservation__any_reservation",
+  "templates": [],
+  "truncations": [],
+  "url": "/api/reservation/1"
+}

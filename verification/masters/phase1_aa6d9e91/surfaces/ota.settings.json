@@ -1,0 +1,37 @@
+{
+  "anon_location": "/auth/login?next=%2Fota%2Fsettings",
+  "anon_status": 302,
+  "body_bytes": 34401,
+  "body_sha256": "d543bdcba1b4d5f640621af812e3b537eb9530d02e5265a38d680cc713cbaf01",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 7,
+  "endpoint": "ota.settings",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "commissions[len]": "9",
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "ota_sources[len]": "9",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 5,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "ota.settings",
+  "templates": [
+    "ota/settings.html"
+  ],
+  "truncations": [],
+  "url": "/ota/settings"
+}

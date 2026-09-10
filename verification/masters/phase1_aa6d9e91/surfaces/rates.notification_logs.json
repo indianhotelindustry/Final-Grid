@@ -1,0 +1,41 @@
+{
+  "anon_location": "/auth/login?next=%2Frates%2Fnotification-logs",
+  "anon_status": 302,
+  "body_bytes": 31468,
+  "body_sha256": "c46a134c37964469c2a70c36d88a8fbe300c44cdcdf1da47e7ab34e5ff809a8a",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 15,
+  "endpoint": "rates.notification_logs",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "logs[0][type]": "NotificationLog",
+    "logs[1][type]": "NotificationLog",
+    "logs[2][type]": "NotificationLog",
+    "logs[3][type]": "NotificationLog",
+    "logs[4][type]": "NotificationLog",
+    "logs[len]": "5",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "rates.notification_logs",
+  "templates": [
+    "rates/notification_logs.html"
+  ],
+  "truncations": [],
+  "url": "/rates/notification-logs"
+}

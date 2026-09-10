@@ -1,0 +1,39 @@
+{
+  "anon_location": "/auth/login?next=%2Floyalty%2Fmilestones",
+  "anon_status": 302,
+  "body_bytes": 28232,
+  "body_sha256": "1081bd31e16e8dede0e25552113891891733dce58b47baecc60670b77f10ed8d",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 7,
+  "endpoint": "loyalty.milestones",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "milestones[0][type]": "LoyaltyMilestone",
+    "milestones[1][type]": "LoyaltyMilestone",
+    "milestones[2][type]": "LoyaltyMilestone",
+    "milestones[len]": "3",
+    "pending_shift_count": "0",
+    "pending_void_count": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "loyalty.milestones",
+  "templates": [
+    "loyalty/milestones.html"
+  ],
+  "truncations": [],
+  "url": "/loyalty/milestones"
+}

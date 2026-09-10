@@ -1,0 +1,39 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Fdepartures",
+  "anon_status": 302,
+  "body_bytes": 26483,
+  "body_sha256": "a7ff1e120f498d2407a97aac7082298dd2dc223295fea682b5a1108a46f0aaca",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 22,
+  "endpoint": "reports.departures",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "records[0][type]": "Reservation",
+    "records[len]": "1",
+    "report_date": "2026-08-10",
+    "today": "2026-08-10"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.departures",
+  "templates": [
+    "reports/departures.html"
+  ],
+  "truncations": [],
+  "url": "/reports/departures"
+}

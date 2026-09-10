@@ -1,0 +1,47 @@
+{
+  "anon_location": "/auth/login?next=%2Ffeedback%2Fdashboard",
+  "anon_status": 302,
+  "body_bytes": 26991,
+  "body_sha256": "3d0653de35deff09b8e8e414d75cad448b50aaf21ea93233988219f14bb688fa",
+  "category": "OPERATIONAL",
+  "content_type": "text/html",
+  "duration_ms": 12,
+  "endpoint": "feedback.dashboard",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "avg_rating": "0",
+    "dev_seed_enabled": "False",
+    "dist.1": "0",
+    "dist.2": "0",
+    "dist.3": "0",
+    "dist.4": "0",
+    "dist.5": "0",
+    "dist[len]": "5",
+    "feedbacks[len]": "0",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "negative": "0",
+    "nps": "0",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "promoters": "0",
+    "total": "0"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "WARN",
+  "status": 200,
+  "surface_id": "feedback.dashboard",
+  "templates": [
+    "feedback/dashboard.html"
+  ],
+  "truncations": [],
+  "url": "/feedback/dashboard"
+}

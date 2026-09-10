@@ -1,0 +1,28 @@
+{
+  "anon_location": "/auth/login?next=%2Fapi%2Fai%2Fpredictive-maintenance%2Fpredictions",
+  "anon_status": 302,
+  "body_bytes": 43,
+  "body_sha256": "6f91029d17cafafa5b100e339143f52f71307ab7c7894c8caabf9fbc07881829",
+  "category": "ADVISORY",
+  "content_type": "application/json",
+  "duration_ms": 2,
+  "endpoint": "ai.api_pm_predictions",
+  "error": "",
+  "figure_source": "json",
+  "figures": {
+    "$.days": "30",
+    "$.predictions[len]": "0",
+    "$[len]": "3"
+  },
+  "location": "",
+  "normalisation_hits": {},
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "INFO",
+  "status": 200,
+  "surface_id": "ai.api_pm_predictions",
+  "templates": [],
+  "truncations": [],
+  "url": "/api/ai/predictive-maintenance/predictions"
+}

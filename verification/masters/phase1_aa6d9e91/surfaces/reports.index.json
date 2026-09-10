@@ -1,0 +1,36 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2F",
+  "anon_status": 302,
+  "body_bytes": 72210,
+  "body_sha256": "6b243e0ed7a7a440df05c12426f85a9e374513a33a1f1ae514a578bc8d92db2d",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 26,
+  "endpoint": "reports.index",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "today": "2026-08-10"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 5,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.index",
+  "templates": [
+    "reports/index.html"
+  ],
+  "truncations": [],
+  "url": "/reports/"
+}

@@ -1,0 +1,47 @@
+{
+  "anon_location": "/auth/login?next=%2Freports%2Foverstay-control",
+  "anon_status": 302,
+  "body_bytes": 28850,
+  "body_sha256": "a2b02c37060e4b351b382fc70b33f7cb037137caef0ca5ec950393aff015a04d",
+  "category": "FINANCIAL",
+  "content_type": "text/html",
+  "duration_ms": 24,
+  "endpoint": "reports.overstay_control",
+  "error": "",
+  "figure_source": "context",
+  "figures": {
+    "dev_seed_enabled": "False",
+    "from_date": "2026-08-01",
+    "g_business_date": "2026-08-10",
+    "g_business_date_locked": "False",
+    "pending_shift_count": "0",
+    "pending_void_count": "0",
+    "rows[len]": "0",
+    "summary.charge_count": "0",
+    "summary.extend_count": "0",
+    "summary.total_charge_excl": "0",
+    "summary.total_charge_incl": "0",
+    "summary.total_gst": "0",
+    "summary.total_records": "0",
+    "summary.total_waived_excl": "0",
+    "summary.waive_count": "0",
+    "summary[len]": "8",
+    "to_date": "2026-08-10"
+  },
+  "location": "",
+  "normalisation_hits": {
+    "csp_nonce_attr": 4,
+    "csrf_meta": 1
+  },
+  "note": "",
+  "origin": "discovered",
+  "params": {},
+  "severity": "BLOCK",
+  "status": 200,
+  "surface_id": "reports.overstay_control",
+  "templates": [
+    "reports/overstay_control.html"
+  ],
+  "truncations": [],
+  "url": "/reports/overstay-control"
+}

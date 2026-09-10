@@ -1,0 +1,16 @@
+{
+  "blocking_count": 0,
+  "by_kind": {},
+  "current_app_version": "2.2.18",
+  "current_frozen_at": "2026-08-10T12:00:00",
+  "difference_count": 0,
+  "differences": [],
+  "master_app_version": "2.2.18",
+  "master_captured_at": "2026-09-09T16:01:49",
+  "master_frozen_at": "2026-08-10T12:00:00",
+  "read_only_verified": true,
+  "surfaces_clean": 158,
+  "surfaces_compared": 158,
+  "tag": "phase1_aa6d9e91",
+  "verdict": "PASS"
+}
