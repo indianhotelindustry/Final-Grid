@@ -1,0 +1,80 @@
+{
+ "directive": "FinalGrid Q06 forward correction implementation",
+ "authority": "Founder Resolution Round 4, Q06-H2 (FG-P2-FOUNDER-RESOLUTION-20260923-01)",
+ "baseline_head": "b0d30542ff6b3cdbbc269fd8c17679c80ed9f718",
+ "implemented": "2026-09-23",
+ "files_changed_application": {
+  "app/night_audit_service.py": {"function": "NightAuditService.tax_snapshot", "insertions": 21, "deletions": 2, "hunks": 1, "other_files_under_app_changed": 0}
+ },
+ "deduplication_key_reused": ["reservation_id", "charge_source_type", "charge_source_id"],
+ "deduplication_key_source": "gst_service.get_gst_report() lines 705,712-716 (unmodified)",
+ "not_modified": ["app/gst_service.py", "app/gst_einvoice.py", "instance/pms.db", "any schema/migration", "any business-date logic", "any payment/folio writer", "verification/quantities.py", "any pre-existing evidence directory"],
+ "focused_test": {
+  "script": "verify_q06_fix.py",
+  "cases_total": 14, "cases_passed": 14, "verdict": "PASS",
+  "dates_exercised": ["2026-08-09", "2026-08-10"],
+  "total_taxable_before_after": {
+   "2026-08-09": {"old_buggy": 2285.7, "fixed": 1142.85, "get_gst_report": 1142.85},
+   "2026-08-10": {"old_buggy": 5904.76, "fixed": 2952.38, "get_gst_report": 2952.38}
+  },
+  "total_tax_unchanged": {"2026-08-09": 57.14, "2026-08-10": 147.6},
+  "interstate_case": {"exists_in_dataset": false, "note": "no IGST TaxLine rows present; dedup key is structurally a no-op for a single-row charge"},
+  "sealed_nightauditlog_20260809": {
+   "snapshot_hash_before": "d248ae5413672f269cdefc9ad73ad18f1da28f3fca86c2248213b976f8ba4128",
+   "snapshot_hash_after": "d248ae5413672f269cdefc9ad73ad18f1da28f3fca86c2248213b976f8ba4128",
+   "unchanged": true
+  }
+ },
+ "existing_tests": {
+  "phase2a_matrix": {"cases_passed": 29, "cases_total": 29, "verdict": "PASS", "note": "re-run from a copy in this evidence directory to avoid overwriting verification/evidence/20260910_retention_control/RESULT.json"}
+ },
+ "regression": {
+  "golden_master": {"tag": "phase1_aa6d9e91", "compared": 158, "clean": 158, "differences": 0, "verdict": "PASS", "pack": "verification/evidence/20260923_155154_gm_verify_phase1_aa6d9e91"},
+  "replay": {
+   "verdict": "FAIL_EXPECTED",
+   "differences": [
+    {"date": "2026-08-09", "day_state": "CLOSED", "severity": "BLOCK", "field": "nas.tax_snapshot.total_taxable", "stored": 2285.7, "current": 1142.85, "delta": -1142.85},
+    {"date": "2026-08-10", "day_state": "BUSINESS_DATE", "severity": "INFO", "field": "nas.tax_snapshot.total_taxable", "stored": 5904.76, "current": 2952.38, "delta": -2952.38}
+   ],
+   "explanation": "the stored replay baseline recorded the pre-fix buggy values; both deltas equal exactly the duplicated CGST-or-SGST base the fix removes; no other field or date diverged; replay baseline NOT altered/re-frozen by this directive",
+   "pack": "verification/evidence/20260923_155240_replay_verify_production"
+  },
+  "invariants": {"registered": 26, "holds": 17, "vacuous": 7, "violated": 2, "violated_ids": ["INV-A02 (D11 8/8)", "INV-A03 (D11)"], "overall": "unchanged from pre-fix baseline (20260910_064257_inv_run_production)", "pack": "verification/evidence/20260923_155256_inv_run_production"},
+  "cross_implementation_q06": {
+   "quantity_id": "Q06",
+   "top_level_verdict": "DIVERGED",
+   "top_level_verdict_cause": "structural impls split (raw whole-table sum vs deduped sum), independent of tax_snapshot(), unchanged by this fix, present before and after",
+   "actual_per_date_divergences": [],
+   "per_date": {
+    "2026-08-09": {"gst_report_deduped": "1142.85", "night_audit_raw": "1142.85"},
+    "2026-08-10": {"gst_report_deduped": "2952.38", "night_audit_raw": "2952.38"}
+   },
+   "real_defect_status": "CLOSED - per-date divergence list is empty",
+   "pack": "verification/evidence/20260923_155322_cross_implementation"
+  }
+ },
+ "production_anchor": {"sha256": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2", "verified_before_and_after_every_script": true, "mutated": false},
+ "historical_record_rule_honoured": {"Q06-H1": true, "Q06-H3": true, "sealed_record_touched": false, "corrective_record_created": false},
+ "incidental_finding_corrected_in_session": [
+  {
+   "description": "running verification/evidence/20260910_retention_control/phase2a_verify.py from its committed location overwrote the differently-cased committed RESULT.json in the same directory on this case-insensitive filesystem",
+   "action_taken": "git checkout -- verification/evidence/20260910_retention_control/RESULT.json (reverted immediately); script re-run from a copy inside this evidence directory instead",
+   "committed_evidence_left_modified": false
+  },
+  {
+   "description": "the same case-insensitive collision then recurred harmlessly inside this new directory: phase2a_verify.py's own result.json (written first) was overwritten on disk when this file, RESULT.json, was written afterward",
+   "action_taken": "none required; both files were new/untracked; phase2a's 29/29 PASS numbers are preserved in prose in Q06_REGRESSION.md from the console transcript",
+   "committed_evidence_left_modified": false,
+   "standalone_phase2a_json_file_present": false
+  }
+ ],
+ "governance_changes_this_directive": [],
+ "evidence_dir": {"path": "verification/evidence/20260923_q06_fix/", "tracked": false, "files": ["Q06_FIX_IMPLEMENTATION.md", "Q06_REGRESSION.md", "RESULT.json", "verify_q06_fix.py", "phase2a_verify.py", "q06_fix_regression_result.json"]},
+ "working_tree_after_implementation": {
+  "modified_tracked": ["app/night_audit_service.py", "verification/FOUNDER_DECISIONS.md"],
+  "untracked_new_from_this_directive": ["verification/evidence/20260923_q06_fix/", "verification/evidence/20260923_155154_gm_verify_phase1_aa6d9e91/", "verification/evidence/20260923_155240_replay_verify_production/", "verification/evidence/20260923_155256_inv_run_production/", "verification/evidence/20260923_155322_cross_implementation/"],
+  "untracked_pre_existing_not_part_of_this_directive": ["verification/evidence/20260923_q06_analysis/", "verification/evidence/20260923_q06_downstream/", "verification/evidence/20260923_q06_founder_resolution/"],
+  "staged": 0, "committed": false, "pushed": false
+ },
+ "stop_conditions_triggered": []
+}

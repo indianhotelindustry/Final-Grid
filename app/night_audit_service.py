@@ -1124,16 +1124,35 @@ class NightAuditService:
     # 9. Tax Snapshot
     # -----------------------------------------------------------------------
     def tax_snapshot(self) -> dict:
+        # Q06 (FG-P2-FOUNDER-RESOLUTION-20260923-01, Q06-H2): an intrastate
+        # charge has two TaxLine rows (CGST + SGST) that each carry the full,
+        # unsplit taxable_amount. Summing taxable_amount over every row
+        # double-counts the taxable base for those charges. Dedupe by the
+        # same charge-level key gst_service.get_gst_report() uses so a base
+        # is counted once per (reservation, charge_source_type,
+        # charge_source_id) regardless of how many tax rows it produced.
+        # tax_amount is untouched — it is already split correctly per row.
         by_rate: dict = {}
+        seen_taxable_overall: set = set()
+        seen_taxable_by_rate: dict = {}
+        total_taxable = 0.0
         for t in self._tax_lines:
             key = f"{t.tax_type} @ {_f(t.tax_rate):.0f}%"
             by_rate.setdefault(key, {'taxable': 0.0, 'tax': 0.0, 'count': 0,
                                      'tax_type': t.tax_type, 'rate': _f(t.tax_rate)})
-            by_rate[key]['taxable'] += _f(t.taxable_amount)
+            src_key = (t.reservation_id, t.charge_source_type, t.charge_source_id)
+
+            bucket_seen = seen_taxable_by_rate.setdefault(key, set())
+            if src_key not in bucket_seen:
+                by_rate[key]['taxable'] += _f(t.taxable_amount)
+                bucket_seen.add(src_key)
             by_rate[key]['tax'] += _f(t.tax_amount)
             by_rate[key]['count'] += 1
 
-        total_taxable = sum(_f(t.taxable_amount) for t in self._tax_lines)
+            if src_key not in seen_taxable_overall:
+                total_taxable += _f(t.taxable_amount)
+                seen_taxable_overall.add(src_key)
+
         total_tax = sum(_f(t.tax_amount) for t in self._tax_lines)
         exempt_count = sum(1 for t in self._tax_lines if t.is_exempted)
 
