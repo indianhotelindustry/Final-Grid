@@ -1652,6 +1652,12 @@ def post_cancellation_disposition(reservation, *, disposition, refund_amount=0,
 
     The caller is responsible for setting reservation.status='Cancelled'
     and committing the transaction.
+
+    Q-5 / CF-10: the refund row, the disposition and the forfeit approval
+    are audited by ``audited_financial_write`` and raise on failure, so the
+    caller rolls the whole cancellation back. ``audit_writer`` is still used
+    for the credit-voucher issuance leg, whose failure is deliberately
+    non-blocking (see below).
     """
     from app.models import Payment, db as _db
     from datetime import datetime as _dt
@@ -1748,18 +1754,17 @@ def post_cancellation_disposition(reservation, *, disposition, refund_amount=0,
         )
         _db.session.add(refund_payment)
         _db.session.flush()
-        if audit_writer is not None:
-            try:
-                audit_writer('Payment', refund_payment.id, 'cancellation_refund',
-                             {'reservation_id': reservation.id,
-                              'advance_total': advance_total,
-                              'available_before_refund': available},
-                             {'refund_amount': refund_amount,
-                              'refund_mode_id': int(refund_mode_id),
-                              'reason': reason_clean,
-                              'by_user_id': user_id})
-            except Exception:
-                pass
+        audited_financial_write(                                        # Q-5
+            'Payment', refund_payment.id, 'cancellation_refund',
+            {'reservation_id': reservation.id,
+             'advance_total': advance_total,
+             'available_before_refund': available},
+            {'refund_amount': refund_amount,
+             'refund_mode_id': int(refund_mode_id),
+             'folio_id': refund_payment.folio_id,
+             'reason': reason_clean,
+             'by_user_id': user_id},
+            user_id=user_id)
 
     # ── Stamp cancellation snapshot columns on the reservation ────
     reservation.cancellation_disposition         = disposition
@@ -1813,34 +1818,36 @@ def post_cancellation_disposition(reservation, *, disposition, refund_amount=0,
         'approval_required': forfeit_amount > get_forfeit_approval_threshold() + 0.005,
     }
 
-    if audit_writer is not None:
-        try:
-            audit_writer('Reservation', reservation.id, 'cancellation_disposition',
-                         {'advance_total': advance_total,
-                          'previously_refunded': already_refunded},
-                         {'disposition':     disposition,
-                          'refund_amount':   round(refund_amount, 2),
-                          'forfeit_amount':  round(forfeit_amount, 2),
-                          'voucher_amount':  round(voucher_amount, 2),
-                          'refund_payment_id': (refund_payment.id
-                                                 if refund_payment else None),
-                          'reason': reason_clean,
-                          'by_user_id': user_id,
-                          'approval': _approval_block})
-            # When forfeit is involved, write a dedicated approval row so
-            # filters like action='forfeit_approved' can find it without
-            # parsing JSON.
-            if forfeit_amount > 0.005:
-                audit_writer('Reservation', reservation.id, 'forfeit_approved',
-                             {'forfeit_amount': round(forfeit_amount, 2),
-                              'threshold': get_forfeit_approval_threshold()},
-                             {'approver_user_id':  approver_user_id,
-                              'approver_is_admin': bool(approver_is_admin),
-                              'approval_reason':   _appr_reason_clean,
-                              'cancellation_reason': reason_clean,
-                              'reservation_id':    reservation.id})
-        except Exception:
-            pass
+    # The disposition stamps refund / forfeit / voucher amounts on the
+    # reservation; forfeit is recognised revenue. Coupled like the refund row.
+    audited_financial_write(
+        'Reservation', reservation.id, 'cancellation_disposition',
+        {'advance_total': advance_total,
+         'previously_refunded': already_refunded},
+        {'disposition':     disposition,
+         'refund_amount':   round(refund_amount, 2),
+         'forfeit_amount':  round(forfeit_amount, 2),
+         'voucher_amount':  round(voucher_amount, 2),
+         'refund_payment_id': (refund_payment.id
+                                if refund_payment else None),
+         'reason': reason_clean,
+         'by_user_id': user_id,
+         'approval': _approval_block},
+        user_id=user_id)
+    # When forfeit is involved, write a dedicated approval row so
+    # filters like action='forfeit_approved' can find it without
+    # parsing JSON.
+    if forfeit_amount > 0.005:
+        audited_financial_write(
+            'Reservation', reservation.id, 'forfeit_approved',
+            {'forfeit_amount': round(forfeit_amount, 2),
+             'threshold': get_forfeit_approval_threshold()},
+            {'approver_user_id':  approver_user_id,
+             'approver_is_admin': bool(approver_is_admin),
+             'approval_reason':   _appr_reason_clean,
+             'cancellation_reason': reason_clean,
+             'reservation_id':    reservation.id},
+            user_id=user_id)
 
     return {
         'refund_payment':  refund_payment,

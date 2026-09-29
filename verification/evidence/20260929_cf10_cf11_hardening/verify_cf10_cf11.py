@@ -599,6 +599,22 @@ def group_w10(E):
               (E.get(m.Reservation, rid, 'status'), len(ca),
                ca[0]['after'].get('forfeit_amount') if ca else None), 'HTTP %s' % status(r))
 
+        print('W-10 credit_voucher disposition (voucher leg unchanged, still non-blocking)')
+        rid = booked('9000001003')
+        vbefore = E.count(m.CreditVoucher)
+        r = c.post('/reservation/%d/cancel' % rid,
+                   data={'cancel_disposition': 'credit_voucher', 'cancel_reason': 'CF10 voucher',
+                         'cancel_voucher_amount': '300'})
+        with E.app.app_context():
+            v = (db.session.query(m.CreditVoucher).filter_by(issued_from_reservation_id=rid)
+                 .order_by(m.CreditVoucher.id.desc()).first())
+            vamt = None if v is None else round(float(v.issued_amount), 2)
+        ca = E.audits('Reservation', rid, 'cancellation_disposition')
+        check('W10-10', 'W-10', 'credit_voucher: cancelled, voucher issued, disposition audited',
+              ('Cancelled', vbefore + 1, 300.0, 1),
+              (E.get(m.Reservation, rid, 'status'), E.count(m.CreditVoucher), vamt, len(ca)),
+              'HTTP %s' % status(r))
+
         for kind in ('F1', 'F2'):
             for disp in ('refund_full', 'forfeit'):
                 rid = booked('90000011%s%d' % (kind[-1], 1 if disp == 'refund_full' else 2))

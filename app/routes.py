@@ -8865,6 +8865,16 @@ def cancel_reservation(reservation_id):
             audit_writer      = _write_audit,
         )
         reservation.status = 'Cancelled'
+        # Written before the commit so it is part of the same transaction.
+        # It used to follow the commit and persisted only if a later
+        # notification helper happened to commit (CF-10 / W-10).
+        _write_audit_strict('Reservation', reservation.id, 'cancelled',
+                            {'status': old_status},
+                            {'status': 'Cancelled',
+                             'disposition': disposition,
+                             'refund_amount': result['refund_amount'],
+                             'forfeit_amount': result['forfeit_amount'],
+                             'voucher_amount': result['voucher_amount']})
         db.session.commit()
     except ValueError as exc:
         db.session.rollback()
@@ -8875,14 +8885,6 @@ def cancel_reservation(reservation_id):
         logger.exception('cancel_reservation failed for res=%d', reservation_id)
         flash('Cancellation failed. See server logs.', 'danger')
         return redirect(url_for('main.reservations'))
-
-    _write_audit('Reservation', reservation.id, 'cancelled',
-                 {'status': old_status},
-                 {'status': 'Cancelled',
-                  'disposition': disposition,
-                  'refund_amount': result['refund_amount'],
-                  'forfeit_amount': result['forfeit_amount'],
-                  'voucher_amount': result['voucher_amount']})
 
     # Cancellation WhatsApp + email notification (non-blocking)
     try:
