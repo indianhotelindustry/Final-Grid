@@ -139,16 +139,31 @@ def process_reservation_noshow(
                 room.status = 'Vacant'
 
     # --- No-show fee as ExtraCharge ---
+    fee_charge = None
     if fee_applied:
-        from app.services import resolve_billing_folio_id
-        db.session.add(ExtraCharge(
+        from app.services import resolve_billing_folio_id, audited_financial_write
+        fee_charge = ExtraCharge(
             reservation_id=reservation.id,
             folio_id=resolve_billing_folio_id(                        # R-1
                 reservation, user_id=posted_by_user_id),
             description=f'No-Show Fee ({config["fee_mode"]})',
             amount=fee_amount,
             charge_date=business_date,
-        ))
+        )
+        db.session.add(fee_charge)
+        db.session.flush()
+        # Q-5 / CF-10 (W-14): the fee row itself is audited, in the caller's
+        # transaction; both callers roll back on any exception.
+        audited_financial_write(
+            'ExtraCharge', fee_charge.id, 'posted', {},
+            {'amount': float(fee_amount),
+             'reservation_id': reservation.id,
+             'folio_id': fee_charge.folio_id,
+             'business_date': str(business_date),
+             'fee_mode': config['fee_mode'],
+             'posted_by': posted_by_user_id or 'night_audit',
+             'flow': 'noshow_fee'},
+            user_id=posted_by_user_id)
 
     # --- NoShowLog (immutable record) ---
     log = NoShowLog(
@@ -176,6 +191,7 @@ def process_reservation_noshow(
             'is_ota': is_ota,
             'audit_date': str(business_date),
             'posted_by': posted_by_user_id or 'night_audit',
+            'extra_charge_id': fee_charge.id if fee_charge is not None else None,
         },
         staff_user_id=posted_by_user_id or 0,  # 0 = system/night audit
     ))

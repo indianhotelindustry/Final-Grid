@@ -740,6 +740,196 @@ def group_w12(E):
 
 
 # ===========================================================================
+# Group w13 - cico_service.post_charge (early check-in / late check-out)
+# ===========================================================================
+
+def group_w13(E):
+    m, db = E.m, E.db
+    import app.cico_service as cico
+
+    def in_house(tag):
+        room = E.take_room()
+        return E.new_res(tag, 'CheckedIn', E.bd - timedelta(days=1), E.bd, 1000, room_id=room)
+
+    def like_checkout(rid, user_id, fault=None, only=None):
+        """What routes.checkout / walkin check-in do: call post_charge inside
+        try/except that logs and CONTINUES, then commit the rest of the
+        request. A sentinel change made in the same transaction must survive."""
+        err = None
+        cm = E.fault(fault, only=only) if fault else _null()
+        with cm, E.logged_ctx():
+            res = db.session.get(m.Reservation, rid)
+            res.checkout_initiated = True                       # sentinel
+            try:
+                cico.post_charge(res, 'late_checkout', 300.0, '02:00 PM - 30%',
+                                 user_id=user_id, pct=30, actual_time_str='14:00')
+            except Exception as exc:                            # swallowed like the route
+                err = '%s: %s' % (exc.__class__.__name__, str(exc)[:80])
+            try:
+                db.session.commit()
+            except Exception as exc:
+                db.session.rollback()
+                err = (err or '') + ' | COMMIT FAILED %s' % exc.__class__.__name__
+        return err
+
+    def st(rid):
+        with E.app.app_context():
+            return {'charges': db.session.query(m.ExtraCharge).filter_by(reservation_id=rid).count(),
+                    'cico_logs': db.session.query(m.CICOChargeLog).filter_by(reservation_id=rid).count(),
+                    'sentinel': bool(db.session.get(m.Reservation, rid).checkout_initiated)}
+
+    print('W-13 post_charge, operator actor, checkout-style caller')
+    rid = in_house('w13')
+    err = like_checkout(rid, E.admin_id)
+    s = st(rid)
+    check('W13-01', 'W-13', 'charge + CICO log posted, rest of request committed',
+          (None, 1, 1, True), (err, s['charges'], s['cico_logs'], s['sentinel']))
+    with E.app.app_context():
+        ec = db.session.query(m.ExtraCharge).filter_by(reservation_id=rid).first()
+        ecid, ecamt, ecf = (ec.id, round(float(ec.amount), 2), ec.folio_id) if ec else (None, None, None)
+        lg = db.session.query(m.CICOChargeLog).filter_by(reservation_id=rid).first()
+        lg_ec = lg.extra_charge_id if lg else None
+    au = E.audits('ExtraCharge', ecid, 'posted') if ecid else []
+    check('W13-02', 'W-13', 'strict posted audit on the charge row', 1, len(au))
+    a = au[0] if au else {'after': {}, 'actor': None}
+    check('W13-03', 'W-13', 'charge audit: amount, folio, charge_type, flow',
+          (ecamt, ecf, 'late_checkout', 'cico'),
+          (a['after'].get('amount'), a['after'].get('folio_id'), a['after'].get('charge_type'),
+           a['after'].get('flow')))
+    check('W13-04', 'W-13', 'charge audit actor is the operator', E.admin_id, a['actor'])
+    ra = E.audits('Reservation', rid, 'auto_late_checkout_charge')
+    check('W13-05', 'W-13', 'reservation audit names the charge row', (1, ecid, E.admin_id),
+          (len(ra), ra[0]['after'].get('extra_charge_id') if ra else None, ra[0]['actor'] if ra else None))
+    check('W13-06', 'W-13', 'CICO log links the charge row', ecid, lg_ec)
+
+    print('W-13 repeat: idempotent')
+    err = like_checkout(rid, E.admin_id)
+    check('W13-C', 'W-13', 'second post for same type adds nothing', (None, 1), (err, st(rid)['charges']))
+
+    print('W-13 missing actor inside an operator request')
+    rid = in_house('w13na')
+    err = like_checkout(rid, None)
+    s = st(rid)
+    with E.app.app_context():
+        ec = db.session.query(m.ExtraCharge).filter_by(reservation_id=rid).first()
+        ecid = ec.id if ec else None
+    au = E.audits('ExtraCharge', ecid, 'posted') if ecid else []
+    ra = E.audits('Reservation', rid, 'auto_late_checkout_charge')
+    check('W13-E1', 'W-13', 'user_id=None: posted, both audits attributed to the logged-in operator',
+          (None, 1, E.admin_id, E.admin_id),
+          (err, s['charges'], au[0]['actor'] if au else None, ra[0]['actor'] if ra else None))
+
+    targets = (('any', None),
+               ('charge', lambda et, ac: et == 'ExtraCharge'),
+               ('reservation', lambda et, ac: ac == 'auto_late_checkout_charge'))
+    for kind in ('F1', 'F2'):
+        for tname, pred in targets:
+            rid = in_house('w13%s%s' % (kind, tname[:3]))
+            err = like_checkout(rid, E.admin_id, fault=kind, only=pred)
+            check('W13-B-%s-%s' % (kind, tname), 'W-13',
+                  '%s on %s audit: no charge/log; rest of request commits' % (kind, tname),
+                  {'charges': 0, 'cico_logs': 0, 'sentinel': True}, st(rid), str(err))
+
+    rid = in_house('w13zero')
+    with E.logged_ctx():
+        out = cico.post_charge(db.session.get(m.Reservation, rid), 'late_checkout', 0.0, 'zero',
+                               user_id=E.admin_id)
+        db.session.commit()
+    check('W13-D', 'W-13', 'zero amount: nothing posted', (None, 0), (out, st(rid)['charges']))
+
+
+@contextmanager
+def _null():
+    yield
+
+
+# ===========================================================================
+# Group w14 - noshow_service.process_reservation_noshow
+# ===========================================================================
+
+def group_w14(E):
+    m, db = E.m, E.db
+    import app.noshow_service as ns
+    with E.app.app_context():
+        for k, v in (('noshow_fee_enabled', 'true'), ('noshow_fee_mode', 'fixed'),
+                     ('noshow_fee_amount', '500')):
+            row = db.session.query(m.Settings).filter_by(key=k).first()
+            if row is None:
+                db.session.add(m.Settings(key=k, value=v))
+            else:
+                row.value = v
+        db.session.commit()
+
+    def reserved(tag):
+        return E.new_res(tag, 'Reserved', E.bd, E.bd + timedelta(days=1), 1000)
+
+    def st(rid):
+        with E.app.app_context():
+            return {'status': db.session.get(m.Reservation, rid).status,
+                    'fees': db.session.query(m.ExtraCharge).filter_by(reservation_id=rid).count(),
+                    'logs': db.session.query(m.NoShowLog).filter_by(reservation_id=rid).count()}
+
+    def manual(rid):
+        with E.logged_ctx():
+            r = ns.manual_noshow(rid, E.admin_id, 'CF10 manual')
+            return (getattr(r, 'success', None), str(getattr(r, 'message', ''))[:90])
+
+    print('W-14 manual no-show with a fee')
+    rid = reserved('w14')
+    ok, msg = manual(rid)
+    s = st(rid)
+    check('W14-01', 'W-14', 'no-show posted with one fee and one log', (True, 'NoShow', 1, 1),
+          (ok, s['status'], s['fees'], s['logs']), msg)
+    with E.app.app_context():
+        ec = db.session.query(m.ExtraCharge).filter_by(reservation_id=rid).first()
+        ecid, ecamt, ecf = (ec.id, round(float(ec.amount), 2), ec.folio_id) if ec else (None, None, None)
+    au = E.audits('ExtraCharge', ecid, 'posted') if ecid else []
+    check('W14-02', 'W-14', 'strict posted audit on the fee row', 1, len(au))
+    a = au[0] if au else {'after': {}, 'actor': None}
+    check('W14-03', 'W-14', 'fee audit: amount, folio, flow, business date',
+          (500.0, ecf, 'noshow_fee', str(E.bd)),
+          (a['after'].get('amount'), a['after'].get('folio_id'), a['after'].get('flow'),
+           a['after'].get('business_date')))
+    check('W14-04', 'W-14', 'fee audit actor is the operator', E.admin_id, a['actor'])
+    ra = E.audits('Reservation', rid, 'noshow_posted')
+    check('W14-05', 'W-14', 'noshow_posted audit names the fee row', (1, ecid),
+          (len(ra), ra[0]['after'].get('extra_charge_id') if ra else None))
+
+    ok, msg = manual(rid)
+    check('W14-C', 'W-14', 'repeat: refused, still one fee', (False, 1), (ok, st(rid)['fees']), msg)
+
+    targets = (('any', None),
+               ('fee', lambda et, ac: et == 'ExtraCharge'),
+               ('noshow_posted', lambda et, ac: ac == 'noshow_posted'))
+    for kind in ('F1', 'F2'):
+        for tname, pred in targets:
+            rid = reserved('w14%s%s' % (kind, tname[:3]))
+            before = st(rid)
+            with E.fault(kind, only=pred):
+                ok, msg = manual(rid)
+            check('W14-B-%s-%s' % (kind, tname), 'W-14',
+                  '%s on %s audit: not a no-show, no fee, no log' % (kind, tname),
+                  (False, before), (bool(ok), st(rid)), msg)
+
+    print('W-14 automated (night-audit style) call: no operator, no request')
+    rid = reserved('w14auto')
+    with E.app.app_context():
+        res = db.session.get(m.Reservation, rid)
+        ns.process_reservation_noshow(res, E.bd, ns._get_noshow_config(), posted_by_user_id=None)
+        db.session.commit()
+        ec = db.session.query(m.ExtraCharge).filter_by(reservation_id=rid).first()
+        ecid = ec.id if ec else None
+        users0 = db.session.query(m.User).filter_by(id=0).count()
+    au = E.audits('ExtraCharge', ecid, 'posted') if ecid else []
+    check('W14-E1', 'W-14', 'automated: fee posted and strictly audited', (1, 1),
+          (st(rid)['fees'], len(au)))
+    check('W14-E2', 'W-14', 'automated: audit actor (system convention)', 0,
+          au[0]['actor'] if au else None,
+          'staff_user_id=0 with users.id=0 present: %d - FK-enforcing engines reject this; '
+          'system identity is an open founder decision (AR-013 / ADR-011)' % users0, gate=False)
+
+
+# ===========================================================================
 # Group w24 - convert_overpayment_to_upsell (CASE A and CASE B), admin caller
 # ===========================================================================
 

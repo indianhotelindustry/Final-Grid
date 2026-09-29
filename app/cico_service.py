@@ -338,7 +338,8 @@ def post_charge(reservation, charge_type, amount, slab_label,
         ExtraCharge object if posted, None if skipped.
     """
     from app.models import ExtraCharge, AuditLog, CICOChargeLog, db
-    from app.services import get_business_date, resolve_billing_folio_id
+    from app.services import (get_business_date, resolve_billing_folio_id,
+                              audited_financial_write)
 
     if amount <= 0:
         return None
@@ -350,31 +351,25 @@ def post_charge(reservation, charge_type, amount, slab_label,
               else 'Late Check-out')
     description = f'{prefix} — {slab_label}'
 
-    ec = ExtraCharge(
-        reservation_id=reservation.id,
-        folio_id=resolve_billing_folio_id(reservation, user_id=user_id),  # R-1
-        description=description,
-        amount=amount,
-        charge_date=charge_date or get_business_date(),
-        charge_type=charge_type,
-    )
-    db.session.add(ec)
-    db.session.flush()
+    # Q-5 / CF-10 (W-13). Both callers (check-in and checkout) catch any
+    # exception from this function, log it and go on to commit the rest of
+    # the request. The charge, its logs and its audit rows are therefore
+    # written inside a SAVEPOINT: if any of them fails, the savepoint rolls
+    # back so no unaudited charge is left in the caller's transaction, and
+    # the exception still propagates to the caller.
+    with db.session.begin_nested():
+        ec = ExtraCharge(
+            reservation_id=reservation.id,
+            folio_id=resolve_billing_folio_id(reservation, user_id=user_id),  # R-1
+            description=description,
+            amount=amount,
+            charge_date=charge_date or get_business_date(),
+            charge_type=charge_type,
+        )
+        db.session.add(ec)
+        db.session.flush()
 
-    # Expire the cached extra_charges collection on the reservation object.
-    # already_has_charge() above loaded and cached it as an empty list; after the
-    # flush the new row is in the DB but that stale cache would cause any immediate
-    # calculate_stay_amount() call to report Rs 0 for extra charges.  Expiring here
-    # ensures the next access re-queries the DB and picks up the posted charge,
-    # regardless of what the caller does (or forgets to do) afterward.
-    try:
-        db.session.expire(reservation, ['extra_charges'])
-    except Exception:
-        pass
-
-    # Dedicated CICO audit log
-    try:
-        db.session.add(CICOChargeLog(
+        db.session.add(CICOChargeLog(                 # dedicated CICO audit log
             reservation_id=reservation.id,
             charge_type=charge_type,
             slab_label=slab_label,
@@ -386,11 +381,20 @@ def post_charge(reservation, charge_type, amount, slab_label,
             extra_charge_id=ec.id,
             staff_user_id=user_id,
         ))
-    except Exception:
-        pass
 
-    # Generic audit trail (for existing audit log UI)
-    try:
+        _audit = audited_financial_write(
+            'ExtraCharge', ec.id, 'posted', {},
+            {'amount': float(amount),
+             'reservation_id': reservation.id,
+             'folio_id': ec.folio_id,
+             'charge_type': charge_type,
+             'charge_date': ec.charge_date.isoformat() if ec.charge_date else None,
+             'slab': slab_label,
+             'flow': 'cico'},
+            user_id=user_id)
+
+        # Generic audit trail (for existing audit log UI). Same actor as the
+        # strict row, resolved once, rather than a possibly-None user_id.
         db.session.add(AuditLog(
             entity_type='Reservation',
             entity_id=reservation.id,
@@ -400,9 +404,20 @@ def post_charge(reservation, charge_type, amount, slab_label,
                 'charge_type': charge_type,
                 'amount': amount,
                 'slab': slab_label,
+                'extra_charge_id': ec.id,
             },
-            staff_user_id=user_id,
+            staff_user_id=_audit.staff_user_id,
         ))
+        db.session.flush()
+
+    # Expire the cached extra_charges collection on the reservation object.
+    # already_has_charge() above loaded and cached it as an empty list; after the
+    # flush the new row is in the DB but that stale cache would cause any immediate
+    # calculate_stay_amount() call to report Rs 0 for extra charges.  Expiring here
+    # ensures the next access re-queries the DB and picks up the posted charge,
+    # regardless of what the caller does (or forgets to do) afterward.
+    try:
+        db.session.expire(reservation, ['extra_charges'])
     except Exception:
         pass
 
