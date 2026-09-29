@@ -2276,6 +2276,17 @@ def new_reservation():
             payment_modes = PaymentMode.query.filter_by(is_active=True).all()
             return render_template('reservation_form.html', room_types=room_types,
                                    payment_modes=payment_modes)
+        except Exception:
+            # Same outcome as a rejected voucher: nothing is saved and the
+            # form is shown again, instead of an HTTP 500 (CF-11).
+            db.session.rollback()
+            logger.exception('voucher redemption failed during new_reservation')
+            flash('Voucher could not be applied; the booking was not saved. '
+                  'See server logs.', 'danger')
+            room_types = RoomType.query.all()
+            payment_modes = PaymentMode.query.filter_by(is_active=True).all()
+            return render_template('reservation_form.html', room_types=room_types,
+                                   payment_modes=payment_modes)
 
         db.session.commit()
         flash('Advance booking created successfully' + (' · ' + voucher_msg if voucher_msg else ''), 'success')
@@ -9325,6 +9336,8 @@ def settle_credit(reservation_id):
             return redirect(url_for('main.settle_credit', reservation_id=reservation_id))
 
         try:
+            # CF-11: Payment has no notes column; the operator's note is kept
+            # on the payment's strict audit row instead.
             payment = Payment(
                 reservation_id   = reservation.id,
                 folio_id         = _billing_folio_id(reservation),    # R-1
@@ -9332,7 +9345,6 @@ def settle_credit(reservation_id):
                 payment_mode_id  = mode_id,
                 payment_date     = get_business_date(),
                 reference_number = ref_no or None,
-                notes            = (notes or None),
                 payment_purpose  = 'credit_recovery',
             )
             db.session.add(payment)
@@ -9342,7 +9354,8 @@ def settle_credit(reservation_id):
                                  'reservation_id': reservation.id,
                                  'folio_id': payment.folio_id,
                                  'mode': pm.name,
-                                 'flow': 'credit_settlement'})
+                                 'flow': 'credit_settlement',
+                                 'notes': notes or None})
 
             apply_credit_settlement(reservation, amount,
                                     by_user_id=current_user.id,

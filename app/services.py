@@ -2032,6 +2032,9 @@ def redeem_credit_voucher(voucher, reservation, amount, *, user_id=None,
                 pm = PaymentMode.query.filter_by(name='Cash').first()
         if pm is None:
             raise RuntimeError('No payment mode available for voucher redemption.')
+        # CF-11: Payment has no notes column. The free-text note is kept on
+        # the CreditVoucherRedemption row below; the voucher code is carried
+        # by reference_number.
         payment = Payment(
             reservation_id   = reservation.id,
             folio_id         = resolve_billing_folio_id(reservation),   # R-1
@@ -2040,10 +2043,19 @@ def redeem_credit_voucher(voucher, reservation, amount, *, user_id=None,
             payment_date     = _d.today(),
             reference_number = f'VOUCHER:{voucher.voucher_code}',
             payment_purpose  = 'settlement',
-            notes            = (notes or f'Voucher {voucher.voucher_code} redemption'),
         )
         _db.session.add(payment)
         _db.session.flush()
+        audited_financial_write(                                        # Q-5
+            'Payment', payment.id, 'posted', {},
+            {'amount': amount,
+             'reservation_id': reservation.id,
+             'folio_id': payment.folio_id,
+             'mode': pm.name,
+             'flow': 'voucher_redemption',
+             'voucher_id': voucher.id,
+             'voucher_code': voucher.voucher_code},
+            user_id=user_id)
 
     voucher.redeemed_amount = round(float(voucher.redeemed_amount or 0) + amount, 2)
     redemption = CreditVoucherRedemption(
@@ -2061,20 +2073,19 @@ def redeem_credit_voucher(voucher, reservation, amount, *, user_id=None,
     new_status = refresh_voucher_status(voucher, audit_writer=audit_writer)
     remaining_after = voucher_remaining(voucher)
 
-    if audit_writer is not None:
-        try:
-            audit_writer('CreditVoucher', voucher.id, 'voucher_used',
-                         {'redeemed_before': round(float(voucher.redeemed_amount) - amount, 2),
-                          'remaining_before': available},
-                         {'redemption_id':   redemption.id,
-                          'amount':          amount,
-                          'reservation_id':  reservation.id,
-                          'payment_id':      (payment.id if payment else None),
-                          'remaining_after': remaining_after,
-                          'status_after':    new_status,
-                          'by_user_id':      user_id})
-        except Exception:
-            pass
+    # The redemption reduces a liability, so its audit is coupled too (Q-5).
+    audited_financial_write(
+        'CreditVoucher', voucher.id, 'voucher_used',
+        {'redeemed_before': round(float(voucher.redeemed_amount) - amount, 2),
+         'remaining_before': available},
+        {'redemption_id':   redemption.id,
+         'amount':          amount,
+         'reservation_id':  reservation.id,
+         'payment_id':      (payment.id if payment else None),
+         'remaining_after': remaining_after,
+         'status_after':    new_status,
+         'by_user_id':      user_id},
+        user_id=user_id)
 
     return {'redemption': redemption, 'payment': payment, 'remaining': remaining_after}
 
