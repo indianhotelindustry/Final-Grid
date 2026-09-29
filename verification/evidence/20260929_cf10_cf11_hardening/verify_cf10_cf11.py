@@ -218,13 +218,19 @@ class Env:
 
     # -- fault seams ----------------------------------------------------------
     @contextmanager
-    def fault(self, kind):
+    def fault(self, kind, only=None):
+        """Inject F1 or F2. ``only(entity_type, action)`` narrows the fault to
+        the matching audit rows, so a test can fail exactly the audit it is
+        about rather than an earlier, unrelated one in the same request."""
         AuditLog = self.m.AuditLog
+        hit = (lambda et, ac: True) if only is None else only
         if kind == 'F1':
             real = AuditLog.__init__
 
             def boom(obj, *a, **kw):
-                raise RuntimeError('injected F1: audit row could not be constructed')
+                if hit(kw.get('entity_type'), kw.get('action')):
+                    raise RuntimeError('injected F1: audit row could not be constructed')
+                return real(obj, *a, **kw)
             AuditLog.__init__ = boom
             try:
                 yield
@@ -234,6 +240,8 @@ class Env:
             from sqlalchemy import event
 
             def boom(mapper, conn, target):
+                if not hit(target.entity_type, target.action):
+                    return
                 raise RuntimeError('injected F2: audit insert failed')
             event.listen(AuditLog, 'before_insert', boom)
             try:
@@ -299,14 +307,16 @@ def group_cf11(E):
     check('CF11-S1i', 'CF-11', 'settle: audit amount matches', 400.0, a['after'].get('amount'))
 
     for kind in ('F1', 'F2'):
-        before = (len(E.rows(m.Payment, rid)), float(E.get(m.Reservation, rid, 'credit_settled_amount') or 0))
-        with E.fault(kind):
-            r = E.call(lambda: c.post('/credit/%d/settle' % rid,
-                                      data={'amount': '100', 'payment_mode_id': str(mode_id),
-                                            'notes': 'under fault'}))
-        after = (len(E.rows(m.Payment, rid)), float(E.get(m.Reservation, rid, 'credit_settled_amount') or 0))
-        check('CF11-S2-%s' % kind, 'CF-11', 'settle under %s: no payment, credit unchanged' % kind,
-              before, after, 'HTTP %s' % status(r))
+        for tname, pred in (('any', None), ('payment', lambda et, ac: et == 'Payment')):
+            before = (len(E.rows(m.Payment, rid)), float(E.get(m.Reservation, rid, 'credit_settled_amount') or 0))
+            with E.fault(kind, only=pred):
+                r = E.call(lambda: c.post('/credit/%d/settle' % rid,
+                                          data={'amount': '100', 'payment_mode_id': str(mode_id),
+                                                'notes': 'under fault'}))
+            after = (len(E.rows(m.Payment, rid)), float(E.get(m.Reservation, rid, 'credit_settled_amount') or 0))
+            check('CF11-S2-%s-%s' % (kind, tname), 'CF-11',
+                  'settle, %s on %s audit: no payment, credit unchanged' % (kind, tname),
+                  before, after, 'HTTP %s' % status(r))
 
     before = (len(E.rows(m.Payment, rid)), float(E.get(m.Reservation, rid, 'credit_settled_amount') or 0))
     r = c.post('/credit/%d/settle' % rid, data={'amount': '5000', 'payment_mode_id': str(mode_id)})
@@ -374,12 +384,16 @@ def group_cf11(E):
     check('W11-R1l', 'W-11', 'redeem: voucher_used audit on the voucher', 1, len(vu))
 
     for kind in ('F1', 'F2'):
-        before = vstate()
-        with E.fault(kind):
-            r = E.call(lambda: c.post('/api/voucher/%d/redeem' % vid,
-                                      json={'reservation_id': rid, 'amount': 50}))
-        check('W11-R2-%s' % kind, 'W-11', 'redeem under %s: no payment/redemption/balance change' % kind,
-              before, vstate(), 'HTTP %s' % status(r))
+        for tname, pred in (('any', None),
+                            ('payment', lambda et, ac: et == 'Payment'),
+                            ('voucher_used', lambda et, ac: ac == 'voucher_used')):
+            before = vstate()
+            with E.fault(kind, only=pred):
+                r = E.call(lambda: c.post('/api/voucher/%d/redeem' % vid,
+                                          json={'reservation_id': rid, 'amount': 50}))
+            check('W11-R2-%s-%s' % (kind, tname), 'W-11',
+                  'redeem, %s on %s audit: no payment/redemption/balance change' % (kind, tname),
+                  before, vstate(), 'HTTP %s' % status(r))
 
     before = vstate()
     r = c.post('/api/voucher/%d/redeem' % vid, json={'reservation_id': rid, 'amount': 1000})
@@ -407,14 +421,18 @@ def group_cf11(E):
           [x['amount'] for x in bp])
     check('W11-B1c', 'W-11', 'booking+voucher: voucher balance consumed', 300.0, vstate()[2])
 
-    for kind in ('F1',):
+    for n, (kind, tname, pred) in enumerate((('F1', 'any', None),
+                                             ('F1', 'payment', lambda et, ac: et == 'Payment'),
+                                             ('F2', 'voucher_used', lambda et, ac: ac == 'voucher_used'))):
         res_before, bal_before = E.count(m.Reservation), vstate()[2]
-        with E.fault(kind):
-            r = E.call(lambda: c.post('/reservations/new', data=booking('9000001102')))
-        check('W11-B2-%s' % kind, 'W-11', 'booking+voucher under %s: no booking, no voucher use' % kind,
+        with E.fault(kind, only=pred):
+            r = E.call(lambda: c.post('/reservations/new', data=booking('90000011%02d' % (n + 2))))
+        check('W11-B2-%s-%s' % (kind, tname), 'W-11',
+              'booking+voucher, %s on %s audit: no booking, no voucher use' % (kind, tname),
               (res_before, bal_before), (E.count(m.Reservation), vstate()[2]),
               'HTTP %s %s' % (status(r), getattr(r, 'exc', '')))
-        check('W11-B3-%s' % kind, 'W-11', 'booking+voucher under %s: form re-rendered, not HTTP 500' % kind,
+        check('W11-B3-%s-%s' % (kind, tname), 'W-11',
+              'booking+voucher, %s on %s audit: form re-rendered, not HTTP 500' % (kind, tname),
               200, status(r))
 
 
@@ -470,13 +488,15 @@ def group_corr(E):
                   E.admin_id, a['actor'])
 
         for kind in ('F1', 'F2'):
-            rid2, p2 = locked_payment('corr%s%s' % (tag, kind), 200.0)
-            before = E.rows(m.Payment, rid2)
-            with E.fault(kind):
-                r = E.call(lambda: c.post(url % p2['id'], data=form))
-            check('W08-%s-B-%s' % (tag, kind), 'W-08/09',
-                  'correction under %s: no reversal/replacement, original intact' % kind,
-                  before, E.rows(m.Payment, rid2), 'HTTP %s' % status(r))
+            for tname in ('any', 'payment_reversed', 'payment_corrected'):
+                pred = None if tname == 'any' else (lambda et, ac, t=tname: ac == t)
+                rid2, p2 = locked_payment('corr%s%s%s' % (tag, kind, tname[8:11]), 200.0)
+                before = E.rows(m.Payment, rid2)
+                with E.fault(kind, only=pred):
+                    r = E.call(lambda: c.post(url % p2['id'], data=form))
+                check('W08-%s-B-%s-%s' % (tag, kind, tname), 'W-08/09',
+                      'correction, %s on %s audit: nothing posted, original intact' % (kind, tname),
+                      before, E.rows(m.Payment, rid2), 'HTTP %s' % status(r))
 
     # ---- W-22 / W-23 --------------------------------------------------------
     print('W-22 / W-23 post_extra_charge_correction - service only (no application caller)')
@@ -515,7 +535,7 @@ def group_corr(E):
         rid2, oid2, _ = fixture_charge('w22%s' % kind)
         before = E.count(m.ExtraCharge, reservation_id=rid2)
         raised = None
-        with E.fault(kind), E.logged_ctx():
+        with E.fault(kind, only=lambda et, ac: et == 'ExtraCharge'), E.logged_ctx():
             try:
                 svc.post_extra_charge_correction(db.session.get(m.ExtraCharge, oid2), new_amount=100.0,
                                                  reason='CF10 under fault', user_id=E.admin_id)
@@ -615,23 +635,107 @@ def group_w10(E):
               (E.get(m.Reservation, rid, 'status'), E.count(m.CreditVoucher), vamt, len(ca)),
               'HTTP %s' % status(r))
 
-        for kind in ('F1', 'F2'):
-            for disp in ('refund_full', 'forfeit'):
-                rid = booked('90000011%s%d' % (kind[-1], 1 if disp == 'refund_full' else 2))
-                before = (E.get(m.Reservation, rid, 'status'), E.rows(m.Payment, rid),
-                          float(E.get(m.Reservation, rid, 'cancellation_amount_forfeited') or 0))
-                with E.fault(kind):
-                    r = E.call(lambda: c.post('/reservation/%d/cancel' % rid,
-                                              data={'cancel_disposition': disp,
-                                                    'cancel_reason': 'CF10 under fault',
-                                                    'cancel_refund_mode_id': '1'}))
-                after = (E.get(m.Reservation, rid, 'status'), E.rows(m.Payment, rid),
-                         float(E.get(m.Reservation, rid, 'cancellation_amount_forfeited') or 0))
-                check('W10-B-%s-%s' % (kind, disp), 'W-10',
-                      '%s under %s: not cancelled, no refund, no forfeit' % (disp, kind),
-                      before, after, 'HTTP %s' % status(r))
+        cases = [(k, d, t) for k in ('F1', 'F2')
+                 for d, ts in (('refund_full', ('any', 'cancellation_refund',
+                                                'cancellation_disposition', 'cancelled')),
+                               ('forfeit', ('any', 'forfeit_approved', 'cancelled')))
+                 for t in ts]
+        for n, (kind, disp, tname) in enumerate(cases):
+            pred = None if tname == 'any' else (lambda et, ac, t=tname: ac == t)
+            rid = booked('900000%04d' % (1200 + n))
+            before = (E.get(m.Reservation, rid, 'status'), E.rows(m.Payment, rid),
+                      float(E.get(m.Reservation, rid, 'cancellation_amount_forfeited') or 0))
+            with E.fault(kind, only=pred):
+                r = E.call(lambda: c.post('/reservation/%d/cancel' % rid,
+                                          data={'cancel_disposition': disp,
+                                                'cancel_reason': 'CF10 under fault',
+                                                'cancel_refund_mode_id': '1'}))
+            after = (E.get(m.Reservation, rid, 'status'), E.rows(m.Payment, rid),
+                     float(E.get(m.Reservation, rid, 'cancellation_amount_forfeited') or 0))
+            check('W10-B-%s-%s-%s' % (kind, disp, tname), 'W-10',
+                  '%s, %s on %s audit: not cancelled, nothing posted' % (disp, kind, tname),
+                  before, after, 'HTTP %s' % status(r))
     finally:
         notif.notify_booking_cancelled = real_notify
+
+
+# ===========================================================================
+# Group w12 - deposit inside CheckInService.complete_full_checkin
+# ===========================================================================
+
+def group_w12(E):
+    m, db, svc = E.m, E.db, E.svc
+
+    def reserved(tag):
+        return E.new_res(tag, 'Reserved', E.bd, E.bd + timedelta(days=1), 1000)
+
+    def state(rid, room):
+        with E.app.app_context():
+            r = db.session.get(m.Reservation, rid)
+            return {'status': r.status, 'room_status': db.session.get(m.Room, room).status,
+                    'payments': db.session.query(m.Payment).filter_by(reservation_id=rid).count(),
+                    'checkin_records': db.session.query(m.CheckInRecord)
+                    .filter_by(reservation_id=rid).count()}
+
+    def checkin(rid, room, deposit, mode='1'):
+        form = {'room_id': str(room), 'deposit_amount': deposit, 'deposit_payment_mode_id': mode,
+                'billing_responsibility': 'Guest'}
+        with E.logged_ctx():
+            try:
+                svc.CheckInService.complete_full_checkin(rid, form, E.admin_id, '127.0.0.1')
+                return None
+            except Exception as exc:
+                return '%s: %s' % (exc.__class__.__name__, str(exc)[:90])
+
+    print('W-12 complete_full_checkin with a deposit')
+    rid, room = reserved('w12'), E.take_room()
+    err = checkin(rid, room, '500')
+    st = state(rid, room)
+    check('W12-01', 'W-12', 'check-in completes', (None, 'CheckedIn', 'Occupied'),
+          (err, st['status'], st['room_status']))
+    pays = E.rows(m.Payment, rid)
+    check('W12-02', 'W-12', 'one deposit Payment of 500 on folio A', [(500.0, E.folio_a(rid))],
+          [(x['amount'], x['folio_id']) for x in pays])
+    au = E.audits('Payment', pays[0]['id'], 'posted') if pays else []
+    check('W12-03', 'W-12', 'strict audit row on the deposit Payment', 1, len(au))
+    a = au[0] if au else {'after': {}, 'actor': None}
+    check('W12-04', 'W-12', 'deposit audit carries amount, folio, flow',
+          (500.0, E.folio_a(rid), 'checkin_deposit'),
+          (a['after'].get('amount'), a['after'].get('folio_id'), a['after'].get('flow')))
+    check('W12-05', 'W-12', 'deposit audit actor is the operator', E.admin_id, a['actor'])
+    ci = E.audits('Reservation', rid, 'checkin_full')
+    check('W12-06', 'W-12', 'checkin_full audit on the reservation', (1, 500.0),
+          (len(ci), ci[0]['after'].get('deposit') if ci else None))
+
+    print('W-12 complete_full_checkin without a deposit')
+    rid, room = reserved('w12nd'), E.take_room()
+    err = checkin(rid, room, '0', mode='')
+    st = state(rid, room)
+    check('W12-07', 'W-12', 'no-deposit check-in completes, no payment, audited',
+          (None, 'CheckedIn', 0, 1),
+          (err, st['status'], st['payments'], len(E.audits('Reservation', rid, 'checkin_full'))))
+
+    # Untargeted faults are caught by the earlier folio auto-creation audit,
+    # so the targeted ones are what isolate this writer's own audit rows.
+    targets = (('any', None),
+               ('deposit', lambda et, ac: et == 'Payment'),
+               ('checkin_full', lambda et, ac: ac == 'checkin_full'))
+    for kind in ('F1', 'F2'):
+        for tname, pred in targets:
+            rid, room = reserved('w12%s%s' % (kind, tname[:3])), E.take_room()
+            before = state(rid, room)
+            with E.fault(kind, only=pred):
+                err = checkin(rid, room, '500')
+            check('W12-B-%s-%s' % (kind, tname), 'W-12',
+                  'deposit check-in, %s fails on %s audit: refused, nothing persisted' % (kind, tname),
+                  (True, before), (err is not None, state(rid, room)), str(err))
+
+    for label, dep, mode in (('negative deposit', '-5', '1'), ('inactive/unknown mode', '500', '99999')):
+        rid, room = reserved('w12inv'), E.take_room()
+        before = state(rid, room)
+        err = checkin(rid, room, dep, mode)
+        check('W12-D-%s' % label.split()[0], 'W-12', '%s refused, nothing persisted' % label,
+              (True, before), (err is not None, state(rid, room)), str(err))
 
 
 # ===========================================================================

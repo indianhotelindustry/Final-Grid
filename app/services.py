@@ -3069,30 +3069,37 @@ class CheckInService:
                     payment_date=get_business_date()
                 )
                 db.session.add(payment)
-            
+                db.session.flush()
+                audited_financial_write(                                # Q-5
+                    'Payment', payment.id, 'posted', {},
+                    {'amount': float(checkin.deposit_amount),
+                     'reservation_id': reservation_id,
+                     'folio_id': payment.folio_id,
+                     'mode_id': checkin.deposit_payment_mode_id,
+                     'flow': 'checkin_deposit'},
+                    user_id=staff_user_id, ip_address=request_ip)
+
             # company.credit_used is updated at checkout once the actual bill is known;
             # the deposit is already recorded in the Payment table above.
-            
-            db.session.commit()
 
-            # Audit log
-            try:
-                from app.models import AuditLog
-                db.session.add(AuditLog(
-                    entity_type='Reservation', entity_id=reservation_id,
-                    action='checkin_full',
-                    before_state={'status': 'Reserved'},
-                    after_state={
-                        'status': 'CheckedIn', 'room_id': room_id, 'mode': 'FULL',
-                        'billing': checkin.billing_responsibility,
-                        'deposit': float(checkin.deposit_amount or 0),
-                    },
-                    staff_user_id=staff_user_id,
-                    ip_address=request_ip,
-                ))
-                db.session.commit()
-            except Exception:
-                pass
+            # Audit log - written before the single commit below, so the
+            # check-in, its deposit and both audit rows share one transaction
+            # (CF-10 / W-12). It used to follow a first commit, in a second
+            # transaction whose failure was swallowed.
+            from app.models import AuditLog
+            db.session.add(AuditLog(
+                entity_type='Reservation', entity_id=reservation_id,
+                action='checkin_full',
+                before_state={'status': 'Reserved'},
+                after_state={
+                    'status': 'CheckedIn', 'room_id': room_id, 'mode': 'FULL',
+                    'billing': checkin.billing_responsibility,
+                    'deposit': float(checkin.deposit_amount or 0),
+                },
+                staff_user_id=staff_user_id,
+                ip_address=request_ip,
+            ))
+            db.session.commit()
 
             return checkin
         except CheckInException:
