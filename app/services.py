@@ -2787,6 +2787,10 @@ def convert_overpayment_to_upsell(reservation, *, overpay_gross=None, reason=Non
     # UPSELL on the reservation. standard_tariff is preserved by the
     # apply_tariff_adjustment call which uses room_type.base_rate.
     old_rate = Decimal(str(reservation.rate_per_night or 0))
+    _before = {'rate_per_night':    float(old_rate),
+               'standard_tariff':   float(reservation.standard_tariff or 0),
+               'adjustment_type':   reservation.adjustment_type,
+               'adjustment_amount': float(reservation.adjustment_amount or 0)}
     new_rate = old_rate + per_night_inc
     reservation.rate_per_night = new_rate
     apply_tariff_adjustment(
@@ -2836,6 +2840,34 @@ def convert_overpayment_to_upsell(reservation, *, overpay_gross=None, reason=Non
             branch = 'case_b_rate_fallback'
 
     db.session.flush()
+
+    # Q-5 / CF-10 (W-24). CASE B changes room revenue without posting any
+    # row, so the audit of record is the reservation's state transition,
+    # written in both cases; CASE A's corrective charge is audited as well.
+    if charge_id is not None:
+        audited_financial_write(
+            'ExtraCharge', charge_id, 'posted', {},
+            {'amount': float(pretax_increment),
+             'reservation_id': reservation.id,
+             'folio_id': charge.folio_id,
+             'charge_type': 'room_upsell',
+             'flow': 'overpayment_upsell'},
+            user_id=authorized_by_user_id)
+    audited_financial_write(
+        'Reservation', reservation.id, 'overpayment_converted_to_upsell',
+        _before,
+        {'rate_per_night':    float(reservation.rate_per_night or 0),
+         'standard_tariff':   float(reservation.standard_tariff or 0),
+         'adjustment_type':   reservation.adjustment_type,
+         'adjustment_amount': float(reservation.adjustment_amount or 0),
+         'overpay_gross':     round(float(overpay_gross), 2),
+         'pretax_increment':  float(round2(pretax_increment)),
+         'gst_rate_applied':  float(round2(gst_rate)),
+         'nights':            nights,
+         'branch':            branch,
+         'charge_id':         charge_id,
+         'reason':            reason},
+        user_id=authorized_by_user_id)
 
     return {
         'ok':                  True,

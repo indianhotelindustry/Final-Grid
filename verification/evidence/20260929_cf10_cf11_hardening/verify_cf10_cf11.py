@@ -182,8 +182,9 @@ class Env:
                                                             entity_id=entity_id)
             if action:
                 q = q.filter_by(action=action)
-            return [{'action': a.action, 'after': a.after_state or {},
-                     'actor': a.staff_user_id} for a in q.order_by(m.AuditLog.id).all()]
+            return [{'action': a.action, 'before': a.before_state or {},
+                     'after': a.after_state or {}, 'actor': a.staff_user_id}
+                    for a in q.order_by(m.AuditLog.id).all()]
 
     def client(self):
         c = self.app.test_client()
@@ -736,6 +737,126 @@ def group_w12(E):
         err = checkin(rid, room, dep, mode)
         check('W12-D-%s' % label.split()[0], 'W-12', '%s refused, nothing persisted' % label,
               (True, before), (err is not None, state(rid, room)), str(err))
+
+
+# ===========================================================================
+# Group w24 - convert_overpayment_to_upsell (CASE A and CASE B), admin caller
+# ===========================================================================
+
+def group_w24(E):
+    m, db, svc = E.m, E.db, E.svc
+    c = E.client()
+
+    def overpaid(tag, case_a):
+        room = E.take_room()
+        rid = E.new_res(tag, 'CheckedIn', E.bd - timedelta(days=1), E.bd + timedelta(days=1), 1000,
+                        room_id=room)
+        with E.app.app_context():
+            res = db.session.get(m.Reservation, rid)
+            fid = svc.resolve_billing_folio_id(res)
+            if case_a:        # a night already posted by the night audit
+                db.session.add(m.ExtraCharge(reservation_id=rid, folio_id=fid, amount=1000.0,
+                                             description='Room Rent (CF10 fixture)',
+                                             charge_date=E.bd - timedelta(days=1),
+                                             charge_type='room_rent', charge_category='Room'))
+            db.session.add(m.Payment(reservation_id=rid, folio_id=fid, payment_mode_id=1,
+                                     amount=5000.0, payment_date=E.bd))
+            db.session.commit()
+        return rid
+
+    def state(rid):
+        with E.app.app_context():
+            r = db.session.get(m.Reservation, rid)
+            return {'rate': round(float(r.rate_per_night or 0), 2), 'adj': r.adjustment_type,
+                    'upsell_rows': db.session.query(m.ExtraCharge)
+                    .filter_by(reservation_id=rid, charge_type='room_upsell').count()}
+
+    def convert(rid):
+        return E.call(lambda: c.post('/admin/reservation/%d/convert-overpay-to-upsell' % rid,
+                                     data={'reason': 'CF10 upsell', 'next': '/'}))
+
+    for case_a in (True, False):
+        case = 'A' if case_a else 'B'
+        print('W-24 CASE %s via the admin route' % case)
+        rid = overpaid('w24%s' % case, case_a)
+        before = state(rid)
+        r = convert(rid)
+        after = state(rid)
+        check('W24-%s-01' % case, 'W-24', 'conversion applied: rate raised, UPSELL stamped',
+              (True, 'UPSELL'), (after['rate'] > before['rate'], after['adj']), 'HTTP %s' % status(r))
+        check('W24-%s-02' % case, 'W-24', 'room_upsell rows (CASE A posts one, CASE B none)',
+              1 if case_a else 0, after['upsell_rows'])
+        ra = E.audits('Reservation', rid, 'overpayment_converted_to_upsell')
+        check('W24-%s-03' % case, 'W-24', 'strict audit of the state transition on the reservation',
+              1, len(ra))
+        a = ra[0]['after'] if ra else {}
+        check('W24-%s-04' % case, 'W-24', 'transition audit records old/new rate and branch',
+              (before['rate'], after['rate'], True),
+              ((ra[0]['before'].get('rate_per_night') if ra else None), a.get('rate_per_night'),
+               str(a.get('branch', '')).startswith('case_%s' % case.lower())))
+        check('W24-%s-05' % case, 'W-24', 'transition audit actor is the operator', E.admin_id,
+              ra[0]['actor'] if ra else None)
+        if case_a:
+            with E.app.app_context():
+                ch = (db.session.query(m.ExtraCharge).filter_by(reservation_id=rid, charge_type='room_upsell')
+                      .first())
+                chg = None if ch is None else (ch.id, round(float(ch.amount), 2), ch.folio_id)
+            ca = E.audits('ExtraCharge', chg[0], 'posted') if chg else []
+            check('W24-A-06', 'W-24', 'strict posted audit on the room_upsell charge', 1, len(ca))
+            check('W24-A-07', 'W-24', 'charge audit carries amount and folio',
+                  (chg[1], chg[2]) if chg else None,
+                  ((ca[0]['after'].get('amount'), ca[0]['after'].get('folio_id')) if ca else None))
+            check('W24-A-08', 'W-24', 'charge amount == pretax increment in the transition audit',
+                  chg[1] if chg else None, a.get('pretax_increment'))
+        adm = E.audits('Reservation', rid, 'admin_convert_overpay_to_upsell')
+        check('W24-%s-09' % case, 'W-24', "admin route audit persisted (was added after the last commit)",
+              1, len(adm))
+
+    targets = (('any', None),
+               ('transition', lambda et, ac: ac == 'overpayment_converted_to_upsell'),
+               ('charge', lambda et, ac: et == 'ExtraCharge'),
+               ('admin', lambda et, ac: ac == 'admin_convert_overpay_to_upsell'))
+    for kind in ('F1', 'F2'):
+        for case_a in (True, False):
+            for tname, pred in targets:
+                if tname == 'charge' and not case_a:
+                    continue
+                case = 'A' if case_a else 'B'
+                rid = overpaid('w24%s%s%s' % (kind, case, tname[:3]), case_a)
+                before = state(rid)
+                with E.fault(kind, only=pred):
+                    r = convert(rid)
+                check('W24-B-%s-%s-%s' % (kind, case, tname), 'W-24',
+                      'CASE %s, %s on %s audit: nothing converted' % (case, kind, tname),
+                      before, state(rid), 'HTTP %s' % status(r))
+
+    # The checkout caller (routes.checkout) calls the service inside its
+    # outer try whose except rolls back. What it relies on is that the
+    # service RAISES when an audit cannot be written - proven here directly.
+    print('W-24 service contract relied on by the checkout caller')
+    for kind in ('F1', 'F2'):
+        rid = overpaid('w24svc%s' % kind, True)
+        before = state(rid)
+        raised = None
+        with E.fault(kind, only=lambda et, ac: ac == 'overpayment_converted_to_upsell'), E.logged_ctx():
+            try:
+                svc.convert_overpayment_to_upsell(db.session.get(m.Reservation, rid), reason='svc',
+                                                  authorized_by_user_id=E.admin_id)
+                db.session.flush()
+            except Exception as exc:
+                raised = exc.__class__.__name__
+            db.session.rollback()        # what checkout's outer except does
+        check('W24-S-%s' % kind, 'W-24', 'service raises under %s; caller rollback leaves nothing' % kind,
+              (True, before), (raised is not None, state(rid)), str(raised))
+
+    print('W-24 no overpayment: refused, nothing written')
+    room = E.take_room()
+    rid = E.new_res('w24none', 'CheckedIn', E.bd, E.bd + timedelta(days=1), 1000, room_id=room)
+    before = state(rid)
+    r = convert(rid)
+    check('W24-D', 'W-24', 'no overpayment: nothing converted, no transition audit', (before, 0),
+          (state(rid), len(E.audits('Reservation', rid, 'overpayment_converted_to_upsell'))),
+          'HTTP %s' % status(r))
 
 
 # ===========================================================================

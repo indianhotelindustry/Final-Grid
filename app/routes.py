@@ -9072,9 +9072,10 @@ def admin_convert_overpay_to_upsell(reservation_id):
         db.session.expire(reservation, ['payments', 'extra_charges'])
         billing_after = calculate_stay_amount(reservation)
 
-        db.session.commit()
-
-        _write_audit(
+        # Written before the commit (CF-10 / W-24). It used to follow the
+        # last commit with the flush-only _write_audit and was discarded at
+        # request teardown, so this row never reached the database.
+        _write_audit_strict(
             'Reservation', reservation_id,
             'admin_convert_overpay_to_upsell',
             before,
@@ -9091,6 +9092,8 @@ def admin_convert_overpay_to_upsell(reservation_id):
                 'balance_after':        str(float(billing_after.get('balance', 0))),
             }
         )
+
+        db.session.commit()
 
         flash(
             f'Overpayment of ₹{float(result["overpay_gross"]):,.2f} converted '
