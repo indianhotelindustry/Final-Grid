@@ -1,0 +1,155 @@
+{
+  "directive": "Q06 forensic analysis — GST/tax divergence between gst_service.get_gst_report and NightAuditService.tax_snapshot (FI-10)",
+  "baseline_commit": "b0d30542ff6b3cdbbc269fd8c17679c80ed9f718",
+  "working_tree_clean_at_start": true,
+  "analysis_type": "read-only forensic, no application/source/db/governance file modified",
+  "sources_examined": {
+    "path_a": {
+      "function": "gst_service.get_gst_report(from_date, to_date)",
+      "file": "app/gst_service.py",
+      "lines": "674-771",
+      "supporting_functions": [
+        "gst_service.compute_tax (app/gst_service.py:243-293)",
+        "gst_service._build_tax_lines (app/gst_service.py:300-339)",
+        "gst_service._ids_of_room_rent_extras (app/gst_service.py:607-620)"
+      ]
+    },
+    "path_b": {
+      "function": "NightAuditService.tax_snapshot()",
+      "file": "app/night_audit_service.py",
+      "lines": "1126-1147",
+      "supporting_context": [
+        "NightAuditService.__init__ self._tax_lines query (app/night_audit_service.py:234-236)",
+        "NightAuditService.revenue_summary tax_amount (app/night_audit_service.py:567)"
+      ]
+    }
+  },
+  "existing_evidence_cited": [
+    "verification/evidence/20260910_phase2_entry/PRODUCTION_READINESS_INVENTORY.md (finding FI-10, line 115 'Q06 GST divergence on production')",
+    "verification/replay/ledger.py lines 222-262 (_tax(): tax.taxable_base_raw vs tax.taxable_base_deduplicated, explicitly labelled Q06 in its own comment)",
+    "verification/ledgers/production/dates/2026-08-09.json",
+    "verification/ledgers/production/dates/2026-08-10.json"
+  ],
+  "dataset": {
+    "method": "verification/dbcopy.py :: make_copy()",
+    "copy_name": "q06_repro.db",
+    "copy_path": "verification/_work/q06_repro.db",
+    "copy_method_used": "sqlite-backup-api",
+    "source": "instance/pms.db",
+    "production_sha256_before": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+    "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+    "production_untouched": true,
+    "app_boot": "create_app() with DATABASE_URL pointed at the disposable copy only, TESTING=True, following verification/evidence/20260910_retention_control/verify_retention.py's pattern",
+    "date_range_in_copy": ["2026-08-09", "2026-08-10"],
+    "total_tax_line_rows_examined": 12,
+    "tax_line_row_ids": [1,2,3,4,5,6,7,8,9,10,11,12]
+  },
+  "input_rows": {
+    "2026-08-09": [
+      {"id": 1, "reservation_id": 1, "charge_source_type": "room_night", "charge_source_id": "night_2026-08-09", "tax_type": "CGST", "tax_rate": "2.500", "taxable_amount": "761.90", "tax_amount": "19.05"},
+      {"id": 2, "reservation_id": 1, "charge_source_type": "room_night", "charge_source_id": "night_2026-08-09", "tax_type": "SGST", "tax_rate": "2.500", "taxable_amount": "761.90", "tax_amount": "19.05"},
+      {"id": 3, "reservation_id": 1, "charge_source_type": "extra_charge", "charge_source_id": "1", "tax_type": "CGST", "tax_rate": "2.500", "taxable_amount": "380.95", "tax_amount": "9.52"},
+      {"id": 4, "reservation_id": 1, "charge_source_type": "extra_charge", "charge_source_id": "1", "tax_type": "SGST", "tax_rate": "2.500", "taxable_amount": "380.95", "tax_amount": "9.52"}
+    ],
+    "2026-08-10": [
+      {"id": 5, "reservation_id": 2, "charge_source_type": "room_night", "charge_source_id": "night_2026-08-10", "tax_type": "CGST", "tax_rate": "2.500", "taxable_amount": "1428.57", "tax_amount": "35.71"},
+      {"id": 6, "reservation_id": 2, "charge_source_type": "room_night", "charge_source_id": "night_2026-08-10", "tax_type": "SGST", "tax_rate": "2.500", "taxable_amount": "1428.57", "tax_amount": "35.71"},
+      {"id": 7, "reservation_id": 3, "charge_source_type": "room_night", "charge_source_id": "night_2026-08-10", "tax_type": "CGST", "tax_rate": "2.500", "taxable_amount": "952.38", "tax_amount": "23.81"},
+      {"id": 8, "reservation_id": 3, "charge_source_type": "room_night", "charge_source_id": "night_2026-08-10", "tax_type": "SGST", "tax_rate": "2.500", "taxable_amount": "952.38", "tax_amount": "23.81"},
+      {"id": 9, "reservation_id": 4, "charge_source_type": "room_night", "charge_source_id": "night_2026-08-10", "tax_type": "CGST", "tax_rate": "2.500", "taxable_amount": "476.19", "tax_amount": "11.90"},
+      {"id": 10, "reservation_id": 4, "charge_source_type": "room_night", "charge_source_id": "night_2026-08-10", "tax_type": "SGST", "tax_rate": "2.500", "taxable_amount": "476.19", "tax_amount": "11.90"},
+      {"id": 11, "reservation_id": 4, "charge_source_type": "extra_charge", "charge_source_id": "2", "tax_type": "CGST", "tax_rate": "2.500", "taxable_amount": "95.24", "tax_amount": "2.38"},
+      {"id": 12, "reservation_id": 4, "charge_source_type": "extra_charge", "charge_source_id": "2", "tax_type": "SGST", "tax_rate": "2.500", "taxable_amount": "95.24", "tax_amount": "2.38"}
+    ]
+  },
+  "formulas": {
+    "path_a_get_gst_report_total_taxable": "sum(TaxLine.taxable_amount), deduplicated by key=(reservation_id, charge_source_type, charge_source_id), each key counted once (app/gst_service.py:705,712-716)",
+    "path_a_get_gst_report_total_tax": "sum(TaxLine.tax_amount) grouped by tax_type (CGST+SGST+IGST), no dedup needed (app/gst_service.py:717-724)",
+    "path_b_tax_snapshot_total_taxable": "sum(TaxLine.taxable_amount) over ALL rows, no dedup key (app/night_audit_service.py:1136) — THE BUG",
+    "path_b_tax_snapshot_total_tax": "sum(TaxLine.tax_amount) over ALL rows, no dedup needed, correct (app/night_audit_service.py:1137)",
+    "why_taxable_amount_needs_dedup_but_tax_amount_does_not": "gst_service._build_tax_lines (app/gst_service.py:300-339) stores the FULL unsplit taxable_amount on BOTH the CGST row and the SGST row of an intrastate charge (kwargs_base shared), but each row's tax_amount is already only that row's own correctly-split half-rate share — so tax_amount sums correctly without dedup while taxable_amount does not."
+  },
+  "intermediate_and_final_values": {
+    "2026-08-09": {
+      "real_taxable_base_ground_truth": 1142.85,
+      "ground_truth_cross_checks": {
+        "revenue_summary.accrual_net": 1142.85,
+        "kpi.total_revenue": 1142.85,
+        "kpi.accrual_summary.accrual_net": 1142.85
+      },
+      "path_a_get_gst_report": {"total_taxable": "1142.85", "cgst_total": "28.57", "sgst_total": "28.57", "igst_total": "0.00", "total_tax": "57.14", "grand_total": "1199.99", "rows_considered": 4},
+      "path_b_tax_snapshot": {"total_taxable": 2285.7, "total_tax": 57.14, "total_lines": 4, "exempt_lines": 0,
+        "by_rate": {"CGST @ 2%": {"count": 2, "rate": 2.5, "tax": 28.57, "taxable": 1142.85}, "SGST @ 2%": {"count": 2, "rate": 2.5, "tax": 28.57, "taxable": 1142.85}}},
+      "taxable_ratio_b_over_a": 2.0,
+      "tax_ratio_b_over_a": 1.0
+    },
+    "2026-08-10": {
+      "real_taxable_base_ground_truth": 2952.38,
+      "ground_truth_cross_checks": {
+        "revenue_summary.accrual_net": 2952.38,
+        "kpi.total_revenue": 2952.38,
+        "kpi.accrual_summary.accrual_net": 2952.38
+      },
+      "path_a_get_gst_report": {"total_taxable": "2952.38", "cgst_total": "73.80", "sgst_total": "73.80", "igst_total": "0.00", "total_tax": "147.60", "grand_total": "3099.98", "rows_considered": 8},
+      "path_b_tax_snapshot": {"total_taxable": 5904.76, "total_tax": 147.6, "total_lines": 8, "exempt_lines": 0,
+        "by_rate": {"CGST @ 2%": {"count": 4, "rate": 2.5, "tax": 73.8, "taxable": 2952.38}, "SGST @ 2%": {"count": 4, "rate": 2.5, "tax": 73.8, "taxable": 2952.38}}},
+      "taxable_ratio_b_over_a": 2.0,
+      "tax_ratio_b_over_a": 1.0
+    },
+    "matches_fi10_reported_figures": true,
+    "fi10_reported": {
+      "get_gst_report": [1142.85, 2952.38],
+      "tax_snapshot": [2285.70, 5904.76]
+    }
+  },
+  "exact_divergence_point": {
+    "file": "app/night_audit_service.py",
+    "line": 1136,
+    "code": "total_taxable = sum(_f(t.taxable_amount) for t in self._tax_lines)",
+    "defect": "Sums taxable_amount over every TaxLine row with no deduplication by (reservation_id, charge_source_type, charge_source_id). Since every intrastate charge produces two TaxLine rows (CGST + SGST) that each carry the FULL taxable_amount, the straight sum double-counts the taxable base of every non-IGST, non-exempt charge. On this dataset (100% intrastate charges) this yields an exact, universal 2.0000x inflation.",
+    "correct_reference_implementation": {
+      "file": "app/gst_service.py",
+      "lines": "705, 712-716",
+      "pattern": "seen_sources = set(); key = (reservation_id, charge_source_type, charge_source_id); add taxable_amount only if key not yet seen"
+    },
+    "scope_of_defect": "Confined to tax_snapshot()'s total_taxable field and the 'taxable' sub-value inside each by_rate bucket. total_tax, total_lines, exempt_lines, and every other NightAuditService section (including final_control's reconciliation, which uses revenue_summary()['tax_amount'] — a correct, non-doubled sum) are unaffected."
+  },
+  "classification": "Q06-B",
+  "classification_options_considered": {
+    "Q06-A_intentional_semantic_difference": "REJECTED — no docstring/comment/naming indicates total_taxable is deliberately a different metric; total_tax agrees exactly between both paths, which it would not if the two aggregates were built on genuinely different definitions.",
+    "Q06-B_one_implementation_incorrect": "ACCEPTED — NightAuditService.tax_snapshot()'s total_taxable (and by_rate[...].taxable in aggregate) is a straightforward missing-deduplication bug; gst_service.get_gst_report is correct.",
+    "Q06-C_both_correct_different_metrics": "REJECTED — total_tax matching exactly between the two paths proves they are measuring the same underlying day's activity, not different business concepts; a genuine metric difference would not produce identical total_tax while total_taxable diverges by exactly 2x.",
+    "Q06-D_insufficient_evidence": "REJECTED — the divergence is mechanically reproduced from source on live data down to individual TaxLine row IDs, with a clean single-line arithmetic explanation and a consistent, exact 2.0000x ratio across both available production dates."
+  },
+  "fix_proposed": true,
+  "fix_implemented": false,
+  "fix_boundary": {
+    "file": "app/night_audit_service.py",
+    "function": "NightAuditService.tax_snapshot() (lines 1126-1147)",
+    "change_description": "Deduplicate taxable_amount accumulation by (reservation_id, charge_source_type, charge_source_id) before adding to total_taxable, mirroring gst_service.get_gst_report's seen_sources pattern (app/gst_service.py:705,712-716) and gst_service.get_folio_gst_summary's identical pattern (app/gst_service.py:645-651). Apply equivalent dedup to the taxable component inside the by_rate loop. Secondary open question for the same fix: whether tax_snapshot() should also apply the legacy room_rent-ExtraCharge duplicate filter that get_gst_report applies (app/gst_service.py:689-702) — moot on the dataset examined (zero such rows) but a second latent divergence source on datasets carrying pre-fix duplicate rows.",
+    "not_touched": ["app/gst_service.py (already correct)", "tax_snapshot()'s total_tax field (already correct)", "any other NightAuditService section"]
+  },
+  "founder_authorization_required": true,
+  "founder_authorization_reason": "total_taxable is a production-visible figure inside the Night Audit document and is captured into audit snapshots/verification ledgers; changing it changes what already-run night audits would show if regenerated, and a Founder should confirm no downstream report/export/GSTR workflow reads tax_snapshot()['total_taxable'] expecting the current (buggy) value before any fix is implemented.",
+  "reproduction_script": {
+    "path": "verification/_work/q06_repro.py",
+    "output": "verification/_work/q06_repro_result.json",
+    "location_status": "left in place under verification/_work/, which is gitignored (.gitignore: 'verification/_work/') and documented as a disposable working area; safe to delete at any time, not required for any downstream process",
+    "run_command": "venv\\Scripts\\python.exe verification\\_work\\q06_repro.py"
+  },
+  "mutation_confirmation": {
+    "instance_pms_db_modified": false,
+    "application_source_files_modified": false,
+    "existing_evidence_directories_modified": false,
+    "adr_or_founder_decisions_or_master_plan_modified": false,
+    "git_commits_made": false,
+    "files_created": [
+      "verification/evidence/20260923_q06_analysis/Q06_ANALYSIS.md",
+      "verification/evidence/20260923_q06_analysis/CALCULATION_BRIDGE.md",
+      "verification/evidence/20260923_q06_analysis/RESULT.json",
+      "verification/_work/q06_repro.py (gitignored scratch script)",
+      "verification/_work/q06_repro.db (gitignored disposable DB copy)",
+      "verification/_work/q06_repro_result.json (gitignored scratch output)"
+    ]
+  }
+}

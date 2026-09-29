@@ -1,0 +1,105 @@
+{
+  "task": "Q06 downstream-impact trace (read-only)",
+  "baseline_commit": "b0d30542ff6b3cdbbc269fd8c17679c80ed9f718",
+  "defect": {
+    "location": "app/night_audit_service.py:1126-1147 (tax_snapshot()), bug at line 1136",
+    "root_cause": "app/gst_service.py::_build_tax_lines (lines 300-339) stores the full unsplit taxable amount on both the CGST and SGST TaxLine row for every intrastate charge; tax_snapshot() sums every row without the charge-level dedup that get_gst_report() applies (app/gst_service.py:705, 712-716).",
+    "affected_return_keys": ["total_taxable", "by_rate.<key>.taxable"],
+    "unaffected_return_keys": ["total_tax", "by_rate.<key>.tax", "total_lines", "exempt_lines", "has_data"]
+  },
+  "direct_caller": {
+    "location": "app/night_audit_service.py:1826 (full_report(), key 'tax')",
+    "note": "tax_snapshot() is only ever invoked via full_report()['tax'] (through the memoising self._get() wrapper); no route/script calls tax_snapshot() directly."
+  },
+  "consumer_chain": {
+    "ui_direct_render": [
+      "app/templates/night_audit_panel.html:1190,1451-1465 (live audit screen, 'Taxable Amt' column and Total row)",
+      "app/templates/reports/night_audit.html:2996-3028 (night-audit HTML report)",
+      "app/templates/reports/night_audit_print.html:497-509 (printable report)"
+    ],
+    "routes_passing_report_tax_to_templates": [
+      "app/reports.py:2479",
+      "app/reports.py:2798",
+      "app/routes.py:4827"
+    ],
+    "export": [
+      "app/reports.py:3618-3629,4056-4079 (_night_audit_excel — writes total_taxable and per-rate taxable into exported workbook)"
+    ],
+    "persisted_db": {
+      "model": "app/models.py:932-943 NightAuditLog.snapshot_json / snapshot_valid / snapshot_hash",
+      "writers": [
+        "app/services.py:441-466 (auto-complete path)",
+        "app/reports.py:3049-3078 (manual /complete path)",
+        "app/reports.py:3398-3421 (re-run-from-Skipped recovery path)"
+      ],
+      "readers_preferring_frozen_snapshot_over_recompute": [
+        "app/routes.py:4786-4808",
+        "app/reports.py:2748-2757 (hash re-check)",
+        "app/services.py:1554-1595 (verify_snapshot_hash)"
+      ],
+      "verified_production_state": {
+        "method": "disposable copy via verification/dbcopy.py::make_copy(), same pattern as verification/_work/q06_repro.py; production sha256 confirmed identical before and after",
+        "night_audit_logs_row_count": 1,
+        "rows_with_snapshot_json": 1,
+        "rows_with_snapshot_valid_1": 1,
+        "row": {
+          "audit_date": "2026-08-09",
+          "status": "Completed",
+          "snapshot_valid": true,
+          "stored_tax_total_taxable": "2285.7",
+          "stored_tax_total_tax": "57.14",
+          "stored_tax_total_lines": 4,
+          "stored_tax_has_data": true
+        },
+        "production_sha256_before": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+        "production_unchanged": true
+      }
+    },
+    "persisted_verification_evidence": {
+      "mechanism": "verification/replay/engines.py:101-120 NAS_SECTIONS includes 'tax_snapshot'; probed and frozen per business date",
+      "files": "verification/ledgers/production/dates/*.json",
+      "non_zero_findings": [
+        {"date": "2026-08-09", "total_taxable": "2285.7", "total_tax": "57.14"},
+        {"date": "2026-08-10", "total_taxable": "5904.76", "total_tax": "147.6"}
+      ],
+      "zero_findings_dates": ["2026-08-01","2026-08-02","2026-08-03","2026-08-04","2026-08-05","2026-08-06","2026-08-07","2026-08-08"]
+    },
+    "verification_consumer": {
+      "location": "verification/quantities.py:496-532 (q06(), Severity.BLOCK)",
+      "behavior": "Computes both gst_service.get_gst_report()['total_taxable'] (deduplicated) and NightAuditService.tax_snapshot()['total_taxable'] (raw) per date, and records a Divergence at BLOCK severity whenever they differ by more than Rs 1. Does NOT compensate, average, or mask the gap; treats it as a defect to report.",
+      "replay_engine_note": "verification/replay/engines.py persists tax_snapshot()'s raw output into the replay ledger without dedup, by design (module is an honest replay of what the app returns, not a corrected figure)."
+    },
+    "report_export_consumers_confirmed_NOT_using_tax_snapshot": {
+      "gst_einvoice.py": "app/gst_einvoice.py consumes gst_data/gst_summary sourced from gst_service.get_gst_report() / get_folio_gst_summary() exclusively (module docstring: 'Caller passes data from gst_service.get_gst_report()'). Never calls tax_snapshot()."
+    }
+  },
+  "compensation_search": {
+    "result": "NONE_FOUND",
+    "detail": "Grepped app/ and verification/ for dedup logic, halving (/2, *0.5), and any special-casing of total_taxable/by_rate inside or around tax_snapshot(). No code compensates for the 2x inflation anywhere. The one /2 found (night_audit_panel.html:1455-1456,1463-1464) halves the already-correct total_tax to split a display column between CGST/SGST — an unrelated pre-existing UI convention, not a taxable-base fix."
+  },
+  "persistence_finding": {
+    "purely_on_demand": false,
+    "detail": "tax_snapshot() is computed on demand for open/live audit dates, but its output IS persisted: (1) hash-sealed in NightAuditLog.snapshot_json in production for closed audit dates (1 row confirmed, date 2026-08-09, carrying the buggy 2285.7 figure), served back verbatim by app/routes.py:4786-4808 without recomputation; (2) frozen into verification/ledgers/production/dates/*.json by the replay harness for audit/regression purposes."
+  },
+  "isolation_assessment": {
+    "fix_can_stay_inside_tax_snapshot": true,
+    "detail": "self._tax_lines is read in only two places in NightAuditService: revenue_summary() (app/night_audit_service.py:567, uses t.tax_amount only, unaffected) and tax_snapshot() itself. total_tax is computed independently from tax_amount, which is already correctly split per row and needs no change. No other full_report() section re-derives a figure from tax_snapshot()'s total_taxable/by_rate.",
+    "caveat": "A code fix only affects tax_snapshot() calls made after the fix. It cannot retroactively correct the already-frozen NightAuditLog.snapshot_json row for 2026-08-09 or the already-written verification/ledgers/production/dates/*.json files for 2026-08-09 and 2026-08-10 — those are immutable-by-design historical records."
+  },
+  "stop_conditions": {
+    "downstream_workflow_intentionally_depends_on_2x_value": false,
+    "need_for_historical_correction": true,
+    "ripple_into_other_financial_calculation": false,
+    "broader_business_rule_discovered": false,
+    "notes": "One STOP-worthy item: production NightAuditLog id=1 (audit_date=2026-08-09, status=Completed, snapshot_valid=1) has a hash-sealed snapshot_json whose tax.total_taxable (2285.7) is the buggy ~2x-inflated figure, and app/routes.py:4786-4808 will keep serving that exact frozen JSON for that date regardless of any future code fix to tax_snapshot(). Whether/how to regenerate or re-flag that one frozen record is a decision for whoever authorizes the fix; not resolved or touched by this trace. No other STOP condition triggered."
+  },
+  "hard_constraints_observed": {
+    "no_application_files_modified": true,
+    "no_production_db_write": true,
+    "no_existing_evidence_dirs_modified": true,
+    "no_fix_implemented": true,
+    "no_git_commit_or_push": true,
+    "database_access_method": "disposable copy via verification/dbcopy.py::make_copy(); production hash verified identical before and after via verification/dbcopy.py::assert_production_untouched()"
+  }
+}

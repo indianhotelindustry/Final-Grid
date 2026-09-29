@@ -1204,3 +1204,51 @@ CF-5 unauthorized-role verification · CF-6 replay coverage of the reconciliatio
 ## Consequence for the Phase 2 gate
 
 Phase 2b entry now requires: CF-10 delivered and verified; ADR-010 adopted with the operation matrix under FD-P2-07; scope declared schema-free or a PD-004 authorization. Phase 3 entry conditions are met (Phase 1 complete) and Phase 3 is scoped under FD-P2-05. **No phase implementation is authorized by this entry.**
+
+# Founder Resolution Round 4 — Q06 GST Taxable-Base Defect — FG-P2-FOUNDER-RESOLUTION-20260923-01
+
+| | |
+|---|---|
+| Recorded | 2026-09-23 |
+| Governed HEAD | `b0d30542ff6b3cdbbc269fd8c17679c80ed9f718` (audit-retention fix; FD-P2-02 implemented) |
+| Kind | Founder decisions Q06-H1 … Q06-H3, ruling on the Q06 GST taxable-base defect established by forensic analysis and downstream-impact tracing. **Governance recording only.** No code, schema, database, invariant or evidence-pack change is made or authorized by this entry; the forward code correction (Q06-H2) names a *later* bounded implementation directive it permits. |
+| Identifiers | `Q06-Hn` as issued by the directive; no new `FD-###` numbers are assigned by this entry |
+| Evidence | `verification/evidence/20260923_q06_analysis/`, `verification/evidence/20260923_q06_downstream/`, `verification/evidence/20260923_q06_founder_resolution/` |
+| Production | `instance/pms.db` `51dd83b7…30bc2`, 733,184 B — verified read-only before and after recording |
+
+## Q06-H1 — Historical record preservation
+
+> **Decision:** PRESERVE THE EXISTING SEALED HISTORICAL RECORD EXACTLY AS RECORDED.
+>
+> The sealed `NightAuditLog` record for `audit_date = 2026-08-09` shall not be deleted, rewritten, recalculated in place, mutated, re-sealed with a corrected value, or silently replaced. It is designated a historical record containing the now-confirmed Q06 taxable-base defect. The historical value remains evidence of what the system recorded at that time.
+
+- **Rationale:** the forensic and downstream-impact analyses established that `NightAuditService.tax_snapshot()` double-counts taxable base for intrastate charges (CGST/SGST `TaxLine` rows each carry the full base; no charge-level dedup, unlike `get_gst_report()`), and that this specific sealed record (`snapshot_json`, hash-sealed, `snapshot_valid=1`) already carries the buggy `total_taxable = 2285.7`. `routes.py:4786-4808` serves closed audit-date records frozen, not recomputed — consistent with how other pre-existing defects (e.g. CF-11) have been handled: disclosed and preserved, not silently altered.
+- **Governance effect:** no retroactive production data correction is authorized by this ruling. If a future requirement arises to present a corrected historical figure, it must be represented as a separate correction/superseding record with explicit provenance, never by overwriting the original sealed snapshot. No such mechanism is authorized or required at this time.
+- **Implementation status:** none required; no record read for modification; no production write performed.
+
+## Q06-H2 — Forward correction (authorization to implement later)
+
+> **Decision:** CORRECT `NightAuditService.tax_snapshot()` FOR FUTURE CALCULATIONS using the established charge-level deduplication semantics already implemented by `get_gst_report()`.
+>
+> This is a forward-looking correction only. It does not authorize alteration of historical production records (Q06-H1 stands). `get_gst_report()` itself requires no change; the actual GST/e-invoice filing path (`app/gst_einvoice.py`) already sources exclusively from it and is unaffected by this defect.
+
+- **Rationale:** downstream-impact tracing found no compensation anywhere in `app/` or `verification/` for the inflated value, no ripple into other calculations (`self._tax_lines` is otherwise read only by `revenue_summary()`, which uses `tax_amount`, unaffected), and the fix is mechanically isolated to `total_taxable`/`by_rate` inside `tax_snapshot()`.
+- **Governance effect:** permits a **later bounded implementation directive** confined to `app/night_audit_service.py :: NightAuditService.tax_snapshot()`, applying the same dedup key `get_gst_report()` uses, with regression evidence (Golden Master, replay, `inv-run`, and the existing `q06()` invariant check in `verification/quantities.py:496-532`) confirming the divergence closes and nothing else moves.
+- **Implementation status:** **not implemented**; `tax_snapshot()` is unchanged at this recording.
+
+## Q06-H3 — Historical correction model
+
+> **Decision:** NO RETROACTIVE PRODUCTION DATA CORRECTION IS AUTHORIZED BY THIS RULING.
+>
+> If a future requirement arises to present a corrected historical figure for the affected date(s), it must be represented as a separate correction/superseding record with explicit provenance rather than overwriting the original sealed snapshot. No such correction mechanism is authorized or required at this time.
+
+- **Governance effect:** establishes the model (supersede, never overwrite) for any future historical-correction need arising from this or a similar defect, without building or requiring that mechanism now.
+- **Implementation status:** not applicable; no mechanism built.
+
+## Carry-forward register — preserved open
+
+CF-5 unauthorized-role verification · CF-6 replay coverage of the reconciliation control · CF-9 deployment verification · CF-10 audit-coupling normalization at the 12 non-strict writers · CF-11 credit-path defects · SR-1 / SR-2 implementation and verification · schema / FK / `NOT NULL` work · migration mechanism (B-4) · recovery implementation · night-audit implementation and hardening · deployment rehearsal (G11) · final certification (G12) · maker-checker (policy-only, FD-P2-07) · remaining authorization work (Phase 4). **New this round: Q06 code correction (Q06-H2) — OPEN, pending a separate implementation directive.** None of the above is closed by this entry. **Closed/settled by this entry:** the governance treatment of the Q06 historical record is now decided (Q06-H1/H3 — preserve, never overwrite; no correction mechanism authorized) — this is a disposition ruling, not an implementation.
+
+## Consequence for the Phase 2 gate
+
+Gate G3 (financial integrity) and G5 (auditability) remain not-PASS pending CF-10 and the Q06-H2 implementation; this entry does not move either gate. **No implementation, schema, database, or production-record change is authorized by this entry.**

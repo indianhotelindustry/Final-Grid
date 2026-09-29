@@ -1,0 +1,27 @@
+{
+ "directive": "FG-P2-FOUNDER-RESOLUTION-20260923-01",
+ "title": "Founder Resolution Round 4 - Q06 GST Taxable-Base Defect",
+ "type": "governance recording only",
+ "recorded": "2026-09-23",
+ "status": "Q06 FOUNDER RESOLUTION PASS - ROUND 4 RECORDED - IMPLEMENTATION NOT AUTHORIZED",
+ "baseline": {"head": "b0d30542ff6b3cdbbc269fd8c17679c80ed9f718", "origin_main": "b0d30542ff6b3cdbbc269fd8c17679c80ed9f718"},
+ "factual_basis_source": ["verification/evidence/20260923_q06_analysis/", "verification/evidence/20260923_q06_downstream/"],
+ "decisions": {
+  "Q06-H1": {"subject": "historical record preservation", "decision": "sealed NightAuditLog 2026-08-09 record preserved exactly; no delete/rewrite/recalc/mutate/re-seal/replace", "affected_record": {"table": "NightAuditLog", "audit_date": "2026-08-09", "sealed_taxable_value": 2285.7, "snapshot_valid": true}, "implementation_status": "none required; record not touched"},
+  "Q06-H2": {"subject": "forward correction", "decision": "correct NightAuditService.tax_snapshot() taxable-base aggregation using get_gst_report()'s charge-level dedup semantics, for future calculations only", "permits": "bounded forward-fix directive confined to app/night_audit_service.py :: tax_snapshot()", "implementation_status": "not implemented; function unchanged at this recording"},
+  "Q06-H3": {"subject": "historical correction model", "decision": "no retroactive production data correction authorized; any future corrected figure must be a separate superseding record with provenance, never an overwrite", "implementation_status": "not applicable; no mechanism built"}
+ },
+ "governance_records": {
+  "FOUNDER_DECISIONS.md": {"section": "Founder Resolution Round 4 - Q06 GST Taxable-Base Defect - FG-P2-FOUNDER-RESOLUTION-20260923-01", "insertions": 48, "deletions": 0, "lines_before": 1206, "lines_after": 1254, "append_only_proof": "diff shows only additions after the prior Round 3 section end; no existing line altered or removed", "prior_resolutions_rewritten": false},
+  "MASTER_PLAN.md": {"modified": false, "note": "not edited by this entry; the ruling is recorded solely in FOUNDER_DECISIONS.md per FD-018"},
+  "ADRs": "not edited; no ADR governs GST computation directly"
+ },
+ "carry_forwards_preserved_open": ["CF-5", "CF-6", "CF-9", "CF-10", "CF-11", "SR-1 implementation/verification", "SR-2 implementation/verification", "schema/FK/NOT NULL", "migration mechanism (B-4)", "recovery implementation", "night-audit implementation/hardening", "deployment rehearsal (G11)", "final certification (G12)", "maker-checker (policy-only, FD-P2-07)", "remaining authorization work (Phase 4)", "Q06 code correction (Q06-H2) - new this round, OPEN"],
+ "closed_by_round4": ["governance disposition of the Q06 historical record (Q06-H1/H3 - preserve, never overwrite; no correction mechanism authorized)"],
+ "not_closed_by_round4": ["Q06-H2 implementation", "CF-10", "CF-11", "business-date integrity", "recovery/PD-006", "deployment rehearsal", "maker-checker implementation", "night-audit hardening"],
+ "production_anchor": {"sha256": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2", "size": 733184, "verified_before_and_after": true, "mutated": false},
+ "actions_not_taken": ["tax_snapshot() code change", "any application file change", "schema change", "database change", "historical record mutation", "invariant change", "ADR edit", "MASTER_PLAN.md edit", "commit", "push"],
+ "evidence_dir": {"path": "verification/evidence/20260923_q06_founder_resolution/", "tracked": false, "files": ["FOUNDER_RESOLUTION_Q06.md", "DECISION_REGISTER.md", "IMPLEMENTATION_CONSEQUENCES.md", "RESULT.json"]},
+ "prior_q06_evidence_preserved_unchanged": ["verification/evidence/20260923_q06_analysis/", "verification/evidence/20260923_q06_downstream/"],
+ "working_tree_after": {"modified_tracked": ["verification/FOUNDER_DECISIONS.md"], "untracked": ["verification/evidence/20260923_q06_analysis/", "verification/evidence/20260923_q06_downstream/", "verification/evidence/20260923_q06_founder_resolution/"], "staged": 0, "committed": false, "pushed": false}
+}
