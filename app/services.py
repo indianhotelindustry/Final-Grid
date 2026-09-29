@@ -1139,6 +1139,12 @@ def post_payment_correction(original_payment, *,
     'payment_corrected'. Caller is responsible for committing the
     transaction.
 
+    Q-5 / CF-10: each row's audit is written by ``audited_financial_write``,
+    which raises when the audit cannot be written, so the caller's
+    transaction rolls back rather than committing an unaudited correction.
+    ``audit_writer`` is accepted for compatibility with existing callers and
+    no longer used: a swallowing writer here is what CF-10 removed.
+
     Returns ``{'reversal': Payment, 'replacement': Payment | None}``.
     """
     from app.models import Payment, db as _db
@@ -1170,19 +1176,18 @@ def post_payment_correction(original_payment, *,
     _db.session.add(reversal)
     _db.session.flush()
 
-    if audit_writer is not None:
-        try:
-            audit_writer('Payment', reversal.id, 'payment_reversed',
-                         {'original_payment_id': original_payment.id,
-                          'original_amount':     float(original_payment.amount),
-                          'original_date':       original_payment.payment_date.isoformat()
-                                                  if original_payment.payment_date else None},
-                         {'reversal_payment_id': reversal.id,
-                          'reversal_amount':     float(reversal.amount),
-                          'reason':              reason,
-                          'by_user_id':          user_id})
-        except Exception:
-            pass
+    audited_financial_write(
+        'Payment', reversal.id, 'payment_reversed',
+        {'original_payment_id': original_payment.id,
+         'original_amount':     float(original_payment.amount),
+         'original_date':       original_payment.payment_date.isoformat()
+                                if original_payment.payment_date else None},
+        {'reversal_payment_id': reversal.id,
+         'reversal_amount':     float(reversal.amount),
+         'folio_id':            reversal.folio_id,
+         'reason':              reason,
+         'by_user_id':          user_id},
+        user_id=user_id)
 
     replacement = None
     if new_amount is not None and float(new_amount) > 0.005:
@@ -1202,18 +1207,17 @@ def post_payment_correction(original_payment, *,
         _db.session.add(replacement)
         _db.session.flush()
 
-        if audit_writer is not None:
-            try:
-                audit_writer('Payment', replacement.id, 'payment_corrected',
-                             {'original_payment_id': original_payment.id,
-                              'original_amount':     float(original_payment.amount)},
-                             {'replacement_payment_id': replacement.id,
-                              'replacement_amount':     float(replacement.amount),
-                              'replacement_mode_id':    mode_id,
-                              'reason':                 reason,
-                              'by_user_id':             user_id})
-            except Exception:
-                pass
+        audited_financial_write(
+            'Payment', replacement.id, 'payment_corrected',
+            {'original_payment_id': original_payment.id,
+             'original_amount':     float(original_payment.amount)},
+            {'replacement_payment_id': replacement.id,
+             'replacement_amount':     float(replacement.amount),
+             'replacement_mode_id':    mode_id,
+             'folio_id':               replacement.folio_id,
+             'reason':                 reason,
+             'by_user_id':             user_id},
+            user_id=user_id)
 
     return {'reversal': reversal, 'replacement': replacement}
 
@@ -1227,6 +1231,10 @@ def post_extra_charge_correction(original_charge, *,
     Mirror of ``post_payment_correction`` for the charges side. Never
     mutates the original. Returns ``{'reversal': ExtraCharge,
     'replacement': ExtraCharge | None}``. Caller commits.
+
+    Audit coupling is strict (Q-5 / CF-10), as in ``post_payment_correction``;
+    ``audit_writer`` is accepted for compatibility and no longer used. No
+    caller exists in ``app/`` at the time of writing (CF-10 evidence).
     """
     from app.models import ExtraCharge, db as _db
     from datetime import date as _date
@@ -1260,20 +1268,19 @@ def post_extra_charge_correction(original_charge, *,
     _db.session.add(reversal)
     _db.session.flush()
 
-    if audit_writer is not None:
-        try:
-            audit_writer('ExtraCharge', reversal.id, 'charge_reversed',
-                         {'original_charge_id': original_charge.id,
-                          'original_amount':    float(original_charge.amount),
-                          'original_desc':      original_charge.description,
-                          'original_date':      original_charge.charge_date.isoformat()
-                                                if original_charge.charge_date else None},
-                         {'reversal_charge_id': reversal.id,
-                          'reversal_amount':    float(reversal.amount),
-                          'reason':             reason,
-                          'by_user_id':         user_id})
-        except Exception:
-            pass
+    audited_financial_write(
+        'ExtraCharge', reversal.id, 'charge_reversed',
+        {'original_charge_id': original_charge.id,
+         'original_amount':    float(original_charge.amount),
+         'original_desc':      original_charge.description,
+         'original_date':      original_charge.charge_date.isoformat()
+                               if original_charge.charge_date else None},
+        {'reversal_charge_id': reversal.id,
+         'reversal_amount':    float(reversal.amount),
+         'folio_id':           reversal.folio_id,
+         'reason':             reason,
+         'by_user_id':         user_id},
+        user_id=user_id)
 
     replacement = None
     if new_amount is not None and float(new_amount) > 0.005:
@@ -1294,18 +1301,17 @@ def post_extra_charge_correction(original_charge, *,
         _db.session.add(replacement)
         _db.session.flush()
 
-        if audit_writer is not None:
-            try:
-                audit_writer('ExtraCharge', replacement.id, 'charge_corrected',
-                             {'original_charge_id': original_charge.id,
-                              'original_amount':    float(original_charge.amount)},
-                             {'replacement_charge_id': replacement.id,
-                              'replacement_amount':    float(replacement.amount),
-                              'replacement_desc':      replacement.description,
-                              'reason':                reason,
-                              'by_user_id':            user_id})
-            except Exception:
-                pass
+        audited_financial_write(
+            'ExtraCharge', replacement.id, 'charge_corrected',
+            {'original_charge_id': original_charge.id,
+             'original_amount':    float(original_charge.amount)},
+            {'replacement_charge_id': replacement.id,
+             'replacement_amount':    float(replacement.amount),
+             'replacement_desc':      replacement.description,
+             'folio_id':              replacement.folio_id,
+             'reason':                reason,
+             'by_user_id':            user_id},
+            user_id=user_id)
 
     return {'reversal': reversal, 'replacement': replacement}
 
