@@ -50,6 +50,25 @@ class AuditCouplingError(RuntimeError):
     """
 
 
+def nested_transaction():
+    """``db.session.begin_nested()`` that stays inside the caller's transaction.
+
+    pysqlite emits BEGIN only before INSERT / UPDATE / DELETE. A SAVEPOINT
+    sent before any of those have run opens no enclosing transaction: SQLite
+    makes the savepoint the outermost transaction and its RELEASE commits,
+    so whatever was written inside it survives the caller's later rollback
+    (verified: 20260930_cf10_completion/probe_savepoint.py). On SQLite this
+    opens the real transaction first; other engines are unaffected.
+    """
+    from app.models import db as _db
+    conn = _db.session.connection()
+    if conn.dialect.name == 'sqlite':
+        dbapi_conn = conn.connection.dbapi_connection
+        if not dbapi_conn.in_transaction:
+            conn.exec_driver_sql('BEGIN')
+    return _db.session.begin_nested()
+
+
 def resolve_billing_folio(reservation, *, user_id=None, ip_address=None):
     """Return the Folio that owns *reservation*'s financial transactions.
 
@@ -108,7 +127,7 @@ def resolve_billing_folio(reservation, *, user_id=None, ip_address=None):
     # unique-constraint collision with a concurrent creator does not poison
     # the caller's transaction.
     try:
-        with _db.session.begin_nested():
+        with nested_transaction():
             folio = Folio(reservation_id=rid,
                           folio_letter=BILLING_FOLIO_LETTER,
                           label='Guest',

@@ -339,7 +339,7 @@ def post_charge(reservation, charge_type, amount, slab_label,
     """
     from app.models import ExtraCharge, AuditLog, CICOChargeLog, db
     from app.services import (get_business_date, resolve_billing_folio_id,
-                              audited_financial_write)
+                              audited_financial_write, nested_transaction)
 
     if amount <= 0:
         return None
@@ -357,7 +357,7 @@ def post_charge(reservation, charge_type, amount, slab_label,
     # written inside a SAVEPOINT: if any of them fails, the savepoint rolls
     # back so no unaudited charge is left in the caller's transaction, and
     # the exception still propagates to the caller.
-    with db.session.begin_nested():
+    with nested_transaction():
         ec = ExtraCharge(
             reservation_id=reservation.id,
             folio_id=resolve_billing_folio_id(reservation, user_id=user_id),  # R-1
