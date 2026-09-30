@@ -1,0 +1,168 @@
+2026-09-30 11:22:58 [WARNING] app: Running on SQLite — row-level locking (with_for_update) is not enforced. SQLite uses a database-wide write lock; concurrent writers will serialise. Move to PostgreSQL for true per-row locking and higher concurrency.
+2026-09-30 11:22:58 [INFO] app: ------- SECURITY MODE -------
+2026-09-30 11:22:58 [INFO] app:   env                : production
+2026-09-30 11:22:58 [INFO] app:   secret_key         : set (>=32 chars)
+2026-09-30 11:22:58 [INFO] app:   updater_signing    : ENFORCED
+2026-09-30 11:22:58 [INFO] app:   encryption         : available
+2026-09-30 11:22:58 [INFO] app:   lan_access         : disabled (127.0.0.1 only)
+2026-09-30 11:22:58 [INFO] app:   schema_drift_mode  : warn-only
+2026-09-30 11:22:58 [INFO] app: -----------------------------
+2026-09-30 11:22:58 [INFO] app: db.create_all() skipped in production. Use Alembic migrations for schema changes. Set DB_AUTO_CREATE=1 to force-enable at next boot.
+2026-09-30 11:22:58 [INFO] app: Migration 10.0.0 applied: ADR011-SA: audit_logs actor kind / mechanism / role / shift; staff_user_id nullable for SYSTEM rows; no users.id 0 (23 rows carried over, digest 1cf41807b7639e55)
+2026-09-30 11:22:58 [INFO] app: SQLite: ensured table credit_vouchers exists
+2026-09-30 11:22:58 [INFO] app: SQLite: ensured table credit_voucher_redemptions exists
+2026-09-30 11:22:58 [INFO] apscheduler.scheduler: Scheduler started
+2026-09-30 11:22:58 [INFO] apscheduler.scheduler: Added job "setup_backup_scheduler.<locals>._scheduled_backup" to job store "default"
+2026-09-30 11:22:58 [INFO] app.backup_manager: Daily backup scheduled at 03:00
+2026-09-30 11:22:58 [INFO] apscheduler.scheduler: Added job "flush_notification_queue" to job store "default"
+2026-09-30 11:22:58 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._prune_old_logs" to job store "default"
+2026-09-30 11:22:58 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._run_predictive_maintenance" to job store "default"
+2026-09-30 11:22:58 [ERROR] app.services: Night audit failed for business date: injected F1: audit row could not be constructed
+2026-09-30 11:22:58 [ERROR] app.services: Night audit failed for business date: injected F1: audit row could not be constructed
+2026-09-30 11:22:58 [ERROR] app.services: Night audit failed for business date: audit row for ExtraCharge 3 (posted) could not be written: RuntimeError: injected F2: audit insert failed
+2026-09-30 11:22:58 [ERROR] app.services: Night audit failed for business date: injected F2: audit insert failed
+2026-09-30 11:22:58 [ERROR] app.services: Night audit failed for business date: audit row for ExtraCharge 3 (posted) could not be written: IntegrityError: (sqlite3.IntegrityError) FOREIGN KEY constraint failed
+[SQL: INSERT INTO audit_logs (entity_type, entity_id, action, before_state, after_state, staff_user_id, ip_address, timestamp, actor_kind, actor_mechanism, actor_role, actor_shift_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('ExtraCharge', 3, 'posted', '{}', '{"amount": 500.0, "reservation_id": 6, "folio_id": 6, "business_date": "2026-08-10", "fee_mode": "fixed", "posted_by": "night_audit", "flow": "noshow_fee"}', 999999, None, '2026-09-30 05:52:58.422879', 'HUMAN', 'test:forced', None, None)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-09-30 11:22:58 [ERROR] app.services: Night audit failed for business date: audit row for ExtraCharge 3 (posted) could not be written: IntegrityError: (sqlite3.IntegrityError) CHECK constraint failed: ck_audit_actor_not_zero
+[SQL: INSERT INTO audit_logs (entity_type, entity_id, action, before_state, after_state, staff_user_id, ip_address, timestamp, actor_kind, actor_mechanism, actor_role, actor_shift_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('ExtraCharge', 3, 'posted', '{}', '{"amount": 500.0, "reservation_id": 6, "folio_id": 6, "business_date": "2026-08-10", "fee_mode": "fixed", "posted_by": "night_audit", "flow": "noshow_fee"}', 0, None, '2026-09-30 05:52:58.433225', 'HUMAN', 'test:forced', None, None)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-09-30 11:22:58 [ERROR] app.services: Night audit failed for business date: audit row for ExtraCharge 3 (posted) has no actor: audit actor unknown: no user, no logged-in operator and no declared system mechanism (wrap unattended work in audit_actor.system_action)
+2026-09-30 11:22:58 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 11:22:58 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 11:22:58 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 11:22:58 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 11:22:58 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 11:22:58 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 11:22:58 [INFO] app.services: Night audit for 2026-08-10 auto-completed. Business date advanced to 2026-08-11
+2026-09-30 11:22:58 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 11:22:58 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 11:22:58 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 11:22:58 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 11:22:58 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 11:22:58 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 11:22:58 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 11:22:58 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 11:22:58 [INFO] app.services: Night audit for 2026-08-11 auto-completed. Business date advanced to 2026-08-12
+2026-09-30 11:22:58 [INFO] app.services: Night audit for 2026-08-13 created as Pending — blockers: 2 pending checkout(s); 1 unclosed shift(s)
+2026-09-30 11:22:58 [INFO] app.services: Night audit for 2026-08-14 created as Pending — blockers: 2 pending checkout(s); 1 unclosed shift(s)
+2026-09-30 11:22:58 [INFO] app.services: Night audit for 2026-08-15 created as Pending — blockers: 3 pending checkout(s)
+2026-09-30 11:22:58 [INFO] app.services: Night audit for 2026-08-16 created as Pending — blockers: 4 pending checkout(s)
+2026-09-30 11:22:58 [WARNING] app: Running on SQLite — row-level locking (with_for_update) is not enforced. SQLite uses a database-wide write lock; concurrent writers will serialise. Move to PostgreSQL for true per-row locking and higher concurrency.
+2026-09-30 11:22:58 [INFO] app: ------- SECURITY MODE -------
+2026-09-30 11:22:58 [INFO] app:   env                : production
+2026-09-30 11:22:58 [INFO] app:   secret_key         : set (>=32 chars)
+2026-09-30 11:22:58 [INFO] app:   updater_signing    : ENFORCED
+2026-09-30 11:22:58 [INFO] app:   encryption         : available
+2026-09-30 11:22:58 [INFO] app:   lan_access         : disabled (127.0.0.1 only)
+2026-09-30 11:22:58 [INFO] app:   schema_drift_mode  : warn-only
+2026-09-30 11:22:58 [INFO] app: -----------------------------
+2026-09-30 11:22:58 [INFO] app: db.create_all() skipped in production. Use Alembic migrations for schema changes. Set DB_AUTO_CREATE=1 to force-enable at next boot.
+2026-09-30 11:22:58 [INFO] app: Migration 10.0.0 applied: ADR011-SA: audit_logs actor kind / mechanism / role / shift; staff_user_id nullable for SYSTEM rows; no users.id 0 (23 rows carried over, digest 1cf41807b7639e55)
+2026-09-30 11:22:59 [INFO] app: SQLite: ensured table credit_vouchers exists
+2026-09-30 11:22:59 [INFO] app: SQLite: ensured table credit_voucher_redemptions exists
+2026-09-30 11:22:59 [INFO] apscheduler.scheduler: Added job "setup_backup_scheduler.<locals>._scheduled_backup" to job store "default"
+2026-09-30 11:22:59 [INFO] app.backup_manager: Daily backup scheduled at 03:00
+2026-09-30 11:22:59 [INFO] apscheduler.scheduler: Added job "flush_notification_queue" to job store "default"
+2026-09-30 11:22:59 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._prune_old_logs" to job store "default"
+2026-09-30 11:22:59 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._run_predictive_maintenance" to job store "default"
+2026-09-30 11:22:59 [ERROR] app.services: Night audit failed for business date: audit row for ExtraCharge 3 (posted) could not be written: IntegrityError: (sqlite3.IntegrityError) FOREIGN KEY constraint failed
+[SQL: INSERT INTO audit_logs (entity_type, entity_id, action, before_state, after_state, staff_user_id, ip_address, timestamp, actor_kind, actor_mechanism, actor_role, actor_shift_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('ExtraCharge', 3, 'posted', '{}', '{"amount": 500.0, "reservation_id": 6, "folio_id": 6, "business_date": "2026-08-10", "fee_mode": "fixed", "posted_by": "night_audit", "flow": "noshow_fee"}', 999999, None, '2026-09-30 05:52:59.240558', 'HUMAN', 'test:forced', None, None)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-09-30 11:22:59 [ERROR] app.services: Night audit failed for business date: audit row for ExtraCharge 3 (posted) could not be written: IntegrityError: (sqlite3.IntegrityError) CHECK constraint failed: ck_audit_actor_not_zero
+[SQL: INSERT INTO audit_logs (entity_type, entity_id, action, before_state, after_state, staff_user_id, ip_address, timestamp, actor_kind, actor_mechanism, actor_role, actor_shift_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('ExtraCharge', 3, 'posted', '{}', '{"amount": 500.0, "reservation_id": 6, "folio_id": 6, "business_date": "2026-08-10", "fee_mode": "fixed", "posted_by": "night_audit", "flow": "noshow_fee"}', 0, None, '2026-09-30 05:52:59.252488', 'HUMAN', 'test:forced', None, None)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-09-30 11:22:59 [ERROR] app.services: Night audit failed for business date: audit row for ExtraCharge 3 (posted) has no actor: audit actor unknown: no user, no logged-in operator and no declared system mechanism (wrap unattended work in audit_actor.system_action)
+=== B  characterisation: production vs restored
+OK    B-00               production SHA-256 == anchor (read-only)                               
+OK    B-01               restored: same tables as production                                    
+OK    B-02               restored: every table row count and content digest == production       53 tables, 299 rows
+OK    B-03               audit_logs: 23 rows; digest and DDL == production                      
+OK    B-04               restored: users, audit actors, integrity, 10.0.0 not applied           schema_migrations max=9.0.0
+=== D 1-12  migration rehearsal on copies of the restored file
+OK    D-01               branch boot on restored copy completes; main control boot completes    
+OK    D-02               migration 10.0.0 recorded (branch); not on the main control            
+OK    D-04               all 23 historical audit rows present                                   
+OK    D-05/06            carried-over columns: digest identical to the restored source          
+OK    D-07/08            actor_kind: all historical rows HUMAN (user 1), no mechanism/role/shif historical rows are carried, not reconstructed
+OK    D-09               no SYSTEM rows exist before any system action                          
+OK    D-10               no audit row names users.id 0                                          
+OK    D-11               constraints: staff_user_id nullable; 3 CHECKs; FK users + shifts; inde 
+OK    D-11b              integrity_check ok; foreign_key_check empty (FK on); no leftover table 
+OK    D-12a              tables changed by boot: branch == main control + audit_logs/schema_mig branch changed=['audit_logs', 'schema_migrations']; main changed=[]
+OK    D-12b              after boot, every other table identical between branch and main contro 
+OK    D-12c              financial tables identical to the restored source after migration      payments, extra_charges, folios, tax_lines, credit_vouchers, credit_voucher_redemptions, night_audit_logs, reservations, credit_notes, cico_charge_logs, busines
+OK    D-03.2             repeat boot 2: completes; every table unchanged                        
+OK    D-03.3             repeat boot 3: completes; every table unchanged                        
+OK    D-JOB              night_audit_job not registered after boot (setting false)              
+=== D 13-22  identity on copies of the restored file (branch app)
+copy=C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\verification\_work\cf10_preprod_ident.db  business date=2026-08-10  vacant=36  admin=2
+OK    D-13.src           working copy made from the restored file, not production               
+OK    S1-RED-F1-room_rent F1 on room_rent audit: whole run rolled back                           RuntimeError: injected F1: audit row could not be constructed
+OK    S1-RED-F1-noshow_posted F1 on noshow_posted audit: whole run rolled back                       RuntimeError: injected F1: audit row could not be constructed
+OK    S1-RED-F2-room_rent F2 on room_rent audit: whole run rolled back                           AuditCouplingError: audit row for ExtraCharge 3 (posted) could not be written: RuntimeError: injected F2: audit insert failed
+OK    S1-RED-F2-noshow_posted F2 on noshow_posted audit: whole run rolled back                       RuntimeError: injected F2: audit insert failed
+OK    S1-RED-FK          FK on, actor references no user: FK failure, run rolled back           AuditCouplingError: audit row for ExtraCharge 3 (posted) could not be written: IntegrityError: (sqlite3.IntegrityError) FOREIGN KEY constraint failed
+[SQL: INSE
+OK    S1-RED-ZERO        FK off, forced users.id 0: refused (CHECK), run rolled back            AuditCouplingError: audit row for ExtraCharge 3 (posted) could not be written: IntegrityError: (sqlite3.IntegrityError) CHECK constraint failed: ck_audit_actor_
+OK    S1-RED-UNDECLARED  no operator and no declared mechanism: refused, run rolled back (never AuditCouplingError: audit row for ExtraCharge 3 (posted) has no actor: audit actor unknown: no user, no logged-in operator and no declared system mechanism (wra
+OK    S1-GREEN-FK        FK on: scheduled run completes (log, rent, fee)                        
+OK    S1-GREEN-ROWS      every system financial row + noshow_posted: one SYSTEM row, no user, s 
+OK    S1-GREEN-RUNBY     NightAuditLog.run_by / NoShowLog.posted_by empty (no human)            
+OK    S1-GREEN-noFK      FK off: run completes, same SYSTEM representation                      
+OK    S2-RED-F1          F1: not a no-show, no fee, no log                                      RuntimeError: injected F1: audit row could not be constructed
+OK    S2-RED-F2          F2: not a no-show, no fee, no log                                      AuditCouplingError: audit row for ExtraCharge 8 (posted) could not be written: RuntimeError: injected F2: audit insert failed
+OK    S2-RED-FK          FK on, invalid actor: FK failure, nothing persisted                    AuditCouplingError: audit row for ExtraCharge 8 (posted) could not be written: IntegrityError: (sqlite3.IntegrityError) FOREIGN KE
+OK    S2-RED-UNDECLARED  no operator, no mechanism: refused, nothing persisted                  AuditCouplingError: audit row for ExtraCharge 8 (posted) has no actor: audit actor unknown: no user, no logged-in operator and no 
+OK    S2-GREEN-FK        completes; fee + noshow_posted are SYSTEM rows with no user            
+OK    S2-GREEN-noFK      completes; fee + noshow_posted are SYSTEM rows with no user            
+OK    S3-GREEN-FK        modify completes; one SYSTEM row, no user, mechanism webhook           
+OK    S3-GREEN-noFK      modify completes; one SYSTEM row, no user, mechanism webhook           
+OK    S4-UNAUTH          unauthenticated request: SYSTEM row, no user, web:unauthenticated      
+OK    S5-CHECK           raw INSERTs: user 0 / HUMAN without user / SYSTEM without mechanism /  
+OK    H-NA-noFK          operator run: every row HUMAN, the operator, role Admin, open shift, m HTTP 302
+OK    H-NA-FK            operator run: every row HUMAN, the operator, role Admin, open shift, m HTTP 302
+OK    H-NS-FK            FK on: HUMAN row, operator, role Admin, no open shift                  No-show posted successfully.
+OK    P-what             answerable from the row: what                                          
+OK    P-when             answerable from the row: when                                          
+OK    P-which_entity     answerable from the row: which entity                                  
+OK    P-which_amount     answerable from the row: which amount                                  
+OK    P-why              answerable from the row: why                                           
+OK    P-human_or_system  answerable from the row: human or system                               
+OK    P-execution_path   answerable from the row: execution path                                
+OK    P-business_date    answerable from the row: business date                                 
+OK    D-13.srcro         restored source unchanged by the run                                   
+=== E  negative testing (financial rolled back AND audit unchanged)
+copy=C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\verification\_work\cf10_preprod_neg.db  business date=2026-08-10  vacant=36  admin=2
+OK    E-01               invalid human user (FK on, users.id 999999): refused; financial rolled AuditCouplingError: audit row for ExtraCharge 3 (posted) could not be written: IntegrityError: (sqlite3.IntegrityError) FOREIGN KEY constraint failed
+[SQL: INSE
+OK    E-02               user 0 as actor (FK off): refused; financial rolled back; audit unchan AuditCouplingError: audit row for ExtraCharge 3 (posted) could not be written: IntegrityError: (sqlite3.IntegrityError) CHECK constraint failed: ck_audit_actor_
+OK    E-06               unknown actor: no operator, no declared mechanism: refused; financial  AuditCouplingError: audit row for ExtraCharge 3 (posted) has no actor: audit actor unknown: no user, no logged-in operator and no declared system mechanism (wra2026-09-30 11:22:59 [ERROR] app.services: Night audit failed for business date: injected F1: audit row could not be constructed
+2026-09-30 11:22:59 [ERROR] app.services: Night audit failed for business date: audit row for ExtraCharge 3 (posted) could not be written: RuntimeError: injected F2: audit insert failed
+
+OK    E-07-F1            failed audit write F1 (room rent): refused; financial rolled back; aud RuntimeError: injected F1: audit row could not be constructed
+OK    E-07-F2            failed audit write F2 (room rent): refused; financial rolled back; aud AuditCouplingError: audit row for ExtraCharge 3 (posted) could not be written: RuntimeError: injected F2: audit insert failed
+OK    E-03               HUMAN without user via raw SQL: rejected by CHECK                      rejected: CHECK constraint failed: ck_audit_actor_identity
+OK    E-04               SYSTEM with a user via raw SQL: rejected by CHECK                      rejected: CHECK constraint failed: ck_audit_actor_identity
+OK    E-05               SYSTEM without mechanism via raw SQL: rejected by CHECK                rejected: CHECK constraint failed: ck_audit_actor_identity
+OK    E-02r              user 0 (raw SQL) via raw SQL: rejected by CHECK                        rejected: CHECK constraint failed: ck_audit_actor_not_zero
+OK    E-05o              SYSTEM without mechanism via ORM: refused by the insert listener       
+OK    E-02o              ORM row with staff_user_id=0 and no operator/mechanism: refused        
+OK    E-AUD              audit table unchanged after all rejected rows                          
+OK    E-10               failed migration validation (digest mismatch injected): boot refused,  rc=1 RuntimeError: audit rows changed during migration: (23, '1cf41807b7639e55fe899b86798ce3059b3c528333b60a552004e7041f94efe7') -> (23, 'tampered')
+OK    E-11-zero          invalid historical actor (zero): boot refused, DB unchanged            rc=1 RuntimeError: 1 audit_logs row(s) name no real user (NULL, 0 or missing); ADR011-SA migration refused - their disposition needs a Founder decision
+OK    E-11-dangling      invalid historical actor (dangling): boot refused, DB unchanged        rc=1 RuntimeError: 1 audit_logs row(s) name no real user (NULL, 0 or missing); ADR011-SA migration refused - their disposition needs a Founder decision
+OK    E-11-mixed         invalid historical actor (mixed): boot refused, DB unchanged           rc=1 RuntimeError: 2 audit_logs row(s) name no real user (NULL, 0 or missing); ADR011-SA migration refused - their disposition needs a Founder decision
+OK    E-13-drop          process killed after "DROP TABLE audit_logs" inside the migration: rol rc=3 2026-09-30 11:23:03 [INFO] app: db.create_all() skipped in production. Use Alembic migrations for schema changes. Set DB_AUTO_CREATE=1 to force-enable
+OK    E-13j-drop         kill left a hot rollback journal (rc 3)                                
+OK    E-13r-drop         next start migrates cleanly; carried-over digest intact                
+OK    E-13-alter         process killed after "ALTER TABLE audit_logs__adr011 RENAME" inside th rc=3 2026-09-30 11:23:05 [INFO] app: db.create_all() skipped in production. Use Alembic migrations for schema changes. Set DB_AUTO_CREATE=1 to force-enable
+OK    E-13j-alter        kill left a hot rollback journal (rc 3)                                
+OK    E-13r-alter        next start migrates cleanly; carried-over digest intact                
+OK    P-00               production SHA-256 unchanged across the run (== anchor)                
+PREPROD ['char', 'mig', 'ident', 'neg']: 77/77 gates -> PASS
+2026-09-30 11:23:06 [INFO] apscheduler.scheduler: Scheduler has been shut down

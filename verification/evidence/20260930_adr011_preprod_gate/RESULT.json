@@ -1,0 +1,219 @@
+{
+  "task": "ADR-011 pre-production gate",
+  "status": "FOUNDER_DECISION_REQUIRED",
+  "main_sha": "16c4ca8b6bf80cbb9502d75d746073abdbfcd5cb",
+  "branch": "adr011-system-actor",
+  "branch_sha_tested": "0450c203851f412affd0c98184542f8c4ec7ad0f",
+  "migration": {
+    "version": "10.0.0",
+    "code_commit": "3ffeba5",
+    "app___init___blob": "1eeaf5482447d54616f3e44f2dc4ae46b207c407",
+    "migration_source_sha256": "e38cb0556b09ab76ea9c0213f86c60b8a3584d02f7046cb053ce149a4fb5364c"
+  },
+  "production_db": {
+    "path": "instance/pms.db",
+    "sha256": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+    "sha256_after_all_work": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+    "size_bytes": 733184,
+    "mtime": "2026-08-31 11:53:14 +0530",
+    "tables": 53,
+    "rows": 299,
+    "audit_rows": 23,
+    "audit_digest": "1cf41807b7639e55fe899b86798ce3059b3c528333b60a552004e7041f94efe7",
+    "schema_migrations_latest": "9.0.0",
+    "journal_mode": "delete",
+    "modified": false
+  },
+  "backup": {
+    "artifact": "db-backups/pms_20260930_111550_adr011-preprod.db",
+    "sha256": "99505a475fecc508a91d323ef0387142159ac483d6577d7a6801b40ea49eb3cd",
+    "restored_sha256": "99505a475fecc508a91d323ef0387142159ac483d6577d7a6801b40ea49eb3cd",
+    "production_touched_by_restore": false,
+    "tool": "tools/backup_db.py",
+    "verdict": "PASS"
+  },
+  "restore_rehearsal": {
+    "run_id": "RR-20260930-ADR011",
+    "tool": "tools/restore_db.py",
+    "checks": {
+      "body_identical_beyond_header": true,
+      "content_digests_equal_all_tables": true,
+      "invoice_count_equal": true,
+      "required_tables_present": true,
+      "restored_file_exists": true,
+      "restored_foreign_key_check": true,
+      "restored_integrity_check": true,
+      "restored_sqlite_header": true,
+      "row_counts_equal": true,
+      "row_counts_match_backup_manifest": true,
+      "schema_readable": true,
+      "schema_sql_equal": true,
+      "source_integrity_check": true,
+      "source_matches_backup_manifest": true,
+      "source_sqlite_header": true,
+      "whole_file_sha256_identical": null
+    },
+    "fdp204_condition8": {
+      "inv_run_restored_identical_to_production": true,
+      "inv_overall": "FAIL",
+      "gm_verify_restored": "PASS 158/158, 0 differences"
+    }
+  },
+  "preprod_harness": {
+    "gates": "77/77",
+    "verdict": "PASS",
+    "branch_app_clean": true,
+    "boot_changed_tables_branch": [
+      "audit_logs",
+      "schema_migrations"
+    ],
+    "boot_changed_tables_main_control": [],
+    "migration_rehearsal": true,
+    "negatives": true,
+    "identity": true
+  },
+  "regression": {
+    "main_baseline_16c4ca8": {
+      "cf10_cf11": {
+        "actor": "9/9 PASS app=16c4ca8",
+        "cf11": "48/48 PASS app=16c4ca8",
+        "corr": "46/46 PASS app=16c4ca8",
+        "na": "21/21 PASS app=16c4ca8",
+        "voucher": "9/9 PASS app=16c4ca8",
+        "w10": "25/25 PASS app=16c4ca8",
+        "w12": "16/16 PASS app=16c4ca8",
+        "w13": "16/16 PASS app=16c4ca8",
+        "w14": "14/14 PASS app=16c4ca8",
+        "w24": "38/38 PASS app=16c4ca8"
+      },
+      "phase1_writers": {
+        "A": "RESULT SET A: 89 / 89 gate checks passed; 4 findings recorded (non-gating)",
+        "B": "RESULT SET B: 48 / 48 gate checks passed; 6 findings recorded (non-gating)",
+        "C": "RESULT SET C: 15 / 15 gate checks passed; 2 findings recorded (non-gating)",
+        "D": "RESULT SET D: 46 / 46 gate checks passed; 2 findings recorded (non-gating)"
+      },
+      "phase1_execution": "RESULT: 44 / 44 passed",
+      "phase2a": "cases             : 29 passed / 29 total",
+      "q06": "15 PASS / 0 FAIL",
+      "retention": "RESULT: 18 / 18 passed   routes=298",
+      "w20": "RESULT: 23 / 23 passed",
+      "restore_tool": "OK",
+      "pvf": {
+        "gm_verify_phase1_aa6d9e91": {
+          "pack": "20260930_054942_gm_verify_phase1_aa6d9e91",
+          "verdict": "PASS",
+          "differences": 0,
+          "surfaces": "158/158"
+        },
+        "replay_verify_production": {
+          "pack": "20260930_054949_replay_verify_production",
+          "verdict": "FAIL",
+          "differences": 2,
+          "surfaces": null
+        },
+        "inv_run_production": {
+          "pack": "20260930_054951_inv_run_production",
+          "verdict": "FAIL",
+          "differences": null,
+          "surfaces": null
+        },
+        "cross_implementation": {
+          "pack": "20260930_054954_cross_implementation",
+          "verdict": "FAIL",
+          "differences": null,
+          "surfaces": null
+        }
+      }
+    },
+    "branch_0450c20": {
+      "cf10_cf11": {
+        "actor": "9/9 PASS app=0450c20",
+        "cf11": "48/48 PASS app=0450c20",
+        "corr": "46/46 PASS app=0450c20",
+        "na": "21/21 PASS app=0450c20",
+        "voucher": "9/9 PASS app=0450c20",
+        "w10": "25/25 PASS app=0450c20",
+        "w12": "16/16 PASS app=0450c20",
+        "w13": "16/16 PASS app=0450c20",
+        "w24": "38/38 PASS app=0450c20",
+        "w14": "14/14 PASS app=0450c20"
+      },
+      "phase1_writers": {
+        "A": null,
+        "B": "RESULT SET B: 48 / 48 gate checks passed; 6 findings recorded (non-gating)",
+        "C": "RESULT SET C: 15 / 15 gate checks passed; 2 findings recorded (non-gating)",
+        "D": null
+      },
+      "phase1_execution": null,
+      "phase2a": "cases             : 29 passed / 29 total",
+      "q06": "15 PASS / 0 FAIL",
+      "retention": "RESULT: 18 / 18 passed   routes=298",
+      "w20": "RESULT: 23 / 23 passed",
+      "restore_tool": "OK",
+      "pvf": {
+        "gm_verify_phase1_aa6d9e91": {
+          "pack": "20260930_055048_gm_verify_phase1_aa6d9e91",
+          "verdict": "PASS",
+          "differences": 0,
+          "surfaces": "158/158"
+        },
+        "replay_verify_production": {
+          "pack": "20260930_055055_replay_verify_production",
+          "verdict": "FAIL",
+          "differences": 2,
+          "surfaces": null
+        },
+        "inv_run_production": {
+          "pack": "20260930_055058_inv_run_production",
+          "verdict": "FAIL",
+          "differences": null,
+          "surfaces": null
+        },
+        "cross_implementation": {
+          "pack": "20260930_055100_cross_implementation",
+          "verdict": "FAIL",
+          "differences": null,
+          "surfaces": null
+        }
+      },
+      "declared": {
+        "phase1_writers": {
+          "A": "RESULT SET A: 89 / 89 gate checks passed; 4 findings recorded (non-gating)",
+          "B": "RESULT SET B: 48 / 48 gate checks passed; 6 findings recorded (non-gating)",
+          "C": "RESULT SET C: 15 / 15 gate checks passed; 2 findings recorded (non-gating)",
+          "D": "RESULT SET D: 46 / 46 gate checks passed; 2 findings recorded (non-gating)"
+        },
+        "phase1_execution": "RESULT: 44 / 44 passed",
+        "undeclared_refusals": {
+          "writers_A.log": 1,
+          "writers_D.log": 1,
+          "phase1_execution.log": 1,
+          "cf10_harness.log": 1
+        }
+      }
+    }
+  },
+  "postgresql": {
+    "verified": false,
+    "status": "BLOCKED",
+    "services": {
+      "postgresql-x64-13": "13.23",
+      "postgresql-x64-18": "18.4"
+    },
+    "listening": [
+      "0.0.0.0:5432",
+      "0.0.0.0:5433"
+    ],
+    "credentials_available": false,
+    "pgpass": false,
+    "python_driver_in_app_venv": false,
+    "static_ddl": "postgresql/static_ddl_postgresql.sql (offline compile only)"
+  },
+  "gates": {
+    "G3": "OPEN",
+    "G5": "OPEN",
+    "G11": "BLOCKED",
+    "G12": "BLOCKED"
+  },
+  "merge_safe_to_authorize": "FOUNDER DECISION REQUIRED - technical evidence PASS; preconditions listed in the report"
+}

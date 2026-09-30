@@ -1,0 +1,39 @@
+{
+  "blocking_count": 1,
+  "by_kind": {
+    "ENGINE_CHANGED": 2
+  },
+  "current_app_version": "2.2.18",
+  "current_business_date": "2026-08-10",
+  "dates_clean": 8,
+  "dates_compared": 10,
+  "difference_count": 2,
+  "differences": [
+    {
+      "current": "1142.85",
+      "date": "2026-08-09",
+      "day_state": "CLOSED",
+      "delta": "-1142.85",
+      "key": "nas.tax_snapshot.total_taxable",
+      "kind": "ENGINE_CHANGED",
+      "severity": "BLOCK",
+      "stored": "2285.7"
+    },
+    {
+      "current": "2952.38",
+      "date": "2026-08-10",
+      "day_state": "BUSINESS_DATE",
+      "delta": "-2952.38",
+      "key": "nas.tax_snapshot.total_taxable",
+      "kind": "ENGINE_CHANGED",
+      "severity": "INFO",
+      "stored": "5904.76"
+    }
+  ],
+  "read_only_verified": true,
+  "stored_app_version": "2.2.18",
+  "stored_business_date": "2026-08-10",
+  "stored_captured_at": "2026-08-31T04:35:44",
+  "tag": "production",
+  "verdict": "FAIL"
+}
