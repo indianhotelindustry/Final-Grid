@@ -1,0 +1,102 @@
+2026-09-30 10:52:43 [WARNING] app: Running on SQLite — row-level locking (with_for_update) is not enforced. SQLite uses a database-wide write lock; concurrent writers will serialise. Move to PostgreSQL for true per-row locking and higher concurrency.
+2026-09-30 10:52:43 [INFO] app: ------- SECURITY MODE -------
+2026-09-30 10:52:43 [INFO] app:   env                : production
+2026-09-30 10:52:43 [INFO] app:   secret_key         : set (>=32 chars)
+2026-09-30 10:52:43 [INFO] app:   updater_signing    : ENFORCED
+2026-09-30 10:52:43 [INFO] app:   encryption         : available
+2026-09-30 10:52:43 [INFO] app:   lan_access         : disabled (127.0.0.1 only)
+2026-09-30 10:52:43 [INFO] app:   schema_drift_mode  : warn-only
+2026-09-30 10:52:43 [INFO] app: -----------------------------
+2026-09-30 10:52:43 [INFO] app: db.create_all() skipped in production. Use Alembic migrations for schema changes. Set DB_AUTO_CREATE=1 to force-enable at next boot.
+2026-09-30 10:52:43 [INFO] app: Migration 10.0.0 applied: ADR011-SA: audit_logs actor kind / mechanism / role / shift; staff_user_id nullable for SYSTEM rows; no users.id 0 (23 rows carried over, digest 1cf41807b7639e55)
+2026-09-30 10:52:43 [INFO] app: SQLite: ensured table credit_vouchers exists
+2026-09-30 10:52:43 [INFO] app: SQLite: ensured table credit_voucher_redemptions exists
+2026-09-30 10:52:43 [INFO] apscheduler.scheduler: Scheduler started
+2026-09-30 10:52:43 [INFO] apscheduler.scheduler: Added job "setup_backup_scheduler.<locals>._scheduled_backup" to job store "default"
+2026-09-30 10:52:43 [INFO] app.backup_manager: Daily backup scheduled at 03:00
+2026-09-30 10:52:43 [INFO] apscheduler.scheduler: Added job "flush_notification_queue" to job store "default"
+2026-09-30 10:52:43 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._prune_old_logs" to job store "default"
+2026-09-30 10:52:43 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._run_predictive_maintenance" to job store "default"
+2026-09-30 10:52:44 [ERROR] app.services: Night audit failed for business date: injected F1: audit row could not be constructed
+2026-09-30 10:52:44 [ERROR] app.services: Night audit failed for business date: injected F1: audit row could not be constructed
+2026-09-30 10:52:44 [ERROR] app.services: Night audit failed for business date: audit row for ExtraCharge 3 (posted) could not be written: RuntimeError: injected F2: audit insert failed
+2026-09-30 10:52:44 [ERROR] app.services: Night audit failed for business date: injected F2: audit insert failed
+2026-09-30 10:52:44 [ERROR] app.services: Night audit failed for business date: audit row for ExtraCharge 3 (posted) could not be written: IntegrityError: (sqlite3.IntegrityError) FOREIGN KEY constraint failed
+[SQL: INSERT INTO audit_logs (entity_type, entity_id, action, before_state, after_state, staff_user_id, ip_address, timestamp, actor_kind, actor_mechanism, actor_role, actor_shift_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('ExtraCharge', 3, 'posted', '{}', '{"amount": 500.0, "reservation_id": 6, "folio_id": 6, "business_date": "2026-08-10", "fee_mode": "fixed", "posted_by": "night_audit", "flow": "noshow_fee"}', 999999, None, '2026-09-30 05:22:44.091134', 'HUMAN', 'test:forced', None, None)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-09-30 10:52:44 [ERROR] app.services: Night audit failed for business date: audit row for ExtraCharge 3 (posted) could not be written: IntegrityError: (sqlite3.IntegrityError) CHECK constraint failed: ck_audit_actor_not_zero
+[SQL: INSERT INTO audit_logs (entity_type, entity_id, action, before_state, after_state, staff_user_id, ip_address, timestamp, actor_kind, actor_mechanism, actor_role, actor_shift_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('ExtraCharge', 3, 'posted', '{}', '{"amount": 500.0, "reservation_id": 6, "folio_id": 6, "business_date": "2026-08-10", "fee_mode": "fixed", "posted_by": "night_audit", "flow": "noshow_fee"}', 0, None, '2026-09-30 05:22:44.101139', 'HUMAN', 'test:forced', None, None)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-09-30 10:52:44 [ERROR] app.services: Night audit failed for business date: audit row for ExtraCharge 3 (posted) has no actor: audit actor unknown: no user, no logged-in operator and no declared system mechanism (wrap unattended work in audit_actor.system_action)
+2026-09-30 10:52:44 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 10:52:44 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 10:52:44 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 10:52:44 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 10:52:44 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 10:52:44 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 10:52:44 [INFO] app.services: Night audit for 2026-08-10 auto-completed. Business date advanced to 2026-08-11
+2026-09-30 10:52:44 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 10:52:44 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 10:52:44 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 10:52:44 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 10:52:44 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 10:52:44 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 10:52:44 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 10:52:44 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 10:52:44 [INFO] app.services: Night audit for 2026-08-11 auto-completed. Business date advanced to 2026-08-12
+2026-09-30 10:52:44 [INFO] app.services: Night audit for 2026-08-13 created as Pending — blockers: 2 pending checkout(s); 1 unclosed shift(s)
+2026-09-30 10:52:44 [INFO] app.services: Night audit for 2026-08-14 created as Pending — blockers: 2 pending checkout(s); 1 unclosed shift(s)
+2026-09-30 10:52:44 [INFO] app.services: Night audit for 2026-08-15 created as Pending — blockers: 3 pending checkout(s)
+2026-09-30 10:52:44 [INFO] app.services: Night audit for 2026-08-16 created as Pending — blockers: 4 pending checkout(s)
+OK    M-00         migration production audit_logs: 23 rows, pre-ADR011 schema          expect=(23, True)             got=(23, True)             
+OK    M-01         migration production copy boots and migrates                         expect=0                      got=0                      
+OK    M-02         migration every pre-existing row carried over unchanged (count + dig expect=(23, '1cf41807b7639e55 got=(23, '1cf41807b7639e55 
+OK    M-03         migration new shape: nullable staff_user_id, 4 actor columns, 3 CHEC expect=(0, True, 3, 1)        got=(0, True, 3, 1)        
+OK    M-04         migration all historical rows HUMAN; migration recorded; integrity o expect=([('HUMAN', 23)], 1, ' got=([('HUMAN', 23)], 1, ' 
+OK    M-05         migration scheduler night-audit job not registered (FD-P2-05)        expect=True                   got=True                   
+OK    M-06         migration second boot: idempotent, table unchanged                   expect=(0, (23, '1cf41807b763 got=(0, (23, '1cf41807b763 
+OK    M-07         migration history naming user 0: boot refused, table untouched, not  expect=(True, True, (24, 'f9d got=(True, True, (24, 'f9d 
+OK    M-08         migration fresh install: models create the ADR011 shape; migration r expect=(0, True, True, 1)     got=(0, True, True, 1)     
+copy=C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\verification\_work\cf10_adr011impl.db  business date=2026-08-10  vacant=36  admin=2
+=== group sys
+OK    S1-RED-F1-room_rent sched NA F1 on room_rent audit: whole run rolled back               expect=(True, {'logs': 0, 're got=(True, {'logs': 0, 're RuntimeError: injected F1: audit row could not be constructed
+OK    S1-RED-F1-noshow_posted sched NA F1 on noshow_posted audit: whole run rolled back           expect=(True, {'logs': 0, 're got=(True, {'logs': 0, 're RuntimeError: injected F1: audit row could not be constructed
+OK    S1-RED-F2-room_rent sched NA F2 on room_rent audit: whole run rolled back               expect=(True, {'logs': 0, 're got=(True, {'logs': 0, 're AuditCouplingError: audit row for ExtraCharge 3 (posted) could not be written: RuntimeError: injected F2: audit insert failed
+OK    S1-RED-F2-noshow_posted sched NA F2 on noshow_posted audit: whole run rolled back           expect=(True, {'logs': 0, 're got=(True, {'logs': 0, 're RuntimeError: injected F2: audit insert failed
+OK    S1-RED-FK    sched NA FK on, actor references no user: FK failure, run rolled ba expect=(True, {'logs': 0, 're got=(True, {'logs': 0, 're AuditCouplingError: audit row for ExtraCharge 3 (posted) could not be written: IntegrityError: (sqlite3.IntegrityError) FOREIGN KEY constraint failed
+[SQL: INSERT INTO audit_logs (entity_type, entity_id, action, before_state, after_state, staff_user_id, ip_address, timestamp, actor_kind, actor_mechanism, actor_role, ac
+OK    S1-RED-ZERO  sched NA FK off, forced users.id 0: refused (CHECK), run rolled bac expect=(True, {'logs': 0, 're got=(True, {'logs': 0, 're AuditCouplingError: audit row for ExtraCharge 3 (posted) could not be written: IntegrityError: (sqlite3.IntegrityError) CHECK constraint failed: ck_audit_actor_not_zero
+[SQL: INSERT INTO audit_logs (entity_type, entity_id, action, before_state, after_state, staff_user_id, ip_address, timestamp, actor_kind, actor_mechan
+OK    S1-RED-UNDECLARED sched NA no operator and no declared mechanism: refused, run rolled expect=(True, {'logs': 0, 're got=(True, {'logs': 0, 're AuditCouplingError: audit row for ExtraCharge 3 (posted) has no actor: audit actor unknown: no user, no logged-in operator and no declared system mechanism (wrap unattended work in audit_actor.system_action)
+OK    S1-GREEN-FK  sched NA FK on: scheduled run completes (log, rent, fee)            expect=(None, 1, True, True)  got=(None, 1, True, True)  
+OK    S1-GREEN-ROWS sched NA every system financial row + noshow_posted: one SYSTEM row expect=[('SYSTEM', None, 'sch got=[('SYSTEM', None, 'sch 
+OK    S1-GREEN-RUNBY sched NA NightAuditLog.run_by / NoShowLog.posted_by empty (no human expect=(None, None)           got=(None, None)           
+OK    S1-GREEN-noFK sched NA FK off: run completes, same SYSTEM representation          expect=(None, [('SYSTEM', Non got=(None, [('SYSTEM', Non 
+OK    S2-RED-F1    auto no-show F1: not a no-show, no fee, no log                          expect=(True, ('Reserved', 0, got=(True, ('Reserved', 0, RuntimeError: injected F1: audit row could not be constructed
+OK    S2-RED-F2    auto no-show F2: not a no-show, no fee, no log                          expect=(True, ('Reserved', 0, got=(True, ('Reserved', 0, AuditCouplingError: audit row for ExtraCharge 8 (posted) could not be written: RuntimeError: injected F2: audit insert failed
+OK    S2-RED-FK    auto no-show FK on, invalid actor: FK failure, nothing persisted        expect=(True, ('Reserved', 0, got=(True, ('Reserved', 0, AuditCouplingError: audit row for ExtraCharge 8 (posted) could not be written: IntegrityError: (sqlite3.IntegrityError) FOREIGN KE
+OK    S2-RED-UNDECLARED auto no-show no operator, no mechanism: refused, nothing persisted      expect=(True, ('Reserved', 0, got=(True, ('Reserved', 0, AuditCouplingError: audit row for ExtraCharge 8 (posted) has no actor: audit actor unknown: no user, no logged-in operator and no 
+OK    S2-GREEN-FK  auto no-show completes; fee + noshow_posted are SYSTEM rows with no use expect=(None, ('NoShow', 1, 1 got=(None, ('NoShow', 1, 1 
+OK    S2-GREEN-noFK auto no-show completes; fee + noshow_posted are SYSTEM rows with no use expect=(None, ('NoShow', 1, 1 got=(None, ('NoShow', 1, 1 
+OK    S3-GREEN-FK  webhook modify completes; one SYSTEM row, no user, mechanism webho expect=(200, 1500.0, [('SYSTE got=(200, 1500.0, [('SYSTE 
+OK    S3-GREEN-noFK webhook modify completes; one SYSTEM row, no user, mechanism webho expect=(200, 1500.0, [('SYSTE got=(200, 1500.0, [('SYSTE 
+OK    S4-UNAUTH    web     unauthenticated request: SYSTEM row, no user, web:unauthen expect=[('SYSTEM', None, 'web got=[('SYSTEM', None, 'web 
+OK    S5-CHECK     schema  raw INSERTs: user 0 / HUMAN without user / SYSTEM without  expect=['rejected', 'rejected got=['rejected', 'rejected 
+=== group human
+OK    H-NA-noFK    manual NA operator run: every row HUMAN, the operator, role Admin, o expect=(1, [('HUMAN', 2, 'Adm got=(1, [('HUMAN', 2, 'Adm HTTP 302
+OK    H-NA-FK      manual NA operator run: every row HUMAN, the operator, role Admin, o expect=(1, [('HUMAN', 2, 'Adm got=(1, [('HUMAN', 2, 'Adm HTTP 302
+OK    H-NS-FK      manual no-show FK on: HUMAN row, operator, role Admin, no open shift      expect=[('HUMAN', 2, 'Admin', got=[('HUMAN', 2, 'Admin', No-show posted successfully.
+=== group prov
+OK    P-what       provenance answerable from the row: what                              expect=True                   got=True                   
+OK    P-when       provenance answerable from the row: when                              expect=True                   got=True                   
+OK    P-which_entity provenance answerable from the row: which entity                      expect=True                   got=True                   
+OK    P-which_amount provenance answerable from the row: which amount                      expect=True                   got=True                   
+OK    P-why        provenance answerable from the row: why                               expect=True                   got=True                   
+OK    P-human_or_system provenance answerable from the row: human or system                   expect=True                   got=True                   
+OK    P-execution_path provenance answerable from the row: execution path                    expect=True                   got=True                   
+OK    P-business_date provenance answerable from the row: business date                     expect=True                   got=True                   
+OK    P-01         prod    production database unchanged (sha256 == anchor)           expect='51dd83b7f0fa42a3e85af got='51dd83b7f0fa42a3e85af 
+ADR011-SA: 42/42 gates -> PASS
+2026-09-30 10:52:44 [INFO] apscheduler.scheduler: Scheduler has been shut down

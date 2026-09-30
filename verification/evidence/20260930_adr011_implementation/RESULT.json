@@ -1,0 +1,88 @@
+{
+  "task": "ADR-011 system-action provenance",
+  "status": "PASS",
+  "status_scope": "implemented and verified on branch adr011-system-actor; NOT merged to main; NOT applied to production",
+  "head_before": "16c4ca8c (main; decision recorded)",
+  "head_after": "branch adr011-system-actor: code 3ffeba5 + this evidence commit; main unchanged at 16c4ca8",
+  "origin_main": "16c4ca8",
+  "working_tree_clean": true,
+  "production_db_modified": false,
+  "production_db": {
+    "sha256": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+    "size_bytes": 733184,
+    "mtime": "2026-08-31 11:53:14 +0530"
+  },
+  "system_action_model": "audit_logs.actor_kind HUMAN|SYSTEM; SYSTEM rows have no user and a mandatory actor_mechanism; HUMAN rows reference the authenticated user with actor_role and actor_shift_id snapshots; users.id 0 rejected by CHECK and never written; unknown actor refused",
+  "founder_decision": "ADR011-SA (FOUNDER_DECISIONS.md Round 5, FG-P2-FOUNDER-RESOLUTION-20260930-01); delivery: branch only (Founder answer 2026-09-30)",
+  "migration": {
+    "version": "10.0.0",
+    "rows_carried_over": 23,
+    "digest_prefix": "1cf41807b7639e55",
+    "refuses_on_invalid_history": true
+  },
+  "tests": {
+    "adr011_impl": {
+      "gates": "42/42",
+      "verdict": "PASS",
+      "app_commit": "3ffeba5bc01d70b577f3cd8db58138f20d6a3416",
+      "app_tree_clean": true
+    },
+    "cf10_cf11_harness": {
+      "actor": "9/9 PASS (app 3ffeba5, clean True)",
+      "cf11": "48/48 PASS (app 3ffeba5, clean True)",
+      "corr": "46/46 PASS (app 3ffeba5, clean True)",
+      "na": "21/21 PASS (app 3ffeba5, clean True)",
+      "voucher": "9/9 PASS (app 3ffeba5, clean True)",
+      "w10": "25/25 PASS (app 3ffeba5, clean True)",
+      "w12": "16/16 PASS (app 3ffeba5, clean True)",
+      "w13": "16/16 PASS (app 3ffeba5, clean True)",
+      "w24": "38/38 PASS (app 3ffeba5, clean True)",
+      "w14": "14/14 PASS (app 3ffeba5, clean True)",
+      "total": "242/242",
+      "note": "w14 run with its no-operator call declared (verification:cf10_w14); see ADR011_REGRESSION.md note 1"
+    },
+    "phase1_writers_declared": [
+      "RESULT SET A: 89 / 89 gate checks passed; 4 findings recorded (non-gating)",
+      "RESULT SET B: 48 / 48 gate checks passed; 6 findings recorded (non-gating)",
+      "RESULT SET C: 15 / 15 gate checks passed; 2 findings recorded (non-gating)",
+      "RESULT SET D: 46 / 46 gate checks passed; 2 findings recorded (non-gating)"
+    ],
+    "phase1_writers_undeclared": {
+      "B": "RESULT SET B: 48 / 48 gate checks passed; 6 findings recorded (non-gating)",
+      "C": "RESULT SET C: 15 / 15 gate checks passed; 2 findings recorded (non-gating)",
+      "A": "refused (2) - undeclared no-operator run_night_audit",
+      "D": "refused (2)"
+    },
+    "phase1_execution_declared": "RESULT: 44 / 44 passed",
+    "phase2a": "cases             : 29 passed / 29 total",
+    "q06_fix": "15 PASS / 0 FAIL",
+    "retention": "RESULT: 18 / 18 passed   routes=298",
+    "w20": "RESULT: 23 / 23 passed",
+    "restore_tool": "OK",
+    "golden_master": {
+      "verdict": "FAIL",
+      "differences": 9,
+      "note": "identical to control run of unchanged main code from a worktree root (pvf/20260930_052018); attributable to branch: 0"
+    },
+    "replay": "FAIL - identical to 3efdd2b (Q06-H2 deltas only)",
+    "inv_run": "FAIL - record-identical to 3efdd2b (D11 exception only); 0 writes",
+    "cross_implementation": "FAIL - record-identical to 3efdd2b",
+    "datasets": "5/5 PASS - app-independent; not evidence about the branch"
+  },
+  "postgresql_verified": false,
+  "postgresql_reason": "NOT EXECUTED: PostgreSQL 13/18 installed locally but no database/credentials provisioned and no driver in the app venv; installation not authorized",
+  "gates": {
+    "G3": "OPEN",
+    "G5": "OPEN - evidence on branch only; not merged/applied; ADR-011 provenance storage beyond actor (e.g. envelope completeness) to be assessed at certification",
+    "G11": "OPEN",
+    "G12": "NOT-VERIFIED"
+  },
+  "remaining_blockers": [
+    "authorization to merge to main (migration then runs at next boot from the production working tree; B-4 undecided)",
+    "PD-005/PD-006 verified-state backup + restore rehearsal before first production start of the merged code",
+    "PostgreSQL verification environment",
+    "gm-verify writes instance/alert_memory.json in the live instance folder",
+    "webhook audit classification (non-strict modify; no audit on new/cancel)",
+    "production guest phone number in git history (purge needs force-push)"
+  ]
+}

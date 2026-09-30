@@ -1,0 +1,439 @@
+{
+  "task": "ADR011-SA implementation verification",
+  "groups": [
+    "mig",
+    "sys",
+    "human",
+    "prov"
+  ],
+  "app_root": "C:\\wt_adr011",
+  "app_commit": "3ffeba5bc01d70b577f3cd8db58138f20d6a3416",
+  "app_tree_clean": true,
+  "finished": "2026-09-30T10:52:44",
+  "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "gates_total": 42,
+  "gates_passed": 42,
+  "verdict": "PASS",
+  "checks": [
+    {
+      "case": "M-00",
+      "writer": "migration",
+      "what": "production audit_logs: 23 rows, pre-ADR011 schema",
+      "expect": "(23, True)",
+      "got": "(23, True)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "M-01",
+      "writer": "migration",
+      "what": "production copy boots and migrates",
+      "expect": "0",
+      "got": "0",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "M-02",
+      "writer": "migration",
+      "what": "every pre-existing row carried over unchanged (count + digest)",
+      "expect": "(23, '1cf41807b7639e55fe899b86798ce3059b3c528333b60a552004e7041f94efe7')",
+      "got": "(23, '1cf41807b7639e55fe899b86798ce3059b3c528333b60a552004e7041f94efe7')",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "M-03",
+      "writer": "migration",
+      "what": "new shape: nullable staff_user_id, 4 actor columns, 3 CHECKs, index",
+      "expect": "(0, True, 3, 1)",
+      "got": "(0, True, 3, 1)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "M-04",
+      "writer": "migration",
+      "what": "all historical rows HUMAN; migration recorded; integrity ok; FK clean",
+      "expect": "([('HUMAN', 23)], 1, 'ok', [])",
+      "got": "([('HUMAN', 23)], 1, 'ok', [])",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "M-05",
+      "writer": "migration",
+      "what": "scheduler night-audit job not registered (FD-P2-05)",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "M-06",
+      "writer": "migration",
+      "what": "second boot: idempotent, table unchanged",
+      "expect": "(0, (23, '1cf41807b7639e55fe899b86798ce3059b3c528333b60a552004e7041f94efe7', 'CREATE TABLE \"audit_logs\" (\\n    id INTEGER NOT NULL,\\n    entity_type VARCHAR(50) NOT NULL,\\n    entity_id INTEGER NOT NULL,\\n    action VARCHAR(50) NOT NULL,\\n    before_state JSON,\\n    after_state JSON,\\n    staff_user_id INTEGER,\\n    ip_address VARCHAR(45),\\n    timestamp DATETIME,\\n    actor_kind VARCHAR(10) DEFAULT \\'HUMAN\\' NOT NULL,\\n    actor_mechanism VARCHAR(64),\\n    actor_role VARCHAR(20),\\n    actor_shift_id INTEGER,\\n    PRIMARY KEY (id),\\n    CONSTRAINT ck_audit_actor_kind CHECK (actor_kind IN (\\'HUMAN\\',\\'SYSTEM\\')),\\n    CONSTRAINT ck_audit_actor_identity CHECK ((actor_kind = \\'HUMAN\\' AND staff_user_id IS NOT NULL) OR (actor_kind = \\'SYSTEM\\' AND staff_user_id IS NULL AND actor_mechanism IS NOT NULL)),\\n    CONSTRAINT ck_audit_actor_not_zero CHECK (staff_user_id IS NULL OR staff_user_id > 0),\\n    FOREIGN KEY(staff_user_id) REFERENCES users (id),\\n    FOREIGN KEY(actor_shift_id) REFERENCES shifts (id)\\n)'))",
+      "got": "(0, (23, '1cf41807b7639e55fe899b86798ce3059b3c528333b60a552004e7041f94efe7', 'CREATE TABLE \"audit_logs\" (\\n    id INTEGER NOT NULL,\\n    entity_type VARCHAR(50) NOT NULL,\\n    entity_id INTEGER NOT NULL,\\n    action VARCHAR(50) NOT NULL,\\n    before_state JSON,\\n    after_state JSON,\\n    staff_user_id INTEGER,\\n    ip_address VARCHAR(45),\\n    timestamp DATETIME,\\n    actor_kind VARCHAR(10) DEFAULT \\'HUMAN\\' NOT NULL,\\n    actor_mechanism VARCHAR(64),\\n    actor_role VARCHAR(20),\\n    actor_shift_id INTEGER,\\n    PRIMARY KEY (id),\\n    CONSTRAINT ck_audit_actor_kind CHECK (actor_kind IN (\\'HUMAN\\',\\'SYSTEM\\')),\\n    CONSTRAINT ck_audit_actor_identity CHECK ((actor_kind = \\'HUMAN\\' AND staff_user_id IS NOT NULL) OR (actor_kind = \\'SYSTEM\\' AND staff_user_id IS NULL AND actor_mechanism IS NOT NULL)),\\n    CONSTRAINT ck_audit_actor_not_zero CHECK (staff_user_id IS NULL OR staff_user_id > 0),\\n    FOREIGN KEY(staff_user_id) REFERENCES users (id),\\n    FOREIGN KEY(actor_shift_id) REFERENCES shifts (id)\\n)'))",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "M-07",
+      "writer": "migration",
+      "what": "history naming user 0: boot refused, table untouched, not recorded",
+      "expect": "(True, True, (24, 'f9dc883ab22245196ac4a90f1c1100bf6791543ea3f5051c4f1c41f8fcaf6eb9', 'CREATE TABLE audit_logs (\\n\\tid INTEGER NOT NULL, \\n\\tentity_type VARCHAR(50) NOT NULL, \\n\\tentity_id INTEGER NOT NULL, \\n\\taction VARCHAR(50) NOT NULL, \\n\\tbefore_state JSON, \\n\\tafter_state JSON, \\n\\tstaff_user_id INTEGER NOT NULL, \\n\\tip_address VARCHAR(45), \\n\\ttimestamp DATETIME, \\n\\tPRIMARY KEY (id), \\n\\tFOREIGN KEY(staff_user_id) REFERENCES users (id)\\n)'), 0, 0)",
+      "got": "(True, True, (24, 'f9dc883ab22245196ac4a90f1c1100bf6791543ea3f5051c4f1c41f8fcaf6eb9', 'CREATE TABLE audit_logs (\\n\\tid INTEGER NOT NULL, \\n\\tentity_type VARCHAR(50) NOT NULL, \\n\\tentity_id INTEGER NOT NULL, \\n\\taction VARCHAR(50) NOT NULL, \\n\\tbefore_state JSON, \\n\\tafter_state JSON, \\n\\tstaff_user_id INTEGER NOT NULL, \\n\\tip_address VARCHAR(45), \\n\\ttimestamp DATETIME, \\n\\tPRIMARY KEY (id), \\n\\tFOREIGN KEY(staff_user_id) REFERENCES users (id)\\n)'), 0, 0)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "M-08",
+      "writer": "migration",
+      "what": "fresh install: models create the ADR011 shape; migration recorded",
+      "expect": "(0, True, True, 1)",
+      "got": "(0, True, True, 1)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S1-RED-F1-room_rent",
+      "writer": "sched NA",
+      "what": "F1 on room_rent audit: whole run rolled back",
+      "expect": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "got": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "pass": true,
+      "severity": "gate",
+      "note": "RuntimeError: injected F1: audit row could not be constructed"
+    },
+    {
+      "case": "S1-RED-F1-noshow_posted",
+      "writer": "sched NA",
+      "what": "F1 on noshow_posted audit: whole run rolled back",
+      "expect": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "got": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "pass": true,
+      "severity": "gate",
+      "note": "RuntimeError: injected F1: audit row could not be constructed"
+    },
+    {
+      "case": "S1-RED-F2-room_rent",
+      "writer": "sched NA",
+      "what": "F2 on room_rent audit: whole run rolled back",
+      "expect": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "got": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError: audit row for ExtraCharge 3 (posted) could not be written: RuntimeError: injected F2: audit insert failed"
+    },
+    {
+      "case": "S1-RED-F2-noshow_posted",
+      "writer": "sched NA",
+      "what": "F2 on noshow_posted audit: whole run rolled back",
+      "expect": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "got": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "pass": true,
+      "severity": "gate",
+      "note": "RuntimeError: injected F2: audit insert failed"
+    },
+    {
+      "case": "S1-RED-FK",
+      "writer": "sched NA",
+      "what": "FK on, actor references no user: FK failure, run rolled back",
+      "expect": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "got": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError: audit row for ExtraCharge 3 (posted) could not be written: IntegrityError: (sqlite3.IntegrityError) FOREIGN KEY constraint failed\n[SQL: INSERT INTO audit_logs (entity_type, entity_id, action, before_state, after_state, staff_user_id, ip_address, timestamp, actor_kind, actor_mechanism, actor_role, ac"
+    },
+    {
+      "case": "S1-RED-ZERO",
+      "writer": "sched NA",
+      "what": "FK off, forced users.id 0: refused (CHECK), run rolled back",
+      "expect": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "got": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError: audit row for ExtraCharge 3 (posted) could not be written: IntegrityError: (sqlite3.IntegrityError) CHECK constraint failed: ck_audit_actor_not_zero\n[SQL: INSERT INTO audit_logs (entity_type, entity_id, action, before_state, after_state, staff_user_id, ip_address, timestamp, actor_kind, actor_mechan"
+    },
+    {
+      "case": "S1-RED-UNDECLARED",
+      "writer": "sched NA",
+      "what": "no operator and no declared mechanism: refused, run rolled back (never mislabelled)",
+      "expect": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "got": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError: audit row for ExtraCharge 3 (posted) has no actor: audit actor unknown: no user, no logged-in operator and no declared system mechanism (wrap unattended work in audit_actor.system_action)"
+    },
+    {
+      "case": "S1-GREEN-FK",
+      "writer": "sched NA",
+      "what": "FK on: scheduled run completes (log, rent, fee)",
+      "expect": "(None, 1, True, True)",
+      "got": "(None, 1, True, True)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S1-GREEN-ROWS",
+      "writer": "sched NA",
+      "what": "every system financial row + noshow_posted: one SYSTEM row, no user, scheduler mechanism",
+      "expect": "[('SYSTEM', None, 'scheduler:night_audit_job', None, None), ('SYSTEM', None, 'scheduler:night_audit_job', None, None), ('SYSTEM', None, 'scheduler:night_audit_job', None, None)]",
+      "got": "[('SYSTEM', None, 'scheduler:night_audit_job', None, None), ('SYSTEM', None, 'scheduler:night_audit_job', None, None), ('SYSTEM', None, 'scheduler:night_audit_job', None, None)]",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S1-GREEN-RUNBY",
+      "writer": "sched NA",
+      "what": "NightAuditLog.run_by / NoShowLog.posted_by empty (no human)",
+      "expect": "(None, None)",
+      "got": "(None, None)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S1-GREEN-noFK",
+      "writer": "sched NA",
+      "what": "FK off: run completes, same SYSTEM representation",
+      "expect": "(None, [('SYSTEM', None, 'scheduler:night_audit_job'), ('SYSTEM', None, 'scheduler:night_audit_job'), ('SYSTEM', None, 'scheduler:night_audit_job')])",
+      "got": "(None, [('SYSTEM', None, 'scheduler:night_audit_job'), ('SYSTEM', None, 'scheduler:night_audit_job'), ('SYSTEM', None, 'scheduler:night_audit_job')])",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S2-RED-F1",
+      "writer": "auto no-show",
+      "what": "F1: not a no-show, no fee, no log",
+      "expect": "(True, ('Reserved', 0, 0))",
+      "got": "(True, ('Reserved', 0, 0))",
+      "pass": true,
+      "severity": "gate",
+      "note": "RuntimeError: injected F1: audit row could not be constructed"
+    },
+    {
+      "case": "S2-RED-F2",
+      "writer": "auto no-show",
+      "what": "F2: not a no-show, no fee, no log",
+      "expect": "(True, ('Reserved', 0, 0))",
+      "got": "(True, ('Reserved', 0, 0))",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError: audit row for ExtraCharge 8 (posted) could not be written: RuntimeError: injected F2: audit insert failed"
+    },
+    {
+      "case": "S2-RED-FK",
+      "writer": "auto no-show",
+      "what": "FK on, invalid actor: FK failure, nothing persisted",
+      "expect": "(True, ('Reserved', 0, 0))",
+      "got": "(True, ('Reserved', 0, 0))",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError: audit row for ExtraCharge 8 (posted) could not be written: IntegrityError: (sqlite3.IntegrityError) FOREIGN KE"
+    },
+    {
+      "case": "S2-RED-UNDECLARED",
+      "writer": "auto no-show",
+      "what": "no operator, no mechanism: refused, nothing persisted",
+      "expect": "(True, ('Reserved', 0, 0))",
+      "got": "(True, ('Reserved', 0, 0))",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError: audit row for ExtraCharge 8 (posted) has no actor: audit actor unknown: no user, no logged-in operator and no "
+    },
+    {
+      "case": "S2-GREEN-FK",
+      "writer": "auto no-show",
+      "what": "completes; fee + noshow_posted are SYSTEM rows with no user",
+      "expect": "(None, ('NoShow', 1, 1), [('SYSTEM', None), ('SYSTEM', None)])",
+      "got": "(None, ('NoShow', 1, 1), [('SYSTEM', None), ('SYSTEM', None)])",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S2-GREEN-noFK",
+      "writer": "auto no-show",
+      "what": "completes; fee + noshow_posted are SYSTEM rows with no user",
+      "expect": "(None, ('NoShow', 1, 1), [('SYSTEM', None), ('SYSTEM', None)])",
+      "got": "(None, ('NoShow', 1, 1), [('SYSTEM', None), ('SYSTEM', None)])",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S3-GREEN-FK",
+      "writer": "webhook",
+      "what": "modify completes; one SYSTEM row, no user, mechanism webhook",
+      "expect": "(200, 1500.0, [('SYSTEM', None, 'webhook')])",
+      "got": "(200, 1500.0, [('SYSTEM', None, 'webhook')])",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S3-GREEN-noFK",
+      "writer": "webhook",
+      "what": "modify completes; one SYSTEM row, no user, mechanism webhook",
+      "expect": "(200, 1500.0, [('SYSTEM', None, 'webhook')])",
+      "got": "(200, 1500.0, [('SYSTEM', None, 'webhook')])",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S4-UNAUTH",
+      "writer": "web",
+      "what": "unauthenticated request: SYSTEM row, no user, web:unauthenticated",
+      "expect": "[('SYSTEM', None, 'web:unauthenticated')]",
+      "got": "[('SYSTEM', None, 'web:unauthenticated')]",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S5-CHECK",
+      "writer": "schema",
+      "what": "raw INSERTs: user 0 / HUMAN without user / SYSTEM without mechanism / SYSTEM with a user -> all rejected by CHECK",
+      "expect": "['rejected', 'rejected', 'rejected', 'rejected']",
+      "got": "['rejected', 'rejected', 'rejected', 'rejected']",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "H-NA-noFK",
+      "writer": "manual NA",
+      "what": "operator run: every row HUMAN, the operator, role Admin, open shift, mechanism web",
+      "expect": "(1, [('HUMAN', 2, 'Admin', 1, 'web'), ('HUMAN', 2, 'Admin', 1, 'web'), ('HUMAN', 2, 'Admin', 1, 'web')], 2)",
+      "got": "(1, [('HUMAN', 2, 'Admin', 1, 'web'), ('HUMAN', 2, 'Admin', 1, 'web'), ('HUMAN', 2, 'Admin', 1, 'web')], 2)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "H-NA-FK",
+      "writer": "manual NA",
+      "what": "operator run: every row HUMAN, the operator, role Admin, open shift, mechanism web",
+      "expect": "(1, [('HUMAN', 2, 'Admin', 1, 'web'), ('HUMAN', 2, 'Admin', 1, 'web'), ('HUMAN', 2, 'Admin', 1, 'web')], 2)",
+      "got": "(1, [('HUMAN', 2, 'Admin', 1, 'web'), ('HUMAN', 2, 'Admin', 1, 'web'), ('HUMAN', 2, 'Admin', 1, 'web')], 2)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "H-NS-FK",
+      "writer": "manual no-show",
+      "what": "FK on: HUMAN row, operator, role Admin, no open shift",
+      "expect": "[('HUMAN', 2, 'Admin', None)]",
+      "got": "[('HUMAN', 2, 'Admin', None)]",
+      "pass": true,
+      "severity": "gate",
+      "note": "No-show posted successfully."
+    },
+    {
+      "case": "P-what",
+      "writer": "provenance",
+      "what": "answerable from the row: what",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "P-when",
+      "writer": "provenance",
+      "what": "answerable from the row: when",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "P-which_entity",
+      "writer": "provenance",
+      "what": "answerable from the row: which entity",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "P-which_amount",
+      "writer": "provenance",
+      "what": "answerable from the row: which amount",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "P-why",
+      "writer": "provenance",
+      "what": "answerable from the row: why",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "P-human_or_system",
+      "writer": "provenance",
+      "what": "answerable from the row: human or system",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "P-execution_path",
+      "writer": "provenance",
+      "what": "answerable from the row: execution path",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "P-business_date",
+      "writer": "provenance",
+      "what": "answerable from the row: business date",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "P-01",
+      "writer": "prod",
+      "what": "production database unchanged (sha256 == anchor)",
+      "expect": "'51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2'",
+      "got": "'51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2'",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    }
+  ]
+}
