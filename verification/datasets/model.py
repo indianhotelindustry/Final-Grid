@@ -85,6 +85,24 @@ ALL_ORIGINS = (Origin.SYNTHETIC, Origin.DERIVED_FROM_PRODUCTION,
                Origin.ANONYMISED_PRODUCTION)
 
 
+class Reachability:
+    """Whether the application can produce the state a dataset declares.
+
+    Separate from ``Origin``: most datasets are written by hand (SYNTHETIC
+    origin) yet describe states the application does produce. A dataset is
+    SYNTHETIC_UNREACHABLE when no supported application operation can
+    create its state; its results are then evidence about the verification
+    framework's detection, not about the application's behaviour
+    (Founder ruling SR-2, 2026-09-30).
+    """
+
+    REACHABLE = 'reachable'
+    SYNTHETIC_UNREACHABLE = 'synthetic-unreachable'
+
+
+ALL_REACHABILITY = (Reachability.REACHABLE, Reachability.SYNTHETIC_UNREACHABLE)
+
+
 class Purpose:
     """What a dataset exists to do."""
     #: Give a VACUOUS invariant a population. The reason D6 exists.
@@ -428,6 +446,12 @@ class Dataset:
     #: Set when the dataset cannot be built on the current schema.
     not_materialisable_reason: str = ''
     covered_by_deliverable: str = ''
+
+    #: Whether the application can produce this dataset's state
+    #: (``Reachability``), and why not when it cannot. Metadata only: it is
+    #: not part of the built database, so it does not move content_hash.
+    reachability: str = Reachability.REACHABLE
+    reachability_reason: str = ''
 
     @property
     def key(self) -> str:

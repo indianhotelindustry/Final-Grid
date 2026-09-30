@@ -45,7 +45,8 @@ proves. Registration therefore refuses:
 from __future__ import annotations
 
 from verification.datasets.model import (
-    ALL_MODES, ALL_ORIGINS, ALL_PURPOSES, Commissioning, Dataset,
+    ALL_MODES, ALL_ORIGINS, ALL_PURPOSES, ALL_REACHABILITY, Commissioning,
+    Dataset, Reachability,
 )
 
 
@@ -89,6 +90,14 @@ def _validate(d: Dataset) -> None:
     if d.provenance.origin not in ALL_ORIGINS:
         raise RegistrationError(
             f'{d.key}: unknown origin {d.provenance.origin!r}')
+    if d.reachability not in ALL_REACHABILITY:
+        raise RegistrationError(
+            f'{d.key}: unknown reachability {d.reachability!r}')
+    if (d.reachability != Reachability.REACHABLE
+            and not d.reachability_reason.strip()):
+        raise RegistrationError(
+            f'{d.key}: is declared {d.reachability} but gives no reason, so '
+            f'nobody could check the classification.')
     if not d.modes:
         raise RegistrationError(
             f'{d.key}: declares no execution modes, so nothing would run it')

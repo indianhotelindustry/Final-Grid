@@ -525,7 +525,10 @@ def _cmd_ds_run(args) -> int:
             result = evaluate.evaluate(d, m)
             print(f'  {d.key:<28} {result.verdict:<12} '
                   f'met={len(result.met)} unmet={len(result.unmet)} '
-                  f'not_run={len(result.not_run)}')
+                  f'not_run={len(result.not_run)}  '
+                  f'reachability={d.reachability}')
+            if d.reachability != 'reachable':
+                print(f'    {d.reachability}: {d.reachability_reason}')
             if result.verdict != 'PASS':
                 failed += 1
         finally:

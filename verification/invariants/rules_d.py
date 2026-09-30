@@ -94,12 +94,22 @@ def _d01(ctx):
 
 
 # ---------------------------------------------------------------------------
-# INV-D02 — every correction references its original
+# INV-D02 — every correction, reversal and refund has explicit lineage
 # ---------------------------------------------------------------------------
+# Rule text: Founder ruling SR-2 (FD-P2-06 refinement), 2026-09-30,
+# recorded in verification/FOUNDER_DECISIONS.md. A cancellation refund is
+# linked through the valid, identifiable cancellation that generated it; a
+# reservation, guest, folio or amount match alone is not lineage.
+
+#: Cancellation dispositions that generate a refund payment
+#: (app.services.post_cancellation_disposition).
+_REFUND_DISPOSITIONS = ('refund_full', 'refund_partial')
+
 
 @invariant(
     invariant_id='INV-D02',
-    title='Every correction and reversal references the transaction it corrects',
+    title=('Every correction, reversal and refund has explicit lineage to '
+           'what it reverses'),
     category=Category.REFERENTIAL,
     business_purpose=(
         'A correction is only auditable if you can see what it corrected. '
@@ -108,28 +118,43 @@ def _d01(ctx):
         'classic shape of a concealed adjustment.'),
     business_rule=(
         'Every payments or extra_charges row flagged is_correction or '
-        'is_reversal carries a corrects_id, and that id resolves to a row '
-        'in the same table.'),
+        'is_reversal has an explicit, traceable relationship to the '
+        'transaction it reverses. An ordinary correction or reversal '
+        'carries a corrects_id resolving to its original in the same table '
+        'and on the same reservation. A cancellation refund (a payment with '
+        'purpose refund, flagged is_reversal, not is_correction) is linked '
+        'through the cancellation that generated it: exactly one '
+        'reservation names it as cancellation_refund_payment_id, that '
+        'reservation is its own, is Cancelled, has a refund disposition, '
+        'and recorded this refund\'s amount. A reservation, guest, folio or '
+        'amount match by itself is not lineage.'),
     severity=Severity.CRITICAL,
     blocking=Blocking.RELEASE,
-    data_sources=('payments', 'extra_charges'),
+    data_sources=('payments', 'extra_charges', 'reservations'),
     canonical_engine='app.services.signed_extra_charge_amount',
     validation_method=(
-        'Check the flag and the pointer together. A row flagged as a '
-        'correction with no pointer is reported, and so is a pointer that '
-        'does not resolve — they are different failures and each is named.'),
+        'Check the flag and the lineage together. A correction with no '
+        'pointer, a pointer that does not resolve, a pointer to another '
+        'reservation\'s transaction, and a refund no valid cancellation '
+        'generated are different failures and each is named.'),
     evidence_produced=(
-        'Per row: which flag is set, the corrects_id, whether it resolves, '
-        'the amount involved.'),
+        'Per row: which flag is set, the corrects_id, whether it resolves '
+        'and to which reservation, or the cancellation that names the '
+        'refund and why it does or does not qualify; the amount involved.'),
     failure_message=(
-        'A correction or reversal exists with no traceable original.'),
+        'A correction, reversal or refund exists with no traceable lineage '
+        'to what it reverses.'),
     likely_root_causes=(
         'A correction UI that sets the flag but not the link',
         'The original deleted after the correction was raised',
+        'A correction pointed at another reservation\'s transaction',
+        'A refund written outside the cancellation disposition',
         'A bulk adjustment written directly to the database'),
     suggested_investigation=(
         'Read correction_reason on the affected rows',
         'Check whether the correction path is transactional',
+        'For a refund, read the reservation\'s cancellation_disposition, '
+        'cancellation_amount_refunded and cancellation_refund_payment_id',
         'Confirm signed_extra_charge_amount treats these rows as intended'),
     applicable_releases='all',
     applicable_business_dates='all',
@@ -150,12 +175,52 @@ def _d01(ctx):
 def _d02(ctx):
     violations = []
     population = 0
+
+    # Cancellations that name a refund payment: payment id -> reservations.
+    cancellations = {}
+    if ctx.table_exists('reservations'):
+        for r in ctx.sql(
+                'SELECT id, status, cancellation_disposition, '
+                '       cancellation_amount_refunded, '
+                '       cancellation_refund_payment_id '
+                'FROM reservations '
+                'WHERE cancellation_refund_payment_id IS NOT NULL'):
+            cancellations.setdefault(r['cancellation_refund_payment_id'],
+                                     []).append(r)
+
+    def refund_lineage(row):
+        """None when a valid cancellation generated this refund, else why not."""
+        named_by = cancellations.get(row['id'], [])
+        if not named_by:
+            return 'no cancellation names this refund'
+        if len(named_by) > 1:
+            return (f'{len(named_by)} reservations name this refund '
+                    f'({", ".join(str(r["id"]) for r in named_by)})')
+        res = named_by[0]
+        if res['id'] != row['reservation_id']:
+            return (f'reservation {res["id"]} names it, but the refund '
+                    f'belongs to reservation {row["reservation_id"]}')
+        if res['status'] != 'Cancelled':
+            return f'reservation {res["id"]} is {res["status"]}, not Cancelled'
+        if res['cancellation_disposition'] not in _REFUND_DISPOSITIONS:
+            return (f'reservation {res["id"]} disposition '
+                    f'{res["cancellation_disposition"]!r} generates no refund')
+        if abs(dec(res['cancellation_amount_refunded'])
+               - dec(row['amount'])) >= dec('0.005'):
+            return (f'reservation {res["id"]} recorded refund '
+                    f'{res["cancellation_amount_refunded"]}, this row is '
+                    f'{row["amount"]}')
+        return None
+
     for table in ('payments', 'extra_charges'):
         if not ctx.table_exists(table):
             continue
+        purpose = ('c.payment_purpose' if table == 'payments'
+                   else 'NULL AS payment_purpose')
         rows = ctx.sql(
             f'SELECT c.id, c.amount, c.is_correction, c.is_reversal, '
-            f'       c.corrects_id, p.id AS original '
+            f'       c.corrects_id, c.reservation_id, {purpose}, '
+            f'       p.id AS original, p.reservation_id AS original_reservation '
             f'FROM "{table}" c LEFT JOIN "{table}" p ON p.id = c.corrects_id '
             f'WHERE c.is_correction = 1 OR c.is_reversal = 1 ORDER BY c.id')
         population += len(rows)
@@ -166,18 +231,41 @@ def _d02(ctx):
             if row['is_reversal']:
                 flags.append('is_reversal')
             label = '+'.join(flags)
-            if row['corrects_id'] is None:
-                violations.append(row_violation(
-                    table.rstrip('s'), row['id'],
-                    expected=f'{label} row carries a corrects_id',
-                    observed='corrects_id is NULL', amount=dec(row['amount']),
-                    table=table))
-            elif row['original'] is None:
-                violations.append(row_violation(
-                    table.rstrip('s'), row['id'],
-                    expected=f'corrects_id {row["corrects_id"]} resolves',
-                    observed='the referenced original does not exist',
-                    amount=dec(row['amount']), table=table))
+            if row['corrects_id'] is not None:
+                if row['original'] is None:
+                    violations.append(row_violation(
+                        table.rstrip('s'), row['id'],
+                        expected=f'corrects_id {row["corrects_id"]} resolves',
+                        observed='the referenced original does not exist',
+                        amount=dec(row['amount']), table=table))
+                elif row['original_reservation'] != row['reservation_id']:
+                    violations.append(row_violation(
+                        table.rstrip('s'), row['id'],
+                        expected=(f'original {row["original"]} belongs to '
+                                  f'reservation {row["reservation_id"]}'),
+                        observed=(f'original belongs to reservation '
+                                  f'{row["original_reservation"]}'),
+                        amount=dec(row['amount']), table=table))
+                continue
+            is_cancellation_refund = (
+                table == 'payments' and row['is_reversal']
+                and not row['is_correction']
+                and row['payment_purpose'] == 'refund')
+            if is_cancellation_refund:
+                why = refund_lineage(row)
+                if why is not None:
+                    violations.append(row_violation(
+                        'payment', row['id'],
+                        expected=('refund generated by a valid cancellation '
+                                  'of its reservation'),
+                        observed=why, amount=dec(row['amount']),
+                        table=table))
+                continue
+            violations.append(row_violation(
+                table.rstrip('s'), row['id'],
+                expected=f'{label} row carries a corrects_id',
+                observed='corrects_id is NULL', amount=dec(row['amount']),
+                table=table))
 
     if population == 0:
         return (Status.VACUOUS, 0, [],

@@ -155,6 +155,7 @@ from __future__ import annotations
 
 from verification.datasets.model import (
     Commissioning, Event, Expectations, Mode, Origin, Provenance, Purpose,
+    Reachability,
 )
 from verification.datasets.registry import dataset
 
@@ -1394,10 +1395,15 @@ _ADMIN = 1                # the only user on this installation.
             # payment, one credit_notes row naming its reservation.
             'INV-D05': 'HOLDS',
 
-            # VIOLATED, and it is the application's doing. The refund row
-            # carries is_reversal with no corrects_id because that is how
-            # post_cancellation_disposition builds every refund. When the
-            # refund path is fixed this must be re-declared with evidence.
+            # VIOLATED, and correctly so under the SR-2 rule (Founder,
+            # 2026-09-30). The refund row is shaped like a cancellation
+            # refund (is_reversal, no corrects_id) but no cancellation
+            # generated it: the stay was completed, not cancelled, and no
+            # reservation names it as cancellation_refund_payment_id. It has
+            # no lineage to what it reverses. The application has no
+            # operation that refunds a credit note, so this state is
+            # classified synthetic-unreachable (see reachability below);
+            # the result is kept, not re-baselined.
             'INV-D02': 'VIOLATED',
 
             'INV-A02': 'HOLDS',
@@ -1615,6 +1621,16 @@ _ADMIN = 1                # the only user on this installation.
 
     # Six of six, ACTIVATION included: INV-D05 is no longer VACUOUS.
     commissioning_status=Commissioning.COMMISSIONED,
+
+    # Founder ruling SR-2 (2026-09-30): classify, do not delete or rewrite.
+    reachability=Reachability.SYNTHETIC_UNREACHABLE,
+    reachability_reason=(
+        'The refund row is hand-written for a credit note on a completed '
+        'stay. No application operation creates a refund payment for a '
+        'credit note (app/billing.py issues the CreditNote only), and the '
+        'only refund writer, post_cancellation_disposition, runs on '
+        'cancellation. The void_requests and credit_notes rows are '
+        'reachable; the credit-note refund payment is not.'),
 )
 def _voidcn():
     pass
