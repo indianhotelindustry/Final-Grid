@@ -1,0 +1,56 @@
+====================================================================================================
+FINALGRID — GOLDEN MASTER VERIFICATION
+Production Verification Framework, Wave 0 Deliverable 2
+====================================================================================================
+Master set      : phase1_aa6d9e91
+Master captured : 2026-09-09T16:01:49 (app v2.2.18)
+Current run     : 2026-09-30T15:36:19 (app v2.2.18)
+Master clock    : 2026-08-10T12:00:00
+Current clock   : 2026-08-10T12:00:00
+Read-only       : VERIFIED
+
+Surfaces compared : 158
+Surfaces clean    : 156
+Differences       : 6
+Blocking          : 0
+
+VERDICT           : WARN
+
+----------------------------------------------------------------------------------------------------
+DIFFERENCES BY KIND
+----------------------------------------------------------------------------------------------------
+  BODY_CHANGED                 2
+  FIGURE_ADDED                 3
+  FIGURE_CHANGED               1
+
+====================================================================================================
+DIFFERENCES
+====================================================================================================
+
+auth.users   [OPERATIONAL]
+  /auth/users
+    [WARN ] BODY_CHANGED          
+            master : 620f701f37d99b3d
+            current: c8e70d2c81bccd96
+
+rates.notification_logs   [OPERATIONAL]
+  /rates/notification-logs
+    [WARN ] BODY_CHANGED          
+            master : c46a134c37964469
+            current: b9b73ed437dbc25d
+    [WARN ] FIGURE_ADDED           logs[5][type]
+            master : 
+            current: NotificationLog
+    [WARN ] FIGURE_ADDED           logs[6][type]
+            master : 
+            current: NotificationLog
+    [WARN ] FIGURE_ADDED           logs[7][type]
+            master : 
+            current: NotificationLog
+    [WARN ] FIGURE_CHANGED         logs[len]
+            master : 5
+            current: 8   (delta +3)
+
+====================================================================================================
+END OF REPORT
+====================================================================================================

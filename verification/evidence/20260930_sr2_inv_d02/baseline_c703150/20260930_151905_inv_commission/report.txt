@@ -1,0 +1,26 @@
+====================================================================================================
+FINALGRID — FINANCIAL INVARIANT ENGINE COMMISSIONING
+Wave 0 Deliverable 4 — Principle 9 / Principle 11
+====================================================================================================
+Result: 3/3 COMMISSIONED
+
+[PASS] INV-D02  (data seed)
+    Every correction and reversal references the transaction it corrects
+      ok   positive_case        baseline status VACUOUS over 0 row(s), 0 violation(s)
+      ok   negative_case        status VACUOUS -> VIOLATED
+      ok   fault_injection      1 row(s) changed by the declared seed
+      ok   detection            the declared invariant fired
+      ok   evidence             evidence complete
+      ok   repeatability        identical on re-evaluation in the same process
+      ok   determinism          two independent processes agreed
+      ok   order_independence   unchanged when the registry was evaluated in reverse order
+      blast radius: INV-B03: HOLDS/0 -> VIOLATED/2; INV-C02: HOLDS/0 -> VIOLATED/1
+
+[PASS] NULL-CONTROL  (none)
+    Identical data must produce identical results
+      ok   determinism          no invariant moved on unmutated data
+
+[PASS] WRITE-CONTROL  (none)
+    The engine performs zero database writes
+      ok   evidence             0 write statement(s) counted across the whole registry
+

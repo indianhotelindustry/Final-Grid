@@ -1,0 +1,87 @@
+{
+  "blocking_count": 0,
+  "by_kind": {
+    "BODY_CHANGED": 2,
+    "FIGURE_ADDED": 3,
+    "FIGURE_CHANGED": 1
+  },
+  "current_app_version": "2.2.18",
+  "current_frozen_at": "2026-08-10T12:00:00",
+  "difference_count": 6,
+  "differences": [
+    {
+      "category": "OPERATIONAL",
+      "current": "c8e70d2c81bccd96",
+      "delta": "",
+      "key": "",
+      "kind": "BODY_CHANGED",
+      "master": "620f701f37d99b3d",
+      "severity": "WARN",
+      "surface_id": "auth.users",
+      "url": "/auth/users"
+    },
+    {
+      "category": "OPERATIONAL",
+      "current": "b9b73ed437dbc25d",
+      "delta": "",
+      "key": "",
+      "kind": "BODY_CHANGED",
+      "master": "c46a134c37964469",
+      "severity": "WARN",
+      "surface_id": "rates.notification_logs",
+      "url": "/rates/notification-logs"
+    },
+    {
+      "category": "OPERATIONAL",
+      "current": "NotificationLog",
+      "delta": "",
+      "key": "logs[5][type]",
+      "kind": "FIGURE_ADDED",
+      "master": "",
+      "severity": "WARN",
+      "surface_id": "rates.notification_logs",
+      "url": "/rates/notification-logs"
+    },
+    {
+      "category": "OPERATIONAL",
+      "current": "NotificationLog",
+      "delta": "",
+      "key": "logs[6][type]",
+      "kind": "FIGURE_ADDED",
+      "master": "",
+      "severity": "WARN",
+      "surface_id": "rates.notification_logs",
+      "url": "/rates/notification-logs"
+    },
+    {
+      "category": "OPERATIONAL",
+      "current": "NotificationLog",
+      "delta": "",
+      "key": "logs[7][type]",
+      "kind": "FIGURE_ADDED",
+      "master": "",
+      "severity": "WARN",
+      "surface_id": "rates.notification_logs",
+      "url": "/rates/notification-logs"
+    },
+    {
+      "category": "OPERATIONAL",
+      "current": "8",
+      "delta": "+3",
+      "key": "logs[len]",
+      "kind": "FIGURE_CHANGED",
+      "master": "5",
+      "severity": "WARN",
+      "surface_id": "rates.notification_logs",
+      "url": "/rates/notification-logs"
+    }
+  ],
+  "master_app_version": "2.2.18",
+  "master_captured_at": "2026-09-09T16:01:49",
+  "master_frozen_at": "2026-08-10T12:00:00",
+  "read_only_verified": true,
+  "surfaces_clean": 156,
+  "surfaces_compared": 158,
+  "tag": "phase1_aa6d9e91",
+  "verdict": "WARN"
+}

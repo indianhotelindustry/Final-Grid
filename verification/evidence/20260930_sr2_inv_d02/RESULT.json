@@ -1,0 +1,132 @@
+{
+  "task": "FD-P2-06 / INV-D02 (SR-2) implementation",
+  "status": "IMPLEMENTED AND VERIFIED (local branch; not pushed; not merged)",
+  "rule": "SR2-RULE, FOUNDER_DECISIONS.md Round 6",
+  "branch": "sr2-inv-d02",
+  "base": "c703150",
+  "commits": {
+    "94cb87a": "record Founder rule SR2-RULE",
+    "6488075": "implement INV-D02 lineage rule and dataset reachability"
+  },
+  "files_changed": [
+    "verification/FOUNDER_DECISIONS.md",
+    "verification/invariants/rules_d.py",
+    "verification/datasets/model.py",
+    "verification/datasets/registry.py",
+    "verification/datasets/datasets_activation.py",
+    "verification/__main__.py"
+  ],
+  "app_schema_production_changed": false,
+  "targeted": {
+    "baseline_c703150": "15/21",
+    "baseline_failures": [
+      "T2a",
+      "T2b",
+      "T7a",
+      "T7b",
+      "T2-APP",
+      "T9a"
+    ],
+    "final_6488075": "21/21",
+    "final_commit": "64880755d86a396012c2b5e3bf5cfc7fb9603d91",
+    "final_code_tree_clean": true
+  },
+  "commissioning": {
+    "final_pack": "20260930_152837_inv_commission",
+    "final_not_passing": {
+      "INV-R01": [
+        "detection",
+        "negative_case"
+      ]
+    },
+    "baseline_pack": "20260930_153128_inv_commission (unchanged c703150)",
+    "baseline_not_passing": {
+      "INV-R01": [
+        "detection",
+        "negative_case"
+      ]
+    },
+    "note": "INV-R01 is declared NOT_COMMISSIONED (rules_r.py:87) and fails identically at baseline: PRE-EXISTING"
+  },
+  "regression_baseline_vs_final": {
+    "inv_run": {
+      "packs": [
+        "20260930_153154_inv_run_production",
+        "20260930_153630_inv_run_production"
+      ],
+      "differing_invariants": [
+        "INV-D02"
+      ],
+      "INV-D02_status": [
+        "VACUOUS",
+        "VACUOUS"
+      ],
+      "unbacked_claims": [
+        [],
+        []
+      ]
+    },
+    "fault_run": {
+      "packs": [
+        "20260930_153256_fip_run_production",
+        "20260930_153733_fip_run_production"
+      ],
+      "counts_identical": true,
+      "counts": {
+        "D1_PARITY": 14,
+        "D2_GOLDEN": 3,
+        "D3_REPLAY": 18,
+        "D4_INVARIANTS": 27,
+        "challenged": 40,
+        "detected": 35,
+        "errors": 0,
+        "missed": 1,
+        "registered": 40,
+        "uncovered": 4
+      },
+      "undetected": [
+        [
+          "FLT-C07"
+        ],
+        [
+          "FLT-C07"
+        ]
+      ]
+    },
+    "gm_verify": {
+      "packs": [
+        "20260930_153619_gm_verify_phase1_aa6d9e91",
+        "20260930_154055_gm_verify_phase1_aa6d9e91"
+      ],
+      "verdicts": [
+        "WARN",
+        "WARN"
+      ],
+      "differences_identical": true,
+      "difference_count": 6,
+      "cause": "production data moved by the Founder's live login (users.last_login) and the notification_queue_flush job (3 notification_logs); OPERATIONAL WARN; identical at baseline; not re-baselined"
+    },
+    "replay_verify": {
+      "packs": [
+        "20260930_153625_replay_verify_production",
+        "20260930_154100_replay_verify_production"
+      ],
+      "identical": true,
+      "verdict": "FAIL"
+    },
+    "cross_implementation": {
+      "packs": [
+        "20260930_153626_cross_implementation",
+        "20260930_154102_cross_implementation"
+      ],
+      "differing": []
+    },
+    "ds_run": "5/5 PASS on both; reachability column added; VOIDCN synthetic-unreachable",
+    "ds_commission": "PASS on both; dataset content hashes identical (VOIDCN 20d069cfa2bb4b4d)"
+  },
+  "production": {
+    "sha256": "21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434",
+    "modified": false,
+    "live_alert_memory_sha256_prefix": "7f79f337c5d99511 (unchanged)"
+  }
+}

@@ -1,0 +1,110 @@
+2026-09-30 21:06:19 [WARNING] app: Running on SQLite — row-level locking (with_for_update) is not enforced. SQLite uses a database-wide write lock; concurrent writers will serialise. Move to PostgreSQL for true per-row locking and higher concurrency.
+2026-09-30 21:06:19 [INFO] app: ------- SECURITY MODE -------
+2026-09-30 21:06:19 [INFO] app:   env                : production
+2026-09-30 21:06:19 [INFO] app:   secret_key         : set (>=32 chars)
+2026-09-30 21:06:19 [INFO] app:   updater_signing    : ENFORCED
+2026-09-30 21:06:19 [INFO] app:   encryption         : available
+2026-09-30 21:06:19 [INFO] app:   lan_access         : disabled (127.0.0.1 only)
+2026-09-30 21:06:19 [INFO] app:   schema_drift_mode  : warn-only
+2026-09-30 21:06:19 [INFO] app: -----------------------------
+2026-09-30 21:06:19 [INFO] app: db.create_all() skipped in production. Use Alembic migrations for schema changes. Set DB_AUTO_CREATE=1 to force-enable at next boot.
+2026-09-30 21:06:19 [INFO] app: SQLite: ensured table credit_vouchers exists
+2026-09-30 21:06:19 [INFO] app: SQLite: ensured table credit_voucher_redemptions exists
+2026-09-30 21:06:19 [INFO] apscheduler.scheduler: Scheduler started
+2026-09-30 21:06:19 [INFO] apscheduler.scheduler: Added job "setup_backup_scheduler.<locals>._scheduled_backup" to job store "default"
+2026-09-30 21:06:19 [INFO] app.backup_manager: Daily backup scheduled at 03:00
+2026-09-30 21:06:19 [INFO] apscheduler.scheduler: Added job "flush_notification_queue" to job store "default"
+2026-09-30 21:06:19 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._prune_old_logs" to job store "default"
+2026-09-30 21:06:19 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._run_predictive_maintenance" to job store "default"
+2026-09-30 21:06:19 [WARNING] app.ai_anomaly: Cash ratio check skipped: name 'Reservation' is not defined
+2026-09-30 21:06:20 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 21:06:21 [ERROR] app.performance_service: compute_daily_performance failed: type object 'Reservation' has no attribute 'checkin_date'
+2026-09-30 21:06:21 [WARNING] app.encryption: PII_ENCRYPTION_KEY not set -- deriving encryption key from SECRET_KEY. Set PII_ENCRYPTION_KEY in production for best security.
+2026-09-30 21:06:21 [INFO] app.rates: resolve_rate: base_rate fallback=1142.86 for rt=2
+2026-09-30 21:06:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 21:06:21 [INFO] app.gst: generate_room_tax_lines: res=1 source=nightly_rows nights=1 lines=0
+2026-09-30 21:06:21 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 21:06:22 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 21:06:22 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 21:06:22 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 21:06:22 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 21:06:22 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 21:06:23 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 21:06:23 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 21:06:23 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-09-30 21:06:23 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+[sr2] app + verification from C:\wt_sr2base ; source (read-only) C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\instance\pms.db
+[gm] working copy : C:\wt_sr2base\verification\_work\pvf_golden.db (sqlite-backup-api)
+[gm] source sha256: 21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434
+[gm] business date: 2026-08-10
+[gm] clock frozen : 2026-08-10T12:00:00
+[gm] identity     : admin (Admin)
+[gm] surfaces     : 158 (150 declared gaps)
+[gm]   20/158 captured
+[gm]   40/158 captured
+[gm]   60/158 captured
+[gm]   80/158 captured
+[gm]   100/158 captured
+[gm]   120/158 captured
+[gm]   140/158 captured
+[gm]   158/158 captured
+
+====================================================================================================
+FINALGRID — GOLDEN MASTER VERIFICATION
+Production Verification Framework, Wave 0 Deliverable 2
+====================================================================================================
+Master set      : phase1_aa6d9e91
+Master captured : 2026-09-09T16:01:49 (app v2.2.18)
+Current run     : 2026-09-30T15:36:19 (app v2.2.18)
+Master clock    : 2026-08-10T12:00:00
+Current clock   : 2026-08-10T12:00:00
+Read-only       : VERIFIED
+
+Surfaces compared : 158
+Surfaces clean    : 156
+Differences       : 6
+Blocking          : 0
+
+VERDICT           : WARN
+
+----------------------------------------------------------------------------------------------------
+DIFFERENCES BY KIND
+----------------------------------------------------------------------------------------------------
+  BODY_CHANGED                 2
+  FIGURE_ADDED                 3
+  FIGURE_CHANGED               1
+
+====================================================================================================
+DIFFERENCES
+====================================================================================================
+
+auth.users   [OPERATIONAL]
+  /auth/users
+    [WARN ] BODY_CHANGED          
+            master : 620f701f37d99b3d
+            current: c8e70d2c81bccd96
+
+rates.notification_logs   [OPERATIONAL]
+  /rates/notification-logs
+    [WARN ] BODY_CHANGED          
+            master : c46a134c37964469
+            current: b9b73ed437dbc25d
+    [WARN ] FIGURE_ADDED           logs[5][type]
+            master : 
+            current: NotificationLog
+    [WARN ] FIGURE_ADDED           logs[6][type]
+            master : 
+            current: NotificationLog
+    [WARN ] FIGURE_ADDED           logs[7][type]
+            master : 
+            current: NotificationLog
+    [WARN ] FIGURE_CHANGED         logs[len]
+            master : 5
+            current: 8   (delta +3)
+
+====================================================================================================
+END OF REPORT
+====================================================================================================
+
+[gm] evidence pack: C:\wt_sr2base\verification\evidence\20260930_153619_gm_verify_phase1_aa6d9e91
+2026-09-30 21:06:23 [INFO] apscheduler.scheduler: Scheduler has been shut down

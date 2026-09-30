@@ -1,0 +1,37 @@
+[sr2] app + verification from C:\wt_sr2 ; source (read-only) C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\instance\pms.db
+====================================================================================================
+PVF D4 — FINANCIAL INVARIANT ENGINE COMMISSIONING
+Principle 9: a control must be capable of failing.
+Principle 11: silence is never evidence.
+====================================================================================================
+baseline copy : C:\wt_sr2\verification\_work\pvf_inv_commission_base.db
+evaluating clean baseline (subprocess)...
+baseline      : 26 invariants evaluated
+
+[NULL CONTROL] same data, no fault
+    PASS — 0 spurious movements
+
+[WRITE CONTROL] the engine must never write
+    PASS — 0 writes counted
+
+[PER-INVARIANT] eight elements each
+    PASS INV-D02    [data seed   ] status VACUOUS -> VIOLATED
+
+====================================================================================================
+COMMISSIONING RESULT: 3/3 PASS
+====================================================================================================
+  PASS  INV-D02        Every correction and reversal references the transaction it corr
+        ok   positive_case        baseline status VACUOUS over 0 row(s), 0 violation(s)
+        ok   negative_case        status VACUOUS -> VIOLATED
+        ok   fault_injection      1 row(s) changed by the declared seed
+        ok   detection            the declared invariant fired
+        ok   evidence             evidence complete
+        ok   repeatability        identical on re-evaluation in the same process
+        ok   determinism          two independent processes agreed
+        ok   order_independence   unchanged when the registry was evaluated in reverse order
+        blast radius (2): INV-B03: HOLDS/0 -> VIOLATED/2; INV-C02: HOLDS/0 -> VIOLATED/1
+  PASS  NULL-CONTROL   Identical data must produce identical results
+        ok   determinism          no invariant moved on unmutated data
+  PASS  WRITE-CONTROL  The engine performs zero database writes
+        ok   evidence             0 write statement(s) counted across the whole registry
+
