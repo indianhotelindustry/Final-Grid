@@ -1519,7 +1519,7 @@ GROUP w14: 14/14 gates passed -> PASS
 2026-09-30 08:17:27 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
 2026-09-30 08:17:27 [INFO] app: [CHECKOUT DEBUG] res=7  total_bill=4761.90  extra=0.00  disc=0.00  paid_before_checkout=5000.00  paying_now_form=0.00  final_paid=5000.00  final_outstanding=0.00  credit=0.00  override=False
 2026-09-30 08:17:27 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
-2026-09-30 08:17:27 [WARNING] app.notifications: Notification failed [whatsapp \u2192 6265222595] checkout_thanks: ULTRAMSG_INSTANCE or ULTRAMSG_TOKEN not configured
+2026-09-30 08:17:27 [WARNING] app.notifications: Notification failed [whatsapp \u2192 [REDACTED-PRODUCTION-GUEST-FIELD]] checkout_thanks: ULTRAMSG_INSTANCE or ULTRAMSG_TOKEN not configured
 --- Logging error ---
 Traceback (most recent call last):
   File "logging\__init__.py", line 1163, in emit
@@ -1540,8 +1540,8 @@ Call stack:
   File "logging\__init__.py", line 1280, in emit
   File "logging\__init__.py", line 1168, in emit
 Message: 'Notification failed [%s \u2192 %s] %s: %s'
-Arguments: ('whatsapp', '6265222595', 'checkout_thanks', 'ULTRAMSG_INSTANCE or ULTRAMSG_TOKEN not configured')
-2026-09-30 08:17:27 [INFO] app.notifications: Queued whatsapp notification to 6265222595 for retry
+Arguments: ('whatsapp', '[REDACTED-PRODUCTION-GUEST-FIELD]', 'checkout_thanks', 'ULTRAMSG_INSTANCE or ULTRAMSG_TOKEN not configured')
+2026-09-30 08:17:27 [INFO] app.notifications: Queued whatsapp notification to [REDACTED-PRODUCTION-GUEST-FIELD] for retry
 2026-09-30 08:17:27 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
 2026-09-30 08:17:27 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
 2026-09-30 08:17:27 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
@@ -1568,7 +1568,7 @@ RuntimeError: injected F1: audit row could not be constructed
 2026-09-30 08:17:27 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
 2026-09-30 08:17:27 [INFO] app: [CHECKOUT DEBUG] res=9  total_bill=4761.90  extra=0.00  disc=0.00  paid_before_checkout=5000.00  paying_now_form=0.00  final_paid=5000.00  final_outstanding=0.00  credit=0.00  override=False
 2026-09-30 08:17:27 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
-2026-09-30 08:17:27 [WARNING] app.notifications: Notification failed [whatsapp \u2192 6265222595] checkout_thanks: ULTRAMSG_INSTANCE or ULTRAMSG_TOKEN not configured
+2026-09-30 08:17:27 [WARNING] app.notifications: Notification failed [whatsapp \u2192 [REDACTED-PRODUCTION-GUEST-FIELD]] checkout_thanks: ULTRAMSG_INSTANCE or ULTRAMSG_TOKEN not configured
 --- Logging error ---
 Traceback (most recent call last):
   File "logging\__init__.py", line 1163, in emit
@@ -1589,8 +1589,8 @@ Call stack:
   File "logging\__init__.py", line 1280, in emit
   File "logging\__init__.py", line 1168, in emit
 Message: 'Notification failed [%s \u2192 %s] %s: %s'
-Arguments: ('whatsapp', '6265222595', 'checkout_thanks', 'ULTRAMSG_INSTANCE or ULTRAMSG_TOKEN not configured')
-2026-09-30 08:17:27 [INFO] app.notifications: Queued whatsapp notification to 6265222595 for retry
+Arguments: ('whatsapp', '[REDACTED-PRODUCTION-GUEST-FIELD]', 'checkout_thanks', 'ULTRAMSG_INSTANCE or ULTRAMSG_TOKEN not configured')
+2026-09-30 08:17:27 [INFO] app.notifications: Queued whatsapp notification to [REDACTED-PRODUCTION-GUEST-FIELD] for retry
 2026-09-30 08:17:28 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
 2026-09-30 08:17:28 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
 2026-09-30 08:17:28 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
