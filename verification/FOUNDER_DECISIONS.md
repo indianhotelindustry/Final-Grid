@@ -1252,3 +1252,39 @@ CF-5 unauthorized-role verification · CF-6 replay coverage of the reconciliatio
 ## Consequence for the Phase 2 gate
 
 Gate G3 (financial integrity) and G5 (auditability) remain not-PASS pending CF-10 and the Q06-H2 implementation; this entry does not move either gate. **No implementation, schema, database, or production-record change is authorized by this entry.**
+
+# Founder Resolution Round 5 — ADR-011 System Actor Representation — FG-P2-FOUNDER-RESOLUTION-20260930-01
+
+| | |
+|---|---|
+| Recorded | 2026-09-30 |
+| Governed HEAD | `cfec0c8c45171dded80bc687a65a567d5e120d2c` (ADR-011 decision package `verification/evidence/20260930_adr011_system_action_provenance/`, outcome DECISION_REQUIRED) |
+| Kind | Founder architecture decision answering item 1 of `ADR011_DECISION_REQUIRED.md` §5 (system-actor representation). **Governance recording only.** No code, schema, database, setting, FK mode or scheduler change is made by this entry. |
+| Identifier | `ADR011-SA` |
+| Source | Ruling given in session by the Founder on 2026-09-30, in reply to the decision package; recorded verbatim below |
+| Production | `instance/pms.db` `51dd83b7…30bc2`, 733,184 B — unchanged by this recording |
+
+## ADR011-SA — System actor representation
+
+> **Decision:**
+>
+> FinalGrid shall distinguish a human actor from a system actor at the audit/provenance layer. System actions shall not impersonate a human user and shall not use a fabricated users.id = 0.
+>
+> audit_logs shall explicitly represent the actor kind and retain sufficient provenance to distinguish:
+>
+> human/operator initiated action;
+> system/scheduled action;
+> execution mechanism;
+> relevant operator role/shift where applicable.
+>
+> Human audit records shall continue referencing the authenticated user.
+>
+> System audit records shall not require a fabricated human users row merely to satisfy the audit FK.
+>
+> Scheduler activation remains a separate authorization and is not enabled by this decision.
+
+- **Option selected** (in the terms of the decision package §4): the explicit actor-kind representation in `audit_logs` (Option B). Option A (seeded system `users` row, including a seeded id 0) is excluded ("shall not impersonate a human user", "shall not use a fabricated users.id = 0", "shall not require a fabricated human users row"). Option C's delegated human identity for system actions is excluded ("System actions shall not impersonate a human user").
+- **Governance effect:** resolves ADR-011 item 4 ("system-actor representation — UNRESOLVED") and the actor-kind part of the ADR-011 storage question: actor kind, execution mechanism and, where applicable, operator role/shift are carried by `audit_logs`. A system audit row need not reference `users` (its `staff_user_id` may therefore be empty); human rows keep referencing the authenticated user. The `0` system convention (`services.resolve_audit_actor`, `webhook._write_audit`, `routes._write_audit`, `services_group_stay._resolve_actor`) is non-compliant with this decision. ADR-011 is not edited by this entry; the reconciliation is applied to it at its adoption review (precedent: FD-P2-04 for ADR-006/ADR-007).
+- **Scheduler:** unchanged. FD-P2-05 stands; `night_audit_enabled` stays `false`; activation needs the AR-013 / B-1 controls and a separate authorization.
+- **Not addressed by this ruling (recorded, not decided):** the delivery of the `audit_logs` schema change — which migration artefact carries it and whether it may run through the existing unattended boot-time registry (`app/__init__.py::_run_pending_migrations`, invoked at every application start; BACKLOG B-4 lists "end of unattended boot-time execution" as undecided) — and the application of that change to the production database (PD-005 / PD-006 verified-state backup). Because `instance/pms.db` lives in the application working tree, a boot-time migration committed to `main` would be applied to production at the next application start.
+- **Implementation status:** not implemented.
