@@ -1,0 +1,168 @@
+{
+  "group": "w14",
+  "started": "2026-09-30T08:18:28",
+  "finished": "2026-09-30T08:18:29",
+  "app_root": "C:\\wt_c4edc7b",
+  "app_commit": "c4edc7b23e83c4e0063a582c9fa80bb818cec7ea",
+  "app_tree_clean": true,
+  "harness": "verification\\evidence\\20260930_cf10_completion\\verify_cf10_cf11.py",
+  "copy": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS\\verification\\_work\\cf10_w14.db",
+  "copy_method": "sqlite-backup-api",
+  "production_sha256_before": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "gates_total": 14,
+  "gates_passed": 14,
+  "verdict": "PASS",
+  "checks": [
+    {
+      "case": "W14-01",
+      "writer": "W-14",
+      "what": "no-show posted with one fee and one log",
+      "expect": "(True, 'NoShow', 1, 1)",
+      "got": "(True, 'NoShow', 1, 1)",
+      "pass": true,
+      "severity": "gate",
+      "note": "No-show posted successfully."
+    },
+    {
+      "case": "W14-02",
+      "writer": "W-14",
+      "what": "strict posted audit on the fee row",
+      "expect": "1",
+      "got": "1",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W14-03",
+      "writer": "W-14",
+      "what": "fee audit: amount, folio, flow, business date",
+      "expect": "(500.0, 5, 'noshow_fee', '2026-08-10')",
+      "got": "(500.0, 5, 'noshow_fee', '2026-08-10')",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W14-04",
+      "writer": "W-14",
+      "what": "fee audit actor is the operator",
+      "expect": "2",
+      "got": "2",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W14-05",
+      "writer": "W-14",
+      "what": "noshow_posted audit names the fee row",
+      "expect": "(1, 3)",
+      "got": "(1, 3)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W14-C",
+      "writer": "W-14",
+      "what": "repeat: refused, still one fee",
+      "expect": "(False, 1)",
+      "got": "(False, 1)",
+      "pass": true,
+      "severity": "gate",
+      "note": "Cannot post no-show: status is NoShow."
+    },
+    {
+      "case": "W14-B-F1-any",
+      "writer": "W-14",
+      "what": "F1 on any audit: not a no-show, no fee, no log",
+      "expect": "(False, {'status': 'Reserved', 'fees': 0, 'logs': 0})",
+      "got": "(False, {'status': 'Reserved', 'fees': 0, 'logs': 0})",
+      "pass": true,
+      "severity": "gate",
+      "note": "Failed to post no-show: injected F1: audit row could not be constructed"
+    },
+    {
+      "case": "W14-B-F1-fee",
+      "writer": "W-14",
+      "what": "F1 on fee audit: not a no-show, no fee, no log",
+      "expect": "(False, {'status': 'Reserved', 'fees': 0, 'logs': 0})",
+      "got": "(False, {'status': 'Reserved', 'fees': 0, 'logs': 0})",
+      "pass": true,
+      "severity": "gate",
+      "note": "Failed to post no-show: injected F1: audit row could not be constructed"
+    },
+    {
+      "case": "W14-B-F1-noshow_posted",
+      "writer": "W-14",
+      "what": "F1 on noshow_posted audit: not a no-show, no fee, no log",
+      "expect": "(False, {'status': 'Reserved', 'fees': 0, 'logs': 0})",
+      "got": "(False, {'status': 'Reserved', 'fees': 0, 'logs': 0})",
+      "pass": true,
+      "severity": "gate",
+      "note": "Failed to post no-show: injected F1: audit row could not be constructed"
+    },
+    {
+      "case": "W14-B-F2-any",
+      "writer": "W-14",
+      "what": "F2 on any audit: not a no-show, no fee, no log",
+      "expect": "(False, {'status': 'Reserved', 'fees': 0, 'logs': 0})",
+      "got": "(False, {'status': 'Reserved', 'fees': 0, 'logs': 0})",
+      "pass": true,
+      "severity": "gate",
+      "note": "Failed to post no-show: audit row for ExtraCharge 4 (posted) could not be written: Runtime"
+    },
+    {
+      "case": "W14-B-F2-fee",
+      "writer": "W-14",
+      "what": "F2 on fee audit: not a no-show, no fee, no log",
+      "expect": "(False, {'status': 'Reserved', 'fees': 0, 'logs': 0})",
+      "got": "(False, {'status': 'Reserved', 'fees': 0, 'logs': 0})",
+      "pass": true,
+      "severity": "gate",
+      "note": "Failed to post no-show: audit row for ExtraCharge 4 (posted) could not be written: Runtime"
+    },
+    {
+      "case": "W14-B-F2-noshow_posted",
+      "writer": "W-14",
+      "what": "F2 on noshow_posted audit: not a no-show, no fee, no log",
+      "expect": "(False, {'status': 'Reserved', 'fees': 0, 'logs': 0})",
+      "got": "(False, {'status': 'Reserved', 'fees': 0, 'logs': 0})",
+      "pass": true,
+      "severity": "gate",
+      "note": "Failed to post no-show: injected F2: audit insert failed"
+    },
+    {
+      "case": "W14-E1",
+      "writer": "W-14",
+      "what": "automated: fee posted and strictly audited",
+      "expect": "(1, 1)",
+      "got": "(1, 1)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W14-E2",
+      "writer": "W-14",
+      "what": "automated: audit actor (system convention)",
+      "expect": "0",
+      "got": "0",
+      "pass": true,
+      "severity": "finding",
+      "note": "staff_user_id=0 with users.id=0 present: 0 - FK-enforcing engines reject this; system identity is an open founder decision (AR-013 / ADR-011)"
+    },
+    {
+      "case": "P-01",
+      "writer": "prod",
+      "what": "production database unchanged (sha256 == anchor)",
+      "expect": "'51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2'",
+      "got": "'51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2'",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    }
+  ]
+}

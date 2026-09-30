@@ -1,0 +1,498 @@
+{
+  "group": "cf11",
+  "started": "2026-09-30T08:17:32",
+  "finished": "2026-09-30T08:17:32",
+  "app_root": "C:\\wt683",
+  "app_commit": "683db721a182205b1eabdd8f692f3a7647a224ca",
+  "app_tree_clean": true,
+  "harness": "verification\\evidence\\20260930_cf10_completion\\verify_cf10_cf11.py",
+  "copy": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS\\verification\\_work\\cf10_cf11.db",
+  "copy_method": "sqlite-backup-api",
+  "production_sha256_before": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "gates_total": 48,
+  "gates_passed": 18,
+  "verdict": "FAIL",
+  "checks": [
+    {
+      "case": "CF11-S1a",
+      "writer": "CF-11",
+      "what": "settle: HTTP redirect (not a failure page)",
+      "expect": "302",
+      "got": "302",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "CF11-S1b",
+      "writer": "CF-11",
+      "what": "settle: one credit_recovery Payment created",
+      "expect": "1",
+      "got": "0",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "CF11-S1c",
+      "writer": "CF-11",
+      "what": "settle: payment amount",
+      "expect": "400.0",
+      "got": "None",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "CF11-S1d",
+      "writer": "CF-11",
+      "what": "settle: payment on billing folio A",
+      "expect": "5",
+      "got": "None",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "CF11-S1e",
+      "writer": "CF-11",
+      "what": "settle: credit_settled_amount advanced",
+      "expect": "400.0",
+      "got": "0.0",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "CF11-S1f",
+      "writer": "CF-11",
+      "what": "settle: strict audit row on the Payment",
+      "expect": "1",
+      "got": "0",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "CF11-S1g",
+      "writer": "CF-11",
+      "what": "settle: operator note preserved in the audit",
+      "expect": "'CF11 settle note'",
+      "got": "None",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "CF11-S1h",
+      "writer": "CF-11",
+      "what": "settle: audit actor is the operator",
+      "expect": "2",
+      "got": "None",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "CF11-S1i",
+      "writer": "CF-11",
+      "what": "settle: audit amount matches",
+      "expect": "400.0",
+      "got": "None",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "CF11-S2-F1-any",
+      "writer": "CF-11",
+      "what": "settle, F1 on any audit: no payment, credit unchanged",
+      "expect": "(0, 0.0)",
+      "got": "(0, 0.0)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "CF11-S2-F1-payment",
+      "writer": "CF-11",
+      "what": "settle, F1 on payment audit: no payment, credit unchanged",
+      "expect": "(0, 0.0)",
+      "got": "(0, 0.0)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "CF11-S2-F2-any",
+      "writer": "CF-11",
+      "what": "settle, F2 on any audit: no payment, credit unchanged",
+      "expect": "(0, 0.0)",
+      "got": "(0, 0.0)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "CF11-S2-F2-payment",
+      "writer": "CF-11",
+      "what": "settle, F2 on payment audit: no payment, credit unchanged",
+      "expect": "(0, 0.0)",
+      "got": "(0, 0.0)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "CF11-S3",
+      "writer": "CF-11",
+      "what": "settle: amount above remaining refused, nothing written",
+      "expect": "(0, 0.0)",
+      "got": "(0, 0.0)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "CF11-S4a",
+      "writer": "CF-11",
+      "what": "settle: second (final) settlement posts",
+      "expect": "2",
+      "got": "0",
+      "pass": false,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "CF11-S4b",
+      "writer": "CF-11",
+      "what": "settle: credit fully settled",
+      "expect": "1000.0",
+      "got": "0.0",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "CF11-S4c",
+      "writer": "CF-11",
+      "what": "settle: blank note recorded as None in audit",
+      "expect": "None",
+      "got": "'NO AUDIT'",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "CF11-S4d",
+      "writer": "CF-11",
+      "what": "settle: settled credit accepts no further payment",
+      "expect": "2",
+      "got": "0",
+      "pass": false,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "CF11-S0",
+      "writer": "CF-11",
+      "what": "settle: no stray payments on the reservation",
+      "expect": "2",
+      "got": "0",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W11-R1a",
+      "writer": "W-11",
+      "what": "redeem: HTTP 200 success",
+      "expect": "(200, True)",
+      "got": "(500, None)",
+      "pass": false,
+      "severity": "gate",
+      "note": "{'error': 'redemption failed; see server logs'}"
+    },
+    {
+      "case": "W11-R1b",
+      "writer": "W-11",
+      "what": "redeem: one settlement Payment",
+      "expect": "1",
+      "got": "0",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W11-R1c",
+      "writer": "W-11",
+      "what": "redeem: payment amount",
+      "expect": "200.0",
+      "got": "None",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W11-R1d",
+      "writer": "W-11",
+      "what": "redeem: payment on billing folio A",
+      "expect": "6",
+      "got": "None",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W11-R1e",
+      "writer": "W-11",
+      "what": "redeem: voucher redeemed_amount",
+      "expect": "200.0",
+      "got": "0.0",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W11-R1f",
+      "writer": "W-11",
+      "what": "redeem: redemption row keeps the note",
+      "expect": "'CF11 redeem note'",
+      "got": "None",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W11-R1g",
+      "writer": "W-11",
+      "what": "redeem: redemption links the payment",
+      "expect": "None",
+      "got": "None",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W11-R1h",
+      "writer": "W-11",
+      "what": "redeem: payment reference carries voucher code",
+      "expect": "'VOUCHER:CF11-V1'",
+      "got": "None",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W11-R1i",
+      "writer": "W-11",
+      "what": "redeem: strict audit row on the Payment",
+      "expect": "1",
+      "got": "0",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W11-R1j",
+      "writer": "W-11",
+      "what": "redeem: payment audit names voucher and amount",
+      "expect": "('CF11-V1', 200.0)",
+      "got": "(None, None)",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W11-R1k",
+      "writer": "W-11",
+      "what": "redeem: payment audit actor is the operator",
+      "expect": "2",
+      "got": "None",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W11-R1l",
+      "writer": "W-11",
+      "what": "redeem: voucher_used audit on the voucher",
+      "expect": "1",
+      "got": "0",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W11-R2-F1-any",
+      "writer": "W-11",
+      "what": "redeem, F1 on any audit: no payment/redemption/balance change",
+      "expect": "(0, 0, 0.0)",
+      "got": "(0, 0, 0.0)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 500"
+    },
+    {
+      "case": "W11-R2-F1-payment",
+      "writer": "W-11",
+      "what": "redeem, F1 on payment audit: no payment/redemption/balance change",
+      "expect": "(0, 0, 0.0)",
+      "got": "(0, 0, 0.0)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 500"
+    },
+    {
+      "case": "W11-R2-F1-voucher_used",
+      "writer": "W-11",
+      "what": "redeem, F1 on voucher_used audit: no payment/redemption/balance change",
+      "expect": "(0, 0, 0.0)",
+      "got": "(0, 0, 0.0)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 500"
+    },
+    {
+      "case": "W11-R2-F2-any",
+      "writer": "W-11",
+      "what": "redeem, F2 on any audit: no payment/redemption/balance change",
+      "expect": "(0, 0, 0.0)",
+      "got": "(0, 0, 0.0)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 500"
+    },
+    {
+      "case": "W11-R2-F2-payment",
+      "writer": "W-11",
+      "what": "redeem, F2 on payment audit: no payment/redemption/balance change",
+      "expect": "(0, 0, 0.0)",
+      "got": "(0, 0, 0.0)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 500"
+    },
+    {
+      "case": "W11-R2-F2-voucher_used",
+      "writer": "W-11",
+      "what": "redeem, F2 on voucher_used audit: no payment/redemption/balance change",
+      "expect": "(0, 0, 0.0)",
+      "got": "(0, 0, 0.0)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 500"
+    },
+    {
+      "case": "W11-R3",
+      "writer": "W-11",
+      "what": "redeem: amount above balance refused, nothing written",
+      "expect": "(400, (0, 0, 0.0))",
+      "got": "(400, (0, 0, 0.0))",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W11-B1a",
+      "writer": "W-11",
+      "what": "booking+voucher: booking saved (redirect)",
+      "expect": "(302, True)",
+      "got": "(500, False)",
+      "pass": false,
+      "severity": "gate",
+      "note": "TypeError: 'notes' is an invalid keyword argument for Payment"
+    },
+    {
+      "case": "W11-B1b",
+      "writer": "W-11",
+      "what": "booking+voucher: settlement Payment on the booking",
+      "expect": "[100.0]",
+      "got": "[]",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W11-B1c",
+      "writer": "W-11",
+      "what": "booking+voucher: voucher balance consumed",
+      "expect": "300.0",
+      "got": "0.0",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W11-B2-F1-any",
+      "writer": "W-11",
+      "what": "booking+voucher, F1 on any audit: no booking, no voucher use",
+      "expect": "(6, 0.0)",
+      "got": "(6, 0.0)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 500 TypeError: 'notes' is an invalid keyword argument for Payment"
+    },
+    {
+      "case": "W11-B3-F1-any",
+      "writer": "W-11",
+      "what": "booking+voucher, F1 on any audit: form re-rendered, not HTTP 500",
+      "expect": "200",
+      "got": "500",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W11-B2-F1-payment",
+      "writer": "W-11",
+      "what": "booking+voucher, F1 on payment audit: no booking, no voucher use",
+      "expect": "(6, 0.0)",
+      "got": "(6, 0.0)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 500 TypeError: 'notes' is an invalid keyword argument for Payment"
+    },
+    {
+      "case": "W11-B3-F1-payment",
+      "writer": "W-11",
+      "what": "booking+voucher, F1 on payment audit: form re-rendered, not HTTP 500",
+      "expect": "200",
+      "got": "500",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W11-B2-F2-voucher_used",
+      "writer": "W-11",
+      "what": "booking+voucher, F2 on voucher_used audit: no booking, no voucher use",
+      "expect": "(6, 0.0)",
+      "got": "(6, 0.0)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 500 TypeError: 'notes' is an invalid keyword argument for Payment"
+    },
+    {
+      "case": "W11-B3-F2-voucher_used",
+      "writer": "W-11",
+      "what": "booking+voucher, F2 on voucher_used audit: form re-rendered, not HTTP 500",
+      "expect": "200",
+      "got": "500",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "P-01",
+      "writer": "prod",
+      "what": "production database unchanged (sha256 == anchor)",
+      "expect": "'51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2'",
+      "got": "'51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2'",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    }
+  ]
+}

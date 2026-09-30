@@ -1,0 +1,128 @@
+{
+  "group": "actor",
+  "started": "2026-09-30T08:18:17",
+  "finished": "2026-09-30T08:18:17",
+  "app_root": "C:\\wt_5847920",
+  "app_commit": "5847920a462f9225ed3f74d1edd01ea380e65b7f",
+  "app_tree_clean": true,
+  "harness": "verification\\evidence\\20260930_cf10_completion\\verify_cf10_cf11.py",
+  "copy": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS\\verification\\_work\\cf10_actor.db",
+  "copy_method": "sqlite-backup-api",
+  "production_sha256_before": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "gates_total": 9,
+  "gates_passed": 7,
+  "verdict": "FAIL",
+  "checks": [
+    {
+      "case": "A-00",
+      "writer": "actor",
+      "what": "copy: no user 0, no FK violation before enforcement",
+      "expect": "(0, 0)",
+      "got": "(0, 0)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "A-01",
+      "writer": "actor",
+      "what": "FK enforcement active on the copy",
+      "expect": "1",
+      "got": "1",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "A-02",
+      "writer": "actor",
+      "what": "operator actor: no-show + fee posted, audits accepted",
+      "expect": "('NoShow', 1)",
+      "got": "('NoShow', 1)",
+      "pass": true,
+      "severity": "gate",
+      "note": "No-show posted successfully."
+    },
+    {
+      "case": "A-03",
+      "writer": "actor",
+      "what": "automated no-show: fails closed, nothing partial persisted",
+      "expect": "('Reserved', 0)",
+      "got": "('Reserved', 0)",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError: audit row for ExtraCharge 4 (posted) could not be written: IntegrityError: (sqlite3.Integr"
+    },
+    {
+      "case": "A-04",
+      "writer": "actor",
+      "what": "automated no-show can complete under FK enforcement",
+      "expect": "None",
+      "got": "'AuditCouplingError: audit row for ExtraCharge 4 (posted) could not be written: IntegrityError: (sqlite3.Integr'",
+      "pass": false,
+      "severity": "finding",
+      "note": "system actor 0 is rejected - AR-013 / ADR-011 unresolved"
+    },
+    {
+      "case": "A-05",
+      "writer": "actor",
+      "what": "scheduler run: fails closed, no log, no charge, date unchanged",
+      "expect": "(0, 0, datetime.date(2026, 8, 10))",
+      "got": "(0, 0, datetime.date(2026, 8, 10))",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError: audit row for ExtraCharge 4 (posted) could not be written: IntegrityError: (sqlite3.Integr"
+    },
+    {
+      "case": "A-06",
+      "writer": "actor",
+      "what": "scheduler night audit can complete under FK enforcement",
+      "expect": "None",
+      "got": "'AuditCouplingError: audit row for ExtraCharge 4 (posted) could not be written: IntegrityError: (sqlite3.Integr'",
+      "pass": false,
+      "severity": "finding",
+      "note": "system actor 0 is rejected - AR-013 / B-1 unresolved; scheduler disabled for the first release (FD-P2-05)"
+    },
+    {
+      "case": "A-07",
+      "writer": "actor",
+      "what": "manual run with a no-show: all-or-nothing (log and charges agree)",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": "logs=0 rent=0"
+    },
+    {
+      "case": "A-08",
+      "writer": "actor",
+      "what": "manual night audit with a pending no-show completes under FK enforcement",
+      "expect": "(1, 1, 'NoShow')",
+      "got": "(0, 0, 'Reserved')",
+      "pass": false,
+      "severity": "gate",
+      "note": "FD-P2-05 first-release model: every audit row of an operator run names the operator"
+    },
+    {
+      "case": "A-09",
+      "writer": "actor",
+      "what": "operator run: noshow_posted actor is the operator, origin still 'night_audit'",
+      "expect": "(1, 2, 'night_audit')",
+      "got": "(0, None, None)",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "P-01",
+      "writer": "prod",
+      "what": "production database unchanged (sha256 == anchor)",
+      "expect": "'51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2'",
+      "got": "'51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2'",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    }
+  ]
+}

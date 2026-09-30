@@ -1,0 +1,31 @@
+{
+  "app_root": "C:\\wtd9f",
+  "app_commit": "d9fa55f39f792c4c31d4ba8413921916775f203a",
+  "app_tree_clean": true,
+  "started": "2026-09-30T08:05:44",
+  "cases": [
+    {
+      "scenario": "no_prior_dml",
+      "charges_after_outer_rollback": 1,
+      "reservation_audits_after_outer_rollback": 1,
+      "expected": 0,
+      "pass": false
+    },
+    {
+      "scenario": "prior_dml",
+      "charges_after_outer_rollback": 0,
+      "reservation_audits_after_outer_rollback": 0,
+      "expected": 0,
+      "pass": true
+    },
+    {
+      "scenario": "folio_auto_create_no_prior_dml",
+      "folios_after_outer_rollback": 1,
+      "folio_audits_after_outer_rollback": 0,
+      "expected": 0,
+      "pass": false
+    }
+  ],
+  "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "verdict": "FAIL"
+}

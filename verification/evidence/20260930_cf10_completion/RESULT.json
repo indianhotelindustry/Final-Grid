@@ -1,0 +1,1082 @@
+{
+  "pack": "20260930_cf10_completion",
+  "start_head": "d9fa55f",
+  "code_head": "61286b7",
+  "harness": "verify_cf10_cf11.py (revision 2)",
+  "production_anchor": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "green_61286b7": {
+    "groups": {
+      "actor": {
+        "file": "results_green_61286b7_actor.json",
+        "app_commit": "61286b76987a670f5bd278dad4a106e57dc2a95f",
+        "app_tree_clean": true,
+        "gates_passed": 9,
+        "gates_total": 9,
+        "verdict": "PASS",
+        "failed_gates": [],
+        "findings": [
+          "A-04",
+          "A-06"
+        ],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "cf11": {
+        "file": "results_green_61286b7_cf11.json",
+        "app_commit": "61286b76987a670f5bd278dad4a106e57dc2a95f",
+        "app_tree_clean": true,
+        "gates_passed": 48,
+        "gates_total": 48,
+        "verdict": "PASS",
+        "failed_gates": [],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "corr": {
+        "file": "results_green_61286b7_corr.json",
+        "app_commit": "61286b76987a670f5bd278dad4a106e57dc2a95f",
+        "app_tree_clean": true,
+        "gates_passed": 46,
+        "gates_total": 46,
+        "verdict": "PASS",
+        "failed_gates": [],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "na": {
+        "file": "results_green_61286b7_na.json",
+        "app_commit": "61286b76987a670f5bd278dad4a106e57dc2a95f",
+        "app_tree_clean": true,
+        "gates_passed": 21,
+        "gates_total": 21,
+        "verdict": "PASS",
+        "failed_gates": [],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "voucher": {
+        "file": "results_green_61286b7_voucher.json",
+        "app_commit": "61286b76987a670f5bd278dad4a106e57dc2a95f",
+        "app_tree_clean": true,
+        "gates_passed": 9,
+        "gates_total": 9,
+        "verdict": "PASS",
+        "failed_gates": [],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "w10": {
+        "file": "results_green_61286b7_w10.json",
+        "app_commit": "61286b76987a670f5bd278dad4a106e57dc2a95f",
+        "app_tree_clean": true,
+        "gates_passed": 25,
+        "gates_total": 25,
+        "verdict": "PASS",
+        "failed_gates": [],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "w12": {
+        "file": "results_green_61286b7_w12.json",
+        "app_commit": "61286b76987a670f5bd278dad4a106e57dc2a95f",
+        "app_tree_clean": true,
+        "gates_passed": 16,
+        "gates_total": 16,
+        "verdict": "PASS",
+        "failed_gates": [],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "w13": {
+        "file": "results_green_61286b7_w13.json",
+        "app_commit": "61286b76987a670f5bd278dad4a106e57dc2a95f",
+        "app_tree_clean": true,
+        "gates_passed": 16,
+        "gates_total": 16,
+        "verdict": "PASS",
+        "failed_gates": [],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "w14": {
+        "file": "results_green_61286b7_w14.json",
+        "app_commit": "61286b76987a670f5bd278dad4a106e57dc2a95f",
+        "app_tree_clean": true,
+        "gates_passed": 14,
+        "gates_total": 14,
+        "verdict": "PASS",
+        "failed_gates": [],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "w24": {
+        "file": "results_green_61286b7_w24.json",
+        "app_commit": "61286b76987a670f5bd278dad4a106e57dc2a95f",
+        "app_tree_clean": true,
+        "gates_passed": 38,
+        "gates_total": 38,
+        "verdict": "PASS",
+        "failed_gates": [],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      }
+    },
+    "gates_passed": 242,
+    "gates_total": 242
+  },
+  "baseline_d9fa55f": {
+    "groups": {
+      "actor": {
+        "file": "results_base_d9fa55f_actor.json",
+        "app_commit": "d9fa55f39f792c4c31d4ba8413921916775f203a",
+        "app_tree_clean": true,
+        "gates_passed": 7,
+        "gates_total": 9,
+        "verdict": "FAIL",
+        "failed_gates": [
+          "A-08",
+          "A-09"
+        ],
+        "findings": [
+          "A-04",
+          "A-06"
+        ],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "cf11": {
+        "file": "results_base_d9fa55f_cf11.json",
+        "app_commit": "d9fa55f39f792c4c31d4ba8413921916775f203a",
+        "app_tree_clean": true,
+        "gates_passed": 48,
+        "gates_total": 48,
+        "verdict": "PASS",
+        "failed_gates": [],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "corr": {
+        "file": "results_base_d9fa55f_corr.json",
+        "app_commit": "d9fa55f39f792c4c31d4ba8413921916775f203a",
+        "app_tree_clean": true,
+        "gates_passed": 46,
+        "gates_total": 46,
+        "verdict": "PASS",
+        "failed_gates": [],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "na": {
+        "file": "results_base_d9fa55f_na.json",
+        "app_commit": "d9fa55f39f792c4c31d4ba8413921916775f203a",
+        "app_tree_clean": true,
+        "gates_passed": 5,
+        "gates_total": 21,
+        "verdict": "FAIL",
+        "failed_gates": [
+          "W21-B-F1-any",
+          "W21-B-F1-charge",
+          "W21-S-F1",
+          "W21-B-F2-any",
+          "W21-B-F2-charge",
+          "W21-S-F2",
+          "W21-02",
+          "W21-03.0",
+          "W21-03.1",
+          "W21-04",
+          "W21-C2",
+          "W16-B-F1-any",
+          "W16-B-F1-charge",
+          "W16-B-F2-any",
+          "W16-B-F2-charge",
+          "W16-02"
+        ],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "voucher": {
+        "file": "results_base_d9fa55f_voucher.json",
+        "app_commit": "d9fa55f39f792c4c31d4ba8413921916775f203a",
+        "app_tree_clean": true,
+        "gates_passed": 5,
+        "gates_total": 9,
+        "verdict": "FAIL",
+        "failed_gates": [
+          "V-04",
+          "V-B-F1",
+          "V-B-F2",
+          "V-C-F1"
+        ],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "w10": {
+        "file": "results_base_d9fa55f_w10.json",
+        "app_commit": "d9fa55f39f792c4c31d4ba8413921916775f203a",
+        "app_tree_clean": true,
+        "gates_passed": 25,
+        "gates_total": 25,
+        "verdict": "PASS",
+        "failed_gates": [],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "w12": {
+        "file": "results_base_d9fa55f_w12.json",
+        "app_commit": "d9fa55f39f792c4c31d4ba8413921916775f203a",
+        "app_tree_clean": true,
+        "gates_passed": 16,
+        "gates_total": 16,
+        "verdict": "PASS",
+        "failed_gates": [],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "w13": {
+        "file": "results_base_d9fa55f_w13.json",
+        "app_commit": "d9fa55f39f792c4c31d4ba8413921916775f203a",
+        "app_tree_clean": true,
+        "gates_passed": 16,
+        "gates_total": 16,
+        "verdict": "PASS",
+        "failed_gates": [],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "w14": {
+        "file": "results_base_d9fa55f_w14.json",
+        "app_commit": "d9fa55f39f792c4c31d4ba8413921916775f203a",
+        "app_tree_clean": true,
+        "gates_passed": 14,
+        "gates_total": 14,
+        "verdict": "PASS",
+        "failed_gates": [],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "w24": {
+        "file": "results_base_d9fa55f_w24.json",
+        "app_commit": "d9fa55f39f792c4c31d4ba8413921916775f203a",
+        "app_tree_clean": true,
+        "gates_passed": 38,
+        "gates_total": 38,
+        "verdict": "PASS",
+        "failed_gates": [],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      }
+    },
+    "gates_passed": 220,
+    "gates_total": 242
+  },
+  "baseline_683db72": {
+    "groups": {
+      "actor": {
+        "file": "results_base_683db72_actor.json",
+        "app_commit": "683db721a182205b1eabdd8f692f3a7647a224ca",
+        "app_tree_clean": true,
+        "gates_passed": 7,
+        "gates_total": 9,
+        "verdict": "FAIL",
+        "failed_gates": [
+          "A-08",
+          "A-09"
+        ],
+        "findings": [
+          "A-04",
+          "A-06"
+        ],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "cf11": {
+        "file": "results_base_683db72_cf11.json",
+        "app_commit": "683db721a182205b1eabdd8f692f3a7647a224ca",
+        "app_tree_clean": true,
+        "gates_passed": 18,
+        "gates_total": 48,
+        "verdict": "FAIL",
+        "failed_gates": [
+          "CF11-S1b",
+          "CF11-S1c",
+          "CF11-S1d",
+          "CF11-S1e",
+          "CF11-S1f",
+          "CF11-S1g",
+          "CF11-S1h",
+          "CF11-S1i",
+          "CF11-S4a",
+          "CF11-S4b",
+          "CF11-S4c",
+          "CF11-S4d",
+          "CF11-S0",
+          "W11-R1a",
+          "W11-R1b",
+          "W11-R1c",
+          "W11-R1d",
+          "W11-R1e",
+          "W11-R1f",
+          "W11-R1h",
+          "W11-R1i",
+          "W11-R1j",
+          "W11-R1k",
+          "W11-R1l",
+          "W11-B1a",
+          "W11-B1b",
+          "W11-B1c",
+          "W11-B3-F1-any",
+          "W11-B3-F1-payment",
+          "W11-B3-F2-voucher_used"
+        ],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "corr": {
+        "file": "results_base_683db72_corr.json",
+        "app_commit": "683db721a182205b1eabdd8f692f3a7647a224ca",
+        "app_tree_clean": true,
+        "gates_passed": 30,
+        "gates_total": 46,
+        "verdict": "FAIL",
+        "failed_gates": [
+          "W08-R-B-F1-any",
+          "W08-R-B-F1-payment_reversed",
+          "W08-R-B-F1-payment_corrected",
+          "W08-B-B-F1-any",
+          "W08-B-B-F1-payment_reversed",
+          "W08-B-B-F1-payment_corrected",
+          "W22-02",
+          "W22-03",
+          "W22-04",
+          "W23-02",
+          "W23-03",
+          "W23-04",
+          "W22-B-F1",
+          "W22-C-F1",
+          "W22-B-F2",
+          "W22-C-F2"
+        ],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "na": {
+        "file": "results_base_683db72_na.json",
+        "app_commit": "683db721a182205b1eabdd8f692f3a7647a224ca",
+        "app_tree_clean": true,
+        "gates_passed": 5,
+        "gates_total": 21,
+        "verdict": "FAIL",
+        "failed_gates": [
+          "W21-B-F1-any",
+          "W21-B-F1-charge",
+          "W21-S-F1",
+          "W21-B-F2-any",
+          "W21-B-F2-charge",
+          "W21-S-F2",
+          "W21-02",
+          "W21-03.0",
+          "W21-03.1",
+          "W21-04",
+          "W21-C2",
+          "W16-B-F1-any",
+          "W16-B-F1-charge",
+          "W16-B-F2-any",
+          "W16-B-F2-charge",
+          "W16-02"
+        ],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "voucher": {
+        "file": "results_base_683db72_voucher.json",
+        "app_commit": "683db721a182205b1eabdd8f692f3a7647a224ca",
+        "app_tree_clean": true,
+        "gates_passed": 5,
+        "gates_total": 9,
+        "verdict": "FAIL",
+        "failed_gates": [
+          "V-04",
+          "V-B-F1",
+          "V-B-F2",
+          "V-C-F1"
+        ],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "w10": {
+        "file": "results_base_683db72_w10.json",
+        "app_commit": "683db721a182205b1eabdd8f692f3a7647a224ca",
+        "app_tree_clean": true,
+        "gates_passed": 13,
+        "gates_total": 25,
+        "verdict": "FAIL",
+        "failed_gates": [
+          "W10-07",
+          "W10-08",
+          "W10-09",
+          "W10-B-F1-refund_full-any",
+          "W10-B-F1-refund_full-cancellation_refund",
+          "W10-B-F1-refund_full-cancellation_disposition",
+          "W10-B-F1-refund_full-cancelled",
+          "W10-B-F1-forfeit-any",
+          "W10-B-F1-forfeit-forfeit_approved",
+          "W10-B-F1-forfeit-cancelled",
+          "W10-B-F2-refund_full-cancelled",
+          "W10-B-F2-forfeit-cancelled"
+        ],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "w12": {
+        "file": "results_base_683db72_w12.json",
+        "app_commit": "683db721a182205b1eabdd8f692f3a7647a224ca",
+        "app_tree_clean": true,
+        "gates_passed": 9,
+        "gates_total": 16,
+        "verdict": "FAIL",
+        "failed_gates": [
+          "W12-03",
+          "W12-04",
+          "W12-05",
+          "W12-B-F1-deposit",
+          "W12-B-F1-checkin_full",
+          "W12-B-F2-deposit",
+          "W12-B-F2-checkin_full"
+        ],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "w13": {
+        "file": "results_base_683db72_w13.json",
+        "app_commit": "683db721a182205b1eabdd8f692f3a7647a224ca",
+        "app_tree_clean": true,
+        "gates_passed": 5,
+        "gates_total": 16,
+        "verdict": "FAIL",
+        "failed_gates": [
+          "W13-02",
+          "W13-03",
+          "W13-04",
+          "W13-05",
+          "W13-E1",
+          "W13-B-F1-any",
+          "W13-B-F1-charge",
+          "W13-B-F1-reservation",
+          "W13-B-F2-any",
+          "W13-B-F2-charge",
+          "W13-B-F2-reservation"
+        ],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "w14": {
+        "file": "results_base_683db72_w14.json",
+        "app_commit": "683db721a182205b1eabdd8f692f3a7647a224ca",
+        "app_tree_clean": true,
+        "gates_passed": 7,
+        "gates_total": 14,
+        "verdict": "FAIL",
+        "failed_gates": [
+          "W14-02",
+          "W14-03",
+          "W14-04",
+          "W14-05",
+          "W14-B-F1-fee",
+          "W14-B-F2-fee",
+          "W14-E1"
+        ],
+        "findings": [
+          "W14-E2"
+        ],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      },
+      "w24": {
+        "file": "results_base_683db72_w24.json",
+        "app_commit": "683db721a182205b1eabdd8f692f3a7647a224ca",
+        "app_tree_clean": true,
+        "gates_passed": 6,
+        "gates_total": 38,
+        "verdict": "FAIL",
+        "failed_gates": [
+          "W24-A-03",
+          "W24-A-04",
+          "W24-A-05",
+          "W24-A-06",
+          "W24-A-07",
+          "W24-A-08",
+          "W24-A-09",
+          "W24-B-03",
+          "W24-B-04",
+          "W24-B-05",
+          "W24-B-09",
+          "W24-CO-A-01",
+          "W24-CO-A-02",
+          "W24-CO-A-B",
+          "W24-CO-B-01",
+          "W24-CO-B-B",
+          "W24-B-F1-A-any",
+          "W24-B-F1-A-transition",
+          "W24-B-F1-A-charge",
+          "W24-B-F1-A-admin",
+          "W24-B-F1-B-any",
+          "W24-B-F1-B-transition",
+          "W24-B-F1-B-admin",
+          "W24-B-F2-A-any",
+          "W24-B-F2-A-transition",
+          "W24-B-F2-A-charge",
+          "W24-B-F2-A-admin",
+          "W24-B-F2-B-any",
+          "W24-B-F2-B-transition",
+          "W24-B-F2-B-admin",
+          "W24-S-F1",
+          "W24-S-F2"
+        ],
+        "findings": [],
+        "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+      }
+    },
+    "gates_passed": 105,
+    "gates_total": 242
+  },
+  "per_commit": {
+    "d34d15a": {
+      "groups": {
+        "actor": {
+          "file": "per_commit/results_commit_d34d15a_actor.json",
+          "app_commit": "d34d15aafabb1621acb34839504472eb7c117292",
+          "app_tree_clean": true,
+          "gates_passed": 7,
+          "gates_total": 9,
+          "verdict": "FAIL",
+          "failed_gates": [
+            "A-08",
+            "A-09"
+          ],
+          "findings": [
+            "A-04",
+            "A-06"
+          ],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "cf11": {
+          "file": "per_commit/results_commit_d34d15a_cf11.json",
+          "app_commit": "d34d15aafabb1621acb34839504472eb7c117292",
+          "app_tree_clean": true,
+          "gates_passed": 48,
+          "gates_total": 48,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "corr": {
+          "file": "per_commit/results_commit_d34d15a_corr.json",
+          "app_commit": "d34d15aafabb1621acb34839504472eb7c117292",
+          "app_tree_clean": true,
+          "gates_passed": 46,
+          "gates_total": 46,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "na": {
+          "file": "per_commit/results_commit_d34d15a_na.json",
+          "app_commit": "d34d15aafabb1621acb34839504472eb7c117292",
+          "app_tree_clean": true,
+          "gates_passed": 5,
+          "gates_total": 21,
+          "verdict": "FAIL",
+          "failed_gates": [
+            "W21-B-F1-any",
+            "W21-B-F1-charge",
+            "W21-S-F1",
+            "W21-B-F2-any",
+            "W21-B-F2-charge",
+            "W21-S-F2",
+            "W21-02",
+            "W21-03.0",
+            "W21-03.1",
+            "W21-04",
+            "W21-C2",
+            "W16-B-F1-any",
+            "W16-B-F1-charge",
+            "W16-B-F2-any",
+            "W16-B-F2-charge",
+            "W16-02"
+          ],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "voucher": {
+          "file": "per_commit/results_commit_d34d15a_voucher.json",
+          "app_commit": "d34d15aafabb1621acb34839504472eb7c117292",
+          "app_tree_clean": true,
+          "gates_passed": 5,
+          "gates_total": 9,
+          "verdict": "FAIL",
+          "failed_gates": [
+            "V-04",
+            "V-B-F1",
+            "V-B-F2",
+            "V-C-F1"
+          ],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "w10": {
+          "file": "per_commit/results_commit_d34d15a_w10.json",
+          "app_commit": "d34d15aafabb1621acb34839504472eb7c117292",
+          "app_tree_clean": true,
+          "gates_passed": 25,
+          "gates_total": 25,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "w12": {
+          "file": "per_commit/results_commit_d34d15a_w12.json",
+          "app_commit": "d34d15aafabb1621acb34839504472eb7c117292",
+          "app_tree_clean": true,
+          "gates_passed": 16,
+          "gates_total": 16,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "w13": {
+          "file": "per_commit/results_commit_d34d15a_w13.json",
+          "app_commit": "d34d15aafabb1621acb34839504472eb7c117292",
+          "app_tree_clean": true,
+          "gates_passed": 16,
+          "gates_total": 16,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "w14": {
+          "file": "per_commit/results_commit_d34d15a_w14.json",
+          "app_commit": "d34d15aafabb1621acb34839504472eb7c117292",
+          "app_tree_clean": true,
+          "gates_passed": 14,
+          "gates_total": 14,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "w24": {
+          "file": "per_commit/results_commit_d34d15a_w24.json",
+          "app_commit": "d34d15aafabb1621acb34839504472eb7c117292",
+          "app_tree_clean": true,
+          "gates_passed": 38,
+          "gates_total": 38,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        }
+      },
+      "gates_passed": 220,
+      "gates_total": 242
+    },
+    "5847920": {
+      "groups": {
+        "actor": {
+          "file": "per_commit/results_commit_5847920_actor.json",
+          "app_commit": "5847920a462f9225ed3f74d1edd01ea380e65b7f",
+          "app_tree_clean": true,
+          "gates_passed": 7,
+          "gates_total": 9,
+          "verdict": "FAIL",
+          "failed_gates": [
+            "A-08",
+            "A-09"
+          ],
+          "findings": [
+            "A-04",
+            "A-06"
+          ],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "cf11": {
+          "file": "per_commit/results_commit_5847920_cf11.json",
+          "app_commit": "5847920a462f9225ed3f74d1edd01ea380e65b7f",
+          "app_tree_clean": true,
+          "gates_passed": 48,
+          "gates_total": 48,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "corr": {
+          "file": "per_commit/results_commit_5847920_corr.json",
+          "app_commit": "5847920a462f9225ed3f74d1edd01ea380e65b7f",
+          "app_tree_clean": true,
+          "gates_passed": 46,
+          "gates_total": 46,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "na": {
+          "file": "per_commit/results_commit_5847920_na.json",
+          "app_commit": "5847920a462f9225ed3f74d1edd01ea380e65b7f",
+          "app_tree_clean": true,
+          "gates_passed": 5,
+          "gates_total": 21,
+          "verdict": "FAIL",
+          "failed_gates": [
+            "W21-B-F1-any",
+            "W21-B-F1-charge",
+            "W21-S-F1",
+            "W21-B-F2-any",
+            "W21-B-F2-charge",
+            "W21-S-F2",
+            "W21-02",
+            "W21-03.0",
+            "W21-03.1",
+            "W21-04",
+            "W21-C2",
+            "W16-B-F1-any",
+            "W16-B-F1-charge",
+            "W16-B-F2-any",
+            "W16-B-F2-charge",
+            "W16-02"
+          ],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "voucher": {
+          "file": "per_commit/results_commit_5847920_voucher.json",
+          "app_commit": "5847920a462f9225ed3f74d1edd01ea380e65b7f",
+          "app_tree_clean": true,
+          "gates_passed": 9,
+          "gates_total": 9,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "w10": {
+          "file": "per_commit/results_commit_5847920_w10.json",
+          "app_commit": "5847920a462f9225ed3f74d1edd01ea380e65b7f",
+          "app_tree_clean": true,
+          "gates_passed": 25,
+          "gates_total": 25,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "w12": {
+          "file": "per_commit/results_commit_5847920_w12.json",
+          "app_commit": "5847920a462f9225ed3f74d1edd01ea380e65b7f",
+          "app_tree_clean": true,
+          "gates_passed": 16,
+          "gates_total": 16,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "w13": {
+          "file": "per_commit/results_commit_5847920_w13.json",
+          "app_commit": "5847920a462f9225ed3f74d1edd01ea380e65b7f",
+          "app_tree_clean": true,
+          "gates_passed": 16,
+          "gates_total": 16,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "w14": {
+          "file": "per_commit/results_commit_5847920_w14.json",
+          "app_commit": "5847920a462f9225ed3f74d1edd01ea380e65b7f",
+          "app_tree_clean": true,
+          "gates_passed": 14,
+          "gates_total": 14,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "w24": {
+          "file": "per_commit/results_commit_5847920_w24.json",
+          "app_commit": "5847920a462f9225ed3f74d1edd01ea380e65b7f",
+          "app_tree_clean": true,
+          "gates_passed": 38,
+          "gates_total": 38,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        }
+      },
+      "gates_passed": 224,
+      "gates_total": 242
+    },
+    "c4edc7b": {
+      "groups": {
+        "actor": {
+          "file": "per_commit/results_commit_c4edc7b_actor.json",
+          "app_commit": "c4edc7b23e83c4e0063a582c9fa80bb818cec7ea",
+          "app_tree_clean": true,
+          "gates_passed": 7,
+          "gates_total": 9,
+          "verdict": "FAIL",
+          "failed_gates": [
+            "A-08",
+            "A-09"
+          ],
+          "findings": [
+            "A-04",
+            "A-06"
+          ],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "cf11": {
+          "file": "per_commit/results_commit_c4edc7b_cf11.json",
+          "app_commit": "c4edc7b23e83c4e0063a582c9fa80bb818cec7ea",
+          "app_tree_clean": true,
+          "gates_passed": 48,
+          "gates_total": 48,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "corr": {
+          "file": "per_commit/results_commit_c4edc7b_corr.json",
+          "app_commit": "c4edc7b23e83c4e0063a582c9fa80bb818cec7ea",
+          "app_tree_clean": true,
+          "gates_passed": 46,
+          "gates_total": 46,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "na": {
+          "file": "per_commit/results_commit_c4edc7b_na.json",
+          "app_commit": "c4edc7b23e83c4e0063a582c9fa80bb818cec7ea",
+          "app_tree_clean": true,
+          "gates_passed": 21,
+          "gates_total": 21,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "voucher": {
+          "file": "per_commit/results_commit_c4edc7b_voucher.json",
+          "app_commit": "c4edc7b23e83c4e0063a582c9fa80bb818cec7ea",
+          "app_tree_clean": true,
+          "gates_passed": 9,
+          "gates_total": 9,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "w10": {
+          "file": "per_commit/results_commit_c4edc7b_w10.json",
+          "app_commit": "c4edc7b23e83c4e0063a582c9fa80bb818cec7ea",
+          "app_tree_clean": true,
+          "gates_passed": 25,
+          "gates_total": 25,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "w12": {
+          "file": "per_commit/results_commit_c4edc7b_w12.json",
+          "app_commit": "c4edc7b23e83c4e0063a582c9fa80bb818cec7ea",
+          "app_tree_clean": true,
+          "gates_passed": 16,
+          "gates_total": 16,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "w13": {
+          "file": "per_commit/results_commit_c4edc7b_w13.json",
+          "app_commit": "c4edc7b23e83c4e0063a582c9fa80bb818cec7ea",
+          "app_tree_clean": true,
+          "gates_passed": 16,
+          "gates_total": 16,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "w14": {
+          "file": "per_commit/results_commit_c4edc7b_w14.json",
+          "app_commit": "c4edc7b23e83c4e0063a582c9fa80bb818cec7ea",
+          "app_tree_clean": true,
+          "gates_passed": 14,
+          "gates_total": 14,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        },
+        "w24": {
+          "file": "per_commit/results_commit_c4edc7b_w24.json",
+          "app_commit": "c4edc7b23e83c4e0063a582c9fa80bb818cec7ea",
+          "app_tree_clean": true,
+          "gates_passed": 38,
+          "gates_total": 38,
+          "verdict": "PASS",
+          "failed_gates": [],
+          "findings": [],
+          "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2"
+        }
+      },
+      "gates_passed": 240,
+      "gates_total": 242
+    }
+  },
+  "savepoint_probe": {
+    "683db72": {
+      "file": "probe_savepoint_base_683db72.json",
+      "app_commit": "683db721a182205b1eabdd8f692f3a7647a224ca",
+      "app_tree_clean": null,
+      "verdict": "FAIL",
+      "cases": {
+        "no_prior_dml": true,
+        "prior_dml": true,
+        "folio_auto_create_no_prior_dml": false
+      }
+    },
+    "d9fa55f": {
+      "file": "probe_savepoint_base_d9fa55f.json",
+      "app_commit": "d9fa55f39f792c4c31d4ba8413921916775f203a",
+      "app_tree_clean": true,
+      "verdict": "FAIL",
+      "cases": {
+        "no_prior_dml": false,
+        "prior_dml": true,
+        "folio_auto_create_no_prior_dml": false
+      }
+    },
+    "d34d15a": {
+      "file": "per_commit/probe_savepoint_commit_d34d15a.json",
+      "app_commit": "d34d15aafabb1621acb34839504472eb7c117292",
+      "app_tree_clean": true,
+      "verdict": "PASS",
+      "cases": {
+        "no_prior_dml": true,
+        "prior_dml": true,
+        "folio_auto_create_no_prior_dml": true
+      }
+    },
+    "61286b7": {
+      "file": "probe_savepoint_green_61286b7.json",
+      "app_commit": "61286b76987a670f5bd278dad4a106e57dc2a95f",
+      "app_tree_clean": true,
+      "verdict": "PASS",
+      "cases": {
+        "no_prior_dml": true,
+        "prior_dml": true,
+        "folio_auto_create_no_prior_dml": true
+      }
+    }
+  },
+  "regression_61286b7": {
+    "verify_writers_setA": "RESULT SET A: 89 / 89 gate checks passed; 4 findings recorded (non-gating)",
+    "verify_writers_setB": "RESULT SET B: 48 / 48 gate checks passed; 6 findings recorded (non-gating)",
+    "verify_writers_setC": "RESULT SET C: 15 / 15 gate checks passed; 2 findings recorded (non-gating)",
+    "verify_writers_setD": "RESULT SET D: 46 / 46 gate checks passed; 2 findings recorded (non-gating)",
+    "phase2a_verify": "cases             : 29 passed / 29 total",
+    "verify_q06_fix": "15 PASS / 0 FAIL",
+    "verify_retention": "RESULT: 18 / 18 passed   routes=298",
+    "phase1_execution_verify": "RESULT: 44 / 44 passed",
+    "w20_runtime_verify": "RESULT: 23 / 23 passed",
+    "tools_test_restore_db": "OK"
+  },
+  "pvf_61286b7": {
+    "gm_verify": {
+      "pack": "20260930_024153_gm_verify_phase1_aa6d9e91",
+      "verdict": "PASS",
+      "surfaces": "158/158",
+      "differences": 0,
+      "read_only": true
+    },
+    "replay_verify": {
+      "pack": "20260930_024158_replay_verify_production",
+      "verdict": "FAIL",
+      "differences": [
+        [
+          "2026-08-09",
+          "nas.tax_snapshot.total_taxable",
+          "2285.7",
+          "1142.85",
+          "BLOCK"
+        ],
+        [
+          "2026-08-10",
+          "nas.tax_snapshot.total_taxable",
+          "5904.76",
+          "2952.38",
+          "INFO"
+        ]
+      ],
+      "read_only": true
+    },
+    "inv_run": {
+      "pack": "20260930_024200_inv_run_production",
+      "overall": "FAIL",
+      "counts": {
+        "HOLDS": 17,
+        "VACUOUS": 7,
+        "VIOLATED": 2,
+        "evaluated": 26,
+        "registered": 26,
+        "uncommissioned": 1,
+        "violations": 10
+      },
+      "release_blocking": [
+        "INV-A03"
+      ],
+      "total_writes": 0,
+      "not_holds": {
+        "INV-A02": "VIOLATED",
+        "INV-A03": "VIOLATED",
+        "INV-A06": "VACUOUS",
+        "INV-C01": "VACUOUS",
+        "INV-C05": "VACUOUS",
+        "INV-C06": "VACUOUS",
+        "INV-D02": "VACUOUS",
+        "INV-D05": "VACUOUS",
+        "INV-D07": "VACUOUS"
+      },
+      "read_only": true
+    },
+    "cross_implementation": {
+      "pack": "20260930_024202_cross_implementation",
+      "overall": "FAIL",
+      "counts": {
+        "AGREED": 15,
+        "DIVERGED": 4,
+        "SINGLE_SOURCE": 1,
+        "VACUOUS": 2
+      },
+      "not_agreed": {
+        "Q01": "SINGLE_SOURCE",
+        "Q06": "DIVERGED",
+        "Q11": "VACUOUS",
+        "Q14": "DIVERGED",
+        "Q17": "DIVERGED",
+        "Q20": "DIVERGED",
+        "Q21": "VACUOUS"
+      },
+      "read_only": true
+    }
+  }
+}

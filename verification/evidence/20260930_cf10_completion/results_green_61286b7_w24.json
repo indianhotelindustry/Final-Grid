@@ -1,0 +1,398 @@
+{
+  "group": "w24",
+  "started": "2026-09-30T08:17:11",
+  "finished": "2026-09-30T08:17:12",
+  "app_root": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS",
+  "app_commit": "61286b76987a670f5bd278dad4a106e57dc2a95f",
+  "app_tree_clean": true,
+  "harness": "verification\\evidence\\20260930_cf10_completion\\verify_cf10_cf11.py",
+  "copy": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS\\verification\\_work\\cf10_w24.db",
+  "copy_method": "sqlite-backup-api",
+  "production_sha256_before": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "gates_total": 38,
+  "gates_passed": 38,
+  "verdict": "PASS",
+  "checks": [
+    {
+      "case": "W24-A-01",
+      "writer": "W-24",
+      "what": "conversion applied: rate raised, UPSELL stamped",
+      "expect": "(True, 'UPSELL')",
+      "got": "(True, 'UPSELL')",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W24-A-02",
+      "writer": "W-24",
+      "what": "room_upsell rows (CASE A posts one, CASE B none)",
+      "expect": "1",
+      "got": "1",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W24-A-03",
+      "writer": "W-24",
+      "what": "strict audit of the state transition on the reservation",
+      "expect": "1",
+      "got": "1",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W24-A-04",
+      "writer": "W-24",
+      "what": "transition audit records old/new rate and branch",
+      "expect": "(1000.0, 2880.95, True)",
+      "got": "(1000.0, 2880.95, True)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W24-A-05",
+      "writer": "W-24",
+      "what": "transition audit actor is the operator",
+      "expect": "2",
+      "got": "2",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W24-A-06",
+      "writer": "W-24",
+      "what": "strict posted audit on the room_upsell charge",
+      "expect": "1",
+      "got": "1",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W24-A-07",
+      "writer": "W-24",
+      "what": "charge audit carries amount and folio",
+      "expect": "(3761.9, 5)",
+      "got": "(3761.9, 5)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W24-A-08",
+      "writer": "W-24",
+      "what": "charge amount == pretax increment in the transition audit",
+      "expect": "3761.9",
+      "got": "3761.9",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W24-A-09",
+      "writer": "W-24",
+      "what": "admin route audit persisted (was added after the last commit)",
+      "expect": "1",
+      "got": "1",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W24-B-01",
+      "writer": "W-24",
+      "what": "conversion applied: rate raised, UPSELL stamped",
+      "expect": "(True, 'UPSELL')",
+      "got": "(True, 'UPSELL')",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W24-B-02",
+      "writer": "W-24",
+      "what": "room_upsell rows (CASE A posts one, CASE B none)",
+      "expect": "0",
+      "got": "0",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W24-B-03",
+      "writer": "W-24",
+      "what": "strict audit of the state transition on the reservation",
+      "expect": "1",
+      "got": "1",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W24-B-04",
+      "writer": "W-24",
+      "what": "transition audit records old/new rate and branch",
+      "expect": "(1000.0, 2380.95, True)",
+      "got": "(1000.0, 2380.95, True)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W24-B-05",
+      "writer": "W-24",
+      "what": "transition audit actor is the operator",
+      "expect": "2",
+      "got": "2",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W24-B-09",
+      "writer": "W-24",
+      "what": "admin route audit persisted (was added after the last commit)",
+      "expect": "1",
+      "got": "1",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W24-CO-A-01",
+      "writer": "W-24",
+      "what": "checkout: checked out, UPSELL, one transition audit (branch, actor) committed",
+      "expect": "('CheckedOut', 'UPSELL', 1, True, 2)",
+      "got": "('CheckedOut', 'UPSELL', 1, True, 2)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W24-CO-A-02",
+      "writer": "W-24",
+      "what": "checkout CASE A: room_upsell charge has its posted audit",
+      "expect": "(True, 1)",
+      "got": "(True, 1)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W24-CO-A-B",
+      "writer": "W-24",
+      "what": "checkout, F1 on the transition audit: not checked out, nothing converted",
+      "expect": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0, 'status': 'CheckedIn', 'transition_audits': 0}",
+      "got": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0, 'status': 'CheckedIn', 'transition_audits': 0}",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 200"
+    },
+    {
+      "case": "W24-CO-B-01",
+      "writer": "W-24",
+      "what": "checkout: checked out, UPSELL, one transition audit (branch, actor) committed",
+      "expect": "('CheckedOut', 'UPSELL', 1, True, 2)",
+      "got": "('CheckedOut', 'UPSELL', 1, True, 2)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W24-CO-B-B",
+      "writer": "W-24",
+      "what": "checkout, F1 on the transition audit: not checked out, nothing converted",
+      "expect": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0, 'status': 'CheckedIn', 'transition_audits': 0}",
+      "got": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0, 'status': 'CheckedIn', 'transition_audits': 0}",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 200"
+    },
+    {
+      "case": "W24-B-F1-A-any",
+      "writer": "W-24",
+      "what": "CASE A, F1 on any audit: nothing converted",
+      "expect": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "got": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W24-B-F1-A-transition",
+      "writer": "W-24",
+      "what": "CASE A, F1 on transition audit: nothing converted",
+      "expect": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "got": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W24-B-F1-A-charge",
+      "writer": "W-24",
+      "what": "CASE A, F1 on charge audit: nothing converted",
+      "expect": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "got": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W24-B-F1-A-admin",
+      "writer": "W-24",
+      "what": "CASE A, F1 on admin audit: nothing converted",
+      "expect": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "got": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W24-B-F1-B-any",
+      "writer": "W-24",
+      "what": "CASE B, F1 on any audit: nothing converted",
+      "expect": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "got": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W24-B-F1-B-transition",
+      "writer": "W-24",
+      "what": "CASE B, F1 on transition audit: nothing converted",
+      "expect": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "got": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W24-B-F1-B-admin",
+      "writer": "W-24",
+      "what": "CASE B, F1 on admin audit: nothing converted",
+      "expect": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "got": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W24-B-F2-A-any",
+      "writer": "W-24",
+      "what": "CASE A, F2 on any audit: nothing converted",
+      "expect": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "got": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W24-B-F2-A-transition",
+      "writer": "W-24",
+      "what": "CASE A, F2 on transition audit: nothing converted",
+      "expect": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "got": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W24-B-F2-A-charge",
+      "writer": "W-24",
+      "what": "CASE A, F2 on charge audit: nothing converted",
+      "expect": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "got": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W24-B-F2-A-admin",
+      "writer": "W-24",
+      "what": "CASE A, F2 on admin audit: nothing converted",
+      "expect": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "got": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W24-B-F2-B-any",
+      "writer": "W-24",
+      "what": "CASE B, F2 on any audit: nothing converted",
+      "expect": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "got": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W24-B-F2-B-transition",
+      "writer": "W-24",
+      "what": "CASE B, F2 on transition audit: nothing converted",
+      "expect": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "got": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W24-B-F2-B-admin",
+      "writer": "W-24",
+      "what": "CASE B, F2 on admin audit: nothing converted",
+      "expect": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "got": "{'rate': 1000.0, 'adj': None, 'upsell_rows': 0}",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W24-S-F1",
+      "writer": "W-24",
+      "what": "service raises under F1; caller rollback leaves nothing",
+      "expect": "(True, {'rate': 1000.0, 'adj': None, 'upsell_rows': 0})",
+      "got": "(True, {'rate': 1000.0, 'adj': None, 'upsell_rows': 0})",
+      "pass": true,
+      "severity": "gate",
+      "note": "RuntimeError"
+    },
+    {
+      "case": "W24-S-F2",
+      "writer": "W-24",
+      "what": "service raises under F2; caller rollback leaves nothing",
+      "expect": "(True, {'rate': 1000.0, 'adj': None, 'upsell_rows': 0})",
+      "got": "(True, {'rate': 1000.0, 'adj': None, 'upsell_rows': 0})",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError"
+    },
+    {
+      "case": "W24-D",
+      "writer": "W-24",
+      "what": "no overpayment: nothing converted, no transition audit",
+      "expect": "({'rate': 1000.0, 'adj': None, 'upsell_rows': 0}, 0)",
+      "got": "({'rate': 1000.0, 'adj': None, 'upsell_rows': 0}, 0)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "P-01",
+      "writer": "prod",
+      "what": "production database unchanged (sha256 == anchor)",
+      "expect": "'51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2'",
+      "got": "'51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2'",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    }
+  ]
+}

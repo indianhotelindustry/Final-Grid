@@ -1,0 +1,228 @@
+{
+  "group": "na",
+  "started": "2026-09-30T08:17:29",
+  "finished": "2026-09-30T08:17:29",
+  "app_root": "C:\\wtd9f",
+  "app_commit": "d9fa55f39f792c4c31d4ba8413921916775f203a",
+  "app_tree_clean": true,
+  "harness": "verification\\evidence\\20260930_cf10_completion\\verify_cf10_cf11.py",
+  "copy": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS\\verification\\_work\\cf10_na.db",
+  "copy_method": "sqlite-backup-api",
+  "production_sha256_before": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "gates_total": 21,
+  "gates_passed": 5,
+  "verdict": "FAIL",
+  "checks": [
+    {
+      "case": "W21-B-F1-any",
+      "writer": "W-21",
+      "what": "route, F1 on any audit: no log, no charge, date unchanged",
+      "expect": "{'logs': 0, 'rent': 0, 'bd': datetime.date(2026, 8, 10)}",
+      "got": "{'logs': 1, 'rent': 2, 'bd': datetime.date(2026, 8, 11)}",
+      "pass": false,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W21-B-F1-charge",
+      "writer": "W-21",
+      "what": "route, F1 on charge audit: no log, no charge, date unchanged",
+      "expect": "{'logs': 0, 'rent': 0, 'bd': datetime.date(2026, 8, 10)}",
+      "got": "{'logs': 1, 'rent': 2, 'bd': datetime.date(2026, 8, 12)}",
+      "pass": false,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W21-S-F1",
+      "writer": "W-21",
+      "what": "scheduler-style call, F1: raises, nothing persisted",
+      "expect": "(True, {'logs': 0, 'rent': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "got": "(False, {'logs': 1, 'rent': 2, 'bd': datetime.date(2026, 8, 12)})",
+      "pass": false,
+      "severity": "gate",
+      "note": "None"
+    },
+    {
+      "case": "W21-B-F2-any",
+      "writer": "W-21",
+      "what": "route, F2 on any audit: no log, no charge, date unchanged",
+      "expect": "{'logs': 0, 'rent': 0, 'bd': datetime.date(2026, 8, 10)}",
+      "got": "{'logs': 1, 'rent': 2, 'bd': datetime.date(2026, 8, 12)}",
+      "pass": false,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W21-B-F2-charge",
+      "writer": "W-21",
+      "what": "route, F2 on charge audit: no log, no charge, date unchanged",
+      "expect": "{'logs': 0, 'rent': 0, 'bd': datetime.date(2026, 8, 10)}",
+      "got": "{'logs': 1, 'rent': 2, 'bd': datetime.date(2026, 8, 12)}",
+      "pass": false,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W21-S-F2",
+      "writer": "W-21",
+      "what": "scheduler-style call, F2: raises, nothing persisted",
+      "expect": "(True, {'logs': 0, 'rent': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "got": "(False, {'logs': 1, 'rent': 2, 'bd': datetime.date(2026, 8, 12)})",
+      "pass": false,
+      "severity": "gate",
+      "note": "None"
+    },
+    {
+      "case": "W21-01",
+      "writer": "W-21",
+      "what": "one log, a room_rent charge per in-house guest",
+      "expect": "(1, 2)",
+      "got": "(1, 2)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W21-02",
+      "writer": "W-21",
+      "what": "run_by_user_id is the operator",
+      "expect": "2",
+      "got": "None",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W21-03.0",
+      "writer": "W-21",
+      "what": "charge 0: one strict audit naming amount, folio, log, actor",
+      "expect": "(1, 1000.0, 5, 'room_rent', 2, 'night_audit', 2)",
+      "got": "(0, None, None, None, None, None, None)",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W21-03.1",
+      "writer": "W-21",
+      "what": "charge 1: one strict audit naming amount, folio, log, actor",
+      "expect": "(1, 1100.0, 6, 'room_rent', 2, 'night_audit', 2)",
+      "got": "(0, None, None, None, None, None, None)",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W21-04",
+      "writer": "W-21",
+      "what": "every room_rent charge for the date has exactly one posted audit",
+      "expect": "[1, 1]",
+      "got": "[0, 0]",
+      "pass": false,
+      "severity": "gate",
+      "note": "2 charges"
+    },
+    {
+      "case": "W21-C",
+      "writer": "W-21",
+      "what": "second run: nothing re-posted for the audited date",
+      "expect": "(1, 2)",
+      "got": "(1, 2)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302; business date now 2026-08-12"
+    },
+    {
+      "case": "W21-C2",
+      "writer": "W-21",
+      "what": "next-day run: every room_rent charge has one posted audit",
+      "expect": "[1, 1]",
+      "got": "[0, 0]",
+      "pass": false,
+      "severity": "gate",
+      "note": "2026-08-12: 2 charges"
+    },
+    {
+      "case": "W16-B-F1-any",
+      "writer": "W-16",
+      "what": "F1 on any audit: still Skipped, no charge, no reopen row",
+      "expect": "{'status': 'Skipped', 'rent': 0, 'reopen': 0}",
+      "got": "{'status': 'Completed', 'rent': 1, 'reopen': 1}",
+      "pass": false,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W16-B-F1-charge",
+      "writer": "W-16",
+      "what": "F1 on charge audit: still Skipped, no charge, no reopen row",
+      "expect": "{'status': 'Skipped', 'rent': 0, 'reopen': 0}",
+      "got": "{'status': 'Completed', 'rent': 1, 'reopen': 1}",
+      "pass": false,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W16-B-F2-any",
+      "writer": "W-16",
+      "what": "F2 on any audit: still Skipped, no charge, no reopen row",
+      "expect": "{'status': 'Skipped', 'rent': 0, 'reopen': 0}",
+      "got": "{'status': 'Completed', 'rent': 1, 'reopen': 1}",
+      "pass": false,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W16-B-F2-charge",
+      "writer": "W-16",
+      "what": "F2 on charge audit: still Skipped, no charge, no reopen row",
+      "expect": "{'status': 'Skipped', 'rent': 0, 'reopen': 0}",
+      "got": "{'status': 'Completed', 'rent': 1, 'reopen': 1}",
+      "pass": false,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W16-01",
+      "writer": "W-16",
+      "what": "rerun: Completed/Warning, charge posted, reopen row",
+      "expect": "(True, 1, 1)",
+      "got": "(True, 1, 1)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W16-02",
+      "writer": "W-16",
+      "what": "one strict audit naming amount, folio, log, flow, actor",
+      "expect": "(1, 1500.0, 7, 5, 'night_audit_rerun', 2)",
+      "got": "(0, None, None, None, None, None)",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W16-C",
+      "writer": "W-16",
+      "what": "repeat: refused (not Skipped), no duplicate",
+      "expect": "{'status': 'Completed', 'rent': 1, 'reopen': 1}",
+      "got": "{'status': 'Completed', 'rent': 1, 'reopen': 1}",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "P-01",
+      "writer": "prod",
+      "what": "production database unchanged (sha256 == anchor)",
+      "expect": "'51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2'",
+      "got": "'51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2'",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    }
+  ]
+}

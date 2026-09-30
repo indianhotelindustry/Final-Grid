@@ -1,0 +1,154 @@
+{
+  "group": "w10",
+  "started": "2026-09-29T23:21:16",
+  "finished": "2026-09-29T23:21:17",
+  "copy": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS\\verification\\_work\\cf10_w10.db",
+  "copy_method": "sqlite-backup-api",
+  "production_sha256_before": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "gates_total": 14,
+  "gates_passed": 9,
+  "verdict": "FAIL",
+  "checks": [
+    {
+      "case": "W10-01",
+      "writer": "W-10",
+      "what": "refund Payment posted",
+      "expect": "1",
+      "got": "1",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W10-02",
+      "writer": "W-10",
+      "what": "reservation cancelled",
+      "expect": "'Cancelled'",
+      "got": "'Cancelled'",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W10-03",
+      "writer": "W-10",
+      "what": "refund on billing folio A",
+      "expect": "5",
+      "got": "5",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W10-04",
+      "writer": "W-10",
+      "what": "strict audit cancellation_refund on the refund",
+      "expect": "1",
+      "got": "1",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W10-05",
+      "writer": "W-10",
+      "what": "audit carries refund amount",
+      "expect": "300.0",
+      "got": "300.0",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W10-06",
+      "writer": "W-10",
+      "what": "audit actor is the operator",
+      "expect": "2",
+      "got": "2",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W10-07",
+      "writer": "W-10",
+      "what": "reservation 'cancelled' audit persisted without a notification commit",
+      "expect": "1",
+      "got": "0",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W10-08",
+      "writer": "W-10",
+      "what": "'cancelled' audit carries the refund amount",
+      "expect": "300.0",
+      "got": "None",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W10-09",
+      "writer": "W-10",
+      "what": "forfeit: cancelled, forfeit audit persisted",
+      "expect": "('Cancelled', 1, 300.0)",
+      "got": "('Cancelled', 0, None)",
+      "pass": false,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W10-B-F1-refund_full",
+      "writer": "W-10",
+      "what": "refund_full under F1: not cancelled, no refund, no forfeit",
+      "expect": "('Confirmed', [{'id': 10, 'folio_id': 7, 'amount': 300.0, 'purpose': 'advance', 'charge_type': None, 'is_reversal': False, 'is_voided': False}], 0.0)",
+      "got": "('Cancelled', [{'id': 10, 'folio_id': 7, 'amount': 300.0, 'purpose': 'advance', 'charge_type': None, 'is_reversal': False, 'is_voided': False}, {'id': 11, 'folio_id': 7, 'amount': 300.0, 'purpose': 'refund', 'charge_type': None, 'is_reversal': True, 'is_voided': False}], 0.0)",
+      "pass": false,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W10-B-F1-forfeit",
+      "writer": "W-10",
+      "what": "forfeit under F1: not cancelled, no refund, no forfeit",
+      "expect": "('Confirmed', [{'id': 12, 'folio_id': 8, 'amount': 300.0, 'purpose': 'advance', 'charge_type': None, 'is_reversal': False, 'is_voided': False}], 0.0)",
+      "got": "('Cancelled', [{'id': 12, 'folio_id': 8, 'amount': 300.0, 'purpose': 'advance', 'charge_type': None, 'is_reversal': False, 'is_voided': False}], 300.0)",
+      "pass": false,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W10-B-F2-refund_full",
+      "writer": "W-10",
+      "what": "refund_full under F2: not cancelled, no refund, no forfeit",
+      "expect": "('Confirmed', [{'id': 13, 'folio_id': 9, 'amount': 300.0, 'purpose': 'advance', 'charge_type': None, 'is_reversal': False, 'is_voided': False}], 0.0)",
+      "got": "('Confirmed', [{'id': 13, 'folio_id': 9, 'amount': 300.0, 'purpose': 'advance', 'charge_type': None, 'is_reversal': False, 'is_voided': False}], 0.0)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "W10-B-F2-forfeit",
+      "writer": "W-10",
+      "what": "forfeit under F2: not cancelled, no refund, no forfeit",
+      "expect": "('Confirmed', [{'id': 14, 'folio_id': 10, 'amount': 300.0, 'purpose': 'advance', 'charge_type': None, 'is_reversal': False, 'is_voided': False}], 0.0)",
+      "got": "('Confirmed', [{'id': 14, 'folio_id': 10, 'amount': 300.0, 'purpose': 'advance', 'charge_type': None, 'is_reversal': False, 'is_voided': False}], 0.0)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "P-01",
+      "writer": "prod",
+      "what": "production database unchanged (sha256 == anchor)",
+      "expect": "'51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2'",
+      "got": "'51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2'",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    }
+  ]
+}

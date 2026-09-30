@@ -1,0 +1,42 @@
+====================================================================================================
+FINALGRID — HISTORICAL REPLAY VERIFICATION
+Production Verification Framework, Wave 0 Deliverable 3
+====================================================================================================
+Stored replay     : production
+Stored captured   : 2026-08-31T04:35:44 (app v2.2.18)
+Current run       : 2026-09-30T02:41:58 (app v2.2.18)
+Business date     : 2026-08-10 -> 2026-08-10
+Read-only         : VERIFIED
+
+Dates compared    : 10
+Dates clean       : 8
+Differences       : 2
+Blocking          : 1
+
+VERDICT           : FAIL
+
+----------------------------------------------------------------------------------------------------
+DIFFERENCES BY KIND
+----------------------------------------------------------------------------------------------------
+  ENGINE_CHANGED                   2
+
+====================================================================================================
+DIFFERENCES
+====================================================================================================
+Severity follows the state of the day: a closed day may not move
+at all, an open past day may move but is reported, and the
+current business date is expected to move.
+
+2026-08-09   [CLOSED]
+    [BLOCK] ENGINE_CHANGED             nas.tax_snapshot.total_taxable
+            stored : 2285.7
+            current: 1142.85   (delta -1142.85)
+
+2026-08-10   [BUSINESS_DATE]
+    [INFO ] ENGINE_CHANGED             nas.tax_snapshot.total_taxable
+            stored : 5904.76
+            current: 2952.38   (delta -2952.38)
+
+====================================================================================================
+END OF REPORT
+====================================================================================================
