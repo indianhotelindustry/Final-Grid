@@ -1,0 +1,395 @@
+{
+  "task": "ADR-011 current-model characterisation",
+  "app_commit": "3efdd2b53337cc78208b7b2e5658367a66d8d7bf",
+  "app_tree_clean": true,
+  "finished": "2026-09-30T08:45:38",
+  "copy": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS\\verification\\_work\\cf10_adr011.db",
+  "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "gates_total": 23,
+  "gates_passed": 23,
+  "verdict": "PASS",
+  "findings": [
+    {
+      "case": "S1-ACTOR",
+      "writer": "W-21/W-14 sched",
+      "what": "system audit rows name an existing user",
+      "expect": "True",
+      "got": "False",
+      "pass": false,
+      "severity": "finding",
+      "note": "actors=[0]; NightAuditLog.run_by_user_id=None; NoShowLog.posted_by_user_id=None"
+    },
+    {
+      "case": "S1-PROV-human",
+      "writer": "provenance",
+      "what": "answerable from the row: human or system (explicit)",
+      "expect": "True",
+      "got": "False",
+      "pass": false,
+      "severity": "finding",
+      "note": "actor=0 flow=night_audit"
+    },
+    {
+      "case": "S1-PROV-execution",
+      "writer": "provenance",
+      "what": "answerable from the row: execution path (scheduler vs manual)",
+      "expect": "True",
+      "got": "False",
+      "pass": false,
+      "severity": "finding",
+      "note": "actor=0 flow=night_audit"
+    },
+    {
+      "case": "S2-ACTOR",
+      "writer": "W-14 auto",
+      "what": "system audit row names an existing user",
+      "expect": "True",
+      "got": "False",
+      "pass": false,
+      "severity": "finding",
+      "note": "actor=0"
+    },
+    {
+      "case": "S3-ACTOR",
+      "writer": "webhook",
+      "what": "webhook audit row names an existing user",
+      "expect": "True",
+      "got": "False",
+      "pass": false,
+      "severity": "finding",
+      "note": "actor=0"
+    },
+    {
+      "case": "S3-RED-F1",
+      "writer": "webhook",
+      "what": "F1 on the audit: rate change not committed unaudited",
+      "expect": "True",
+      "got": "False",
+      "pass": false,
+      "severity": "finding",
+      "note": "state=(1500.0, 0) HTTP 200 (swallowing _write_audit)"
+    },
+    {
+      "case": "S3-FK-completes",
+      "writer": "webhook",
+      "what": "FK on: OTA modification can complete",
+      "expect": "(1500.0, 1)",
+      "got": "(1000.0, 0)",
+      "pass": false,
+      "severity": "finding",
+      "note": "HTTP 500"
+    }
+  ],
+  "checks": [
+    {
+      "case": "C-00",
+      "writer": "contract",
+      "what": "copy: no user id 0; FK check clean",
+      "expect": "(False, 0)",
+      "got": "(False, 0)",
+      "pass": true,
+      "severity": "gate",
+      "note": "users=[(1, 'Admin', True), (2, 'Admin', True)]"
+    },
+    {
+      "case": "S1-RED-F1-room_rent",
+      "writer": "W-21/W-14 sched",
+      "what": "F1 on room_rent audit: run rolled back (no log, rent, fee; date unchanged)",
+      "expect": "{'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)}",
+      "got": "{'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)}",
+      "pass": true,
+      "severity": "gate",
+      "note": "RuntimeError: injected F1: audit row could not be constructed"
+    },
+    {
+      "case": "S1-RED-F1-noshow_posted",
+      "writer": "W-21/W-14 sched",
+      "what": "F1 on noshow_posted audit: run rolled back (no log, rent, fee; date unchanged)",
+      "expect": "{'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)}",
+      "got": "{'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)}",
+      "pass": true,
+      "severity": "gate",
+      "note": "RuntimeError: injected F1: audit row could not be constructed"
+    },
+    {
+      "case": "S1-RED-F2-room_rent",
+      "writer": "W-21/W-14 sched",
+      "what": "F2 on room_rent audit: run rolled back (no log, rent, fee; date unchanged)",
+      "expect": "{'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)}",
+      "got": "{'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)}",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError: audit row for ExtraCharge 3 (posted) could not be written: RuntimeError: injected F2: audit insert f"
+    },
+    {
+      "case": "S1-RED-F2-noshow_posted",
+      "writer": "W-21/W-14 sched",
+      "what": "F2 on noshow_posted audit: run rolled back (no log, rent, fee; date unchanged)",
+      "expect": "{'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)}",
+      "got": "{'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)}",
+      "pass": true,
+      "severity": "gate",
+      "note": "RuntimeError: injected F2: audit insert failed"
+    },
+    {
+      "case": "S1-FKRED",
+      "writer": "W-21/W-14 sched",
+      "what": "FK on: actor 0 rejected, run rolled back atomically",
+      "expect": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "got": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError: audit row for ExtraCharge 3 (posted) could not be written: IntegrityError: (sqlite3.IntegrityError) "
+    },
+    {
+      "case": "S1-GREEN",
+      "writer": "W-21/W-14 sched",
+      "what": "FK off: run commits (log, rent, no-show fee)",
+      "expect": "(None, 1, True, True)",
+      "got": "(None, 1, True, True)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S1-GREEN-audit",
+      "writer": "W-21/W-14 sched",
+      "what": "every system financial row has exactly one audit row",
+      "expect": "[1, 1, 1]",
+      "got": "[1, 1, 1]",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S1-ACTOR",
+      "writer": "W-21/W-14 sched",
+      "what": "system audit rows name an existing user",
+      "expect": "True",
+      "got": "False",
+      "pass": false,
+      "severity": "finding",
+      "note": "actors=[0]; NightAuditLog.run_by_user_id=None; NoShowLog.posted_by_user_id=None"
+    },
+    {
+      "case": "S1-PROV-what",
+      "writer": "provenance",
+      "what": "answerable from the row: what (action)",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": "actor=0 flow=night_audit"
+    },
+    {
+      "case": "S1-PROV-when",
+      "writer": "provenance",
+      "what": "answerable from the row: when (technical timestamp)",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": "actor=0 flow=night_audit"
+    },
+    {
+      "case": "S1-PROV-which",
+      "writer": "provenance",
+      "what": "answerable from the row: which entity",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": "actor=0 flow=night_audit"
+    },
+    {
+      "case": "S1-PROV-which",
+      "writer": "provenance",
+      "what": "answerable from the row: which amount",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": "actor=0 flow=night_audit"
+    },
+    {
+      "case": "S1-PROV-why",
+      "writer": "provenance",
+      "what": "answerable from the row: why (flow / run)",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": "actor=0 flow=night_audit"
+    },
+    {
+      "case": "S1-PROV-business",
+      "writer": "provenance",
+      "what": "answerable from the row: business date",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": "actor=0 flow=night_audit"
+    },
+    {
+      "case": "S1-PROV-human",
+      "writer": "provenance",
+      "what": "answerable from the row: human or system (explicit)",
+      "expect": "True",
+      "got": "False",
+      "pass": false,
+      "severity": "finding",
+      "note": "actor=0 flow=night_audit"
+    },
+    {
+      "case": "S1-PROV-execution",
+      "writer": "provenance",
+      "what": "answerable from the row: execution path (scheduler vs manual)",
+      "expect": "True",
+      "got": "False",
+      "pass": false,
+      "severity": "finding",
+      "note": "actor=0 flow=night_audit"
+    },
+    {
+      "case": "S1-HUMAN-noFK",
+      "writer": "W-21/W-14 manual",
+      "what": "operator run commits; every audit row names the operator; run_by recorded",
+      "expect": "(1, [2], 2)",
+      "got": "(1, [2], 2)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "S1-HUMAN-FK",
+      "writer": "W-21/W-14 manual",
+      "what": "operator run commits; every audit row names the operator; run_by recorded",
+      "expect": "(1, [2], 2)",
+      "got": "(1, [2], 2)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "S2-RED-F1",
+      "writer": "W-14 auto",
+      "what": "F1 on any audit: not a no-show, no fee, no log",
+      "expect": "('Reserved', 0, 0)",
+      "got": "('Reserved', 0, 0)",
+      "pass": true,
+      "severity": "gate",
+      "note": "RuntimeError: injected F1: audit row could not be constructed"
+    },
+    {
+      "case": "S2-RED-F2",
+      "writer": "W-14 auto",
+      "what": "F2 on any audit: not a no-show, no fee, no log",
+      "expect": "('Reserved', 0, 0)",
+      "got": "('Reserved', 0, 0)",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError: audit row for ExtraCharge 12 (posted) could not be written: RuntimeError: injected F2: aud"
+    },
+    {
+      "case": "S2-FKRED",
+      "writer": "W-14 auto",
+      "what": "FK on: actor 0 rejected, nothing persisted",
+      "expect": "(True, ('Reserved', 0, 0))",
+      "got": "(True, ('Reserved', 0, 0))",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError: audit row for ExtraCharge 12 (posted) could not be written: IntegrityError: (sqlite3.Integ"
+    },
+    {
+      "case": "S2-GREEN",
+      "writer": "W-14 auto",
+      "what": "FK off: no-show, fee and log commit with audit",
+      "expect": "(None, ('NoShow', 1, 1), 1)",
+      "got": "(None, ('NoShow', 1, 1), 1)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S2-ACTOR",
+      "writer": "W-14 auto",
+      "what": "system audit row names an existing user",
+      "expect": "True",
+      "got": "False",
+      "pass": false,
+      "severity": "finding",
+      "note": "actor=0"
+    },
+    {
+      "case": "S3-GREEN",
+      "writer": "webhook",
+      "what": "FK off: rate changed and audited",
+      "expect": "(1500.0, 1)",
+      "got": "(1500.0, 1)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 200"
+    },
+    {
+      "case": "S3-ACTOR",
+      "writer": "webhook",
+      "what": "webhook audit row names an existing user",
+      "expect": "True",
+      "got": "False",
+      "pass": false,
+      "severity": "finding",
+      "note": "actor=0"
+    },
+    {
+      "case": "S3-RED-F1",
+      "writer": "webhook",
+      "what": "F1 on the audit: rate change not committed unaudited",
+      "expect": "True",
+      "got": "False",
+      "pass": false,
+      "severity": "finding",
+      "note": "state=(1500.0, 0) HTTP 200 (swallowing _write_audit)"
+    },
+    {
+      "case": "S3-RED-F2",
+      "writer": "webhook",
+      "what": "F2 on the audit: rate change not committed unaudited",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "finding",
+      "note": "state=(1000.0, 0) HTTP 500 (swallowing _write_audit)"
+    },
+    {
+      "case": "S3-FKRED",
+      "writer": "webhook",
+      "what": "FK on: all-or-nothing (no unaudited rate change)",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": "state=(1000.0, 0) HTTP 500"
+    },
+    {
+      "case": "S3-FK-completes",
+      "writer": "webhook",
+      "what": "FK on: OTA modification can complete",
+      "expect": "(1500.0, 1)",
+      "got": "(1000.0, 0)",
+      "pass": false,
+      "severity": "finding",
+      "note": "HTTP 500"
+    },
+    {
+      "case": "P-01",
+      "writer": "prod",
+      "what": "production database unchanged (sha256 == anchor)",
+      "expect": "'51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2'",
+      "got": "'51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2'",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    }
+  ]
+}

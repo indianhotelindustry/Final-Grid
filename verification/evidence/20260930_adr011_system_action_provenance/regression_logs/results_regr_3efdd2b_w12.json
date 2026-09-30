@@ -1,0 +1,178 @@
+{
+  "group": "w12",
+  "started": "2026-09-30T08:46:24",
+  "finished": "2026-09-30T08:46:25",
+  "app_root": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS",
+  "app_commit": "3efdd2b53337cc78208b7b2e5658367a66d8d7bf",
+  "app_tree_clean": true,
+  "harness": "verification\\evidence\\20260930_cf10_completion\\verify_cf10_cf11.py",
+  "copy": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS\\verification\\_work\\cf10_w12.db",
+  "copy_method": "sqlite-backup-api",
+  "production_sha256_before": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "gates_total": 16,
+  "gates_passed": 16,
+  "verdict": "PASS",
+  "checks": [
+    {
+      "case": "W12-01",
+      "writer": "W-12",
+      "what": "check-in completes",
+      "expect": "(None, 'CheckedIn', 'Occupied')",
+      "got": "(None, 'CheckedIn', 'Occupied')",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W12-02",
+      "writer": "W-12",
+      "what": "one deposit Payment of 500 on folio A",
+      "expect": "[(500.0, 5)]",
+      "got": "[(500.0, 5)]",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W12-03",
+      "writer": "W-12",
+      "what": "strict audit row on the deposit Payment",
+      "expect": "1",
+      "got": "1",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W12-04",
+      "writer": "W-12",
+      "what": "deposit audit carries amount, folio, flow",
+      "expect": "(500.0, 5, 'checkin_deposit')",
+      "got": "(500.0, 5, 'checkin_deposit')",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W12-05",
+      "writer": "W-12",
+      "what": "deposit audit actor is the operator",
+      "expect": "2",
+      "got": "2",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W12-06",
+      "writer": "W-12",
+      "what": "checkin_full audit on the reservation",
+      "expect": "(1, 500.0)",
+      "got": "(1, 500.0)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W12-07",
+      "writer": "W-12",
+      "what": "no-deposit check-in completes, no payment, audited",
+      "expect": "(None, 'CheckedIn', 0, 1)",
+      "got": "(None, 'CheckedIn', 0, 1)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W12-B-F1-any",
+      "writer": "W-12",
+      "what": "deposit check-in, F1 fails on any audit: refused, nothing persisted",
+      "expect": "(True, {'status': 'Reserved', 'room_status': 'Vacant', 'payments': 0, 'checkin_records': 0})",
+      "got": "(True, {'status': 'Reserved', 'room_status': 'Vacant', 'payments': 0, 'checkin_records': 0})",
+      "pass": true,
+      "severity": "gate",
+      "note": "CheckInException: Full check-in failed: injected F1: audit row could not be constructed"
+    },
+    {
+      "case": "W12-B-F1-deposit",
+      "writer": "W-12",
+      "what": "deposit check-in, F1 fails on deposit audit: refused, nothing persisted",
+      "expect": "(True, {'status': 'Reserved', 'room_status': 'Vacant', 'payments': 0, 'checkin_records': 0})",
+      "got": "(True, {'status': 'Reserved', 'room_status': 'Vacant', 'payments': 0, 'checkin_records': 0})",
+      "pass": true,
+      "severity": "gate",
+      "note": "CheckInException: Full check-in failed: injected F1: audit row could not be constructed"
+    },
+    {
+      "case": "W12-B-F1-checkin_full",
+      "writer": "W-12",
+      "what": "deposit check-in, F1 fails on checkin_full audit: refused, nothing persisted",
+      "expect": "(True, {'status': 'Reserved', 'room_status': 'Vacant', 'payments': 0, 'checkin_records': 0})",
+      "got": "(True, {'status': 'Reserved', 'room_status': 'Vacant', 'payments': 0, 'checkin_records': 0})",
+      "pass": true,
+      "severity": "gate",
+      "note": "CheckInException: Full check-in failed: injected F1: audit row could not be constructed"
+    },
+    {
+      "case": "W12-B-F2-any",
+      "writer": "W-12",
+      "what": "deposit check-in, F2 fails on any audit: refused, nothing persisted",
+      "expect": "(True, {'status': 'Reserved', 'room_status': 'Vacant', 'payments': 0, 'checkin_records': 0})",
+      "got": "(True, {'status': 'Reserved', 'room_status': 'Vacant', 'payments': 0, 'checkin_records': 0})",
+      "pass": true,
+      "severity": "gate",
+      "note": "CheckInException: Full check-in failed: injected F2: audit insert failed"
+    },
+    {
+      "case": "W12-B-F2-deposit",
+      "writer": "W-12",
+      "what": "deposit check-in, F2 fails on deposit audit: refused, nothing persisted",
+      "expect": "(True, {'status': 'Reserved', 'room_status': 'Vacant', 'payments': 0, 'checkin_records': 0})",
+      "got": "(True, {'status': 'Reserved', 'room_status': 'Vacant', 'payments': 0, 'checkin_records': 0})",
+      "pass": true,
+      "severity": "gate",
+      "note": "CheckInException: Full check-in failed: audit row for Payment 8 (posted) could not be written: RuntimeError:"
+    },
+    {
+      "case": "W12-B-F2-checkin_full",
+      "writer": "W-12",
+      "what": "deposit check-in, F2 fails on checkin_full audit: refused, nothing persisted",
+      "expect": "(True, {'status': 'Reserved', 'room_status': 'Vacant', 'payments': 0, 'checkin_records': 0})",
+      "got": "(True, {'status': 'Reserved', 'room_status': 'Vacant', 'payments': 0, 'checkin_records': 0})",
+      "pass": true,
+      "severity": "gate",
+      "note": "CheckInException: Full check-in failed: injected F2: audit insert failed"
+    },
+    {
+      "case": "W12-D-negative",
+      "writer": "W-12",
+      "what": "negative deposit refused, nothing persisted",
+      "expect": "(True, {'status': 'Reserved', 'room_status': 'Vacant', 'payments': 0, 'checkin_records': 0})",
+      "got": "(True, {'status': 'Reserved', 'room_status': 'Vacant', 'payments': 0, 'checkin_records': 0})",
+      "pass": true,
+      "severity": "gate",
+      "note": "CheckInException: Deposit amount cannot be negative."
+    },
+    {
+      "case": "W12-D-inactive/unknown",
+      "writer": "W-12",
+      "what": "inactive/unknown mode refused, nothing persisted",
+      "expect": "(True, {'status': 'Reserved', 'room_status': 'Vacant', 'payments': 0, 'checkin_records': 0})",
+      "got": "(True, {'status': 'Reserved', 'room_status': 'Vacant', 'payments': 0, 'checkin_records': 0})",
+      "pass": true,
+      "severity": "gate",
+      "note": "CheckInException: Invalid or inactive deposit payment mode selected."
+    },
+    {
+      "case": "P-01",
+      "writer": "prod",
+      "what": "production database unchanged (sha256 == anchor)",
+      "expect": "'51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2'",
+      "got": "'51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2'",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    }
+  ]
+}
