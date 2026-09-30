@@ -188,23 +188,15 @@ def inherit_billing_folio_id(original, *, what='row'):
     return fid
 
 
-def resolve_audit_actor(user_id=None):
-    """The ``staff_user_id`` for an audit row: *user_id*, else the logged-in
-    operator, else 0.
+def resolve_audit_actor(user_id=None, mechanism=None):
+    """The actor of an audit row (ADR011-SA): an :class:`app.audit_actor.AuditActor`.
 
-    0 is the existing system / unauthenticated convention (``_write_audit``).
-    No user 0 exists, so an FK-enforcing engine rejects it; AR-013 / ADR-011
-    will replace it with a controlled system identity.
+    *user_id*, else the logged-in operator (HUMAN), else the system mechanism
+    declared with ``app.audit_actor.system_action`` (SYSTEM, no user). Raises
+    ``AuditActorError`` when none applies; the retired ``0`` is never returned.
     """
-    if user_id is not None:
-        return user_id
-    try:
-        from flask_login import current_user
-        if current_user and current_user.is_authenticated:
-            return current_user.id
-    except Exception:
-        pass
-    return 0
+    from app.audit_actor import resolve
+    return resolve(user_id, mechanism)
 
 
 def audited_financial_write(entity_type, entity_id, action,
@@ -230,7 +222,12 @@ def audited_financial_write(entity_type, entity_id, action,
         raise AuditCouplingError(
             f'{action}: entity_id is required to audit a financial mutation')
 
-    actor = resolve_audit_actor(user_id)
+    try:
+        actor = resolve_audit_actor(user_id)
+    except Exception as exc:
+        raise AuditCouplingError(
+            f'audit row for {entity_type} {entity_id} ({action}) has no '
+            f'actor: {exc}') from exc
 
     ip = ip_address
     if ip is None:
@@ -246,7 +243,9 @@ def audited_financial_write(entity_type, entity_id, action,
                    action=action,
                    before_state=before_state,
                    after_state=after_state,
-                   staff_user_id=actor,
+                   staff_user_id=actor.staff_user_id,
+                   actor_kind=actor.actor_kind,
+                   actor_mechanism=actor.actor_mechanism,
                    ip_address=ip)
     try:
         _db.session.add(log)
@@ -268,8 +267,10 @@ def run_night_audit(app=None, user_id=None):
 
     ``user_id`` is the operator who initiated a manual run; it is recorded as
     ``run_by_user_id`` and as the actor of each room-rent charge's audit row.
-    A scheduler run passes none, and the actor falls back to the system
-    convention of ``audited_financial_write`` (AR-013, open).
+    A scheduler run passes none and runs inside ``scheduled_night_audit``'s
+    ``system_action('scheduler:night_audit_job')``, so its audit rows are
+    SYSTEM rows (ADR011-SA). With neither an operator nor a declared system
+    mechanism, the first audit row raises and the whole run rolls back.
 
     Guarantees:
     - **Idempotent**: Will not create a second NightAuditLog row for the same
@@ -531,6 +532,17 @@ def run_night_audit(app=None, user_id=None):
             raise
 
 
+def scheduled_night_audit(app=None):
+    """The ``night_audit_job`` entry point: an unattended SYSTEM run (ADR011-SA).
+
+    Registering it changes nothing about whether it runs: the job exists only
+    while ``night_audit_enabled`` is true (FD-P2-05 keeps it false).
+    """
+    from app.audit_actor import system_action
+    with system_action('scheduler:night_audit_job'):
+        return run_night_audit(app)
+
+
 def setup_night_audit_scheduler(app):
     """Configure the night audit cron job. Always starts the scheduler."""
     global _night_audit_app
@@ -548,7 +560,7 @@ def setup_night_audit_scheduler(app):
             hour, minute = 2, 0
 
         scheduler.add_job(
-            func=run_night_audit,
+            func=scheduled_night_audit,
             trigger='cron',
             hour=hour,
             minute=minute,
@@ -590,7 +602,7 @@ def reschedule_night_audit(app=None):
             hour, minute = 2, 0
 
         scheduler.add_job(
-            func=run_night_audit,
+            func=scheduled_night_audit,
             trigger='cron',
             hour=hour,
             minute=minute,

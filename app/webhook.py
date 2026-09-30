@@ -354,7 +354,11 @@ def _write_audit(entity_type, entity_id, action, before_state, after_state):
             action=action,
             before_state=before_state,
             after_state=after_state,
-            staff_user_id=0,  # webhook / system action
+            # ADR011-SA: an inbound channel-manager call is a SYSTEM action;
+            # it references no user (it used the fabricated users.id = 0).
+            staff_user_id=None,
+            actor_kind='SYSTEM',
+            actor_mechanism='webhook',
             ip_address=request.remote_addr if request else None,
         )
         db.session.add(log_entry)

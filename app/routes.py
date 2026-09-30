@@ -314,7 +314,9 @@ def _write_audit(entity_type, entity_id, action, before_state, after_state):
     import logging as _logging
     _audit_log = _logging.getLogger(__name__)
     try:
-        user_id = current_user.id if current_user and current_user.is_authenticated else 0
+        # No user -> the AuditLog insert listener resolves a SYSTEM actor or
+        # refuses the row (ADR011-SA); users.id = 0 is never written.
+        user_id = current_user.id if current_user and current_user.is_authenticated else None
         log = AuditLog(
             entity_type=entity_type,
             entity_id=entity_id,

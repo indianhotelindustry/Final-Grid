@@ -55,11 +55,13 @@ _ACTION_REMOVED  = 'GROUP_ROOM_LINK_REMOVED'
 _ACTION_PRIMARY  = 'GROUP_ROOM_LINK_PRIMARY_CHANGED'
 
 
-def _resolve_actor(user_id: Optional[int]) -> int:
+def _resolve_actor(user_id: Optional[int]) -> Optional[int]:
     """Resolve the actor user id for audit purposes.
 
-    Falls back to ``current_user.id`` from Flask-Login if available, else 0.
-    R2A backfill paths (no operator context) pass 0 explicitly.
+    Falls back to ``current_user.id`` from Flask-Login if available, else
+    None: the AuditLog insert listener then records a SYSTEM actor from a
+    declared ``audit_actor.system_action`` or refuses the row (ADR011-SA).
+    ``users.id = 0`` is never written.
     """
     if user_id is not None:
         return user_id
@@ -69,7 +71,7 @@ def _resolve_actor(user_id: Optional[int]) -> int:
             return int(current_user.id)
     except Exception:
         pass
-    return 0
+    return None
 
 
 def _resolve_ip(ip_address: Optional[str]) -> Optional[str]:

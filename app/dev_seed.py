@@ -549,7 +549,10 @@ def reset() -> dict:
     db.session.add(AuditLog(
         entity_type='DevSeed', entity_id=0, action='reset',
         before_state={}, after_state=removed,
-        staff_user_id=admin.id if admin else 0,
+        # ADR011-SA: no admin -> a SYSTEM row, never users.id = 0.
+        staff_user_id=admin.id if admin else None,
+        actor_kind='HUMAN' if admin else 'SYSTEM',
+        actor_mechanism=None if admin else 'dev_seed',
     ))
     db.session.commit()
     return {'reset': True, 'removed': removed}

@@ -407,6 +407,8 @@ def post_charge(reservation, charge_type, amount, slab_label,
                 'extra_charge_id': ec.id,
             },
             staff_user_id=_audit.staff_user_id,
+            actor_kind=_audit.actor_kind,
+            actor_mechanism=_audit.actor_mechanism,
         ))
         db.session.flush()
 

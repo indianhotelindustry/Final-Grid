@@ -604,6 +604,138 @@ def create_app():
 
     return app
 
+
+AUDIT_ACTOR_MIGRATION = ('10.0.0', 'ADR011-SA: audit_logs actor kind / mechanism / role / shift; '
+                                   'staff_user_id nullable for SYSTEM rows; no users.id 0')
+
+_AUDIT_COLS = ('id', 'entity_type', 'entity_id', 'action', 'before_state', 'after_state',
+               'staff_user_id', 'ip_address', 'timestamp')
+
+_AUDIT_LOGS_SQLITE_DDL = """
+CREATE TABLE audit_logs__adr011 (
+    id INTEGER NOT NULL,
+    entity_type VARCHAR(50) NOT NULL,
+    entity_id INTEGER NOT NULL,
+    action VARCHAR(50) NOT NULL,
+    before_state JSON,
+    after_state JSON,
+    staff_user_id INTEGER,
+    ip_address VARCHAR(45),
+    timestamp DATETIME,
+    actor_kind VARCHAR(10) DEFAULT 'HUMAN' NOT NULL,
+    actor_mechanism VARCHAR(64),
+    actor_role VARCHAR(20),
+    actor_shift_id INTEGER,
+    PRIMARY KEY (id),
+    CONSTRAINT ck_audit_actor_kind CHECK (actor_kind IN ('HUMAN','SYSTEM')),
+    CONSTRAINT ck_audit_actor_identity CHECK ((actor_kind = 'HUMAN' AND staff_user_id IS NOT NULL) OR (actor_kind = 'SYSTEM' AND staff_user_id IS NULL AND actor_mechanism IS NOT NULL)),
+    CONSTRAINT ck_audit_actor_not_zero CHECK (staff_user_id IS NULL OR staff_user_id > 0),
+    FOREIGN KEY(staff_user_id) REFERENCES users (id),
+    FOREIGN KEY(actor_shift_id) REFERENCES shifts (id)
+)"""
+
+_AUDIT_LOGS_PG_DDL = (
+    "ALTER TABLE audit_logs ADD COLUMN actor_kind VARCHAR(10) DEFAULT 'HUMAN' NOT NULL",
+    'ALTER TABLE audit_logs ADD COLUMN actor_mechanism VARCHAR(64)',
+    'ALTER TABLE audit_logs ADD COLUMN actor_role VARCHAR(20)',
+    'ALTER TABLE audit_logs ADD COLUMN actor_shift_id INTEGER REFERENCES shifts(id)',
+    'ALTER TABLE audit_logs ALTER COLUMN staff_user_id DROP NOT NULL',
+    "ALTER TABLE audit_logs ADD CONSTRAINT ck_audit_actor_kind CHECK (actor_kind IN ('HUMAN','SYSTEM'))",
+    "ALTER TABLE audit_logs ADD CONSTRAINT ck_audit_actor_identity CHECK "
+    "((actor_kind = 'HUMAN' AND staff_user_id IS NOT NULL) OR "
+    "(actor_kind = 'SYSTEM' AND staff_user_id IS NULL AND actor_mechanism IS NOT NULL))",
+    'ALTER TABLE audit_logs ADD CONSTRAINT ck_audit_actor_not_zero CHECK '
+    '(staff_user_id IS NULL OR staff_user_id > 0)',
+)
+
+
+def _audit_rows_digest(conn):
+    """(row count, SHA-256) over every audit row's pre-ADR011 columns, in id order."""
+    import hashlib
+    import json as _json
+    h = hashlib.sha256()
+    n = 0
+    for row in conn.exec_driver_sql(
+            'SELECT %s FROM audit_logs ORDER BY id' % ', '.join(_AUDIT_COLS)):
+        h.update(_json.dumps(list(row), default=str, sort_keys=True).encode())
+        h.update(b'\n')
+        n += 1
+    return n, h.hexdigest()
+
+
+def _migrate_audit_actor_kind(is_sqlite):
+    """Apply ADR011-SA to ``audit_logs`` once (FOUNDER_DECISIONS.md, Round 5).
+
+    Existing rows are carried over unchanged and marked ``HUMAN``: each one
+    must already reference a real user. If any row does not (NULL, 0 or a
+    missing user), the migration refuses — reclassifying such a row would be
+    a decision about history, not a schema step. The row count and a digest
+    of every pre-existing column are compared before and after; any
+    difference rolls the whole migration back. On SQLite the table is rebuilt
+    (SQLite cannot drop NOT NULL in place) inside one explicit transaction.
+
+    A database created from the models (fresh install) already has the new
+    shape and is only recorded as migrated.
+    """
+    from app.models import db
+    from sqlalchemy import inspect as _inspect
+    version, description = AUDIT_ACTOR_MIGRATION
+    ph = '?' if is_sqlite else '%s'
+    before = None
+    with db.engine.connect() as conn:
+        done = conn.exec_driver_sql(
+            'SELECT 1 FROM schema_migrations WHERE version = %s' % ph, (version,)).first()
+        if done:
+            return
+        mark = 'INSERT INTO schema_migrations(version, description) VALUES (%s, %s)' % (ph, ph)
+        cols = {c['name']: c for c in _inspect(conn).get_columns('audit_logs')}
+        if 'actor_kind' in cols and cols['staff_user_id']['nullable']:
+            conn.exec_driver_sql(mark, (version, description))
+            conn.commit()
+            logger.info('Migration %s: audit_logs already in ADR011-SA shape; recorded', version)
+            return
+
+        if is_sqlite:
+            conn.exec_driver_sql('BEGIN')        # DDL too, in one transaction
+        try:
+            bad = conn.exec_driver_sql(
+                'SELECT COUNT(*) FROM audit_logs a WHERE a.staff_user_id IS NULL '
+                'OR a.staff_user_id <= 0 OR NOT EXISTS '
+                '(SELECT 1 FROM users u WHERE u.id = a.staff_user_id)').scalar()
+            if bad:
+                raise RuntimeError(
+                    f'{bad} audit_logs row(s) name no real user (NULL, 0 or missing); '
+                    f'ADR011-SA migration refused - their disposition needs a Founder decision')
+            before = _audit_rows_digest(conn)
+            if is_sqlite:
+                conn.exec_driver_sql(_AUDIT_LOGS_SQLITE_DDL)
+                conn.exec_driver_sql(
+                    "INSERT INTO audit_logs__adr011 (%s, actor_kind) SELECT %s, 'HUMAN' "
+                    "FROM audit_logs ORDER BY id" % (', '.join(_AUDIT_COLS), ', '.join(_AUDIT_COLS)))
+                conn.exec_driver_sql('DROP TABLE audit_logs')
+                conn.exec_driver_sql('ALTER TABLE audit_logs__adr011 RENAME TO audit_logs')
+                conn.exec_driver_sql(
+                    'CREATE INDEX idx_audit_entity ON audit_logs (entity_type, entity_id)')
+            else:
+                for stmt in _AUDIT_LOGS_PG_DDL:
+                    conn.exec_driver_sql(stmt)
+            after = _audit_rows_digest(conn)
+            if before != after:
+                raise RuntimeError(f'audit rows changed during migration: {before} -> {after}')
+            not_human = conn.exec_driver_sql(
+                "SELECT COUNT(*) FROM audit_logs WHERE actor_kind <> 'HUMAN'").scalar()
+            if not_human:
+                raise RuntimeError(f'{not_human} migrated row(s) not HUMAN')
+            conn.exec_driver_sql(mark, (version, description))
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            logger.critical('Migration %s FAILED and was rolled back; refusing to start', version)
+            raise
+    logger.info('Migration %s applied: %s (%d rows carried over, digest %s)',
+                version, description, before[0], before[1][:16])
+
+
 def _run_pending_migrations(app):
     """
     Lightweight schema migration runner.
@@ -1512,6 +1644,10 @@ def _run_pending_migrations(app):
             except Exception as e:
                 db.session.rollback()
                 logger.error('Migration %s FAILED: %s', version, e)
+
+        # ADR011-SA audit actor representation. Runs its own transaction and
+        # raises on failure: a half-migrated audit table must not boot.
+        _migrate_audit_actor_kind(_is_sqlite)
 
         # ── SQLite column fixer ──────────────────────────────────────────
         # db.create_all() creates new TABLES but cannot add columns to

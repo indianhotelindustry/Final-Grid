@@ -1063,11 +1063,62 @@ class AuditLog(db.Model):
     action = db.Column(db.String(50), nullable=False)
     before_state = db.Column(db.JSON)
     after_state = db.Column(db.JSON)
-    staff_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    # ADR011-SA: a HUMAN row references the authenticated user; a SYSTEM row
+    # has no user and names its mechanism instead. 0 is never an actor.
+    staff_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     ip_address = db.Column(db.String(45))
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    actor_kind = db.Column(db.String(10), nullable=False, default='HUMAN',
+                           server_default='HUMAN')
+    actor_mechanism = db.Column(db.String(64))                  # web / service / scheduler:<job> / webhook
+    actor_role = db.Column(db.String(20))                       # users.role at the time (HUMAN)
+    actor_shift_id = db.Column(db.Integer, db.ForeignKey('shifts.id'))  # open shift at the time (HUMAN)
     staff_user = db.relationship('User', foreign_keys=[staff_user_id])
-    __table_args__ = (db.Index('idx_audit_entity', 'entity_type', 'entity_id'),)
+    __table_args__ = (
+        db.Index('idx_audit_entity', 'entity_type', 'entity_id'),
+        db.CheckConstraint("actor_kind IN ('HUMAN','SYSTEM')", name='ck_audit_actor_kind'),
+        db.CheckConstraint(
+            "(actor_kind = 'HUMAN' AND staff_user_id IS NOT NULL) OR "
+            "(actor_kind = 'SYSTEM' AND staff_user_id IS NULL AND actor_mechanism IS NOT NULL)",
+            name='ck_audit_actor_identity'),
+        db.CheckConstraint('staff_user_id IS NULL OR staff_user_id > 0',
+                           name='ck_audit_actor_not_zero'),
+    )
+
+
+@_sa_event.listens_for(AuditLog, 'before_insert')
+def _audit_actor_before_insert(mapper, connection, target):
+    """Complete the actor of every audit row at insert time (ADR011-SA).
+
+    A row written without a user (or with the retired 0) is resolved through
+    ``app.audit_actor.resolve``; that raises when the actor is unknown, so the
+    row — and, for strict financial writers, the transaction — fails rather
+    than recording a false actor. HUMAN rows get their role and open shift
+    snapshotted; nothing is guessed for SYSTEM rows.
+    """
+    from app import audit_actor as _aa
+    if target.actor_kind == _aa.SYSTEM:
+        target.staff_user_id = None
+        if not target.actor_mechanism:
+            raise _aa.AuditActorError('SYSTEM audit row without actor_mechanism')
+    else:
+        actor = _aa.resolve(target.staff_user_id, target.actor_mechanism)
+        target.staff_user_id = actor.staff_user_id
+        target.actor_kind = actor.actor_kind
+        target.actor_mechanism = actor.actor_mechanism
+    if target.actor_kind == _aa.HUMAN:
+        users_t, shifts_t = User.__table__, Shift.__table__
+        if target.actor_role is None:
+            target.actor_role = connection.execute(
+                db.select(users_t.c.role).where(users_t.c.id == target.staff_user_id)
+            ).scalar()
+        if target.actor_shift_id is None:
+            target.actor_shift_id = connection.execute(
+                db.select(shifts_t.c.id)
+                .where(shifts_t.c.user_id == target.staff_user_id,
+                       shifts_t.c.status == 'Open')
+                .order_by(shifts_t.c.id.desc()).limit(1)
+            ).scalar()
 
 
 class WebhookLog(db.Model):
