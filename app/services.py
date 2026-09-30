@@ -188,6 +188,25 @@ def inherit_billing_folio_id(original, *, what='row'):
     return fid
 
 
+def resolve_audit_actor(user_id=None):
+    """The ``staff_user_id`` for an audit row: *user_id*, else the logged-in
+    operator, else 0.
+
+    0 is the existing system / unauthenticated convention (``_write_audit``).
+    No user 0 exists, so an FK-enforcing engine rejects it; AR-013 / ADR-011
+    will replace it with a controlled system identity.
+    """
+    if user_id is not None:
+        return user_id
+    try:
+        from flask_login import current_user
+        if current_user and current_user.is_authenticated:
+            return current_user.id
+    except Exception:
+        pass
+    return 0
+
+
 def audited_financial_write(entity_type, entity_id, action,
                             before_state, after_state, *,
                             user_id=None, ip_address=None):
@@ -211,18 +230,7 @@ def audited_financial_write(entity_type, entity_id, action,
         raise AuditCouplingError(
             f'{action}: entity_id is required to audit a financial mutation')
 
-    actor = user_id
-    if actor is None:
-        try:
-            from flask_login import current_user
-            if current_user and current_user.is_authenticated:
-                actor = current_user.id
-        except Exception:
-            actor = None
-    if actor is None:
-        # Same convention as _write_audit: 0 marks a system / unauthenticated
-        # actor. AR-013 will replace this with a controlled system identity.
-        actor = 0
+    actor = resolve_audit_actor(user_id)
 
     ip = ip_address
     if ip is None:

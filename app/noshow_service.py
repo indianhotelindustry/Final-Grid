@@ -179,6 +179,11 @@ def process_reservation_noshow(
     db.session.add(log)
 
     # --- AuditLog ---
+    # Actor resolved like the fee's strict audit row above, so an operator-
+    # initiated night audit is attributed to that operator on both rows;
+    # 'posted_by' keeps recording the night-audit origin. A run with no
+    # operator still falls back to the 0 system convention (AR-013, open).
+    from app.services import resolve_audit_actor
     db.session.add(AuditLog(
         entity_type='Reservation',
         entity_id=reservation.id,
@@ -193,7 +198,7 @@ def process_reservation_noshow(
             'posted_by': posted_by_user_id or 'night_audit',
             'extra_charge_id': fee_charge.id if fee_charge is not None else None,
         },
-        staff_user_id=posted_by_user_id or 0,  # 0 = system/night audit
+        staff_user_id=resolve_audit_actor(posted_by_user_id),
     ))
 
     return NoShowResult(success=True, message='No-show posted successfully.', no_show_log=log)
