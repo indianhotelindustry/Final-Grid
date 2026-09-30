@@ -1804,26 +1804,32 @@ def post_cancellation_disposition(reservation, *, disposition, refund_amount=0,
     issued_voucher = None
     if disposition == 'credit_voucher' and voucher_amount > 0.005:
         try:
-            issued_voucher = issue_credit_voucher(
-                guest_id        = reservation.guest_id,
-                amount          = voucher_amount,
-                reservation_id  = reservation.id,
-                expiry_days     = 365,   # default 1 year; admin can override later
-                user_id         = user_id,
-                notes           = f'Issued from cancellation of booking #{reservation.id} | {reason_clean}',
-                audit_writer    = audit_writer,
-            )
+            # The voucher and its strict audit row share a SAVEPOINT (CF-10):
+            # if either fails both are rolled back, so no unaudited voucher
+            # can reach the caller's commit.
+            with nested_transaction():
+                issued_voucher = issue_credit_voucher(
+                    guest_id        = reservation.guest_id,
+                    amount          = voucher_amount,
+                    reservation_id  = reservation.id,
+                    expiry_days     = 365,   # default 1 year; admin can override later
+                    user_id         = user_id,
+                    notes           = f'Issued from cancellation of booking #{reservation.id} | {reason_clean}',
+                    audit_writer    = audit_writer,
+                )
         except Exception as exc:
-            # Never let voucher issuance break the cancellation. Caller
-            # rolls back on failure of the parent transaction; the
-            # snapshot column still records the intent.
-            try:
-                if audit_writer is not None:
-                    audit_writer('Reservation', reservation.id, 'voucher_issue_failed',
-                                 {'voucher_amount': voucher_amount},
-                                 {'error': str(exc)[:200]})
-            except Exception:
-                pass
+            # Never let voucher issuance break the cancellation; the
+            # snapshot column still records the intent. The failure itself
+            # is recorded strictly: if even that cannot be written, the
+            # caller rolls the whole cancellation back rather than
+            # committing a promised voucher with no trace of why it is
+            # missing.
+            issued_voucher = None
+            audited_financial_write(
+                'Reservation', reservation.id, 'voucher_issue_failed',
+                {'voucher_amount': voucher_amount},
+                {'error': str(exc)[:200]},
+                user_id=user_id)
 
     # Approval block — captured in audit even when below threshold, so
     # the trail explicitly records who signed off (or the absence of an
@@ -1849,6 +1855,7 @@ def post_cancellation_disposition(reservation, *, disposition, refund_amount=0,
          'voucher_amount':  round(voucher_amount, 2),
          'refund_payment_id': (refund_payment.id
                                 if refund_payment else None),
+         'voucher_id': (issued_voucher.id if issued_voucher else None),
          'reason': reason_clean,
          'by_user_id': user_id,
          'approval': _approval_block},
@@ -1926,18 +1933,19 @@ def issue_credit_voucher(*, guest_id, amount, reservation_id=None,
     _db.session.add(voucher)
     _db.session.flush()
 
-    if audit_writer is not None:
-        try:
-            audit_writer('CreditVoucher', voucher.id, 'voucher_created',
-                         None,
-                         {'voucher_code':   code,
-                          'guest_id':       int(guest_id),
-                          'issued_amount':  float(voucher.issued_amount),
-                          'expiry_date':    expiry.isoformat() if expiry else None,
-                          'issued_from_reservation_id': reservation_id,
-                          'by_user_id':     user_id})
-        except Exception:
-            pass
+    # A voucher is a liability, so its creation is audited strictly (Q-5 /
+    # CF-10). ``audit_writer`` is accepted for compatibility and no longer
+    # used here.
+    audited_financial_write(
+        'CreditVoucher', voucher.id, 'voucher_created',
+        None,
+        {'voucher_code':   code,
+         'guest_id':       int(guest_id),
+         'issued_amount':  float(voucher.issued_amount),
+         'expiry_date':    expiry.isoformat() if expiry else None,
+         'issued_from_reservation_id': reservation_id,
+         'by_user_id':     user_id},
+        user_id=user_id)
 
     return voucher
 
