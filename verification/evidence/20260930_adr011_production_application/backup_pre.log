@@ -1,0 +1,9 @@
+sha256     : 51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2
+tables     : 53, 299 rows
+
+snapshot   : C:\Users\SIPL Server\Downloads\DSS\FinalGrid\db-backups\pms_20260930_132300_adr011-apply-pre.db
+sha256     : 99505a475fecc508a91d323ef0387142159ac483d6577d7a6801b40ea49eb3cd
+integrity  : ok
+row counts : match across 53 tables
+source now : 51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2
+VERDICT    : BACKUP VERIFIED — production unchanged

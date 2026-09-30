@@ -1,0 +1,8 @@
+tables     : 53, 300 rows
+
+snapshot   : C:\Users\SIPL Server\Downloads\DSS\FinalGrid\db-backups\pms_20260930_132529_adr011-apply-post.db
+sha256     : 12ba7b7eb8004b43492829b5c1f153e0010f777e0b2c146f86b423cb39c8fac6
+integrity  : ok
+row counts : match across 53 tables
+source now : e67f963b87e4004cee4f5f4abd6b97a07e07763faf328256397d8246e49ec569
+VERDICT    : BACKUP VERIFIED — production unchanged

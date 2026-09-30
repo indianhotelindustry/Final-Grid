@@ -1,0 +1,24 @@
+=== B  characterisation: production vs restored
+OK    B-00               production SHA-256 == anchor (read-only)                               
+OK    B-01               restored: same tables as production                                    
+OK    B-02               restored: every table row count and content digest == production       53 tables, 299 rows
+OK    B-03               audit_logs: 23 rows; digest and DDL == production                      
+OK    B-04               restored: users, audit actors, integrity, 10.0.0 not applied           schema_migrations max=9.0.0
+=== D 1-12  migration rehearsal on copies of the restored file
+OK    D-01               branch boot on restored copy completes; main control boot completes    
+OK    D-02               migration 10.0.0 recorded (branch); not on the main control            
+OK    D-04               all 23 historical audit rows present                                   
+OK    D-05/06            carried-over columns: digest identical to the restored source          
+OK    D-07/08            actor_kind: all historical rows HUMAN (user 1), no mechanism/role/shif historical rows are carried, not reconstructed
+OK    D-09               no SYSTEM rows exist before any system action                          
+OK    D-10               no audit row names users.id 0                                          
+OK    D-11               constraints: staff_user_id nullable; 3 CHECKs; FK users + shifts; inde 
+OK    D-11b              integrity_check ok; foreign_key_check empty (FK on); no leftover table 
+OK    D-12a              tables changed by boot: branch == main control + audit_logs/schema_mig branch changed=['audit_logs', 'schema_migrations']; main changed=[]
+OK    D-12b              after boot, every other table identical between branch and main contro 
+OK    D-12c              financial tables identical to the restored source after migration      payments, extra_charges, folios, tax_lines, credit_vouchers, credit_voucher_redemptions, night_audit_logs, reservations, credit_notes, cico_charge_logs, busines
+OK    D-03.2             repeat boot 2: completes; every table unchanged                        
+OK    D-03.3             repeat boot 3: completes; every table unchanged                        
+OK    D-JOB              night_audit_job not registered after boot (setting false)              
+OK    P-00               production SHA-256 unchanged across the run (== anchor)                
+PREPROD ['char', 'mig']: 21/21 gates -> PASS

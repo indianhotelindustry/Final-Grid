@@ -1,0 +1,300 @@
+{
+ "post": {
+  "audit_logs": [
+   23,
+   "fb9452744bf3637a90cdd661b3d70b83d3c31129395631c3d53d4cecb43731e2"
+  ],
+  "backup_logs": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "business_date": [
+   1,
+   "b920846506c58a1c83cddc1f02618cec50f523209a4d778831ac1de63f5f8f0d"
+  ],
+  "checkin_records": [
+   4,
+   "7f58ab7c8788e3a922337ed28f2970d2e210193f2699b1d7a4593cda5036f743"
+  ],
+  "cico_charge_logs": [
+   2,
+   "d9c51cddea9dee81af8c91450b7256e4fbfa6e99a690e72ca7e3e624ce25abde"
+  ],
+  "companies": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "credit_notes": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "credit_voucher_redemptions": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "credit_vouchers": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "equipment": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "equipment_health_logs": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "extra_charges": [
+   2,
+   "f86eb128fcafcffa853893962d631b8dd833b6dafdfa95b9eb70e147e87bc9b9"
+  ],
+  "folios": [
+   4,
+   "f1f4c48551302ef129c19b34a8d9412205cab80d965e72cf1f64b7310fb5606f"
+  ],
+  "foreign_national_info": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "group_blocks": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "guest_feedback": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "guest_id_documents": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "guests": [
+   32,
+   "3e216b7d76d82c3d44bc5a52359e48ab988125b77aae22162c9c8edd005e027d"
+  ],
+  "loyalty_config": [
+   3,
+   "476bcebf00fcf2c3dda34af6871190d769982f452e487959cc8d8d27cd3eaf80"
+  ],
+  "loyalty_milestones": [
+   3,
+   "3453ef3de0a31f9114e033255aaa6e504a439cc6d8a0d9686f96243e4ea7d13c"
+  ],
+  "loyalty_redemptions": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "loyalty_transactions": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "maintenance_requests": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "night_audit_logs": [
+   1,
+   "1da359d6f0468de2290a44d617dc095be2697b4cb9049577d7eed3fadaaba407"
+  ],
+  "night_audit_reopen_logs": [
+   5,
+   "ec8e9e698a16085d5fb3bcf327d0a7a529751e0b8dbb1436ca6a85ab7758edf7"
+  ],
+  "no_show_logs": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "notification_logs": [
+   5,
+   "c6b4ac73722dcd79b102c78866129a8e026c128aad5eb151d1656d011f325684"
+  ],
+  "notification_queue": [
+   4,
+   "2bf532198643a01d2073633f97d6bcb05037cc041832f6c5474ebde69475edb8"
+  ],
+  "ota_payouts": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "overpayment_logs": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "payment_modes": [
+   12,
+   "c9a94de2de4efc5e34f86901237d3621fce2d74bb636d63da1dec6e3d133d74f"
+  ],
+  "payments": [
+   6,
+   "2c43c88a370ec35aa28bddbd45b02e0f5931e9843bc9a8283776686972ccd806"
+  ],
+  "pos_items": [
+   8,
+   "35dc4ecc67f0cf7fba97efd32f2e49537fe0be271a8f235fd944cc40496ddf86"
+  ],
+  "precheckin_submissions": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "precheckin_tokens": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "preventive_schedules": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "rate_plans": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "reservation_night_rates": [
+   4,
+   "232ab4f394e916b9a9651857df1e819a3af4c474e9fd3f5da726ba2aabec5c28"
+  ],
+  "reservation_passengers": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "reservation_rooms": [
+   4,
+   "fb61242da239c5639daab934a2d60468bb600bf8e0e277d256dbc343633ac925"
+  ],
+  "reservations": [
+   4,
+   "d33423b5f771e7d245e33c12136c8f24cc479815efc7934192477ddbe062295d"
+  ],
+  "revenue_alerts": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "room_types": [
+   3,
+   "3be726c32e3fd9a15b0fad922c0c537fbfb69427b1d0424f174d26c72016601d"
+  ],
+  "rooms": [
+   39,
+   "a73b6e3dce3e2a9437f2b89c9c17d792e55b09793c59e01350feb9ed4b1401c3"
+  ],
+  "schema_migrations": [
+   58,
+   "7eb176e85e94cd82d2ea95e90565e7c63969e7ece47670b687a7398f39850d5a"
+  ],
+  "settings": [
+   60,
+   "38858acc0769c836b800cbed0bd4a401747e7aef35b90f299656f88dab5fb701"
+  ],
+  "shift_adjustments": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "shifts": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "staff_performance_daily": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "tax_lines": [
+   12,
+   "38dd580a2edba0ae7d1c0f36afb662e6ea84bdcaf2423601d10a5f1b5d0aef1c"
+  ],
+  "users": [
+   1,
+   "35a962afc8c4c8fe175da8f7afdb4315484e203656322ac09a46dae70c5dd764"
+  ],
+  "void_requests": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ],
+  "webhook_logs": [
+   0,
+   "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  ]
+ },
+ "checks": {
+  "tables_changed": [
+   "audit_logs",
+   "schema_migrations"
+  ],
+  "row_counts_equal_all_tables": {
+   "schema_migrations": [
+    57,
+    58
+   ]
+  },
+  "audit_rows": 23,
+  "audit_digest_equal": true,
+  "audit_digest": "1cf41807b7639e55fe899b86798ce3059b3c528333b60a552004e7041f94efe7",
+  "actor_kinds": [
+   [
+    "HUMAN",
+    1,
+    null,
+    null,
+    null,
+    23
+   ]
+  ],
+  "rows_actor_zero": 0,
+  "users": [
+   [
+    1,
+    "Admin",
+    1
+   ]
+  ],
+  "staff_user_id_notnull": 0,
+  "new_columns": {
+   "actor_kind": [
+    "VARCHAR(10)",
+    1
+   ],
+   "actor_mechanism": [
+    "VARCHAR(64)",
+    0
+   ],
+   "actor_role": [
+    "VARCHAR(20)",
+    0
+   ],
+   "actor_shift_id": [
+    "INTEGER",
+    0
+   ]
+  },
+  "checks_in_ddl": [
+   "ck_audit_actor_kind",
+   "ck_audit_actor_identity",
+   "ck_audit_actor_not_zero"
+  ],
+  "fks_in_ddl": 2,
+  "index": [
+   "CREATE INDEX idx_audit_entity ON audit_logs (entity_type, entity_id)"
+  ],
+  "leftover_tables": [],
+  "schema_migrations_added": [
+   "10.0.0"
+  ],
+  "integrity": "ok",
+  "night_audit_enabled": "false",
+  "foreign_key_check": [],
+  "financial_tables_unchanged": {
+   "payments": true,
+   "extra_charges": true,
+   "folios": true,
+   "tax_lines": true,
+   "credit_vouchers": true,
+   "credit_voucher_redemptions": true,
+   "night_audit_logs": true,
+   "reservations": true,
+   "credit_notes": true,
+   "cico_charge_logs": true,
+   "shifts": true,
+   "users": true,
+   "guests": true,
+   "business_date": true
+  }
+ }
+}

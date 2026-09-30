@@ -1,0 +1,234 @@
+{
+  "task": "ADR-011 migration 10.0.0 - controlled production application",
+  "status": "APPLIED AND VERIFIED",
+  "authorization": "Founder authorization in session 2026-09-30: controlled application of ADR-011 migration 10.0.0 to production subject to PD-004/PD-005",
+  "git": {
+    "main_before": "16c4ca8b6bf80cbb9502d75d746073abdbfcd5cb",
+    "main_after_fast_forward": "e7086da05b692a7a54b155161212c9cbd4c0b068",
+    "merge": "git merge --ff-only adr011-system-actor (no merge commit, no history rewrite)",
+    "app_tools_diff_vs_tested_3ffeba5": 0
+  },
+  "production_db": {
+    "path": "instance/pms.db",
+    "sha256_before": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+    "sha256_after": "e67f963b87e4004cee4f5f4abd6b97a07e07763faf328256397d8246e49ec569",
+    "size_bytes_before_after": [
+      733184,
+      733184
+    ],
+    "mtime_after": "2026-09-30 13:24:35 +0530"
+  },
+  "pd005": {
+    "backup_pre": {
+      "artifact": "pms_20260930_132300_adr011-apply-pre.db",
+      "sha256": "99505a475fecc508a91d323ef0387142159ac483d6577d7a6801b40ea49eb3cd",
+      "verdict": "BACKUP VERIFIED",
+      "equals_preprod_gate_backup": true
+    },
+    "restore_rehearsal_pre": {
+      "run_id": "RR-20260930-ADR011-APPLY",
+      "all_checks_ok": true,
+      "failures": []
+    },
+    "execution_time_migration_rehearsal": "21/21 PASS",
+    "pre_invariants": {
+      "pack": "20260930_075341_inv_run_production",
+      "overall": "FAIL",
+      "violated": [
+        "INV-A02",
+        "INV-A03"
+      ]
+    },
+    "pre_golden_master": {
+      "pack": "20260930_075346_gm_verify_phase1_aa6d9e91",
+      "verdict": "PASS",
+      "surfaces": "158/158"
+    },
+    "backup_post": {
+      "artifact": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\db-backups\\pms_20260930_132529_adr011-apply-post.db",
+      "sha256": "12ba7b7eb8004b43492829b5c1f153e0010f777e0b2c146f86b423cb39c8fac6",
+      "verdict": "BACKUP VERIFIED"
+    },
+    "restore_rehearsal_post": {
+      "run_id": "RR-20260930-ADR011-POST",
+      "all_checks_ok": true
+    }
+  },
+  "first_start": {
+    "migration_log": [
+      "2026-09-30 13:24:35 [INFO] app: Migration 10.0.0 applied: ADR011-SA: audit_logs actor kind / mechanism / role / shift; staff_user_id nullable for SYSTEM rows; no users.id 0 (23 rows carried over, digest 1cf41807b7639e55)"
+    ],
+    "database_uri": "sqlite:///C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\SukoonPMS\\app\\..\\instance\\pms.db",
+    "env_mode": "production",
+    "night_audit_job_registered": false,
+    "scheduler_jobs": [
+      [
+        "daily_backup_job",
+        "cron[hour='3', minute='0']"
+      ],
+      [
+        "log_pruning_job",
+        "cron[hour='4', minute='0']"
+      ],
+      [
+        "notification_queue_flush",
+        "interval[0:05:00]"
+      ],
+      [
+        "predictive_maintenance_job",
+        "cron[hour='5', minute='0']"
+      ]
+    ],
+    "started_normally": true
+  },
+  "post_migration": {
+    "tables_changed": [
+      "audit_logs",
+      "schema_migrations"
+    ],
+    "row_count_changes": {
+      "schema_migrations": [
+        57,
+        58
+      ]
+    },
+    "audit_rows": 23,
+    "audit_digest_equal_to_pre": true,
+    "audit_digest": "1cf41807b7639e55fe899b86798ce3059b3c528333b60a552004e7041f94efe7",
+    "actor_kinds": [
+      [
+        "HUMAN",
+        1,
+        null,
+        null,
+        null,
+        23
+      ]
+    ],
+    "rows_actor_zero": 0,
+    "staff_user_id_nullable": true,
+    "checks": [
+      "ck_audit_actor_kind",
+      "ck_audit_actor_identity",
+      "ck_audit_actor_not_zero"
+    ],
+    "fks": 2,
+    "index": true,
+    "leftover_tables": [],
+    "schema_migrations_added": [
+      "10.0.0"
+    ],
+    "integrity": "ok",
+    "foreign_key_check": [],
+    "financial_tables_unchanged": {
+      "payments": true,
+      "extra_charges": true,
+      "folios": true,
+      "tax_lines": true,
+      "credit_vouchers": true,
+      "credit_voucher_redemptions": true,
+      "night_audit_logs": true,
+      "reservations": true,
+      "credit_notes": true,
+      "cico_charge_logs": true,
+      "shifts": true,
+      "users": true,
+      "guests": true,
+      "business_date": true
+    },
+    "night_audit_enabled": "false"
+  },
+  "smoke": {
+    "night_audit_job": false,
+    "/api/health": {
+      "status": 200,
+      "bytes": 49,
+      "json": {
+        "online": true,
+        "status": "ok",
+        "version": "2.2.18"
+      }
+    },
+    "/auth/login": {
+      "status": 200,
+      "bytes": 7509,
+      "json": null
+    },
+    "/dashboard (unauthenticated)": {
+      "status": 302,
+      "location": "/auth/login?next=http://localhost/dashboard"
+    }
+  },
+  "human_provenance": {
+    "where": "copy of the post-migration backup (not production)",
+    "database": "sqlite:///C:/Users/SIPL Server/Downloads/DSS/FinalGrid/adr011_apply/human_check_copy.db",
+    "user": [
+      1,
+      "Admin"
+    ],
+    "open_shift_of_user_1": null,
+    "rows": [
+      [
+        1,
+        "HUMAN",
+        "web",
+        "Admin",
+        null,
+        "127.0.0.1"
+      ]
+    ],
+    "live_production": "NOT VERIFIED - awaits the Founder's own next login"
+  },
+  "identity_on_post_migration_copy": {
+    "gates": "34/35",
+    "failed": [
+      "P-00"
+    ],
+    "note": "P-00 compares against the pre-migration anchor 51dd83b7; production is legitimately e67f963b after the authorized migration and was unchanged during the run (before == after == e67f963b)"
+  },
+  "post_invariants": {
+    "pack": "20260930_075629_inv_run_production",
+    "overall": "FAIL",
+    "writes": 0,
+    "identical_to_pre": true
+  },
+  "post_golden_master": {
+    "pack": "20260930_075631_gm_verify_phase1_aa6d9e91",
+    "verdict": "PASS",
+    "surfaces": "158/158",
+    "differences": 0
+  },
+  "post_replay": {
+    "pack": "20260930_075641_replay_verify_production",
+    "verdict": "FAIL",
+    "differences": [
+      [
+        "2026-08-09",
+        "nas.tax_snapshot.total_taxable"
+      ],
+      [
+        "2026-08-10",
+        "nas.tax_snapshot.total_taxable"
+      ]
+    ]
+  },
+  "post_cross_implementation": {
+    "pack": "20260930_075643_cross_implementation",
+    "overall": "FAIL",
+    "counts": {
+      "AGREED": 15,
+      "DIVERGED": 4,
+      "SINGLE_SOURCE": 1,
+      "VACUOUS": 2
+    }
+  },
+  "scheduler": "night_audit_enabled=false; night_audit_job not registered",
+  "rolled_back": false,
+  "gates": {
+    "G3": "OPEN",
+    "G5": "OPEN",
+    "G11": "BLOCKED",
+    "G12": "BLOCKED"
+  },
+  "production_ready_100_percent": false
+}

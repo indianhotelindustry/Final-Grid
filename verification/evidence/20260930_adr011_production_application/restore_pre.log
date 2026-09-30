@@ -1,0 +1,16 @@
+  [ok] source_sqlite_header
+  [ok] source_matches_backup_manifest
+  [ok] source_integrity_check
+  [ok] restored_file_exists
+  [ok] restored_sqlite_header
+  [ok] restored_integrity_check
+  [ok] restored_foreign_key_check
+  [ok] required_tables_present
+  [ok] schema_readable
+  [ok] schema_sql_equal
+  [ok] row_counts_equal
+  [ok] invoice_count_equal
+  [ok] content_digests_equal_all_tables
+  [ok] row_counts_match_backup_manifest
+  [ok] body_identical_beyond_header
+VERDICT    : RESTORE VERIFIED — C:\Users\SIPL Server\Downloads\DSS\FinalGrid\adr011_apply\restored_pre.db

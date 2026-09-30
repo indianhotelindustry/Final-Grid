@@ -1,0 +1,369 @@
+{
+  "task": "ADR-011 pre-production gate rehearsal",
+  "phases": [
+    "ident"
+  ],
+  "branch_commit": "e7086da05b692a7a54b155161212c9cbd4c0b068",
+  "branch_app_clean": true,
+  "main_control_commit": "16c4ca8b6bf80cbb9502d75d746073abdbfcd5cb",
+  "restored": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\adr011_apply\\restored_post.db",
+  "finished": "2026-09-30T13:25:40",
+  "production_sha256_before": "e67f963b87e4004cee4f5f4abd6b97a07e07763faf328256397d8246e49ec569",
+  "production_sha256_after": "e67f963b87e4004cee4f5f4abd6b97a07e07763faf328256397d8246e49ec569",
+  "info": {},
+  "gates_total": 35,
+  "gates_passed": 34,
+  "verdict": "FAIL",
+  "checks": [
+    {
+      "case": "D-13.src",
+      "area": "isolation",
+      "what": "working copy made from the restored file, not production",
+      "expect": "'c:\\\\users\\\\sipl server\\\\downloads\\\\dss\\\\finalgrid\\\\adr011_apply\\\\restored_post.db'",
+      "got": "'c:\\\\users\\\\sipl server\\\\downloads\\\\dss\\\\finalgrid\\\\adr011_apply\\\\restored_post.db'",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S1-RED-F1-room_rent",
+      "area": "sched NA",
+      "what": "F1 on room_rent audit: whole run rolled back",
+      "expect": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "got": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "pass": true,
+      "severity": "gate",
+      "note": "RuntimeError: injected F1: audit row could not be constructed"
+    },
+    {
+      "case": "S1-RED-F1-noshow_posted",
+      "area": "sched NA",
+      "what": "F1 on noshow_posted audit: whole run rolled back",
+      "expect": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "got": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "pass": true,
+      "severity": "gate",
+      "note": "RuntimeError: injected F1: audit row could not be constructed"
+    },
+    {
+      "case": "S1-RED-F2-room_rent",
+      "area": "sched NA",
+      "what": "F2 on room_rent audit: whole run rolled back",
+      "expect": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "got": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError: audit row for ExtraCharge 3 (posted) could not be written: RuntimeError: injected F2: audit insert failed"
+    },
+    {
+      "case": "S1-RED-F2-noshow_posted",
+      "area": "sched NA",
+      "what": "F2 on noshow_posted audit: whole run rolled back",
+      "expect": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "got": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "pass": true,
+      "severity": "gate",
+      "note": "RuntimeError: injected F2: audit insert failed"
+    },
+    {
+      "case": "S1-RED-FK",
+      "area": "sched NA",
+      "what": "FK on, actor references no user: FK failure, run rolled back",
+      "expect": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "got": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError: audit row for ExtraCharge 3 (posted) could not be written: IntegrityError: (sqlite3.IntegrityError) FOREIGN KEY constraint failed\n[SQL: INSERT INTO audit_logs (entity_type, entity_id, action, before_state, after_state, staff_user_id, ip_address, timestamp, actor_kind, actor_mechanism, actor_role, ac"
+    },
+    {
+      "case": "S1-RED-ZERO",
+      "area": "sched NA",
+      "what": "FK off, forced users.id 0: refused (CHECK), run rolled back",
+      "expect": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "got": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError: audit row for ExtraCharge 3 (posted) could not be written: IntegrityError: (sqlite3.IntegrityError) CHECK constraint failed: ck_audit_actor_not_zero\n[SQL: INSERT INTO audit_logs (entity_type, entity_id, action, before_state, after_state, staff_user_id, ip_address, timestamp, actor_kind, actor_mechan"
+    },
+    {
+      "case": "S1-RED-UNDECLARED",
+      "area": "sched NA",
+      "what": "no operator and no declared mechanism: refused, run rolled back (never mislabelled)",
+      "expect": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "got": "(True, {'logs': 0, 'rent': 0, 'fees': 0, 'bd': datetime.date(2026, 8, 10)})",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError: audit row for ExtraCharge 3 (posted) has no actor: audit actor unknown: no user, no logged-in operator and no declared system mechanism (wrap unattended work in audit_actor.system_action)"
+    },
+    {
+      "case": "S1-GREEN-FK",
+      "area": "sched NA",
+      "what": "FK on: scheduled run completes (log, rent, fee)",
+      "expect": "(None, 1, True, True)",
+      "got": "(None, 1, True, True)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S1-GREEN-ROWS",
+      "area": "sched NA",
+      "what": "every system financial row + noshow_posted: one SYSTEM row, no user, scheduler mechanism",
+      "expect": "[('SYSTEM', None, 'scheduler:night_audit_job', None, None), ('SYSTEM', None, 'scheduler:night_audit_job', None, None), ('SYSTEM', None, 'scheduler:night_audit_job', None, None)]",
+      "got": "[('SYSTEM', None, 'scheduler:night_audit_job', None, None), ('SYSTEM', None, 'scheduler:night_audit_job', None, None), ('SYSTEM', None, 'scheduler:night_audit_job', None, None)]",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S1-GREEN-RUNBY",
+      "area": "sched NA",
+      "what": "NightAuditLog.run_by / NoShowLog.posted_by empty (no human)",
+      "expect": "(None, None)",
+      "got": "(None, None)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S1-GREEN-noFK",
+      "area": "sched NA",
+      "what": "FK off: run completes, same SYSTEM representation",
+      "expect": "(None, [('SYSTEM', None, 'scheduler:night_audit_job'), ('SYSTEM', None, 'scheduler:night_audit_job'), ('SYSTEM', None, 'scheduler:night_audit_job')])",
+      "got": "(None, [('SYSTEM', None, 'scheduler:night_audit_job'), ('SYSTEM', None, 'scheduler:night_audit_job'), ('SYSTEM', None, 'scheduler:night_audit_job')])",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S2-RED-F1",
+      "area": "auto no-show",
+      "what": "F1: not a no-show, no fee, no log",
+      "expect": "(True, ('Reserved', 0, 0))",
+      "got": "(True, ('Reserved', 0, 0))",
+      "pass": true,
+      "severity": "gate",
+      "note": "RuntimeError: injected F1: audit row could not be constructed"
+    },
+    {
+      "case": "S2-RED-F2",
+      "area": "auto no-show",
+      "what": "F2: not a no-show, no fee, no log",
+      "expect": "(True, ('Reserved', 0, 0))",
+      "got": "(True, ('Reserved', 0, 0))",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError: audit row for ExtraCharge 8 (posted) could not be written: RuntimeError: injected F2: audit insert failed"
+    },
+    {
+      "case": "S2-RED-FK",
+      "area": "auto no-show",
+      "what": "FK on, invalid actor: FK failure, nothing persisted",
+      "expect": "(True, ('Reserved', 0, 0))",
+      "got": "(True, ('Reserved', 0, 0))",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError: audit row for ExtraCharge 8 (posted) could not be written: IntegrityError: (sqlite3.IntegrityError) FOREIGN KE"
+    },
+    {
+      "case": "S2-RED-UNDECLARED",
+      "area": "auto no-show",
+      "what": "no operator, no mechanism: refused, nothing persisted",
+      "expect": "(True, ('Reserved', 0, 0))",
+      "got": "(True, ('Reserved', 0, 0))",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError: audit row for ExtraCharge 8 (posted) has no actor: audit actor unknown: no user, no logged-in operator and no "
+    },
+    {
+      "case": "S2-GREEN-FK",
+      "area": "auto no-show",
+      "what": "completes; fee + noshow_posted are SYSTEM rows with no user",
+      "expect": "(None, ('NoShow', 1, 1), [('SYSTEM', None), ('SYSTEM', None)])",
+      "got": "(None, ('NoShow', 1, 1), [('SYSTEM', None), ('SYSTEM', None)])",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S2-GREEN-noFK",
+      "area": "auto no-show",
+      "what": "completes; fee + noshow_posted are SYSTEM rows with no user",
+      "expect": "(None, ('NoShow', 1, 1), [('SYSTEM', None), ('SYSTEM', None)])",
+      "got": "(None, ('NoShow', 1, 1), [('SYSTEM', None), ('SYSTEM', None)])",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S3-GREEN-FK",
+      "area": "webhook",
+      "what": "modify completes; one SYSTEM row, no user, mechanism webhook",
+      "expect": "(200, 1500.0, [('SYSTEM', None, 'webhook')])",
+      "got": "(200, 1500.0, [('SYSTEM', None, 'webhook')])",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S3-GREEN-noFK",
+      "area": "webhook",
+      "what": "modify completes; one SYSTEM row, no user, mechanism webhook",
+      "expect": "(200, 1500.0, [('SYSTEM', None, 'webhook')])",
+      "got": "(200, 1500.0, [('SYSTEM', None, 'webhook')])",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S4-UNAUTH",
+      "area": "web",
+      "what": "unauthenticated request: SYSTEM row, no user, web:unauthenticated",
+      "expect": "[('SYSTEM', None, 'web:unauthenticated')]",
+      "got": "[('SYSTEM', None, 'web:unauthenticated')]",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "S5-CHECK",
+      "area": "schema",
+      "what": "raw INSERTs: user 0 / HUMAN without user / SYSTEM without mechanism / SYSTEM with a user -> all rejected by CHECK",
+      "expect": "['rejected', 'rejected', 'rejected', 'rejected']",
+      "got": "['rejected', 'rejected', 'rejected', 'rejected']",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "H-NA-noFK",
+      "area": "manual NA",
+      "what": "operator run: every row HUMAN, the operator, role Admin, open shift, mechanism web",
+      "expect": "(1, [('HUMAN', 2, 'Admin', 1, 'web'), ('HUMAN', 2, 'Admin', 1, 'web'), ('HUMAN', 2, 'Admin', 1, 'web')], 2)",
+      "got": "(1, [('HUMAN', 2, 'Admin', 1, 'web'), ('HUMAN', 2, 'Admin', 1, 'web'), ('HUMAN', 2, 'Admin', 1, 'web')], 2)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "H-NA-FK",
+      "area": "manual NA",
+      "what": "operator run: every row HUMAN, the operator, role Admin, open shift, mechanism web",
+      "expect": "(1, [('HUMAN', 2, 'Admin', 1, 'web'), ('HUMAN', 2, 'Admin', 1, 'web'), ('HUMAN', 2, 'Admin', 1, 'web')], 2)",
+      "got": "(1, [('HUMAN', 2, 'Admin', 1, 'web'), ('HUMAN', 2, 'Admin', 1, 'web'), ('HUMAN', 2, 'Admin', 1, 'web')], 2)",
+      "pass": true,
+      "severity": "gate",
+      "note": "HTTP 302"
+    },
+    {
+      "case": "H-NS-FK",
+      "area": "manual no-show",
+      "what": "FK on: HUMAN row, operator, role Admin, no open shift",
+      "expect": "[('HUMAN', 2, 'Admin', None)]",
+      "got": "[('HUMAN', 2, 'Admin', None)]",
+      "pass": true,
+      "severity": "gate",
+      "note": "No-show posted successfully."
+    },
+    {
+      "case": "P-what",
+      "area": "provenance",
+      "what": "answerable from the row: what",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "P-when",
+      "area": "provenance",
+      "what": "answerable from the row: when",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "P-which_entity",
+      "area": "provenance",
+      "what": "answerable from the row: which entity",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "P-which_amount",
+      "area": "provenance",
+      "what": "answerable from the row: which amount",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "P-why",
+      "area": "provenance",
+      "what": "answerable from the row: why",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "P-human_or_system",
+      "area": "provenance",
+      "what": "answerable from the row: human or system",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "P-execution_path",
+      "area": "provenance",
+      "what": "answerable from the row: execution path",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "P-business_date",
+      "area": "provenance",
+      "what": "answerable from the row: business date",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "D-13.srcro",
+      "area": "isolation",
+      "what": "restored source unchanged by the run",
+      "expect": "'12ba7b7eb8004b43492829b5c1f153e0010f777e0b2c146f86b423cb39c8fac6'",
+      "got": "'12ba7b7eb8004b43492829b5c1f153e0010f777e0b2c146f86b423cb39c8fac6'",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "P-00",
+      "area": "production",
+      "what": "production SHA-256 unchanged across the run (== anchor)",
+      "expect": "('51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2', '51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2')",
+      "got": "('e67f963b87e4004cee4f5f4abd6b97a07e07763faf328256397d8246e49ec569', 'e67f963b87e4004cee4f5f4abd6b97a07e07763faf328256397d8246e49ec569')",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    }
+  ]
+}

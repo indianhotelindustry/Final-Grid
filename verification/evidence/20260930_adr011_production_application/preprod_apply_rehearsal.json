@@ -1,0 +1,259 @@
+{
+  "task": "ADR-011 pre-production gate rehearsal",
+  "phases": [
+    "char",
+    "mig"
+  ],
+  "branch_commit": "e7086da05b692a7a54b155161212c9cbd4c0b068",
+  "branch_app_clean": true,
+  "main_control_commit": "16c4ca8b6bf80cbb9502d75d746073abdbfcd5cb",
+  "restored": "C:\\Users\\SIPL Server\\Downloads\\DSS\\FinalGrid\\adr011_apply\\restored_pre.db",
+  "finished": "2026-09-30T13:24:03",
+  "production_sha256_before": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "production_sha256_after": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+  "info": {
+    "production_sha256": "51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2",
+    "production_size": 733184,
+    "restored_sha256": "99505a475fecc508a91d323ef0387142159ac483d6577d7a6801b40ea49eb3cd",
+    "tables": 53,
+    "rows": 299,
+    "audit_rows": 23,
+    "audit_digest": "1cf41807b7639e55fe899b86798ce3059b3c528333b60a552004e7041f94efe7",
+    "audit_ddl_before": "CREATE TABLE audit_logs (\n\tid INTEGER NOT NULL, \n\tentity_type VARCHAR(50) NOT NULL, \n\tentity_id INTEGER NOT NULL, \n\taction VARCHAR(50) NOT NULL, \n\tbefore_state JSON, \n\tafter_state JSON, \n\tstaff_user_id INTEGER NOT NULL, \n\tip_address VARCHAR(45), \n\ttimestamp DATETIME, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(staff_user_id) REFERENCES users (id)\n)",
+    "users": [
+      [
+        1,
+        "Admin",
+        1
+      ]
+    ],
+    "audit_actors": [
+      [
+        1,
+        23
+      ]
+    ],
+    "schema_migrations_latest": "9.0.0",
+    "mig_branch_sha256": "c40b3d16730de412d7cb52bbd0428e0ac789e06dcb0c56e8d1ab77f668e3baf4",
+    "boot_changed_tables_branch": [
+      "audit_logs",
+      "schema_migrations"
+    ],
+    "boot_changed_tables_main_control": []
+  },
+  "gates_total": 21,
+  "gates_passed": 21,
+  "verdict": "PASS",
+  "checks": [
+    {
+      "case": "B-00",
+      "area": "production",
+      "what": "production SHA-256 == anchor (read-only)",
+      "expect": "'51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2'",
+      "got": "'51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2'",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "B-01",
+      "area": "restore",
+      "what": "restored: same tables as production",
+      "expect": "['audit_logs', 'backup_logs', 'business_date', 'checkin_records', 'cico_charge_logs', 'companies', 'credit_notes', 'credit_voucher_redemptions', 'credit_vouchers', 'equipment', 'equipment_health_logs', 'extra_charges', 'folios', 'foreign_national_info', 'group_blocks', 'guest_feedback', 'guest_id_documents', 'guests', 'loyalty_config', 'loyalty_milestones', 'loyalty_redemptions', 'loyalty_transactions', 'maintenance_requests', 'night_audit_logs', 'night_audit_reopen_logs', 'no_show_logs', 'notification_logs', 'notification_queue', 'ota_payouts', 'overpayment_logs', 'payment_modes', 'payments', 'pos_items', 'precheckin_submissions', 'precheckin_tokens', 'preventive_schedules', 'rate_plans', 'reservation_night_rates', 'reservation_passengers', 'reservation_rooms', 'reservations', 'revenue_alerts', 'room_types', 'rooms', 'schema_migrations', 'settings', 'shift_adjustments', 'shifts', 'staff_performance_daily', 'tax_lines', 'users', 'void_requests', 'webhook_logs']",
+      "got": "['audit_logs', 'backup_logs', 'business_date', 'checkin_records', 'cico_charge_logs', 'companies', 'credit_notes', 'credit_voucher_redemptions', 'credit_vouchers', 'equipment', 'equipment_health_logs', 'extra_charges', 'folios', 'foreign_national_info', 'group_blocks', 'guest_feedback', 'guest_id_documents', 'guests', 'loyalty_config', 'loyalty_milestones', 'loyalty_redemptions', 'loyalty_transactions', 'maintenance_requests', 'night_audit_logs', 'night_audit_reopen_logs', 'no_show_logs', 'notification_logs', 'notification_queue', 'ota_payouts', 'overpayment_logs', 'payment_modes', 'payments', 'pos_items', 'precheckin_submissions', 'precheckin_tokens', 'preventive_schedules', 'rate_plans', 'reservation_night_rates', 'reservation_passengers', 'reservation_rooms', 'reservations', 'revenue_alerts', 'room_types', 'rooms', 'schema_migrations', 'settings', 'shift_adjustments', 'shifts', 'staff_performance_daily', 'tax_lines', 'users', 'void_requests', 'webhook_logs']",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "B-02",
+      "area": "restore",
+      "what": "restored: every table row count and content digest == production",
+      "expect": "{'audit_logs': (23, '1cf41807b7639e55fe899b86798ce3059b3c528333b60a552004e7041f94efe7'), 'backup_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'business_date': (1, 'b920846506c58a1c83cddc1f02618cec50f523209a4d778831ac1de63f5f8f0d'), 'checkin_records': (4, '7f58ab7c8788e3a922337ed28f2970d2e210193f2699b1d7a4593cda5036f743'), 'cico_charge_logs': (2, 'd9c51cddea9dee81af8c91450b7256e4fbfa6e99a690e72ca7e3e624ce25abde'), 'companies': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'credit_notes': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'credit_voucher_redemptions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'credit_vouchers': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'equipment': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'equipment_health_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'extra_charges': (2, 'f86eb128fcafcffa853893962d631b8dd833b6dafdfa95b9eb70e147e87bc9b9'), 'folios': (4, 'f1f4c48551302ef129c19b34a8d9412205cab80d965e72cf1f64b7310fb5606f'), 'foreign_national_info': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'group_blocks': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'guest_feedback': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'guest_id_documents': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'guests': (32, '3e216b7d76d82c3d44bc5a52359e48ab988125b77aae22162c9c8edd005e027d'), 'loyalty_config': (3, '476bcebf00fcf2c3dda34af6871190d769982f452e487959cc8d8d27cd3eaf80'), 'loyalty_milestones': (3, '3453ef3de0a31f9114e033255aaa6e504a439cc6d8a0d9686f96243e4ea7d13c'), 'loyalty_redemptions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'loyalty_transactions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'maintenance_requests': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'night_audit_logs': (1, '1da359d6f0468de2290a44d617dc095be2697b4cb9049577d7eed3fadaaba407'), 'night_audit_reopen_logs': (5, 'ec8e9e698a16085d5fb3bcf327d0a7a529751e0b8dbb1436ca6a85ab7758edf7'), 'no_show_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'notification_logs': (5, 'c6b4ac73722dcd79b102c78866129a8e026c128aad5eb151d1656d011f325684'), 'notification_queue': (4, '2bf532198643a01d2073633f97d6bcb05037cc041832f6c5474ebde69475edb8'), 'ota_payouts': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'overpayment_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'payment_modes': (12, 'c9a94de2de4efc5e34f86901237d3621fce2d74bb636d63da1dec6e3d133d74f'), 'payments': (6, '2c43c88a370ec35aa28bddbd45b02e0f5931e9843bc9a8283776686972ccd806'), 'pos_items': (8, '35dc4ecc67f0cf7fba97efd32f2e49537fe0be271a8f235fd944cc40496ddf86'), 'precheckin_submissions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'precheckin_tokens': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'preventive_schedules': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'rate_plans': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'reservation_night_rates': (4, '232ab4f394e916b9a9651857df1e819a3af4c474e9fd3f5da726ba2aabec5c28'), 'reservation_passengers': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'reservation_rooms': (4, 'fb61242da239c5639daab934a2d60468bb600bf8e0e277d256dbc343633ac925'), 'reservations': (4, 'd33423b5f771e7d245e33c12136c8f24cc479815efc7934192477ddbe062295d'), 'revenue_alerts': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'room_types': (3, '3be726c32e3fd9a15b0fad922c0c537fbfb69427b1d0424f174d26c72016601d'), 'rooms': (39, 'a73b6e3dce3e2a9437f2b89c9c17d792e55b09793c59e01350feb9ed4b1401c3'), 'schema_migrations': (57, '60c746a2cde6d6a9c0f4a25b8450d0e6aa9e9cdfb318907f9def555a1e57e8b9'), 'settings': (60, '38858acc0769c836b800cbed0bd4a401747e7aef35b90f299656f88dab5fb701'), 'shift_adjustments': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'shifts': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'staff_performance_daily': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'tax_lines': (12, '38dd580a2edba0ae7d1c0f36afb662e6ea84bdcaf2423601d10a5f1b5d0aef1c'), 'users': (1, '35a962afc8c4c8fe175da8f7afdb4315484e203656322ac09a46dae70c5dd764'), 'void_requests': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'webhook_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')}",
+      "got": "{'audit_logs': (23, '1cf41807b7639e55fe899b86798ce3059b3c528333b60a552004e7041f94efe7'), 'backup_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'business_date': (1, 'b920846506c58a1c83cddc1f02618cec50f523209a4d778831ac1de63f5f8f0d'), 'checkin_records': (4, '7f58ab7c8788e3a922337ed28f2970d2e210193f2699b1d7a4593cda5036f743'), 'cico_charge_logs': (2, 'd9c51cddea9dee81af8c91450b7256e4fbfa6e99a690e72ca7e3e624ce25abde'), 'companies': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'credit_notes': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'credit_voucher_redemptions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'credit_vouchers': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'equipment': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'equipment_health_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'extra_charges': (2, 'f86eb128fcafcffa853893962d631b8dd833b6dafdfa95b9eb70e147e87bc9b9'), 'folios': (4, 'f1f4c48551302ef129c19b34a8d9412205cab80d965e72cf1f64b7310fb5606f'), 'foreign_national_info': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'group_blocks': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'guest_feedback': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'guest_id_documents': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'guests': (32, '3e216b7d76d82c3d44bc5a52359e48ab988125b77aae22162c9c8edd005e027d'), 'loyalty_config': (3, '476bcebf00fcf2c3dda34af6871190d769982f452e487959cc8d8d27cd3eaf80'), 'loyalty_milestones': (3, '3453ef3de0a31f9114e033255aaa6e504a439cc6d8a0d9686f96243e4ea7d13c'), 'loyalty_redemptions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'loyalty_transactions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'maintenance_requests': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'night_audit_logs': (1, '1da359d6f0468de2290a44d617dc095be2697b4cb9049577d7eed3fadaaba407'), 'night_audit_reopen_logs': (5, 'ec8e9e698a16085d5fb3bcf327d0a7a529751e0b8dbb1436ca6a85ab7758edf7'), 'no_show_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'notification_logs': (5, 'c6b4ac73722dcd79b102c78866129a8e026c128aad5eb151d1656d011f325684'), 'notification_queue': (4, '2bf532198643a01d2073633f97d6bcb05037cc041832f6c5474ebde69475edb8'), 'ota_payouts': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'overpayment_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'payment_modes': (12, 'c9a94de2de4efc5e34f86901237d3621fce2d74bb636d63da1dec6e3d133d74f'), 'payments': (6, '2c43c88a370ec35aa28bddbd45b02e0f5931e9843bc9a8283776686972ccd806'), 'pos_items': (8, '35dc4ecc67f0cf7fba97efd32f2e49537fe0be271a8f235fd944cc40496ddf86'), 'precheckin_submissions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'precheckin_tokens': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'preventive_schedules': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'rate_plans': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'reservation_night_rates': (4, '232ab4f394e916b9a9651857df1e819a3af4c474e9fd3f5da726ba2aabec5c28'), 'reservation_passengers': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'reservation_rooms': (4, 'fb61242da239c5639daab934a2d60468bb600bf8e0e277d256dbc343633ac925'), 'reservations': (4, 'd33423b5f771e7d245e33c12136c8f24cc479815efc7934192477ddbe062295d'), 'revenue_alerts': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'room_types': (3, '3be726c32e3fd9a15b0fad922c0c537fbfb69427b1d0424f174d26c72016601d'), 'rooms': (39, 'a73b6e3dce3e2a9437f2b89c9c17d792e55b09793c59e01350feb9ed4b1401c3'), 'schema_migrations': (57, '60c746a2cde6d6a9c0f4a25b8450d0e6aa9e9cdfb318907f9def555a1e57e8b9'), 'settings': (60, '38858acc0769c836b800cbed0bd4a401747e7aef35b90f299656f88dab5fb701'), 'shift_adjustments': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'shifts': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'staff_performance_daily': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'tax_lines': (12, '38dd580a2edba0ae7d1c0f36afb662e6ea84bdcaf2423601d10a5f1b5d0aef1c'), 'users': (1, '35a962afc8c4c8fe175da8f7afdb4315484e203656322ac09a46dae70c5dd764'), 'void_requests': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'webhook_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')}",
+      "pass": true,
+      "severity": "gate",
+      "note": "53 tables, 299 rows"
+    },
+    {
+      "case": "B-03",
+      "area": "restore",
+      "what": "audit_logs: 23 rows; digest and DDL == production",
+      "expect": "(23, (23, '1cf41807b7639e55fe899b86798ce3059b3c528333b60a552004e7041f94efe7', 'CREATE TABLE audit_logs (\\n\\tid INTEGER NOT NULL, \\n\\tentity_type VARCHAR(50) NOT NULL, \\n\\tentity_id INTEGER NOT NULL, \\n\\taction VARCHAR(50) NOT NULL, \\n\\tbefore_state JSON, \\n\\tafter_state JSON, \\n\\tstaff_user_id INTEGER NOT NULL, \\n\\tip_address VARCHAR(45), \\n\\ttimestamp DATETIME, \\n\\tPRIMARY KEY (id), \\n\\tFOREIGN KEY(staff_user_id) REFERENCES users (id)\\n)'))",
+      "got": "(23, (23, '1cf41807b7639e55fe899b86798ce3059b3c528333b60a552004e7041f94efe7', 'CREATE TABLE audit_logs (\\n\\tid INTEGER NOT NULL, \\n\\tentity_type VARCHAR(50) NOT NULL, \\n\\tentity_id INTEGER NOT NULL, \\n\\taction VARCHAR(50) NOT NULL, \\n\\tbefore_state JSON, \\n\\tafter_state JSON, \\n\\tstaff_user_id INTEGER NOT NULL, \\n\\tip_address VARCHAR(45), \\n\\ttimestamp DATETIME, \\n\\tPRIMARY KEY (id), \\n\\tFOREIGN KEY(staff_user_id) REFERENCES users (id)\\n)'))",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "B-04",
+      "area": "restore",
+      "what": "restored: users, audit actors, integrity, 10.0.0 not applied",
+      "expect": "([(1, 'Admin', 1)], [(1, 23)], 'ok', False)",
+      "got": "([(1, 'Admin', 1)], [(1, 23)], 'ok', False)",
+      "pass": true,
+      "severity": "gate",
+      "note": "schema_migrations max=9.0.0"
+    },
+    {
+      "case": "D-01",
+      "area": "migration",
+      "what": "branch boot on restored copy completes; main control boot completes",
+      "expect": "(0, 0)",
+      "got": "(0, 0)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "D-02",
+      "area": "migration",
+      "what": "migration 10.0.0 recorded (branch); not on the main control",
+      "expect": "(1, False)",
+      "got": "(1, False)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "D-04",
+      "area": "migration",
+      "what": "all 23 historical audit rows present",
+      "expect": "23",
+      "got": "23",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "D-05/06",
+      "area": "migration",
+      "what": "carried-over columns: digest identical to the restored source",
+      "expect": "'1cf41807b7639e55fe899b86798ce3059b3c528333b60a552004e7041f94efe7'",
+      "got": "'1cf41807b7639e55fe899b86798ce3059b3c528333b60a552004e7041f94efe7'",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "D-07/08",
+      "area": "migration",
+      "what": "actor_kind: all historical rows HUMAN (user 1), no mechanism/role/shift",
+      "expect": "[('HUMAN', None, None, None, 23)]",
+      "got": "[('HUMAN', None, None, None, 23)]",
+      "pass": true,
+      "severity": "gate",
+      "note": "historical rows are carried, not reconstructed"
+    },
+    {
+      "case": "D-09",
+      "area": "migration",
+      "what": "no SYSTEM rows exist before any system action",
+      "expect": "0",
+      "got": "0",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "D-10",
+      "area": "migration",
+      "what": "no audit row names users.id 0",
+      "expect": "0",
+      "got": "0",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "D-11",
+      "area": "migration",
+      "what": "constraints: staff_user_id nullable; 3 CHECKs; FK users + shifts; index",
+      "expect": "(0, 3, 2, True)",
+      "got": "(0, 3, 2, True)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "D-11b",
+      "area": "migration",
+      "what": "integrity_check ok; foreign_key_check empty (FK on); no leftover table",
+      "expect": "('ok', [], 0)",
+      "got": "('ok', [], 0)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "D-12a",
+      "area": "migration",
+      "what": "tables changed by boot: branch == main control + audit_logs/schema_migrations",
+      "expect": "['audit_logs', 'schema_migrations']",
+      "got": "['audit_logs', 'schema_migrations']",
+      "pass": true,
+      "severity": "gate",
+      "note": "branch changed=['audit_logs', 'schema_migrations']; main changed=[]"
+    },
+    {
+      "case": "D-12b",
+      "area": "migration",
+      "what": "after boot, every other table identical between branch and main control",
+      "expect": "[]",
+      "got": "[]",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "D-12c",
+      "area": "migration",
+      "what": "financial tables identical to the restored source after migration",
+      "expect": "{'payments': (6, '2c43c88a370ec35aa28bddbd45b02e0f5931e9843bc9a8283776686972ccd806'), 'extra_charges': (2, 'f86eb128fcafcffa853893962d631b8dd833b6dafdfa95b9eb70e147e87bc9b9'), 'folios': (4, 'f1f4c48551302ef129c19b34a8d9412205cab80d965e72cf1f64b7310fb5606f'), 'tax_lines': (12, '38dd580a2edba0ae7d1c0f36afb662e6ea84bdcaf2423601d10a5f1b5d0aef1c'), 'credit_vouchers': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'credit_voucher_redemptions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'night_audit_logs': (1, '1da359d6f0468de2290a44d617dc095be2697b4cb9049577d7eed3fadaaba407'), 'reservations': (4, 'd33423b5f771e7d245e33c12136c8f24cc479815efc7934192477ddbe062295d'), 'credit_notes': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'cico_charge_logs': (2, 'd9c51cddea9dee81af8c91450b7256e4fbfa6e99a690e72ca7e3e624ce25abde'), 'business_date': (1, 'b920846506c58a1c83cddc1f02618cec50f523209a4d778831ac1de63f5f8f0d'), 'shifts': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'users': (1, '35a962afc8c4c8fe175da8f7afdb4315484e203656322ac09a46dae70c5dd764')}",
+      "got": "{'payments': (6, '2c43c88a370ec35aa28bddbd45b02e0f5931e9843bc9a8283776686972ccd806'), 'extra_charges': (2, 'f86eb128fcafcffa853893962d631b8dd833b6dafdfa95b9eb70e147e87bc9b9'), 'folios': (4, 'f1f4c48551302ef129c19b34a8d9412205cab80d965e72cf1f64b7310fb5606f'), 'tax_lines': (12, '38dd580a2edba0ae7d1c0f36afb662e6ea84bdcaf2423601d10a5f1b5d0aef1c'), 'credit_vouchers': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'credit_voucher_redemptions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'night_audit_logs': (1, '1da359d6f0468de2290a44d617dc095be2697b4cb9049577d7eed3fadaaba407'), 'reservations': (4, 'd33423b5f771e7d245e33c12136c8f24cc479815efc7934192477ddbe062295d'), 'credit_notes': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'cico_charge_logs': (2, 'd9c51cddea9dee81af8c91450b7256e4fbfa6e99a690e72ca7e3e624ce25abde'), 'business_date': (1, 'b920846506c58a1c83cddc1f02618cec50f523209a4d778831ac1de63f5f8f0d'), 'shifts': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'users': (1, '35a962afc8c4c8fe175da8f7afdb4315484e203656322ac09a46dae70c5dd764')}",
+      "pass": true,
+      "severity": "gate",
+      "note": "payments, extra_charges, folios, tax_lines, credit_vouchers, credit_voucher_redemptions, night_audit_logs, reservations, credit_notes, cico_charge_logs, business_date, shifts, users"
+    },
+    {
+      "case": "D-03.2",
+      "area": "migration",
+      "what": "repeat boot 2: completes; every table unchanged",
+      "expect": "(0, {'audit_logs': (23, 'fb9452744bf3637a90cdd661b3d70b83d3c31129395631c3d53d4cecb43731e2'), 'backup_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'business_date': (1, 'b920846506c58a1c83cddc1f02618cec50f523209a4d778831ac1de63f5f8f0d'), 'checkin_records': (4, '7f58ab7c8788e3a922337ed28f2970d2e210193f2699b1d7a4593cda5036f743'), 'cico_charge_logs': (2, 'd9c51cddea9dee81af8c91450b7256e4fbfa6e99a690e72ca7e3e624ce25abde'), 'companies': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'credit_notes': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'credit_voucher_redemptions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'credit_vouchers': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'equipment': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'equipment_health_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'extra_charges': (2, 'f86eb128fcafcffa853893962d631b8dd833b6dafdfa95b9eb70e147e87bc9b9'), 'folios': (4, 'f1f4c48551302ef129c19b34a8d9412205cab80d965e72cf1f64b7310fb5606f'), 'foreign_national_info': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'group_blocks': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'guest_feedback': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'guest_id_documents': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'guests': (32, '3e216b7d76d82c3d44bc5a52359e48ab988125b77aae22162c9c8edd005e027d'), 'loyalty_config': (3, '476bcebf00fcf2c3dda34af6871190d769982f452e487959cc8d8d27cd3eaf80'), 'loyalty_milestones': (3, '3453ef3de0a31f9114e033255aaa6e504a439cc6d8a0d9686f96243e4ea7d13c'), 'loyalty_redemptions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'loyalty_transactions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'maintenance_requests': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'night_audit_logs': (1, '1da359d6f0468de2290a44d617dc095be2697b4cb9049577d7eed3fadaaba407'), 'night_audit_reopen_logs': (5, 'ec8e9e698a16085d5fb3bcf327d0a7a529751e0b8dbb1436ca6a85ab7758edf7'), 'no_show_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'notification_logs': (5, 'c6b4ac73722dcd79b102c78866129a8e026c128aad5eb151d1656d011f325684'), 'notification_queue': (4, '2bf532198643a01d2073633f97d6bcb05037cc041832f6c5474ebde69475edb8'), 'ota_payouts': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'overpayment_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'payment_modes': (12, 'c9a94de2de4efc5e34f86901237d3621fce2d74bb636d63da1dec6e3d133d74f'), 'payments': (6, '2c43c88a370ec35aa28bddbd45b02e0f5931e9843bc9a8283776686972ccd806'), 'pos_items': (8, '35dc4ecc67f0cf7fba97efd32f2e49537fe0be271a8f235fd944cc40496ddf86'), 'precheckin_submissions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'precheckin_tokens': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'preventive_schedules': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'rate_plans': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'reservation_night_rates': (4, '232ab4f394e916b9a9651857df1e819a3af4c474e9fd3f5da726ba2aabec5c28'), 'reservation_passengers': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'reservation_rooms': (4, 'fb61242da239c5639daab934a2d60468bb600bf8e0e277d256dbc343633ac925'), 'reservations': (4, 'd33423b5f771e7d245e33c12136c8f24cc479815efc7934192477ddbe062295d'), 'revenue_alerts': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'room_types': (3, '3be726c32e3fd9a15b0fad922c0c537fbfb69427b1d0424f174d26c72016601d'), 'rooms': (39, 'a73b6e3dce3e2a9437f2b89c9c17d792e55b09793c59e01350feb9ed4b1401c3'), 'schema_migrations': (58, '4079d7bc2e3abbb9c35ab9675eb4d95943b7a8dc7517c55b61b2ea722b6a6c3d'), 'settings': (60, '38858acc0769c836b800cbed0bd4a401747e7aef35b90f299656f88dab5fb701'), 'shift_adjustments': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'shifts': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'staff_performance_daily': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'tax_lines': (12, '38dd580a2edba0ae7d1c0f36afb662e6ea84bdcaf2423601d10a5f1b5d0aef1c'), 'users': (1, '35a962afc8c4c8fe175da8f7afdb4315484e203656322ac09a46dae70c5dd764'), 'void_requests': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'webhook_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')})",
+      "got": "(0, {'audit_logs': (23, 'fb9452744bf3637a90cdd661b3d70b83d3c31129395631c3d53d4cecb43731e2'), 'backup_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'business_date': (1, 'b920846506c58a1c83cddc1f02618cec50f523209a4d778831ac1de63f5f8f0d'), 'checkin_records': (4, '7f58ab7c8788e3a922337ed28f2970d2e210193f2699b1d7a4593cda5036f743'), 'cico_charge_logs': (2, 'd9c51cddea9dee81af8c91450b7256e4fbfa6e99a690e72ca7e3e624ce25abde'), 'companies': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'credit_notes': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'credit_voucher_redemptions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'credit_vouchers': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'equipment': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'equipment_health_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'extra_charges': (2, 'f86eb128fcafcffa853893962d631b8dd833b6dafdfa95b9eb70e147e87bc9b9'), 'folios': (4, 'f1f4c48551302ef129c19b34a8d9412205cab80d965e72cf1f64b7310fb5606f'), 'foreign_national_info': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'group_blocks': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'guest_feedback': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'guest_id_documents': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'guests': (32, '3e216b7d76d82c3d44bc5a52359e48ab988125b77aae22162c9c8edd005e027d'), 'loyalty_config': (3, '476bcebf00fcf2c3dda34af6871190d769982f452e487959cc8d8d27cd3eaf80'), 'loyalty_milestones': (3, '3453ef3de0a31f9114e033255aaa6e504a439cc6d8a0d9686f96243e4ea7d13c'), 'loyalty_redemptions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'loyalty_transactions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'maintenance_requests': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'night_audit_logs': (1, '1da359d6f0468de2290a44d617dc095be2697b4cb9049577d7eed3fadaaba407'), 'night_audit_reopen_logs': (5, 'ec8e9e698a16085d5fb3bcf327d0a7a529751e0b8dbb1436ca6a85ab7758edf7'), 'no_show_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'notification_logs': (5, 'c6b4ac73722dcd79b102c78866129a8e026c128aad5eb151d1656d011f325684'), 'notification_queue': (4, '2bf532198643a01d2073633f97d6bcb05037cc041832f6c5474ebde69475edb8'), 'ota_payouts': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'overpayment_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'payment_modes': (12, 'c9a94de2de4efc5e34f86901237d3621fce2d74bb636d63da1dec6e3d133d74f'), 'payments': (6, '2c43c88a370ec35aa28bddbd45b02e0f5931e9843bc9a8283776686972ccd806'), 'pos_items': (8, '35dc4ecc67f0cf7fba97efd32f2e49537fe0be271a8f235fd944cc40496ddf86'), 'precheckin_submissions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'precheckin_tokens': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'preventive_schedules': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'rate_plans': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'reservation_night_rates': (4, '232ab4f394e916b9a9651857df1e819a3af4c474e9fd3f5da726ba2aabec5c28'), 'reservation_passengers': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'reservation_rooms': (4, 'fb61242da239c5639daab934a2d60468bb600bf8e0e277d256dbc343633ac925'), 'reservations': (4, 'd33423b5f771e7d245e33c12136c8f24cc479815efc7934192477ddbe062295d'), 'revenue_alerts': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'room_types': (3, '3be726c32e3fd9a15b0fad922c0c537fbfb69427b1d0424f174d26c72016601d'), 'rooms': (39, 'a73b6e3dce3e2a9437f2b89c9c17d792e55b09793c59e01350feb9ed4b1401c3'), 'schema_migrations': (58, '4079d7bc2e3abbb9c35ab9675eb4d95943b7a8dc7517c55b61b2ea722b6a6c3d'), 'settings': (60, '38858acc0769c836b800cbed0bd4a401747e7aef35b90f299656f88dab5fb701'), 'shift_adjustments': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'shifts': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'staff_performance_daily': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'tax_lines': (12, '38dd580a2edba0ae7d1c0f36afb662e6ea84bdcaf2423601d10a5f1b5d0aef1c'), 'users': (1, '35a962afc8c4c8fe175da8f7afdb4315484e203656322ac09a46dae70c5dd764'), 'void_requests': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'webhook_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')})",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "D-03.3",
+      "area": "migration",
+      "what": "repeat boot 3: completes; every table unchanged",
+      "expect": "(0, {'audit_logs': (23, 'fb9452744bf3637a90cdd661b3d70b83d3c31129395631c3d53d4cecb43731e2'), 'backup_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'business_date': (1, 'b920846506c58a1c83cddc1f02618cec50f523209a4d778831ac1de63f5f8f0d'), 'checkin_records': (4, '7f58ab7c8788e3a922337ed28f2970d2e210193f2699b1d7a4593cda5036f743'), 'cico_charge_logs': (2, 'd9c51cddea9dee81af8c91450b7256e4fbfa6e99a690e72ca7e3e624ce25abde'), 'companies': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'credit_notes': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'credit_voucher_redemptions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'credit_vouchers': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'equipment': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'equipment_health_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'extra_charges': (2, 'f86eb128fcafcffa853893962d631b8dd833b6dafdfa95b9eb70e147e87bc9b9'), 'folios': (4, 'f1f4c48551302ef129c19b34a8d9412205cab80d965e72cf1f64b7310fb5606f'), 'foreign_national_info': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'group_blocks': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'guest_feedback': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'guest_id_documents': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'guests': (32, '3e216b7d76d82c3d44bc5a52359e48ab988125b77aae22162c9c8edd005e027d'), 'loyalty_config': (3, '476bcebf00fcf2c3dda34af6871190d769982f452e487959cc8d8d27cd3eaf80'), 'loyalty_milestones': (3, '3453ef3de0a31f9114e033255aaa6e504a439cc6d8a0d9686f96243e4ea7d13c'), 'loyalty_redemptions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'loyalty_transactions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'maintenance_requests': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'night_audit_logs': (1, '1da359d6f0468de2290a44d617dc095be2697b4cb9049577d7eed3fadaaba407'), 'night_audit_reopen_logs': (5, 'ec8e9e698a16085d5fb3bcf327d0a7a529751e0b8dbb1436ca6a85ab7758edf7'), 'no_show_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'notification_logs': (5, 'c6b4ac73722dcd79b102c78866129a8e026c128aad5eb151d1656d011f325684'), 'notification_queue': (4, '2bf532198643a01d2073633f97d6bcb05037cc041832f6c5474ebde69475edb8'), 'ota_payouts': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'overpayment_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'payment_modes': (12, 'c9a94de2de4efc5e34f86901237d3621fce2d74bb636d63da1dec6e3d133d74f'), 'payments': (6, '2c43c88a370ec35aa28bddbd45b02e0f5931e9843bc9a8283776686972ccd806'), 'pos_items': (8, '35dc4ecc67f0cf7fba97efd32f2e49537fe0be271a8f235fd944cc40496ddf86'), 'precheckin_submissions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'precheckin_tokens': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'preventive_schedules': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'rate_plans': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'reservation_night_rates': (4, '232ab4f394e916b9a9651857df1e819a3af4c474e9fd3f5da726ba2aabec5c28'), 'reservation_passengers': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'reservation_rooms': (4, 'fb61242da239c5639daab934a2d60468bb600bf8e0e277d256dbc343633ac925'), 'reservations': (4, 'd33423b5f771e7d245e33c12136c8f24cc479815efc7934192477ddbe062295d'), 'revenue_alerts': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'room_types': (3, '3be726c32e3fd9a15b0fad922c0c537fbfb69427b1d0424f174d26c72016601d'), 'rooms': (39, 'a73b6e3dce3e2a9437f2b89c9c17d792e55b09793c59e01350feb9ed4b1401c3'), 'schema_migrations': (58, '4079d7bc2e3abbb9c35ab9675eb4d95943b7a8dc7517c55b61b2ea722b6a6c3d'), 'settings': (60, '38858acc0769c836b800cbed0bd4a401747e7aef35b90f299656f88dab5fb701'), 'shift_adjustments': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'shifts': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'staff_performance_daily': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'tax_lines': (12, '38dd580a2edba0ae7d1c0f36afb662e6ea84bdcaf2423601d10a5f1b5d0aef1c'), 'users': (1, '35a962afc8c4c8fe175da8f7afdb4315484e203656322ac09a46dae70c5dd764'), 'void_requests': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'webhook_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')})",
+      "got": "(0, {'audit_logs': (23, 'fb9452744bf3637a90cdd661b3d70b83d3c31129395631c3d53d4cecb43731e2'), 'backup_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'business_date': (1, 'b920846506c58a1c83cddc1f02618cec50f523209a4d778831ac1de63f5f8f0d'), 'checkin_records': (4, '7f58ab7c8788e3a922337ed28f2970d2e210193f2699b1d7a4593cda5036f743'), 'cico_charge_logs': (2, 'd9c51cddea9dee81af8c91450b7256e4fbfa6e99a690e72ca7e3e624ce25abde'), 'companies': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'credit_notes': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'credit_voucher_redemptions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'credit_vouchers': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'equipment': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'equipment_health_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'extra_charges': (2, 'f86eb128fcafcffa853893962d631b8dd833b6dafdfa95b9eb70e147e87bc9b9'), 'folios': (4, 'f1f4c48551302ef129c19b34a8d9412205cab80d965e72cf1f64b7310fb5606f'), 'foreign_national_info': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'group_blocks': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'guest_feedback': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'guest_id_documents': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'guests': (32, '3e216b7d76d82c3d44bc5a52359e48ab988125b77aae22162c9c8edd005e027d'), 'loyalty_config': (3, '476bcebf00fcf2c3dda34af6871190d769982f452e487959cc8d8d27cd3eaf80'), 'loyalty_milestones': (3, '3453ef3de0a31f9114e033255aaa6e504a439cc6d8a0d9686f96243e4ea7d13c'), 'loyalty_redemptions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'loyalty_transactions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'maintenance_requests': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'night_audit_logs': (1, '1da359d6f0468de2290a44d617dc095be2697b4cb9049577d7eed3fadaaba407'), 'night_audit_reopen_logs': (5, 'ec8e9e698a16085d5fb3bcf327d0a7a529751e0b8dbb1436ca6a85ab7758edf7'), 'no_show_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'notification_logs': (5, 'c6b4ac73722dcd79b102c78866129a8e026c128aad5eb151d1656d011f325684'), 'notification_queue': (4, '2bf532198643a01d2073633f97d6bcb05037cc041832f6c5474ebde69475edb8'), 'ota_payouts': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'overpayment_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'payment_modes': (12, 'c9a94de2de4efc5e34f86901237d3621fce2d74bb636d63da1dec6e3d133d74f'), 'payments': (6, '2c43c88a370ec35aa28bddbd45b02e0f5931e9843bc9a8283776686972ccd806'), 'pos_items': (8, '35dc4ecc67f0cf7fba97efd32f2e49537fe0be271a8f235fd944cc40496ddf86'), 'precheckin_submissions': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'precheckin_tokens': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'preventive_schedules': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'rate_plans': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'reservation_night_rates': (4, '232ab4f394e916b9a9651857df1e819a3af4c474e9fd3f5da726ba2aabec5c28'), 'reservation_passengers': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'reservation_rooms': (4, 'fb61242da239c5639daab934a2d60468bb600bf8e0e277d256dbc343633ac925'), 'reservations': (4, 'd33423b5f771e7d245e33c12136c8f24cc479815efc7934192477ddbe062295d'), 'revenue_alerts': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'room_types': (3, '3be726c32e3fd9a15b0fad922c0c537fbfb69427b1d0424f174d26c72016601d'), 'rooms': (39, 'a73b6e3dce3e2a9437f2b89c9c17d792e55b09793c59e01350feb9ed4b1401c3'), 'schema_migrations': (58, '4079d7bc2e3abbb9c35ab9675eb4d95943b7a8dc7517c55b61b2ea722b6a6c3d'), 'settings': (60, '38858acc0769c836b800cbed0bd4a401747e7aef35b90f299656f88dab5fb701'), 'shift_adjustments': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'shifts': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'staff_performance_daily': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'tax_lines': (12, '38dd580a2edba0ae7d1c0f36afb662e6ea84bdcaf2423601d10a5f1b5d0aef1c'), 'users': (1, '35a962afc8c4c8fe175da8f7afdb4315484e203656322ac09a46dae70c5dd764'), 'void_requests': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), 'webhook_logs': (0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')})",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "D-JOB",
+      "area": "scheduler",
+      "what": "night_audit_job not registered after boot (setting false)",
+      "expect": "True",
+      "got": "True",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "P-00",
+      "area": "production",
+      "what": "production SHA-256 unchanged across the run (== anchor)",
+      "expect": "('51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2', '51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2')",
+      "got": "('51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2', '51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2')",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    }
+  ]
+}
