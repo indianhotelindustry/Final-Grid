@@ -4922,7 +4922,7 @@ def run_night_audit_manual():
     if denied:
         return denied
     try:
-        run_night_audit()
+        run_night_audit(user_id=current_user.id)
         # Check what actually happened — was it completed or left pending?
         from app.services import get_business_date
         bd = get_business_date()

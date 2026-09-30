@@ -254,9 +254,14 @@ def audited_financial_write(entity_type, entity_id, action,
     return log
 
 
-def run_night_audit(app=None):
+def run_night_audit(app=None, user_id=None):
     """
     Night audit — called by APScheduler (auto) or manually from a route.
+
+    ``user_id`` is the operator who initiated a manual run; it is recorded as
+    ``run_by_user_id`` and as the actor of each room-rent charge's audit row.
+    A scheduler run passes none, and the actor falls back to the system
+    convention of ``audited_financial_write`` (AR-013, open).
 
     Guarantees:
     - **Idempotent**: Will not create a second NightAuditLog row for the same
@@ -329,6 +334,7 @@ def run_night_audit(app=None):
                 accrual_revenue=accrual['accrual_net'],
                 occupancy_count=occupied_rooms,
                 pending_checkouts=pending_checkouts,
+                run_by_user_id=user_id,
             )
             db.session.add(audit_log)
             db.session.flush()   # get audit_log.id before no-show processing
@@ -406,6 +412,19 @@ def run_night_audit(app=None):
                 )
                 db.session.add(charge)
                 db.session.flush()
+                # Q-5 / CF-10 (W-21): each room-rent charge is audited in the
+                # run's single transaction; a failure rolls the whole run back.
+                audited_financial_write(
+                    'ExtraCharge', charge.id, 'posted', {},
+                    {'amount': float(rate),
+                     'reservation_id': res.id,
+                     'folio_id': charge.folio_id,
+                     'charge_type': 'room_rent',
+                     'charge_date': _bd.isoformat(),
+                     'rate_source': _post_source,
+                     'night_audit_log_id': audit_log.id,
+                     'flow': 'night_audit'},
+                    user_id=user_id)
 
                 # Link nightly row to posted charge
                 if _nr_row and _post_source == 'nightly_row':

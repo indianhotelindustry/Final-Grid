@@ -3354,6 +3354,20 @@ def _rerun_skipped_audit(target_date, user_id: int, reason: str) -> tuple[bool, 
             )
             db.session.add(ec)
             db.session.flush()
+            # Q-5 / CF-10 (W-16): each recovered charge is audited in the
+            # rerun's single transaction; the except below rolls it all back.
+            from app.services import audited_financial_write
+            audited_financial_write(
+                'ExtraCharge', ec.id, 'posted', {},
+                {'amount': float(rate),
+                 'reservation_id': res.id,
+                 'folio_id': ec.folio_id,
+                 'charge_type': 'room_rent',
+                 'charge_date': target_date.isoformat(),
+                 'night_audit_log_id': log.id,
+                 'reason': reason,
+                 'flow': 'night_audit_rerun'},
+                user_id=user_id)
             if nr_row and not nr_row.is_posted:
                 nr_row.is_posted = True
                 nr_row.posted_charge_id = ec.id
