@@ -125,13 +125,14 @@ _REFUND_DISPOSITIONS = ('refund_full', 'refund_partial')
         'purpose refund, flagged is_reversal, not is_correction) is linked '
         'through the cancellation that generated it: exactly one '
         'reservation names it as cancellation_refund_payment_id, that '
-        'reservation is its own, and its cancellation record (stamped '
-        'cancellation_processed_at, with a refund disposition) was written '
-        'when the refund was. That record is write-once in the application, '
-        'so lineage does not depend on the reservation\'s status today. '
-        'The refund amount matching cancellation_amount_refunded is a '
-        'separate consistency check, reported under its own name. Later '
-        'voiding or correcting the refund does not change its lineage. A '
+        'reservation is its own, its disposition is refund_full or '
+        'refund_partial, and cancellation_processed_at is present: the '
+        'application\'s durable evidence that the cancellation-processing '
+        'event occurred and generated the refund. Lineage does not require '
+        'the reservation\'s status to be Cancelled today. The refund amount '
+        'matching cancellation_amount_refunded is a separate consistency '
+        'check, reported under its own name. A later status change, void or '
+        'correction does not retroactively invalidate the lineage. A '
         'reservation, guest, folio or amount match by itself is not '
         'lineage.'),
     severity=Severity.CRITICAL,
@@ -202,8 +203,9 @@ def _d02(ctx):
         refund's origin, 'consistency' when lineage is established but the
         amount disagrees with what the cancellation recorded. Neither looks
         at the refund's later life (is_voided, correction rows) or at the
-        reservation's status today: the cancellation snapshot is written
-        once, in the refund's own transaction, by the only refund writer.
+        reservation's status today. The cancellation-processing snapshot
+        is the application's durable evidence that the event occurred and
+        generated the refund; audit rows are not consulted.
         """
         named_by = cancellations.get(row['id'], [])
         if not named_by:

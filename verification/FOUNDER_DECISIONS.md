@@ -1319,3 +1319,36 @@ Gate G3 (financial integrity) and G5 (auditability) remain not-PASS pending CF-1
 ## Effect
 
 Resolves the FD-P2-06 statement "INV-D02 must not treat a legitimate cancellation refund as an automatic integrity failure" through the cancellation/reservation link, without changing application behaviour, the data model or the refund amount allocation. SR-1 (INV-B06), K-7 and all other open items are unaffected.
+
+# Founder Resolution Round 7 — SR-2 / INV-D02 Revision 2 — FG-P2-FOUNDER-RESOLUTION-20261001-01
+
+| | |
+|---|---|
+| Recorded | 2026-10-01 |
+| Governed HEAD | `c703150a06fd29547e575536d63f9ee2a3af4f7a` (`main`); implementation on local branch `sr2-inv-d02`, not pushed, not merged |
+| Kind | Founder confirmation of the revised SR-2 / INV-D02 interpretation (Revision 2), with governance wording. Refines the operationalisation of `SR2-RULE` (Round 6); `SR2-RULE` itself is unchanged |
+| Identifier | `SR2-REV2` |
+| Context | The first implementation required the refund's reservation to be `Cancelled` today and treated amount equality as part of lineage. The Founder asked for a rule independent of current status, with audit as supporting evidence only. Revision 2 was implemented and verified (`verification/evidence/20260930_sr2_inv_d02/REVISION_2_REPORT.md`) and is confirmed below |
+
+## SR2-REV2 — Founder interpretation
+
+1. A legitimate cancellation refund is **not** required to have the reservation's current status equal to `Cancelled`.
+2. Cancellation lineage is established from the existing cancellation-processing snapshot: exactly one reservation names the refund; it is the refund's own reservation; the disposition is `refund_full` or `refund_partial`; and `cancellation_processed_at` is present.
+3. `cancellation_processed_at` is **not** described as proof of historical reservation status. It is the application's durable evidence that the cancellation-processing event occurred and generated the refund.
+4. Audit rows are supporting provenance evidence only. INV-D02 does not depend on the existence of an audit row.
+5. Refund amount equality (`cancellation_amount_refunded` against the refund amount) remains a separate **consistency** check. A consistency failure is not represented as a lineage failure.
+6. A later reservation-status change, refund void, or correction does not retroactively invalidate the historical cancellation lineage.
+7. No ordering check between the refund's `created_at` and `cancellation_processed_at` is added. That absence is outside this ruling.
+8. The direct-database-forgery limitation is acknowledged as a limitation of the current architecture. No schema or application change is made to address it under this directive.
+9. Refunds predating the cancellation snapshot fields are outside the current supported verification population.
+
+## Recorded limitations (not decisions)
+
+- The application keeps no reservation status history; the rule does not claim to establish historical status.
+- The snapshot is write-once by application code, not by the database; a direct database write could forge it and the rule would accept it (item 8).
+- No `created_at` / `cancellation_processed_at` ordering check (item 7).
+- Refunds predating the snapshot fields are not supported (item 9). Production holds no correction or refund rows, so INV-D02 is VACUOUS there; other installations were not examined.
+
+## Effect
+
+`SR2-RULE` stands. Revision 2 fixes how it is operationalised in `verification/invariants/rules_d.py` (INV-D02) only. No change to `app/`, the schema, production, K-7, SR-1 or any other rule. Push and merge remain separately unauthorised; the local branch is the only authorised delivery location.

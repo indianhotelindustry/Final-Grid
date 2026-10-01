@@ -2,6 +2,8 @@
 
 Branch `sr2-inv-d02` (local only; **not pushed, not merged, `main` untouched**). Code commit `6e46e2c`, on top of `3fba926`. Verification framework only: no `app/`, schema, migration, production, K-7 or SR-1 change. Production SHA-256 `21dc0e97…` unchanged across every run; the application was never started against the live folder.
 
+> **Founder confirmation (2026-10-01, `SR2-REV2`, recorded in `FOUNDER_DECISIONS.md` Round 7).** Where this report's wording differs, the recorded wording governs: `cancellation_processed_at` is the application's durable evidence that the cancellation-processing event occurred and generated the refund, not proof of historical reservation status; audit rows are supporting provenance only; a `created_at` ordering check is outside the ruling; the forgery and pre-snapshot-refund limitations are acknowledged, not to be fixed under this directive.
+
 ## Founder instructions and what was done
 
 | Instruction | Result |
