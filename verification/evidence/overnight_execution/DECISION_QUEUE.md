@@ -30,6 +30,17 @@ Priority: **P1** unblocks a G3 item or a production risk · **P2** unblocks prep
 | DQ-23 | P2 | Release | Name the release-candidate tag (no gate can PASS without one) | same, GT-D14 | OPEN |
 | DQ-24 | P2 | G8 | Issue the FD-P2-04 recovery-hardening directive (backups still `shutil.copy2`, `app/backup_manager.py:208`) | same, GT-D15 | OPEN |
 | DQ-25 | P3 | G9 | Execute the FD-017 launcher CRLF fix | same, GT-D16 | OPEN |
+| DQ-26 | P1 | B-4 | Single schema authority (inline registry / Alembic / new); fate of the SQLite column fixer, table bootstrap and `update.bat` patch | `20261002_overnight_b4_postgresql/B4_DECISION_PACKAGE.md` B4-D1 | OPEN |
+| DQ-27 | P1 | B-4 | May migrations keep running automatically at startup, or flag-gated / separate command with read-only boot? | same, B4-D2 (overlaps DQ-20) | OPEN |
+| DQ-28 | P2 | B-4 | Stop the automatic boot-time data writes (seeds, owner promotion, `ota_channel` fill)? | same, B4-D3 | OPEN |
+| DQ-29 | P1 | B-4 / G8 | Tie every migration to a verified pre-migration backup (which path); exempt pre-update backups from the 30-day purge? | same, B4-D4 | OPEN |
+| DQ-30 | P2 | B-4 | Move the production database out of the application working tree? | same, B4-D5 | OPEN |
+| DQ-31 | P1 | B-4 / B-1 | Should startup keep registering every scheduled job, including guest messaging gated only by credentials? | same, B4-D6 | OPEN |
+| DQ-32 | P2 | PostgreSQL | Is PostgreSQL a first-release target, or NOT APPLICABLE until MP-D4? | `20261002_overnight_b4_postgresql/POSTGRESQL_VERIFICATION_BLOCKER.md` PG-D1 | OPEN |
+| DQ-33 | P2 | PostgreSQL | Which server (18 @5432 / 13 @5433 / new), owner, throwaway role+DB, credential hand-over (env only), verification venv with pinned `psycopg[binary]` | same, PG-D2…PG-D4 | OPEN |
+| DQ-34 | P2 | PostgreSQL | Verification levels L1–L4, acceptance criteria, authority to port the SQLite-bound harness | same, PG-D5 | OPEN |
+| DQ-35 | P1 | Host security | Separate read-only review of two PostgreSQL services listening on all interfaces (0.0.0.0/::) on the production host | same, PG-D6 | OPEN |
+| — | — | duplicates | B4-D7 = handled by correction record (`20261002_overnight_adr011_adoption/CORRECTION_RECORD_…`); remaining question "change version checks going forward" folded into DQ-26 |
 | — | — | duplicates | GT-D2 = DQ-01…DQ-04 · GT-D3 = DQ-05 · GT-D4 = DQ-06 (not re-asked) | — | — |
 | DQ-06 | P3 | Governance record | Record the founder's authorization to push/merge SR-2 to `origin/main` (Round 7, `FOUNDER_DECISIONS.md:1354`, still says "Push and merge remain separately unauthorised", but `origin/main` = `c9eeff0` contains it) | this file, below | OPEN |
 

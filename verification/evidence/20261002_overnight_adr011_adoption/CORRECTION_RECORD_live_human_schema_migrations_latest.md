@@ -22,3 +22,11 @@ Cause: `verify_live_human.py:127` computes `SELECT MAX(version) FROM schema_migr
 Any harness that reads "latest migration" with a text `MAX(version)` or `ORDER BY version` has the same defect once versions reach two-digit majors. Compare parsed version tuples instead. No harness code is changed by this record.
 
 Found by: the ADR-011 adoption analysis (`ADR011_ADOPTION_PACKAGE.md`, inconsistency I-5); reconfirmed by reading `verify_live_human.py:127` and `RESULT.json`.
+
+## Addendum — same latent pattern in two earlier harnesses (no evidence value is wrong)
+
+Reported by the B-4 analysis (`20261002_overnight_b4_postgresql/B4_STARTUP_MIGRATION_ANALYSIS.md:85-86`, F-1) and reconfirmed by reading the scripts:
+- `20260930_adr011_preprod_gate/verify_preprod.py:138` — `ORDER BY version` then `migs[-1]`; it ran before 10.0.0 was applied, so its recorded value was correct;
+- `20260908_golden_master/baseline.py:47` — `max(version)`; it ran before 10.0.0, so it was correct then.
+
+Neither run's recorded value is wrong. Re-running either script against a database that has 10.0.0 would mis-report "latest". Not edited.
