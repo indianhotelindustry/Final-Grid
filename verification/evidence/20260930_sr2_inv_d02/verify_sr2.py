@@ -15,6 +15,12 @@ FOUNDER_DECISIONS.md, SR-2):
     cancellation that generated it;
   - a reservation, guest, folio or amount match alone is not lineage.
 
+Revision 2 (Founder, 2026-10-01): a legitimate refund does not depend on the
+reservation's status today; the cancellation snapshot (disposition,
+cancellation_processed_at, pointer) is the historical record; the audit trail
+is supporting evidence only; amount equality is a separately named
+consistency check; later void/correction activity does not change lineage.
+
     <main>\\venv\\Scripts\\python.exe verify_sr2.py [--label L]
 """
 from __future__ import annotations
@@ -98,7 +104,8 @@ def new_reservation(c, like_id=1, guest_id=None, status='CheckedOut'):
     rid = c.execute('SELECT last_insert_rowid()').fetchone()[0]
     c.execute("UPDATE reservations SET booking_reference = 'SR2-' || ?, status = ?, "
               "cancellation_refund_payment_id = NULL, cancellation_disposition = NULL, "
-              "cancellation_amount_refunded = 0 WHERE id = ?", (rid, status, rid))
+              "cancellation_amount_refunded = 0, cancellation_processed_at = NULL WHERE id = ?",
+              (rid, status, rid))
     if guest_id is not None:
         c.execute('UPDATE reservations SET guest_id = ? WHERE id = ?', (guest_id, rid))
     return rid
@@ -121,14 +128,19 @@ def charge(c, rid, amount, is_rev=0, is_corr=0, corrects=None):
     return c.execute('SELECT last_insert_rowid()').fetchone()[0]
 
 
-def cancel(c, rid, refund_id, amount, disposition='refund_full', status='Cancelled'):
+def cancel(c, rid, refund_id, amount, disposition='refund_full', status='Cancelled',
+           processed_at='2026-08-10 12:00:00'):
     c.execute('UPDATE reservations SET status = ?, cancellation_disposition = ?, '
-              'cancellation_amount_refunded = ?, cancellation_refund_payment_id = ? WHERE id = ?',
-              (status, disposition, amount, refund_id, rid))
+              'cancellation_amount_refunded = ?, cancellation_refund_payment_id = ?, '
+              'cancellation_processed_at = ? WHERE id = ?',
+              (status, disposition, amount, refund_id, processed_at, rid))
 
 
 # ---------------------------------------------------------------------------
 CASES = []
+#: cases whose failure must carry a specific name (consistency vs lineage)
+KIND = {'N3': 'recorded refund', 'N5': 'no processed cancellation is identifiable',
+        'V3': 'corrects_id is NULL'}
 
 
 def case(cid, what, expect):
@@ -237,11 +249,50 @@ def _t8(c):
     pay(c, r, 500, is_rev=1, is_corr=1, corrects=999999)
 
 
-@case('N1', 'cancellation pointer but reservation not Cancelled (cancellation not valid)', 'FAIL')
+@case('N1', 'cancellation record stamped, reservation status later NOT Cancelled (status is not lineage)', 'HOLDS')
 def _n1(c):
     r = new_reservation(c, status='Reserved')
     f = pay(c, r, 300, 'refund', is_rev=1)
     cancel(c, r, f, 300, status='Reserved')
+
+
+@case('N1b', 'same, status later CheckedOut', 'HOLDS')
+def _n1b(c):
+    r = new_reservation(c, status='Reserved')
+    f = pay(c, r, 300, 'refund', is_rev=1)
+    cancel(c, r, f, 300, status='CheckedOut')
+
+
+@case('N5', 'pointer + refund disposition but NO cancellation_processed_at (no processed cancellation identifiable)', 'FAIL')
+def _n5(c):
+    r = new_reservation(c, status='Reserved')
+    f = pay(c, r, 300, 'refund', is_rev=1)
+    cancel(c, r, f, 300, processed_at=None)
+
+
+@case('V1', 'refund voided AFTER the cancellation (subsequent activity, lineage unchanged)', 'HOLDS')
+def _v1(c):
+    r = new_reservation(c, status='Reserved')
+    f = pay(c, r, 300, 'refund', is_rev=1)
+    cancel(c, r, f, 300)
+    c.execute("UPDATE payments SET is_voided = 1, voided_at = '2026-08-11 09:00:00', "
+              "void_reason = 'SR2 later void' WHERE id = ?", (f,))
+
+
+@case('V2', 'refund later corrected: a correction reversal names the refund; the refund keeps its lineage', 'HOLDS')
+def _v2(c):
+    r = new_reservation(c, status='Reserved')
+    f = pay(c, r, 300, 'refund', is_rev=1)
+    cancel(c, r, f, 300)
+    pay(c, r, 300, 'refund', is_rev=1, is_corr=1, corrects=f, reason='SR2 later correction')
+
+
+@case('V3', 'a correction that names no original is still a failure (only the correction row)', 'FAIL')
+def _v3(c):
+    r = new_reservation(c, status='Reserved')
+    f = pay(c, r, 300, 'refund', is_rev=1)
+    cancel(c, r, f, 300)
+    pay(c, r, 300, 'refund', is_rev=1, is_corr=1, corrects=None, reason='SR2 orphan correction')
 
 
 @case('N2', 'cancellation pointer, but disposition generates no refund (forfeit)', 'FAIL')
@@ -251,7 +302,7 @@ def _n2(c):
     cancel(c, r, f, 300, disposition='forfeit')
 
 
-@case('N3', 'cancellation pointer, but the refund amount differs from the recorded refund', 'FAIL')
+@case('N3', 'lineage established, but refund amount differs from the recorded refund (consistency check)', 'FAIL')
 def _n3(c):
     r = new_reservation(c, status='Reserved')
     f = pay(c, r, 300, 'refund', is_rev=1)
@@ -301,8 +352,15 @@ with app.app_context():
     r.status = 'Cancelled'
     db.session.commit()
     rp = res['refund_payment']
+    audit = db.session.execute(db.text(
+        "SELECT action, COUNT(*) FROM audit_logs WHERE (entity_type='Payment' AND entity_id=:p) "
+        "OR (entity_type='Reservation' AND entity_id=:r) GROUP BY action"),
+        {'p': rp.id, 'r': r.id}).fetchall()
     print('APPJSON ' + json.dumps({'reservation': r.id, 'refund_id': rp.id, 'corrects_id': rp.corrects_id,
-                                   'is_reversal': rp.is_reversal, 'pointer': r.cancellation_refund_payment_id}))
+                                   'is_reversal': rp.is_reversal, 'pointer': r.cancellation_refund_payment_id,
+                                   'processed_at_stamped': r.cancellation_processed_at is not None,
+                                   'refund_created_at_le_processed_at': (rp.created_at <= r.cancellation_processed_at),
+                                   'audit_supporting_rows': {a: n for a, n in audit}}, default=str))
 ''' % (WT, os.path.join(MAIN, '.env'), db)
     p = subprocess.run([sys.executable, '-c', code], capture_output=True, text=True,
                        env=dict(os.environ, PYTHONIOENCODING='utf-8'))
@@ -311,6 +369,16 @@ with app.app_context():
     status, viol = evaluate(db)
     check('T2-APP', 'cancellation refund produced by the real post_cancellation_disposition writer',
           'HOLDS', status, json.dumps(info))
+    check('T2-APP-stamp', 'the real writer stamps cancellation_processed_at (the historical record the rule relies on)',
+          True, info.get('processed_at_stamped'))
+    # Same copy, status moved away from Cancelled afterwards: lineage must hold.
+    cx = sqlite3.connect(db)
+    cx.execute("UPDATE reservations SET status = 'Reserved' WHERE id = ?", (info['reservation'],))
+    cx.commit()
+    cx.close()
+    status2, viol2 = evaluate(db)
+    check('T2-APP-status', 'real-writer refund, reservation status later no longer Cancelled', 'HOLDS', status2,
+          '; '.join(objects(viol2)))
     return assert_production_untouched(h)
 
 
@@ -346,6 +414,10 @@ def main():
         status, viol = evaluate(db)
         got = 'HOLDS' if status == 'HOLDS' else ('FAIL' if status == 'VIOLATED' else status)
         check(cid, what, expect, got, '; '.join(objects(viol)))
+        if cid in KIND:
+            sub = KIND[cid]
+            blob = json.dumps(viol, default=str)
+            check(cid + 'k', 'failure is named as: ' + sub, True, sub in blob)
         assert_production_untouched(h)
     app_refund_case()
     voidcn_case()

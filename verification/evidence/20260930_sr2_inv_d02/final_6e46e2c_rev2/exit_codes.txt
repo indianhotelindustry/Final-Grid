@@ -1,0 +1,5 @@
+inv_commission rc=1
+inv_run rc=1
+ds_run rc=0
+ds_commission rc=0
+fault_run rc=1
