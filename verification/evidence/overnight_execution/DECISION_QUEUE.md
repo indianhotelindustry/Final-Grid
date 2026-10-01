@@ -11,6 +11,12 @@ Priority: **P1** unblocks a G3 item or a production risk · **P2** unblocks prep
 | DQ-03 | P1 | SR-1 | Which negative seeds/scenarios the amended INV-B06 must fail on? | same, SR1-D3 | OPEN |
 | DQ-04 | P2 | SR-1 × K-7 | SR-1 before K-7 (basis-independent clauses), after K-7, or split? | same, SR1-D4 | OPEN |
 | DQ-05 | P3 | SR-1 governance | Does the SR-1 directive itself carve out Phase 6 "Not touched: invariant semantics" (as SR-2 implicitly did)? | same, SR1-D5 | OPEN |
+| DQ-07 | P3 | ADR-011 | Adopt ADR-011 now (qualified, as ADR-005/007), in part, keep PROPOSED, or supersede? | `20261002_overnight_adr011_adoption/ADR011_FORMAL_ADOPTION_REQUIRED.md` A11-D1 | OPEN |
+| DQ-08 | P3 | ADR-011 | Does a SYSTEM row with NULL `staff_user_id` (+ required mechanism) satisfy ADR item 4 "never NULL and never admin"? | same, A11-D2 | OPEN |
+| DQ-09 | P3 | ADR-011 | Confirm the four implementer readings (unknown actor refused; unauthenticated = SYSTEM `web:unauthenticated`; history = HUMAN; role/shift/mechanism not reconstructed) | same, A11-D3 | OPEN |
+| DQ-10 | P3 | Governance record | Record the in-session ADR-011 authorizations (branch-only delivery, 10.0.0 production application, boot-time mechanism use, rollback path, live check) in `FOUNDER_DECISIONS.md` (`:1290` still says "not implemented") | same, A11-D4 | OPEN |
+| DQ-11 | P2 | ADR-011 × webhook | Are the webhook audit gaps in ADR-011 scope and do they block adoption? | same, A11-D5 (see also webhook package) | OPEN |
+| DQ-12 | P3 | ADR-011 | Is a failed login recorded as HUMAN naming the targeted account (`app/auth.py:110-117`, pre-existing) acceptable? | same, A11-D6 | OPEN |
 | DQ-06 | P3 | Governance record | Record the founder's authorization to push/merge SR-2 to `origin/main` (Round 7, `FOUNDER_DECISIONS.md:1354`, still says "Push and merge remain separately unauthorised", but `origin/main` = `c9eeff0` contains it) | this file, below | OPEN |
 
 ---
