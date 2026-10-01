@@ -60,6 +60,20 @@ Priority: **P1** unblocks a G3 item or a production risk · **P2** unblocks prep
 | DQ-53 | P1 | Live-data copies | Which artifacts are the retained recovery points, where is the recovery store, is a fresh backup of `21dc0e97…` needed? | `20261002_overnight_webhook_privacy_copies/LIVE_DATA_RETENTION_DECISION.md` LD-D1 (overlaps DQ-37) | OPEN |
 | DQ-54 | P2 | Live-data copies | Keep or dispose of the 15 derived working copies; the three identical `99505a47` backups; location/access/encryption/retention of kept copies (all hold guest personal data, unencrypted) | same, LD-D2, LD-D3, LD-D5 | OPEN |
 | DQ-55 | P2 | Live-data copies | What is `SukoonPMS.zip` (120 MB, 2026-09-19, unreferenced); may its entry names be listed; keep? | same, LD-D4 | OPEN |
+| DQ-56 | **P1** | Q06-H1 protection | While the business date is 2026-08-10, an operator Reopen of 2026-08-09 would mutate the sealed Q06-H1 record (BUG FG-ON-20). Accept the exposure until the date advances, require an operating instruction (no reopen of 2026-08-09), or authorize a code guard? | `20261002_overnight_k7_analysis/BUSINESS_DATE_PRODUCTION_DECISION.md`; `BUG_INDEX.md` FG-ON-20 | OPEN |
+| DQ-57 | P1 | K-7 / Phase 3 | Issue a Phase 3 directive for unit 3.1 (alone / with 3.5–3.6 / whole phase); waive or require the B-1 scheduler ADR (`MASTER_PLAN.md:370`) and Gates A–H | `20261002_overnight_k7_analysis/K7_DECISION_REQUIRED.md` K7-D1 (overlaps DQ-15) | OPEN |
+| DQ-58 | P1 | K-7 | Sites in scope (core 8 writers, voucher issue/expiry, 3 secondary calendar fallbacks, late checkout + preview, void/shift UTC-day mapping, documents, reports) | same, K7-D2, K7-D4, K7-D5, K7-D6 | OPEN |
+| DQ-59 | P1 | K-7 | `get_business_date()` fail-closed vs calendar; replacement for `date.today` model defaults (NULL / UTC-table-default hazard, `app/__init__.py:1794`) | same, K7-D3 | OPEN |
+| DQ-60 | P2 | K-7 | Evidence standard; basis-checking invariant (B-10 #4); frozen suites superseded or re-baselined (Golden Master cannot detect K-7) | same, K7-D7 | OPEN |
+| DQ-61 | P1 | K-7 deploy | May K-7 deploy before the business date is current? (separate production authorization either way) | same, K7-D8 (overlaps DQ-16) | OPEN |
+| DQ-62 | P2 | K-7 / night audit | Close-path divergence (panel Run+Complete posts no room rent / no-shows; `run_night_audit` does both and posts rent for every checked-in reservation with no date condition) — in 3.1, 3.2, or accepted? | same, K7-D10 | OPEN |
+| DQ-63 | P2 | Defects | Register and route defect candidates N-7 (UTC invoice/GST dates), N-8 (GSTR-1 credit-note bound), N-10 (no-show TypeError) | same, K7-D11; `BUG_INDEX.md` FG-ON-21…23 | OPEN |
+| DQ-64 | **P1** | Business date | When: bring current now / on the first trading day / after Phase 3 units 3.5–3.6 | `BUSINESS_DATE_PRODUCTION_DECISION.md` BD-D1 (= DQ-16 detail) | OPEN |
+| DQ-65 | P1 | Business date | Mechanism: panel close ×53 / `run_night_audit` ×53 / close 2026-08-10 then Force Close / Force Close all (no snapshot, no AuditLog — FG-ON-13) / direct SQL | same, BD-D2 | OPEN |
+| DQ-66 | P1 | Business date / D11 | May 2026-08-10 (five D11 rows) be closed or marked Skipped under FD-010 / FD-P2-03? | same, BD-D3 | OPEN |
+| DQ-67 | P2 | Business date | Target date, time-of-day for closes, interim staleness rule (B-10 #5) | same, BD-D4 | OPEN |
+| DQ-68 | P1 | Business date | Authorization path (PD-004/PD-005, FD-P2-04 conditions 1–7, 9, 10), full rehearsal on a copy, read-only pre-checks incl. `notification_queue` statuses before any start | same, BD-D5 (overlaps DQ-37) | OPEN |
+| — | — | duplicates | K7-D9 = DQ-13 (G3 on unit 3.1) |
 | — | — | duplicates | GD-D4 = DQ-23 (release tag) · GD-D9 = DQ-17 (G10 baselines) · GD-D10 = DQ-27 (B-4) |
 | — | — | duplicates | B4-D7 = handled by correction record (`20261002_overnight_adr011_adoption/CORRECTION_RECORD_…`); remaining question "change version checks going forward" folded into DQ-26 |
 | — | — | duplicates | GT-D2 = DQ-01…DQ-04 · GT-D3 = DQ-05 · GT-D4 = DQ-06 (not re-asked) | — | — |
