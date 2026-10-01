@@ -40,6 +40,16 @@ Priority: **P1** unblocks a G3 item or a production risk · **P2** unblocks prep
 | DQ-33 | P2 | PostgreSQL | Which server (18 @5432 / 13 @5433 / new), owner, throwaway role+DB, credential hand-over (env only), verification venv with pinned `psycopg[binary]` | same, PG-D2…PG-D4 | OPEN |
 | DQ-34 | P2 | PostgreSQL | Verification levels L1–L4, acceptance criteria, authority to port the SQLite-bound harness | same, PG-D5 | OPEN |
 | DQ-35 | P1 | Host security | Separate read-only review of two PostgreSQL services listening on all interfaces (0.0.0.0/::) on the production host | same, PG-D6 | OPEN |
+| DQ-36 | P2 | G11 | May a non-certifying dry-run rehearsal (M-DRY) happen before G3/G5/G6/G8/G9 pass? | `20261002_overnight_g11_g12_prep/G11_G12_DECISION_REQUIRED.md` GD-D1 | OPEN |
+| DQ-37 | P1 | G11 / G8 | Source database for the rehearsal copy; authorize a read-only `tools/backup_db.py` run against the live folder? (**No verified backup of current production state `21dc0e97…` exists**; newest recovery point `12ba7b7e…` predates the founder's logins and the 2026-09-30 notification retry) | same, GD-D2 (overlaps live-data retention) | OPEN |
+| DQ-38 | P2 | G11 | Rehearsal machine, clone vs worktree (worktrees share the live `.git`; precedent harness loads the live `.env`), key material | same, GD-D3 | OPEN |
+| DQ-39 | P2 | G11 | Upgrade mechanism (git ff / signed web updater / `update.bat` — unsigned, continues on failed backup) and signing-key custody | same, GD-D5 | OPEN |
+| DQ-40 | P2 | G11 | Fresh-install path in scope? install artefact (`setup.bat` missing); FD-P2-05 on fresh install (BUG FG-ON-01) | same, GD-D6 | OPEN |
+| DQ-41 | P2 | G11 / G6 | Multi-day run N, pass criteria for reopen and interrupted close; daily-close entry point (close vs `advance-date`) | same, GD-D7, GD-D8 (overlaps DQ-16) | OPEN |
+| DQ-42 | P2 | G11 | In-place restore (PD-004 act) pre-authorized? Is data rollback after go-live allowed at all? | same, GD-D11 | OPEN |
+| DQ-43 | P2 | G11 / B-1 | Which standing scheduler jobs may run during rehearsal/go-live; are their start-up mutations accepted? | same, GD-D12 (overlaps DQ-31) | OPEN |
+| DQ-44 | P2 | G12 | D11 declared-exception comparison on the 8 objects or the 10 (invariant, object) pairs (INV-A03 ×2 on extra_charges 1–2)? | same, GD-D13 | OPEN |
+| — | — | duplicates | GD-D4 = DQ-23 (release tag) · GD-D9 = DQ-17 (G10 baselines) · GD-D10 = DQ-27 (B-4) |
 | — | — | duplicates | B4-D7 = handled by correction record (`20261002_overnight_adr011_adoption/CORRECTION_RECORD_…`); remaining question "change version checks going forward" folded into DQ-26 |
 | — | — | duplicates | GT-D2 = DQ-01…DQ-04 · GT-D3 = DQ-05 · GT-D4 = DQ-06 (not re-asked) | — | — |
 | DQ-06 | P3 | Governance record | Record the founder's authorization to push/merge SR-2 to `origin/main` (Round 7, `FOUNDER_DECISIONS.md:1354`, still says "Push and merge remain separately unauthorised", but `origin/main` = `c9eeff0` contains it) | this file, below | OPEN |
