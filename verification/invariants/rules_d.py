@@ -125,9 +125,15 @@ _REFUND_DISPOSITIONS = ('refund_full', 'refund_partial')
         'purpose refund, flagged is_reversal, not is_correction) is linked '
         'through the cancellation that generated it: exactly one '
         'reservation names it as cancellation_refund_payment_id, that '
-        'reservation is its own, is Cancelled, has a refund disposition, '
-        'and recorded this refund\'s amount. A reservation, guest, folio or '
-        'amount match by itself is not lineage.'),
+        'reservation is its own, and its cancellation record (stamped '
+        'cancellation_processed_at, with a refund disposition) was written '
+        'when the refund was. That record is write-once in the application, '
+        'so lineage does not depend on the reservation\'s status today. '
+        'The refund amount matching cancellation_amount_refunded is a '
+        'separate consistency check, reported under its own name. Later '
+        'voiding or correcting the refund does not change its lineage. A '
+        'reservation, guest, folio or amount match by itself is not '
+        'lineage.'),
     severity=Severity.CRITICAL,
     blocking=Blocking.RELEASE,
     data_sources=('payments', 'extra_charges', 'reservations'),
@@ -182,6 +188,7 @@ def _d02(ctx):
         for r in ctx.sql(
                 'SELECT id, status, cancellation_disposition, '
                 '       cancellation_amount_refunded, '
+                '       cancellation_processed_at, '
                 '       cancellation_refund_payment_id '
                 'FROM reservations '
                 'WHERE cancellation_refund_payment_id IS NOT NULL'):
@@ -189,27 +196,41 @@ def _d02(ctx):
                                      []).append(r)
 
     def refund_lineage(row):
-        """None when a valid cancellation generated this refund, else why not."""
+        """(kind, why) when this refund fails, else None.
+
+        kind is 'lineage' when no valid cancellation is established as the
+        refund's origin, 'consistency' when lineage is established but the
+        amount disagrees with what the cancellation recorded. Neither looks
+        at the refund's later life (is_voided, correction rows) or at the
+        reservation's status today: the cancellation snapshot is written
+        once, in the refund's own transaction, by the only refund writer.
+        """
         named_by = cancellations.get(row['id'], [])
         if not named_by:
-            return 'no cancellation names this refund'
+            return 'lineage', 'no cancellation names this refund'
         if len(named_by) > 1:
-            return (f'{len(named_by)} reservations name this refund '
-                    f'({", ".join(str(r["id"]) for r in named_by)})')
+            return 'lineage', (
+                f'{len(named_by)} reservations name this refund '
+                f'({", ".join(str(r["id"]) for r in named_by)})')
         res = named_by[0]
         if res['id'] != row['reservation_id']:
-            return (f'reservation {res["id"]} names it, but the refund '
-                    f'belongs to reservation {row["reservation_id"]}')
-        if res['status'] != 'Cancelled':
-            return f'reservation {res["id"]} is {res["status"]}, not Cancelled'
+            return 'lineage', (
+                f'reservation {res["id"]} names it, but the refund '
+                f'belongs to reservation {row["reservation_id"]}')
         if res['cancellation_disposition'] not in _REFUND_DISPOSITIONS:
-            return (f'reservation {res["id"]} disposition '
-                    f'{res["cancellation_disposition"]!r} generates no refund')
+            return 'lineage', (
+                f'reservation {res["id"]} disposition '
+                f'{res["cancellation_disposition"]!r} generates no refund')
+        if res['cancellation_processed_at'] is None:
+            return 'lineage', (
+                f'reservation {res["id"]} has no cancellation_processed_at, '
+                f'so no processed cancellation is identifiable')
         if abs(dec(res['cancellation_amount_refunded'])
                - dec(row['amount'])) >= dec('0.005'):
-            return (f'reservation {res["id"]} recorded refund '
-                    f'{res["cancellation_amount_refunded"]}, this row is '
-                    f'{row["amount"]}')
+            return 'consistency', (
+                f'reservation {res["id"]} recorded refund '
+                f'{res["cancellation_amount_refunded"]}, this row is '
+                f'{row["amount"]}')
         return None
 
     for table in ('payments', 'extra_charges'):
@@ -252,12 +273,16 @@ def _d02(ctx):
                 and not row['is_correction']
                 and row['payment_purpose'] == 'refund')
             if is_cancellation_refund:
-                why = refund_lineage(row)
-                if why is not None:
+                failure = refund_lineage(row)
+                if failure is not None:
+                    kind, why = failure
+                    expected = (
+                        'refund generated by a processed cancellation of '
+                        'its reservation' if kind == 'lineage' else
+                        'refund amount equals the amount the cancellation '
+                        'recorded (lineage itself is established)')
                     violations.append(row_violation(
-                        'payment', row['id'],
-                        expected=('refund generated by a valid cancellation '
-                                  'of its reservation'),
+                        'payment', row['id'], expected=expected,
                         observed=why, amount=dec(row['amount']),
                         table=table))
                 continue
