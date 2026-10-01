@@ -49,6 +49,17 @@ Priority: **P1** unblocks a G3 item or a production risk · **P2** unblocks prep
 | DQ-42 | P2 | G11 | In-place restore (PD-004 act) pre-authorized? Is data rollback after go-live allowed at all? | same, GD-D11 | OPEN |
 | DQ-43 | P2 | G11 / B-1 | Which standing scheduler jobs may run during rehearsal/go-live; are their start-up mutations accepted? | same, GD-D12 (overlaps DQ-31) | OPEN |
 | DQ-44 | P2 | G12 | D11 declared-exception comparison on the 8 objects or the 10 (invariant, object) pairs (INV-A03 ×2 on extra_charges 1–2)? | same, GD-D13 | OPEN |
+| DQ-45 | **P1** | Privacy | A real production guest phone number (masked `62xxxxxx95`) is **still in the current tree** (10 occurrences: `20260909_phase1_verification_completion/writers_setA.txt` ×6, `writers_setD.txt` ×4) and in 34 commits on all four remote branches. Forward-only redaction now / redaction now + rewrite later / rewrite now / no action? | `20261002_overnight_webhook_privacy_copies/GIT_HISTORY_PRIVACY_DECISION.md` GH-D1 | OPEN |
+| DQ-46 | P2 | Privacy | If history is rewritten: how evidence hashes are re-anchored (185 files, 5 "Governed HEAD" lines) and how the production folder's `.git` is handled | same, GH-D2 | OPEN |
+| DQ-47 | P1 | Privacy | Control to stop harnesses leaking guest data into evidence (synthetic guests/stubs, pre-commit scan, masking in app) | same, GH-D3 | OPEN |
+| DQ-48 | P2 | Webhook / Q5-P1 | Are webhook reservation/folio/status writes "financial mutations" under Q5-P1? Which audit behaviour per path (strict / same-txn / none)? | `20261002_overnight_webhook_privacy_copies/WEBHOOK_DECISION_REQUIRED.md` WH-D1, WH-D2 (overlaps DQ-11) | OPEN |
+| DQ-49 | P2 | Webhook / ADR-011 | Operator-triggered retry (`/ota/webhook/retry`) recorded as SYSTEM with no user — should it be HUMAN? | same, WH-D3 | OPEN |
+| DQ-50 | P1 | Webhook / production | Does the production webhook stay armed (API key set) while the audit gaps are open? | same, WH-D4 | OPEN |
+| DQ-51 | P2 | Webhook | Authorize a bounded runtime check on a copy (post-ADR-011 audit-failure case, lost `webhook_logs` row, retry provenance) | same, WH-D5 | OPEN |
+| DQ-52 | P2 | Webhook | Must an OTA webhook cancellation go through the cancellation-disposition path (`routes.py:8853-8879`)? | same, WH-D6 | OPEN |
+| DQ-53 | P1 | Live-data copies | Which artifacts are the retained recovery points, where is the recovery store, is a fresh backup of `21dc0e97…` needed? | `20261002_overnight_webhook_privacy_copies/LIVE_DATA_RETENTION_DECISION.md` LD-D1 (overlaps DQ-37) | OPEN |
+| DQ-54 | P2 | Live-data copies | Keep or dispose of the 15 derived working copies; the three identical `99505a47` backups; location/access/encryption/retention of kept copies (all hold guest personal data, unencrypted) | same, LD-D2, LD-D3, LD-D5 | OPEN |
+| DQ-55 | P2 | Live-data copies | What is `SukoonPMS.zip` (120 MB, 2026-09-19, unreferenced); may its entry names be listed; keep? | same, LD-D4 | OPEN |
 | — | — | duplicates | GD-D4 = DQ-23 (release tag) · GD-D9 = DQ-17 (G10 baselines) · GD-D10 = DQ-27 (B-4) |
 | — | — | duplicates | B4-D7 = handled by correction record (`20261002_overnight_adr011_adoption/CORRECTION_RECORD_…`); remaining question "change version checks going forward" folded into DQ-26 |
 | — | — | duplicates | GT-D2 = DQ-01…DQ-04 · GT-D3 = DQ-05 · GT-D4 = DQ-06 (not re-asked) | — | — |

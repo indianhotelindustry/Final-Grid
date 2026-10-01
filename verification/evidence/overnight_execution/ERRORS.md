@@ -5,6 +5,7 @@ Every error, failure or denial, classified (NEW / PRE-EXISTING / EXPECTED / ENVI
 | # | Time (IST) | Activity | What happened | Class | Effect | Disposition |
 |---|---|---|---|---|---|---|
 | E-01 | 2026-10-02 ~00:55 | SR-1 analysis: read-only `SELECT` of production `payments` (purpose/flags/dates) via `sqlite3 mode=ro` | Denied by the session permission classifier before execution | GOVERNANCE BLOCK (tooling) | none — command did not run; production hash checked before and after other reads: `21dc0e97…` | Not retried, not worked around. Production facts for SR-1 are taken from committed evidence (`20261001_120800_inv_commission`, 6 payments HOLDS) and the 2026-09-30 analysis. Earlier read-only reads of `business_date`, `settings` and `schema_migrations` were permitted and ran. |
+| E-02 | 2026-10-02 ~01:30 | webhook/privacy analysis agent: history search | The agent redirected search output to its own temp file (`%TEMP%/x`), which held phone-like values including the real guest number. It **deleted the file immediately**; deletion reconfirmed by the orchestrator. Never committed or transmitted. | NEW (process) | none persistent | Recorded for transparency. Lesson: PII searches print counts or masked values only (applied in the orchestrator's later count-only checks). |
 
 ## Pre-existing failures carried into the night (not new; from committed evidence)
 
