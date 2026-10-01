@@ -22,28 +22,50 @@
     "calendar_date": "2026-10-02",
     "business_date_lag_days": 53,
     "night_audit_enabled": "false",
-    "worktrees": ["SukoonPMS c703150 [main]", "C:/wtsr2 c9eeff0 [sr2-inv-d02]"],
-    "local_branches": {"adr011-system-actor": "e7086da", "main": "c703150", "phase-2a-folio-authz": "237db2a", "sr2-inv-d02": "c9eeff0"}
+    "worktrees": [
+      "SukoonPMS c703150 [main]",
+      "C:/wtsr2 c9eeff0 [sr2-inv-d02]"
+    ],
+    "local_branches": {
+      "adr011-system-actor": "e7086da",
+      "main": "c703150",
+      "phase-2a-folio-authz": "237db2a",
+      "sr2-inv-d02": "c9eeff0"
+    }
   },
-  "notes": ["N-01 SR-2 push authorization not recorded in FOUNDER_DECISIONS.md (DQ-06)", "N-02 live checkout behind origin/main by 7 (not pulled)", "N-03 g3_decision_package outside repo used as input"],
+  "notes": [
+    "N-01 SR-2 push authorization not recorded in FOUNDER_DECISIONS.md (DQ-06)",
+    "N-02 live checkout behind origin/main by 7 (not pulled)",
+    "N-03 g3_decision_package outside repo used as input"
+  ],
   "current_operation": {
-    "name": "parallel analysis workstreams + checkpoint commit",
-    "started_at": "2026-10-02T00:41:00+05:30",
-    "branch": "overnight-20261002",
-    "worktree": "C:/wtov",
-    "expected_result": "decision packages under verification/evidence/20261002_overnight_*",
-    "rollback_status": "nothing to roll back"
+    "name": "none - stopped (all remaining blocked)",
+    "result": "DONE",
+    "next_step": "founder decisions, OVERNIGHT_FINAL_REPORT.md section 9"
   },
   "workstreams": {
-    "SR-1": "BLOCKED (DQ-01..DQ-05)",
-    "K-7": "IN PROGRESS (analysis only; implementation NOT AUTHORIZED)",
-    "business_date": "IN PROGRESS (analysis)",
-    "G3_G6": "IN PROGRESS",
-    "G11_G12": "IN PROGRESS",
-    "B4_PostgreSQL": "IN PROGRESS",
-    "webhook_privacy_copies": "IN PROGRESS",
-    "ADR011_adoption": "IN PROGRESS"
+    "SR-1": "BLOCKED (DQ-01..05)",
+    "K-7": "analysis DONE; implementation NOT AUTHORIZED",
+    "business_date": "decision package DONE; advancement NOT AUTHORIZED",
+    "G3_G6": "DONE (G3 OPEN, G6 FAIL)",
+    "G11_G12": "DONE (BLOCKED)",
+    "B4_PostgreSQL": "DONE (PostgreSQL BLOCKED)",
+    "webhook_privacy_copies": "DONE",
+    "ADR011_adoption": "DONE (NOT AUTHORIZED)"
   },
-  "errors": ["E-01 prod payments SELECT denied by permission classifier; not retried"],
-  "production_touched": false
+  "errors": [
+    "E-01 prod payments SELECT denied by permission classifier; not retried",
+    "E-02 agent temp file with PII created and deleted immediately"
+  ],
+  "production_touched": false,
+  "ending_state": {
+    "prod_db_sha256": "21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434",
+    "python_processes": 0,
+    "port_5000_listener": false,
+    "live_checkout_head": "c703150",
+    "origin_main": "c9eeff0",
+    "overnight_branch_last_content_commit": "fdee5de"
+  },
+  "decisions_queued": 68,
+  "bugs_recorded": 23
 }
