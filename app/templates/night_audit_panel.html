@@ -169,6 +169,8 @@
       {% endif %}
       {# night_audit_run reads request.form['audit_date']; the original block
          posted 'date', so its Re-run button always failed validation. #}
+      {# DQ56-R1: 2026-08-09 is the Q06-H1 sealed record — no Run / Reopen. #}
+      {% if not q06h1_protected(audit_date) %}
       <form method="POST" action="{{ url_for('reports.night_audit_run') }}" class="d-inline">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="audit_date" value="{{ audit_date.isoformat() }}">
@@ -176,6 +178,7 @@
           <i class="bi bi-play-fill me-1"></i>Re-run Audit
         </button>
       </form>
+      {% endif %}
     </div>
   </div>
 </div>
@@ -198,6 +201,8 @@
         <i class="bi bi-braces me-1"></i>View Snapshot JSON
       </a>
       {% endif %}
+      {# DQ56-R1: 2026-08-09 is the Q06-H1 sealed record — no Run / Reopen. #}
+      {% if not q06h1_protected(audit_date) %}
       <form method="POST" action="{{ url_for('reports.night_audit_run') }}" class="d-inline">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="audit_date" value="{{ audit_date.isoformat() }}">
@@ -205,6 +210,7 @@
           <i class="bi bi-play-fill me-1"></i>Re-run to refresh under current version
         </button>
       </form>
+      {% endif %}
     </div>
   </div>
 </div>
@@ -663,7 +669,7 @@
         {# Action buttons #}
         <div class="d-grid gap-2">
 
-            {% if log_status in ('Open', 'Pending', 'Reopened', 'InProgress') %}
+            {% if log_status in ('Open', 'Pending', 'Reopened', 'InProgress') and not q06h1_protected(audit_date) %}
             <form method="POST" action="{{ url_for('reports.night_audit_run') }}" class="mb-0">
                 <input type="hidden" name="audit_date" value="{{ audit_date.isoformat() }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -696,10 +702,15 @@
                 {% endif %}
                 {% endif %}
 
-                {% if log_status in ('Completed', 'Warning') %}
+                {% if log_status in ('Completed', 'Warning') and not q06h1_protected(audit_date) %}
                 <button class="btn btn-outline-warning w-100" data-bs-toggle="modal" data-bs-target="#reopenModal">
                     <i class="bi bi-arrow-counterclockwise me-1"></i>Reopen Audit
                 </button>
+                {% elif q06h1_protected(audit_date) %}
+                <div class="small text-muted text-center" id="q06h1-protected-note">
+                    <i class="bi bi-lock-fill me-1"></i>Sealed historical record (Founder ruling Q06-H1):
+                    Run and Reopen are disabled for this date.
+                </div>
                 {% endif %}
 
                 {# Re-run a previously-skipped audit (Admin-only). Appears only
@@ -1018,6 +1029,8 @@
 </div>
 
 {# ── Reopen Audit Modal ───────────────────────────────────────────────── #}
+{# DQ56-R1: 2026-08-09 is the Q06-H1 sealed record — no Run / Reopen. #}
+{% if not q06h1_protected(audit_date) %}
 <div class="modal fade" id="reopenModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -1047,6 +1060,7 @@
         </div>
     </div>
 </div>
+{% endif %}
 {% endif %}
 
 {# ── Fix Skipped Day modal — collects mandatory reason, posts to the

@@ -2820,6 +2820,38 @@ def night_audit():
     )
 
 
+# ---------------------------------------------------------------------------
+# DQ56-R1 / Q06-H1 — the sealed 2026-08-09 night-audit record
+# ---------------------------------------------------------------------------
+# Founder ruling Q06-H1 (verification/FOUNDER_DECISIONS.md, Round 4) keeps the
+# sealed NightAuditLog for 2026-08-09 exactly as recorded. Founder directive
+# DQ56-R1 (Round 8) protects that one business date only: Run and Reopen are
+# refused for it, and the night-audit pages hide both actions. Every other
+# date keeps its existing behaviour, including Run on other closed days.
+Q06_H1_PROTECTED_AUDIT_DATES = frozenset({date(2026, 8, 9)})
+
+_Q06_H1_REFUSAL = ('{action} is disabled for 09 Aug 2026: it is the sealed '
+                   'historical night-audit record preserved by Founder ruling '
+                   'Q06-H1.')
+
+
+def is_q06h1_protected_date(audit_date) -> bool:
+    """True when `audit_date` is the business date of the Q06-H1 sealed record."""
+    if isinstance(audit_date, datetime):
+        audit_date = audit_date.date()
+    elif isinstance(audit_date, str):
+        try:
+            audit_date = date.fromisoformat(audit_date[:10])
+        except ValueError:
+            return False
+    return audit_date in Q06_H1_PROTECTED_AUDIT_DATES
+
+
+@reports_bp.app_template_global('q06h1_protected')
+def _q06h1_protected_template(audit_date):
+    return is_q06h1_protected_date(audit_date)
+
+
 @reports_bp.route('/night-audit/run', methods=['POST'])
 def night_audit_run():
     """Stage 2 — Run pre-audit checks and mark audit as InProgress."""
@@ -2838,6 +2870,10 @@ def night_audit_run():
     except ValueError:
         flash('Invalid date.', 'danger')
         return redirect(url_for('main.night_audit', tab='dashboard'))
+
+    if is_q06h1_protected_date(audit_date):                      # DQ56-R1
+        flash(_Q06_H1_REFUSAL.format(action='Run'), 'danger')
+        return redirect(url_for('main.night_audit', tab='dashboard', date=date_str))
 
     svc = NightAuditService(audit_date)
     exc = svc.exception_report()
@@ -3122,6 +3158,10 @@ def night_audit_reopen():
     except ValueError:
         flash('Invalid date.', 'danger')
         return redirect(url_for('main.night_audit', tab='dashboard'))
+
+    if is_q06h1_protected_date(audit_date):                      # DQ56-R1
+        flash(_Q06_H1_REFUSAL.format(action='Reopen'), 'danger')
+        return redirect(url_for('main.night_audit', tab='dashboard', date=date_str))
 
     try:
         # Lock the audit log row to prevent concurrent reopen/complete
