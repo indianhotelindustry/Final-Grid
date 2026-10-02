@@ -1352,3 +1352,23 @@ Resolves the FD-P2-06 statement "INV-D02 must not treat a legitimate cancellatio
 ## Effect
 
 `SR2-RULE` stands. Revision 2 fixes how it is operationalised in `verification/invariants/rules_d.py` (INV-D02) only. No change to `app/`, the schema, production, K-7, SR-1 or any other rule. Push and merge remain separately unauthorised; the local branch is the only authorised delivery location.
+
+# Founder Resolution Round 8 — DQ-56 / Q06-H1 sealed record protection (R1) — FG-P2-FOUNDER-RESOLUTION-20261002-01
+
+| | |
+|---|---|
+| Recorded | 2026-10-02 |
+| Governed HEAD | `c9eeff0` (`origin/main`); decision package `verification/evidence/20261002_dq56_sealed_record/DQ56_SEALED_RECORD_DECISION_PACKAGE.md` (branch `overnight-20261002`, commit `5accb2f`) |
+| Kind | Founder implementation directive for remediation option R1 of the DQ-56 package. Recorded verbatim. Implementation on a local branch only |
+| Identifier | `DQ56-R1` |
+| Source | Ruling given in session by the Founder on 2026-10-02, in reply to the DQ-56 decision package |
+
+## DQ56-R1 — Directive, verbatim
+
+> Proceed with DQ-56 R1 exactly as decided: protect only business date 2026-08-09. Block Run and Reopen for that date and hide/disable those UI actions. Do not modify the database, schema, general closed-day Run semantics, business-date logic, SR-1, K-7, or any other production behavior. Work only on a disposable/copy environment. Run the supplied DQ-56 tests and relevant regression tests. Produce a complete evidence report. Do not push, merge, start production, or modify production until I separately authorize the production application. Stop at the production decision boundary.
+
+## Effect
+
+- Resolves DQ-56b (option **R1**) and DQ-56c (protected set = **{2026-08-09} only**). DQ-56d (Run on other closed days) is **not** adopted: general closed-day Run semantics stay unchanged.
+- Q06-H1 (`:1219-1227`) stands; this directive adds an application-level guard for that one record.
+- Not authorized: push, merge, production start, production application, any database/schema change, or any change to business-date logic, SR-1 or K-7.
