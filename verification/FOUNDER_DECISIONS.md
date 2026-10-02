@@ -1578,3 +1578,7 @@ Residual Phase 3.2 / 3.4 items, not changed by K-7: `app/reports.py:3121-3125` (
 - **Not authorized (as stated by the Founder):** starting the application; advancing the business date; deployment activation; trading; voucher issuance; any other Phase 3 work.
 - **Not decided by this round and still open:** K7-D5, K7-D8, K7-D10, BD-D2 to BD-D5, G6 C3/C4/C5 (units 3.2 to 3.8), and the governance-record entries G-1 to G-7.
 - **Record note:** this entry is a documentation-only commit on top of the gated head `ba502a7`; `app/`, `tools/` and every other file are unchanged from the gated tree.
+
+## Execution record (appended after completion)
+
+The Round 13 authorization was executed on 2026-10-02: `k7-phase-3-1` pushed; `main` fast-forwarded `0938069..5690649547c3439efc48f9add08a16006827454f` and pushed; local `main`, `origin/main` and both branch refs aligned at that SHA; no merge commit, squash, rebase or force push; production `pms.db` byte-identical (`21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434`); application stopped, port 5000 free. Full record: `verification/evidence/20261002_k7_integration/K7_INTEGRATION_RECORD.md`. No further authorization is implied: starting the application, advancing the business date, deployment activation, trading, voucher issuance and all other Phase 3 work remain not authorized.
