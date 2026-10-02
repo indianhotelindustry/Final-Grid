@@ -1,0 +1,11 @@
+source     : C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\instance\pms.db
+size       : 733,184 bytes
+sha256     : 21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434
+tables     : 53, 306 rows
+
+snapshot   : C:\Users\SIPL Server\Downloads\DSS\FinalGrid\db-backups\pms_20261002_093338_dq56-apply-pre.db
+sha256     : 5c78edb214993d6a34dfed8c5f82756bf288cea3767caf49785a8ed8971dfa8e
+integrity  : ok
+row counts : match across 53 tables
+source now : 21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434
+VERDICT    : BACKUP VERIFIED — production unchanged

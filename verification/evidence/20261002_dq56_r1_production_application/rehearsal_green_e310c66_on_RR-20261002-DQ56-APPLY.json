@@ -1,0 +1,447 @@
+{
+  "app_root": "C:\\wq06h1",
+  "boot_changed_copy": false,
+  "checks": [],
+  "db_uri_is_copy": true,
+  "finished_utc": "2026-10-02T04:04:02.455571",
+  "label": "REHEARSAL_GREEN_e310c66_on_RR-20261002-DQ56-APPLY",
+  "live_db_sha256_after": "21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434",
+  "live_db_sha256_before": "21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434",
+  "live_db_unchanged": true,
+  "master_copy_sha256": "5c78edb214993d6a34dfed8c5f82756bf288cea3767caf49785a8ed8971dfa8e",
+  "scheduler_running_after_shutdown": false,
+  "source": "C:/Users/SIPL Server/Downloads/DSS/FinalGrid/dq56_apply/restored_pre.db",
+  "source_sha256_after": "5c78edb214993d6a34dfed8c5f82756bf288cea3767caf49785a8ed8971dfa8e",
+  "source_sha256_after_copy": "5c78edb214993d6a34dfed8c5f82756bf288cea3767caf49785a8ed8971dfa8e",
+  "source_sha256_before": "5c78edb214993d6a34dfed8c5f82756bf288cea3767caf49785a8ed8971dfa8e",
+  "source_unchanged": true,
+  "started_utc": "2026-10-02T04:03:55.863779",
+  "tests": {
+    "T-01_reopen_protected_admin": {
+      "after": {
+        "2026-08-09": {
+          "row_sha256": "36341b7945a899236fc964a189515aac74f2143fdb3912aec8803a723511f429",
+          "rows": [
+            {
+              "accrual_revenue": 1142.85,
+              "actual_cash": 0,
+              "audit_date": "2026-08-09",
+              "blocker_count": 0,
+              "cash_variance": 0,
+              "completed_at": "2026-08-11 12:42:48.458686",
+              "expected_cash": 0,
+              "id": 1,
+              "net_revenue": 1200,
+              "notes": null,
+              "occupancy_count": 1,
+              "outstanding_amount": 0,
+              "override_reason": "cvnvhm",
+              "override_used": 1,
+              "pending_checkouts": 0,
+              "reconciliation_difference": -0.009999999999990905,
+              "reopen_reason": "dfhd",
+              "run_at": "2026-08-11 12:42:48.458686",
+              "run_by_user_id": 1,
+              "snapshot_hash": "d248ae5413672f269cdefc9ad73ad18f1da28f3fca86c2248213b976f8ba4128",
+              "snapshot_json_sha256": "d248ae5413672f269cdefc9ad73ad18f1da28f3fca86c2248213b976f8ba4128",
+              "snapshot_total_taxable": 2285.7,
+              "snapshot_valid": 1,
+              "snapshot_version": "2.2.18",
+              "started_at": "2026-08-11 12:19:00.356823",
+              "started_by_user_id": 1,
+              "status": "Completed",
+              "total_discount": 0,
+              "total_payments": 1200,
+              "total_revenue": 1200,
+              "warning_count": 0
+            }
+          ]
+        },
+        "2026-08-10": {
+          "row_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "rows": []
+        },
+        "business_date": "2026-08-10",
+        "count_audit_logs": 26,
+        "count_extra_charges": 2,
+        "count_night_audit_logs": 1,
+        "count_night_audit_reopen_logs": 5,
+        "count_payments": 6
+      },
+      "audit_logs_delta": 0,
+      "before": {
+        "2026-08-09": {
+          "row_sha256": "36341b7945a899236fc964a189515aac74f2143fdb3912aec8803a723511f429",
+          "rows": [
+            {
+              "accrual_revenue": 1142.85,
+              "actual_cash": 0,
+              "audit_date": "2026-08-09",
+              "blocker_count": 0,
+              "cash_variance": 0,
+              "completed_at": "2026-08-11 12:42:48.458686",
+              "expected_cash": 0,
+              "id": 1,
+              "net_revenue": 1200,
+              "notes": null,
+              "occupancy_count": 1,
+              "outstanding_amount": 0,
+              "override_reason": "cvnvhm",
+              "override_used": 1,
+              "pending_checkouts": 0,
+              "reconciliation_difference": -0.009999999999990905,
+              "reopen_reason": "dfhd",
+              "run_at": "2026-08-11 12:42:48.458686",
+              "run_by_user_id": 1,
+              "snapshot_hash": "d248ae5413672f269cdefc9ad73ad18f1da28f3fca86c2248213b976f8ba4128",
+              "snapshot_json_sha256": "d248ae5413672f269cdefc9ad73ad18f1da28f3fca86c2248213b976f8ba4128",
+              "snapshot_total_taxable": 2285.7,
+              "snapshot_valid": 1,
+              "snapshot_version": "2.2.18",
+              "started_at": "2026-08-11 12:19:00.356823",
+              "started_by_user_id": 1,
+              "status": "Completed",
+              "total_discount": 0,
+              "total_payments": 1200,
+              "total_revenue": 1200,
+              "warning_count": 0
+            }
+          ]
+        },
+        "2026-08-10": {
+          "row_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "rows": []
+        },
+        "business_date": "2026-08-10",
+        "count_audit_logs": 26,
+        "count_extra_charges": 2,
+        "count_night_audit_logs": 1,
+        "count_night_audit_reopen_logs": 5,
+        "count_payments": 6
+      },
+      "business_date_after": "2026-08-10",
+      "business_date_before": "2026-08-10",
+      "reopen_logs_delta": 0,
+      "response": {
+        "flash": [
+          "Reopen is disabled for 09 Aug 2026: it is the sealed historical night-audit record preserved by Founder ruling Q06-H1."
+        ],
+        "status": 302
+      },
+      "row_unchanged": true,
+      "snapshot_valid_after": [
+        1
+      ],
+      "status_after": [
+        "Completed"
+      ]
+    },
+    "T-02_run_protected_roles": {
+      "Accountant": {
+        "response": {
+          "flash": [
+            "Run is disabled for 09 Aug 2026: it is the sealed historical night-audit record preserved by Founder ruling Q06-H1."
+          ],
+          "status": 302
+        },
+        "row_unchanged": true,
+        "sentinel_total_revenue_after": [
+          -12345
+        ],
+        "status_after": [
+          "Completed"
+        ]
+      },
+      "Admin": {
+        "response": {
+          "flash": [
+            "Run is disabled for 09 Aug 2026: it is the sealed historical night-audit record preserved by Founder ruling Q06-H1."
+          ],
+          "status": 302
+        },
+        "row_unchanged": true,
+        "sentinel_total_revenue_after": [
+          -12345
+        ],
+        "status_after": [
+          "Completed"
+        ]
+      },
+      "Admin_unperturbed": {
+        "response": {
+          "flash": [
+            "Run is disabled for 09 Aug 2026: it is the sealed historical night-audit record preserved by Founder ruling Q06-H1."
+          ],
+          "status": 302
+        },
+        "row_unchanged": true
+      },
+      "Manager": {
+        "response": {
+          "flash": [
+            "Run is disabled for 09 Aug 2026: it is the sealed historical night-audit record preserved by Founder ruling Q06-H1."
+          ],
+          "status": 302
+        },
+        "row_unchanged": true,
+        "sentinel_total_revenue_after": [
+          -12345
+        ],
+        "status_after": [
+          "Completed"
+        ]
+      }
+    },
+    "T-03_chain_protected": {
+      "business_date_after": "2026-08-10",
+      "row_unchanged": true,
+      "snapshot_hash_column_after": "d248ae5413672f269cdefc9ad73ad18f1da28f3fca86c2248213b976f8ba4128",
+      "snapshot_hash_column_before": "d248ae5413672f269cdefc9ad73ad18f1da28f3fca86c2248213b976f8ba4128",
+      "snapshot_sha256_after": "d248ae5413672f269cdefc9ad73ad18f1da28f3fca86c2248213b976f8ba4128",
+      "snapshot_sha256_before": "d248ae5413672f269cdefc9ad73ad18f1da28f3fca86c2248213b976f8ba4128",
+      "status_after": "Completed",
+      "status_before": "Completed",
+      "steps": [
+        {
+          "flash": [
+            "Reopen is disabled for 09 Aug 2026: it is the sealed historical night-audit record preserved by Founder ruling Q06-H1."
+          ],
+          "status": 302
+        },
+        {
+          "flash": [
+            "Run is disabled for 09 Aug 2026: it is the sealed historical night-audit record preserved by Founder ruling Q06-H1."
+          ],
+          "status": 302
+        },
+        {
+          "flash": [
+            "Audit for 09 Aug 2026 is already completed (status: Completed). Reopen it first if changes are needed."
+          ],
+          "status": 302
+        }
+      ],
+      "total_taxable_after": 2285.7,
+      "total_taxable_before": 2285.7
+    },
+    "T-04_T-05_lock_after_reopen_attempt": {
+      "business_date": "2026-08-10",
+      "is_date_locked_protected": true
+    },
+    "T-06_other_day_close_reopen_close": {
+      "after_complete_1": {
+        "business_date": "2026-08-11",
+        "status": [
+          "Completed"
+        ]
+      },
+      "after_complete_2": {
+        "business_date": "2026-08-11",
+        "snapshot_valid": [
+          1
+        ],
+        "status": [
+          "Completed"
+        ]
+      },
+      "after_reopen": {
+        "business_date": "2026-08-10",
+        "snapshot_valid": [
+          0
+        ],
+        "status": [
+          "Reopened"
+        ]
+      },
+      "complete_1": {
+        "flash": [
+          "Night audit for 10 Aug 2026 completed. (Override used) Business date advanced to 11 Aug 2026."
+        ],
+        "status": 302
+      },
+      "complete_2": {
+        "flash": [
+          "Night audit for 10 Aug 2026 completed. (Override used) Business date advanced to 11 Aug 2026."
+        ],
+        "status": 302
+      },
+      "protected_row_unchanged_throughout": true,
+      "reopen": {
+        "flash": [
+          "Audit for 10 Aug 2026 reopened. Business date rolled back to 10 Aug 2026."
+        ],
+        "status": 302
+      },
+      "run_1": {
+        "flash": [
+          "Audit checks run for 10 Aug 2026. 0 blocker(s), 0 warning(s)."
+        ],
+        "status": 302
+      },
+      "run_2": {
+        "flash": [
+          "Audit checks run for 10 Aug 2026. 0 blocker(s), 0 warning(s)."
+        ],
+        "status": 302
+      },
+      "ui_other_closed": {
+        "panel": {
+          "drift_banner": false,
+          "protected_note": false,
+          "reopen_button": true,
+          "reopen_form": true,
+          "reopen_modal": true,
+          "run_form": false,
+          "status": 200
+        },
+        "report": {
+          "drift_banner": false,
+          "protected_note": false,
+          "reopen_button": true,
+          "reopen_form": true,
+          "reopen_modal": true,
+          "run_form": false,
+          "status": 200
+        }
+      },
+      "ui_other_closed_drift": {
+        "panel": {
+          "drift_banner": true,
+          "protected_note": false,
+          "reopen_button": true,
+          "reopen_form": true,
+          "reopen_modal": true,
+          "run_form": true,
+          "status": 200
+        },
+        "report": {
+          "drift_banner": true,
+          "protected_note": false,
+          "reopen_button": true,
+          "reopen_form": true,
+          "reopen_modal": true,
+          "run_form": true,
+          "status": 200
+        }
+      }
+    },
+    "T-07_run_other_closed_day": {
+      "response": {
+        "flash": [
+          "Audit checks run for 10 Aug 2026. 0 blocker(s), 0 warning(s)."
+        ],
+        "status": 302
+      },
+      "sentinel_overwritten": true,
+      "status_after": [
+        "Completed"
+      ]
+    },
+    "T-08_ui_protected": {
+      "panel": {
+        "drift_banner": false,
+        "protected_note": true,
+        "reopen_button": false,
+        "reopen_form": false,
+        "reopen_modal": false,
+        "run_form": false,
+        "status": 200
+      },
+      "panel_drift": {
+        "drift_banner": true,
+        "protected_note": true,
+        "reopen_button": false,
+        "reopen_form": false,
+        "reopen_modal": false,
+        "run_form": false,
+        "status": 200
+      },
+      "protected_row_unchanged_by_gets": true,
+      "report": {
+        "drift_banner": false,
+        "protected_note": true,
+        "reopen_button": false,
+        "reopen_form": false,
+        "reopen_modal": false,
+        "run_form": false,
+        "status": 200
+      },
+      "report_drift": {
+        "drift_banner": true,
+        "protected_note": true,
+        "reopen_button": false,
+        "reopen_form": false,
+        "reopen_modal": false,
+        "run_form": false,
+        "status": 200
+      }
+    },
+    "T-09_role_matrix_protected": {
+      "Accountant": {
+        "reopen": {
+          "flash": [],
+          "status": 403
+        },
+        "run": {
+          "flash": [
+            "Run is disabled for 09 Aug 2026: it is the sealed historical night-audit record preserved by Founder ruling Q06-H1."
+          ],
+          "status": 302
+        }
+      },
+      "FrontDesk": {
+        "reopen": {
+          "flash": [],
+          "status": 403
+        },
+        "run": {
+          "flash": [],
+          "status": 403
+        }
+      },
+      "Housekeeping": {
+        "reopen": {
+          "flash": [],
+          "status": 403
+        },
+        "run": {
+          "flash": [],
+          "status": 403
+        }
+      },
+      "Manager": {
+        "reopen": {
+          "flash": [
+            "Reopen is disabled for 09 Aug 2026: it is the sealed historical night-audit record preserved by Founder ruling Q06-H1."
+          ],
+          "status": 302
+        },
+        "run": {
+          "flash": [
+            "Run is disabled for 09 Aug 2026: it is the sealed historical night-audit record preserved by Founder ruling Q06-H1."
+          ],
+          "status": 302
+        }
+      },
+      "business_date_after": "2026-08-10",
+      "protected_row_after": {
+        "snapshot_valid": [
+          1
+        ],
+        "status": [
+          "Completed"
+        ]
+      }
+    },
+    "T-10a_guard_function": {
+      "bad_str": false,
+      "date_2026_08_08": false,
+      "date_2026_08_09": true,
+      "date_2026_08_10": false,
+      "datetime_2026_08_09": true,
+      "empty": false,
+      "none": false,
+      "str_2026_08_09": true
+    }
+  }
+}

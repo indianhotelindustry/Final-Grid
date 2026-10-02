@@ -1,0 +1,16 @@
+{
+  "authorization": "DQ56e (FOUNDER_DECISIONS.md Round 9)",
+  "change": "DQ56-R1",
+  "code_commit": "46c4aab",
+  "applied_head": "e310c66",
+  "step1_backup": {"verdict": "PASS", "snapshot": "db-backups/pms_20261002_093338_dq56-apply-pre.db", "snapshot_sha256": "5c78edb214993d6a34dfed8c5f82756bf288cea3767caf49785a8ed8971dfa8e", "source_sha256_before_after": "21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434", "tables": 53, "rows": 306},
+  "step1_restore_rehearsal": {"run_id": "RR-20261002-DQ56-APPLY", "verdict": "PASS", "checks": "15/15"},
+  "step1_app_rehearsal_on_restore": {"verdict": "PASS", "boot_changed_copy": false},
+  "step2_preconditions": "PASS",
+  "step3_push": {"origin_dq56_q06h1_guard": "e310c66", "origin_main": "c9eeff0..e310c66 (fast-forward)", "live_main": "c703150..e310c66 (ff-only)", "sync_main": "0 0", "force_push": false},
+  "step4_app_started": false,
+  "production_db_sha256_end": "21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434",
+  "production_db_unchanged": true,
+  "notification_queue_at_backup": {"failed": 4, "pending": 0},
+  "production_start": "NOT AUTHORIZED"
+}

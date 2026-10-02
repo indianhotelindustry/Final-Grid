@@ -1372,3 +1372,31 @@ Resolves the FD-P2-06 statement "INV-D02 must not treat a legitimate cancellatio
 - Resolves DQ-56b (option **R1**) and DQ-56c (protected set = **{2026-08-09} only**). DQ-56d (Run on other closed days) is **not** adopted: general closed-day Run semantics stay unchanged.
 - Q06-H1 (`:1219-1227`) stands; this directive adds an application-level guard for that one record.
 - Not authorized: push, merge, production start, production application, any database/schema change, or any change to business-date logic, SR-1 or K-7.
+
+# Founder Resolution Round 9 — DQ-56e production application of DQ56-R1 — FG-P2-FOUNDER-RESOLUTION-20261002-02
+
+| | |
+|---|---|
+| Recorded | 2026-10-02 |
+| Governed HEAD | `e310c66` (branch `dq56-q06h1-guard`; code `46c4aab` tested in `verification/evidence/20261002_dq56_r1_guard/`) |
+| Kind | Founder production authorization for DQ56-R1, recorded verbatim. Production application **excludes** application start |
+| Identifier | `DQ56e` |
+| Source | Ruling given in session by the Founder on 2026-10-02, in reply to the DQ56-R1 implementation report |
+
+## DQ56e — Authorization, verbatim
+
+> AUTHORIZE DQ-56e: Apply R1 to production.
+> Proceed systematically:
+> 1. Take and verify a fresh production backup and perform the required isolated restore rehearsal.
+> 2. Verify Git/branch/working-tree/process/port/production-hash preconditions.
+> 3. Push the R1 branch and fast-forward main exactly as authorized.
+> 4. Do NOT start the production application yet.
+> 5. Produce a pre-start production gate report and STOP.
+> R1 scope remains strictly limited to protecting business date 2026-08-09: block Run and Reopen and hide/disable those controls. Do not modify Complete, other dates, business-date logic, SR-1, K-7, schema, database data, or general closed-day Run behavior.
+> Do not perform any other queued work. Do not start the live application until I separately authorize the production-start step.
+
+## Effect
+
+- Authorizes: fresh backup and isolated restore rehearsal; push of `dq56-q06h1-guard`; fast-forward of `origin/main` and of the live checkout's `main` to the R1 head.
+- Not authorized: starting the live application (a separate production-start authorization is required); any other queued work; any database, schema or behaviour change beyond DQ56-R1.
+- Execution evidence: `verification/evidence/20261002_dq56_r1_production_application/`.
