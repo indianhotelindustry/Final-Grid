@@ -1,7 +1,7 @@
 {
   "step": "DQ-56 R1 production start (controlled, once)",
   "live_head": "e310c66",
-  "server": {"command": "venv\Scripts\python.exe -m waitress --host=127.0.0.1 --port=5000 --threads=4 wsgi:app", "pid": 946596, "started": "2026-10-02T09:43:38+05:30", "stopped": "2026-10-02T09:44:13+05:30", "left_running": false},
+  "server": {"command": "venv/Scripts/python.exe -m waitress --host=127.0.0.1 --port=5000 --threads=4 wsgi:app", "pid": 946596, "started": "2026-10-02T09:43:38+05:30", "stopped": "2026-10-02T09:44:13+05:30", "left_running": false},
   "starts_normally": "PASS",
   "health": {"status": 200, "version": "2.2.18"},
   "r1_loaded_by_production_process": "PASS (reports.pyc recompiled 09:43:39; header matches R1 source; guard symbols present)",
