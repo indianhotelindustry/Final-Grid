@@ -1,0 +1,8 @@
+inv_run rc=1
+ds_run rc=0
+ds_commission rc=0
+fault_run rc=1
+gm_verify rc=1
+replay_verify rc=1
+cross_implementation rc=1
+inv_registry rc=0

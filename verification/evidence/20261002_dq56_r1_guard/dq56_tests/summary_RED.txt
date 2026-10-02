@@ -1,0 +1,32 @@
+label RED_c9eeff0 | source unchanged True | live unchanged True | boot changed copy False | sched running False
+T-01 302 ['Audit for 09 Aug 2026 reopened. Business date rolled back to 09 Aug 2026.'] row_unchanged False status ['Reopened'] valid [0] reopenlog+ 1 audit+ 1 bd 2026-08-10 -> 2026-08-09
+T-04/05 {'business_date': '2026-08-09', 'is_date_locked_protected': False}
+T-02 Accountant 302 Audit checks run for 09 Aug 2026. 0 blocker(s), 0 warning(s). row_unchanged False [1200]
+T-02 Admin 302 Audit checks run for 09 Aug 2026. 0 blocker(s), 0 warning(s). row_unchanged False [1200]
+T-02 Admin_unperturbed 302 Audit checks run for 09 Aug 2026. 0 blocker(s), 0 warning(s). row_unchanged True None
+T-02 Manager 302 Audit checks run for 09 Aug 2026. 0 blocker(s), 0 warning(s). row_unchanged False [1200]
+T-03 [(302, 'Audit for 09 Aug 2026 reopened. Business date rolled back to'), (302, 'Audit checks run for 09 Aug 2026. 0 blocker(s), 0 warning(s)'), (302, 'Night audit for 09 Aug 2026 completed. (Override used) Busin')]
+   row_unchanged False snap d248ae541367 -> 43ebbca8f094 taxable 2285.7 -> 1142.85 status Completed -> Completed bd 2026-08-10
+T-09 FrontDesk run 403  | reopen 403 
+T-09 Housekeeping run 403  | reopen 403 
+T-09 Accountant run 302 Audit checks run for 09 Aug 2026. 0 blocker(s), 0  | reopen 403 
+T-09 Manager run 302 Audit checks run for 09 Aug 2026. 0 blocker(s), 0  | reopen 302 Audit for 09 Aug 2026 reopened. Business date roll
+T-09 after {'snapshot_valid': [0], 'status': ['Reopened']} 2026-08-09
+T-08 panel {'drift_banner': False, 'protected_note': False, 'reopen_button': True, 'reopen_form': True, 'reopen_modal': True, 'run_form': False, 'status': 200}
+T-08 panel_drift {'drift_banner': True, 'protected_note': False, 'reopen_button': True, 'reopen_form': True, 'reopen_modal': True, 'run_form': True, 'status': 200}
+T-08 protected_row_unchanged_by_gets True
+T-08 report {'drift_banner': False, 'protected_note': False, 'reopen_button': True, 'reopen_form': True, 'reopen_modal': True, 'run_form': False, 'status': 200}
+T-08 report_drift {'drift_banner': True, 'protected_note': False, 'reopen_button': True, 'reopen_form': True, 'reopen_modal': True, 'run_form': True, 'status': 200}
+T-06 run_1 302 Audit checks run for 10 Aug 2026. 0 blocker(s), 0 warning(s).
+T-06 complete_1 302 Night audit for 10 Aug 2026 completed. (Override used) Business date a
+T-06 reopen 302 Audit for 10 Aug 2026 reopened. Business date rolled back to 10 Aug 20
+T-06 run_2 302 Audit checks run for 10 Aug 2026. 0 blocker(s), 0 warning(s).
+T-06 complete_2 302 Night audit for 10 Aug 2026 completed. (Override used) Business date a
+T-06 after_complete_1 {'business_date': '2026-08-11', 'status': ['Completed']}
+T-06 after_reopen {'business_date': '2026-08-10', 'snapshot_valid': [0], 'status': ['Reopened']}
+T-06 after_complete_2 {'business_date': '2026-08-11', 'snapshot_valid': [1], 'status': ['Completed']}
+T-08b ui_other_closed {'panel': {'drift_banner': False, 'protected_note': False, 'reopen_button': True, 'reopen_form': True, 'reopen_modal': True, 'run_form': False, 'status': 200}, 'report': {'drift_banner': False, 'protected_note': False, 'reopen_button': True, 'reopen_form': True, 'reopen_modal': True, 'run_form': False, 'status': 200}}
+T-08b ui_other_closed_drift {'panel': {'drift_banner': True, 'protected_note': False, 'reopen_button': True, 'reopen_form': True, 'reopen_modal': True, 'run_form': True, 'status': 200}, 'report': {'drift_banner': True, 'protected_note': False, 'reopen_button': True, 'reopen_form': True, 'reopen_modal': True, 'run_form': True, 'status': 200}}
+T-06 protected unchanged True
+T-07 {'response': {'flash': ['Audit checks run for 10 Aug 2026. 0 blocker(s), 0 warning(s).'], 'status': 302}, 'sentinel_overwritten': True, 'status_after': ['Completed']}
+T-10a not present (control)

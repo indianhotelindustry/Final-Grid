@@ -1,0 +1,67 @@
+## 20261002_033855_inv_run_production differences: 1
+    /results[7]/metering/memory_peak_kb | 144 -> 146
+## 20261002_034009_fip_run_production differences: 21
+    /results[2]/metering/memory_peak_kb | 3222 -> 3223
+    /results[3]/metering/memory_peak_kb | 3216 -> 3215
+    /results[4]/metering/memory_peak_kb | 3218 -> 3219
+    /results[5]/metering/memory_peak_kb | 3218 -> 3220
+    /results[6]/metering/memory_peak_kb | 3222 -> 3223
+    /results[7]/metering/memory_peak_kb | 3218 -> 3217
+    /results[8]/metering/memory_peak_kb | 3224 -> 3223
+    /results[9]/metering/memory_peak_kb | 3225 -> 3226
+    /results[10]/metering/memory_peak_kb | 3223 -> 3222
+    /results[12]/metering/memory_peak_kb | 3223 -> 3224
+    /results[14]/metering/memory_peak_kb | 3216 -> 3214
+    /results[15]/metering/memory_peak_kb | 3216 -> 3217
+    /results[17]/metering/memory_peak_kb | 3217 -> 3218
+    /results[24]/metering/memory_peak_kb | 3220 -> 3218
+    /results[25]/metering/memory_peak_kb | 3198 -> 3199
+    /results[26]/metering/memory_peak_kb | 3215 -> 3216
+    /results[27]/metering/memory_peak_kb | 3218 -> 3217
+    /results[28]/metering/memory_peak_kb | 3217 -> 3218
+    /results[30]/metering/memory_peak_kb | 3489 -> 3488
+    /results[31]/metering/memory_peak_kb | 3216 -> 3217
+    /results[37]/metering/memory_peak_kb | 3216 -> 3215
+## 20261002_034405_gm_verify_phase1_aa6d9e91 differences: 74
+    /by_kind/BODY_CHANGED | 30 -> 31
+    /by_kind/NORMALISATION_CHANGED | <absent> -> 1
+    /difference_count | 39 -> 41
+    /differences | len 39 -> len 41
+    /differences[25]/category | OPERATIONAL -> FINANCIAL
+    /differences[25]/current | 8fca7da6c59ecd6a -> 4b84d5059b4c5558
+    /differences[25]/master | b3705d054418b618 -> 71e0720694a65b46
+    /differences[25]/surface_id | main.room_grid -> main.night_audit
+    /differences[25]/url | /room-grid -> /night-audit
+    /differences[26]/current | 2d7c8ea43fb3cf3c -> {'csp_nonce_attr': 4, 'csrf_meta': 1, 'csrf_input': 1}
+    /differences[26]/kind | BODY_CHANGED -> NORMALISATION_CHANGED
+    /differences[26]/master | 65c5a0e9d84794ae -> {'csp_nonce_attr': 4, 'csrf_input': 2, 'csrf_meta': 1}
+    /differences[26]/surface_id | ota.bookings -> main.night_audit
+    /differences[26]/url | /ota/bookings -> /night-audit
+    /differences[27]/category | FINANCIAL -> OPERATIONAL
+    /differences[27]/current | f007a698bc67c6ac -> 8fca7da6c59ecd6a
+    /differences[27]/master | 6affae7eaeeca6cb -> b3705d054418b618
+    /differences[27]/surface_id | ota.dashboard -> main.room_grid
+    /differences[27]/url | /ota/ -> /room-grid
+    /differences[28]/current | e1ec7f5b10f83474 -> 2d7c8ea43fb3cf3c
+    /differences[28]/master | d543bdcba1b4d5f6 -> 65c5a0e9d84794ae
+    /differences[28]/surface_id | ota.settings -> ota.bookings
+    /differences[28]/url | /ota/settings -> /ota/bookings
+    /differences[29]/current | 7bb638fd660a5147 -> f007a698bc67c6ac
+    /differences[29]/master | 42ad1a041ae015b4 -> 6affae7eaeeca6cb
+    /differences[29]/surface_id | ota.webhook_logs -> ota.dashboard
+    /differences[29]/url | /ota/webhook/logs -> /ota/
+    /differences[30]/category | OPERATIONAL -> FINANCIAL
+    /differences[30]/current | b9b73ed437dbc25d -> e1ec7f5b10f83474
+    /differences[30]/master | c46a134c37964469 -> d543bdcba1b4d5f6
+    /differences[30]/surface_id | rates.notification_logs -> ota.settings
+    /differences[30]/url | /rates/notification-logs -> /ota/settings
+    /differences[31]/category | OPERATIONAL -> FINANCIAL
+    /differences[31]/current | NotificationLog -> 7bb638fd660a5147
+    /differences[31]/key | logs[5][type] -> 
+    /differences[31]/kind | FIGURE_ADDED -> BODY_CHANGED
+    /differences[31]/master |  -> 42ad1a041ae015b4
+    /differences[31]/surface_id | rates.notification_logs -> ota.webhook_logs
+    /differences[31]/url | /rates/notification-logs -> /ota/webhook/logs
+    /differences[32]/current | NotificationLog -> b9b73ed437dbc25d
+## 20261002_034411_replay_verify_production differences: 0
+## 20261002_034414_cross_implementation differences: 0

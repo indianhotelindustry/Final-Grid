@@ -1,0 +1,44 @@
+{
+  "directive": "DQ56-R1 (FOUNDER_DECISIONS.md Round 8)",
+  "branch": "dq56-q06h1-guard",
+  "pushed": false,
+  "merged": false,
+  "base_commit": "c9eeff0",
+  "governance_commit": "9ddde22",
+  "code_commit_tested": "46c4aab",
+  "control_commit": "c9eeff0",
+  "files_changed": ["app/reports.py", "app/templates/night_audit_panel.html", "app/templates/reports/night_audit.html"],
+  "schema_changed": false,
+  "database_changed": false,
+  "protected_dates": ["2026-08-09"],
+  "dq56_tests": {
+    "T-01": "PASS", "T-02": "PASS", "T-03": "PASS", "T-04": "PASS", "T-05": "PASS",
+    "T-06": "PASS", "T-07": "PASS", "T-08": "PASS", "T-08b": "PASS", "T-09": "PASS",
+    "T-10a": "PASS", "T-10_regression": "PASS", "T-11": "NOT APPLICABLE"
+  },
+  "red_on_control_demonstrated": {
+    "reopen_mutates_sealed_row": true,
+    "run_overwrites_sealed_summary": true,
+    "chain_reseals_total_taxable": "2285.7 -> 1142.85",
+    "business_date_rollback": "2026-08-10 -> 2026-08-09"
+  },
+  "regression_control_vs_branch": {
+    "inv_run": "identical (metering only); FAIL pre-existing = D11 declared rows",
+    "ds_run": "identical PASS",
+    "ds_commission": "identical PASS",
+    "fault_run": "identical (metering only); FAIL pre-existing",
+    "gm_verify": "39 common differences (environmental/operational); 2 branch-only on main.night_audit = EXPECTED R1 UI change; no master re-baselined",
+    "replay_verify": "0 differences; FAIL pre-existing (governed Q06-H2 deltas)",
+    "cross_implementation": "0 differences; FAIL pre-existing",
+    "inv_registry": "identical"
+  },
+  "harness_defects_corrected": ["unquoted current_date read SQLite CURRENT_DATE (RED v1 kept)", "deprecated template reachable only via unrecognised format value"],
+  "production": {
+    "db_sha256": "21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434",
+    "unchanged": true,
+    "started": false,
+    "live_env_loaded": false
+  },
+  "outcome": "PASS",
+  "production_application": "NOT AUTHORIZED - decision DQ-56e"
+}
