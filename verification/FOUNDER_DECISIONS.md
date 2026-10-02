@@ -1449,3 +1449,44 @@ FD-P2-06 (this file, `:1178-1187`) is recorded as the explicit carve-out from Ma
 - DQ-01…DQ-05 (overnight queue) are RULED by this round.
 - Authorizes: on an isolated branch, changes to INV-B06 in `verification/invariants/rules_b.py` (rule, metadata, negative seed); the 13 targeted scenarios and the regression battery on disposable copies of production.
 - Not authorized: any change to `app/`, the schema, K-7, business-date logic, financial writers, production, other invariants, baselines of unrelated failures; push, merge or deployment.
+
+# Founder Resolution Round 11 — GT-D1 / K7-D1…D10 — Phase 3.1 K-7 directive — FG-P2-FOUNDER-RESOLUTION-20261002-04
+
+| | |
+|---|---|
+| Recorded | 2026-10-02 |
+| Governed HEAD | `0938069` (`main` = `origin/main`; SR-1 integrated); recorded on local branch `round11-k7-directive` |
+| Kind | Founder rulings GT-D1, K7-D1/GT-D5, K7-D2, K7-D3, K7-D7; instructions on K7-D4 and K7-D10; instruction to refresh the stale G3 governance documentation. Recorded verbatim |
+| Identifier | `R11-GT-D1`, `R11-K7-D1`, `R11-K7-D2`, `R11-K7-D3`, `R11-K7-D4`, `R11-K7-D7`, `R11-K7-D10` |
+| Source | Founder message of 2026-10-02 in session, in reply to the K-7 / G3 decision package |
+| Decision inputs | `verification/evidence/20261002_overnight_k7_analysis/` and `20261002_overnight_gates_g3_g6/` (branch `overnight-20261002`) |
+| Deliverables | `verification/evidence/20261002_round11_k7_directive/`: `K7_PHASE_3_1_DIRECTIVE.md` (draft, not in force), `K7_D4_VOUCHER_BASIS_DECISION.md`, `K7_D10_CLOSE_PATH_DECISION_PACKAGE.md`, `G3_GOVERNANCE_STATUS_REFRESH.md` |
+
+## Round 11 — Founder directive, verbatim
+
+> Proceed with Round 11 governance only.
+> Record the following Founder rulings in FOUNDER_DECISIONS.md and produce the Phase 3.1 K-7 directive. Do not implement, push, merge, start the application, modify production data, or advance the business date.
+> GT-D1: G3's K-7 item closes when Phase 3.1 is completely implemented and evidenced.
+> K7-D1 / GT-D5: Authorize a dedicated Phase 3.1 directive for K-7. B-1 and the undefined Gates A–H are explicitly outside this directive's scope; validate the directive against G3, G6 and G10.
+> K7-D2 — Scope: Include:
+> - W-08, W-09, W-10, W-11, W-17, W-20, W-22, W-23;
+> - voucher issued_date and expiry anchor;
+> - relevant model defaults;
+> - business-date fallback paths.
+> Keep late checkout, report ranges, void/shift-day mapping and invoice/credit-note UTC dating outside K-7 unless a concrete dependency is demonstrated. The package identifies these as the remaining B-10 scope.
+> K7-D3 — Fallback/default behaviour: fail closed with a logged error where the business date cannot be resolved; defaults must resolve the business date at insertion or raise rather than silently using the wall clock.
+> K7-D4 — Voucher expiry basis: before implementation, present the exact alternatives and consequences for Founder confirmation. Do not silently choose a liability/expiry basis. Production currently has zero vouchers, so this does not block the present data state.
+> K7-D7 — Evidence: use a dedicated RED/GREEN harness with the system clock deliberately different from the production business date, disposable production copies, full regression battery, and a declared-delta list. Do not create a new invariant merely for K-7.
+> K7-D10: prepare the two close-path alternatives as a separate decision package. Do not perform either path in production.
+> Also update the governance package to identify the already-completed SR-1 integration and DQ-56/R1 status, because the existing G3 documentation is stale.
+> STOP after producing the Round 11 decision/directive package. Do not begin K-7 implementation until the Founder has reviewed the resulting package.
+
+Note on the text: the Founder's message carried two interface paste-markers (`Pasted markdown(20261002-115512)`), one after the K7-D2 paragraph and one after the final governance paragraph. They are omitted above and are not part of the ruling. Nothing else was changed.
+
+## Effect
+
+- **RULED:** GT-D1 (overnight queue DQ-13); K7-D1 / GT-D5 for this directive (DQ-57; DQ-14 in part); K7-D2 (DQ-58); K7-D3 (DQ-59); K7-D7 (DQ-60, evidence standard and no new invariant).
+- **Instructions executed as preparation only:** K7-D4 (alternatives presented, **not chosen**; awaiting Founder confirmation), K7-D10 (close-path decision package prepared, **no decision**; neither path was run anywhere), refresh of the stale G3 governance documentation.
+- **Not ruled by this round:** the K7-D4 voucher basis; K7-D10; K7-D5 and K7-D6 beyond "outside K-7"; K7-D8 / DQ-61 (deployment sequencing); GT-D7 / BD-D1…BD-D5 (the 53-day stale business date); B-10 #4 and #5; any other open DQ or GT item.
+- **Not authorized:** K-7 implementation (it begins only after the Founder has reviewed the package and records an activation entry naming `FG-P3-1-K7-DIRECTIVE-01`); push; merge; deployment; an application start; any production data change; advancing the business date.
+- **Status of record (facts, not decisions):** SR-1 / INV-B06 is integrated; `main` = `origin/main` = `0938069`. DQ-56 / DQ56-R1 is applied to the live checkout (`app/` guard for 2026-08-09; production application stopped). Detail and the list of governance-record gaps for the Founder to dictate are in `G3_GOVERNANCE_STATUS_REFRESH.md`.

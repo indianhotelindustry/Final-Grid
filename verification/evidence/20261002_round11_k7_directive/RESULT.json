@@ -1,0 +1,30 @@
+{
+  "task": "Founder Round 11 - Phase 3.1 K-7 directive and governance refresh (documents only)",
+  "authorization": "Founder Round 11 (FG-P2-FOUNDER-RESOLUTION-20261002-04), verification/FOUNDER_DECISIONS.md",
+  "branch": "round11-k7-directive",
+  "base": "0938069",
+  "kind": "governance documents; no code, no tests, no production activity",
+  "deliverables": [
+    "K7_PHASE_3_1_DIRECTIVE.md (DRAFT, not in force until a Founder activation entry)",
+    "K7_D4_VOUCHER_BASIS_DECISION.md (alternatives A/B/C/D, nothing chosen)",
+    "K7_D10_CLOSE_PATH_DECISION_PACKAGE.md (two alternatives, nothing run, nothing chosen)",
+    "G3_GOVERNANCE_STATUS_REFRESH.md (SR-1 integrated, DQ-56/R1 status, DQ reconciliation, record gaps)"
+  ],
+  "ruled_by_round_11": ["GT-D1", "K7-D1/GT-D5", "K7-D2", "K7-D3", "K7-D7"],
+  "prepared_not_decided": ["K7-D4", "K7-D10"],
+  "g3_status": "OPEN, not PASS; K-7 is the only remaining engineering item",
+  "k7_implementation": "NOT AUTHORIZED until the Founder reviews the package and records an activation entry",
+  "verification_done": {
+    "file_line_anchors_checked_against_0938069": 43,
+    "anchor_mismatches": 0,
+    "note": "three anchors were range or decorator lines; all cited ranges and the route decorator are correct"
+  },
+  "safety": {
+    "production_pms_db_sha256": "21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434",
+    "production_opened": false,
+    "application_started": false,
+    "business_date_advanced": false,
+    "pushed": false,
+    "merged": false
+  }
+}
