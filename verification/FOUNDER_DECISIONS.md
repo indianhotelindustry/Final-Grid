@@ -1556,3 +1556,25 @@ Residual Phase 3.2 / 3.4 items, not changed by K-7: `app/reports.py:3121-3125` (
 - **Not ruled by this round:** governance entries G-1 to G-7. They are prepared in the review pack §4 for later Founder review; no missing authorization wording was supplied or invented, and none is treated as ruled. BD-D2 to BD-D5, K7-D5 and every other open item are unchanged.
 - **Authorizes:** K-7 implementation and evidence generation on the local branch `k7-phase-3-1`, under the frozen directive.
 - **Not authorized:** push, merge, tag, deployment, production start, any production data change, a database modification outside disposable copies, a migration, a business-date change, trading.
+
+# Founder Resolution Round 13 — K-7 Phase 3.1 integration authorization — FG-P2-FOUNDER-RESOLUTION-20261002-06
+
+| | |
+|---|---|
+| Recorded | 2026-10-02 |
+| Governed HEAD | `main` = `origin/main` = `0938069`. Branch `k7-phase-3-1` gated at `ba502a7` (local, not yet pushed when this entry was written) |
+| Kind | Founder authorization of code and evidence integration. Recorded verbatim |
+| Identifier | `R13-K7-INTEGRATION` |
+| Source | Founder message of 2026-10-02 in session, in reply to the K-7 pre-push gate result |
+| Gate relied on | the K-7 pre-push gate at `ba502a7`: 174/174 harness; control/branch regression battery with 0 verdict-level differences; DQ56-R1 guard tests identical (9 of 9); content scan of the 159-file push set clean; 17/17 mutation anchors; production `pms.db` `21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434` unchanged |
+
+## Round 13 — Founder authorization, verbatim
+
+> I authorize push and fast-forward merge of the gated k7-phase-3-1 branch into main, based on the passed K-7 pre-push gate (ba502a7). This authorization covers code/evidence integration only. It does not authorize starting the application, advancing the business date, deployment activation, trading, voucher issuance, or any other Phase 3 work.
+
+## Effect
+
+- **Authorizes:** a plain push of `k7-phase-3-1` and a fast-forward-only merge of `main` to it (no merge commit, squash, rebase, cherry-pick or force push), and the recording of that integration.
+- **Not authorized (as stated by the Founder):** starting the application; advancing the business date; deployment activation; trading; voucher issuance; any other Phase 3 work.
+- **Not decided by this round and still open:** K7-D5, K7-D8, K7-D10, BD-D2 to BD-D5, G6 C3/C4/C5 (units 3.2 to 3.8), and the governance-record entries G-1 to G-7.
+- **Record note:** this entry is a documentation-only commit on top of the gated head `ba502a7`; `app/`, `tools/` and every other file are unchanged from the gated tree.
