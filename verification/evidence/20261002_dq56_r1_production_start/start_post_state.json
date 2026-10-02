@@ -1,0 +1,83 @@
+{
+  "captured_at": "2026-10-02T09:44:32.093615",
+  "git_head": "e310c6672f00a4bed5d6134c710f8b8dba1ae94a",
+  "git_status_porcelain": "",
+  "pms_db": {
+    "sha256": "21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434",
+    "size": 733184,
+    "mtime": "2026-09-30T13:52:28.623180"
+  },
+  "alert_memory": {
+    "sha256": "7f79f337c5d995110a79d021c64bf0f77cb7df6c4355b4113f68165c621f1a46",
+    "size": 176,
+    "mtime": "2026-09-30T10:51:55.488215"
+  },
+  "instance_files": [
+    "alert_memory.json",
+    "pms.db"
+  ],
+  "logs_files": {
+    ".pre_patch_version.tmp": {
+      "size": 6,
+      "mtime": "2026-05-27T19:20:08.827470"
+    },
+    "adr011_run_20260930.log": {
+      "size": 8420,
+      "mtime": "2026-09-30T14:54:40.137078"
+    },
+    "install.log": {
+      "size": 2223,
+      "mtime": "2026-05-27T13:43:00.074454"
+    },
+    "occupancy_engine_debug.log": {
+      "size": 331244,
+      "mtime": "2026-09-30T13:52:28.640285"
+    },
+    "patch.log": {
+      "size": 334,
+      "mtime": "2026-05-27T19:20:10.489083"
+    },
+    "patch_trace.log": {
+      "size": 49,
+      "mtime": "2026-05-27T19:20:09.316400"
+    },
+    "pms.log": {
+      "size": 7845551,
+      "mtime": "2026-10-02T09:43:40.108083"
+    },
+    "pms.log.5": {
+      "size": 10484713,
+      "mtime": "2026-08-05T04:47:09.149380"
+    },
+    "start.log": {
+      "size": 388,
+      "mtime": "2026-06-12T10:23:50.452165"
+    }
+  },
+  "backups_dir": [
+    "backup_pre-reset_20260809_051801.db.enc",
+    "pms_PRE_TXN_RESET_20260809_104630.db",
+    "pms_pre_DEF004_20260811_174256.db",
+    "pms_pre_v2.2.18_upgrade.db"
+  ],
+  "comparison": {
+    "pms_db_unchanged": true,
+    "alert_memory_unchanged": true,
+    "instance_files_unchanged": true,
+    "backups_dir_unchanged": true,
+    "git_head_unchanged": true,
+    "git_tree_clean": true,
+    "logs_changed": {
+      "pms.log": [
+        {
+          "size": 7843534,
+          "mtime": "2026-09-30T14:54:40.137078"
+        },
+        {
+          "size": 7845551,
+          "mtime": "2026-10-02T09:43:40.108083"
+        }
+      ]
+    }
+  }
+}

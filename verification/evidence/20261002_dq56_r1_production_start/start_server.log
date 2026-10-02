@@ -1,0 +1,20 @@
+2026-10-02 09:43:39 [INFO] app: DATABASE_URL not set — using local SQLite: sqlite:///C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\app\..\instance\pms.db
+2026-10-02 09:43:39 [WARNING] app: Running on SQLite — row-level locking (with_for_update) is not enforced. SQLite uses a database-wide write lock; concurrent writers will serialise. Move to PostgreSQL for true per-row locking and higher concurrency.
+2026-10-02 09:43:39 [INFO] app: ------- SECURITY MODE -------
+2026-10-02 09:43:39 [INFO] app:   env                : production
+2026-10-02 09:43:39 [INFO] app:   secret_key         : set (>=32 chars)
+2026-10-02 09:43:39 [INFO] app:   updater_signing    : ENFORCED
+2026-10-02 09:43:39 [INFO] app:   encryption         : available
+2026-10-02 09:43:39 [INFO] app:   lan_access         : disabled (127.0.0.1 only)
+2026-10-02 09:43:39 [INFO] app:   schema_drift_mode  : warn-only
+2026-10-02 09:43:39 [INFO] app: -----------------------------
+2026-10-02 09:43:39 [INFO] app: db.create_all() skipped in production. Use Alembic migrations for schema changes. Set DB_AUTO_CREATE=1 to force-enable at next boot.
+2026-10-02 09:43:40 [INFO] app: SQLite: ensured table credit_vouchers exists
+2026-10-02 09:43:40 [INFO] app: SQLite: ensured table credit_voucher_redemptions exists
+2026-10-02 09:43:40 [INFO] apscheduler.scheduler: Scheduler started
+2026-10-02 09:43:40 [INFO] apscheduler.scheduler: Added job "setup_backup_scheduler.<locals>._scheduled_backup" to job store "default"
+2026-10-02 09:43:40 [INFO] app.backup_manager: Daily backup scheduled at 03:00
+2026-10-02 09:43:40 [INFO] apscheduler.scheduler: Added job "flush_notification_queue" to job store "default"
+2026-10-02 09:43:40 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._prune_old_logs" to job store "default"
+2026-10-02 09:43:40 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._run_predictive_maintenance" to job store "default"
+2026-10-02 09:43:40 [INFO] waitress: Serving on http://127.0.0.1:5000
