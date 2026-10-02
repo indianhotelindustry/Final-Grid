@@ -1,0 +1,519 @@
+{
+  "registered": "2026-10-02, before the first harness run. Frozen directive FG-P3-1-K7-DIRECTIVE-01, SHA-256 28413d8e381fcefced8e6d9f0fc7798a1ef682e3f6d4e39025d0502ae4589f95 (section 7.1 item 3)",
+  "rule": "Each assertion names the value expected from the BASE tree (activation commit d21eb50, application code identical to 0938069) and from the BRANCH tree. Any mismatch is reported, never adjusted. Fixture mechanics may be repaired before the recorded run; expectations may not.",
+  "constants": {
+    "business_date_on_copy": "2026-08-10",
+    "frozen_calendar_date_F_LAG": "2026-10-02",
+    "F_LAG_clock": "2026-10-02T12:00:00",
+    "F_AHEAD": {
+      "business_date": "2026-10-03",
+      "clock": "2026-10-02T23:30:00",
+      "sealed_day": "2026-10-02"
+    },
+    "F_UTC_clock": "2026-10-02T00:30:00",
+    "expiry_days": 365
+  },
+  "common_asserts_every_scenario": {
+    "freeze_proven": {
+      "base": true,
+      "branch": true
+    },
+    "d11_unchanged": {
+      "base": true,
+      "branch": true
+    },
+    "sealed_0809_unchanged": {
+      "base": true,
+      "branch": true
+    }
+  },
+  "scenarios": {
+    "S-08-09": {
+      "fixture": "F-LAG",
+      "entry": "post_payment_correction (service)",
+      "asserts": {
+        "reversal_date": {
+          "base": "2026-10-02",
+          "branch": "2026-08-10"
+        },
+        "replacement_date": {
+          "base": "2026-10-02",
+          "branch": "2026-08-10"
+        },
+        "n2_new_rows_all_on_bd": {
+          "base": false,
+          "branch": true
+        }
+      }
+    },
+    "S-08-09-route": {
+      "fixture": "F-CLOSED",
+      "entry": "POST /payment/<id>/void with Admin override on a payment in closed day 2026-08-09",
+      "asserts": {
+        "reversal_date": {
+          "base": "2026-10-02",
+          "branch": "2026-08-10"
+        },
+        "replacement_date": {
+          "base": "2026-10-02",
+          "branch": "2026-08-10"
+        },
+        "n2_new_rows_all_on_bd": {
+          "base": false,
+          "branch": true
+        }
+      }
+    },
+    "S-10": {
+      "fixture": "F-CANCEL",
+      "entry": "post_cancellation_disposition refund_full",
+      "asserts": {
+        "refund_date": {
+          "base": "2026-10-02",
+          "branch": "2026-08-10"
+        },
+        "n2_new_rows_all_on_bd": {
+          "base": false,
+          "branch": true
+        }
+      }
+    },
+    "S-VI": {
+      "fixture": "F-CANCEL",
+      "entry": "post_cancellation_disposition credit_voucher",
+      "asserts": {
+        "issued_date": {
+          "base": "2026-10-02",
+          "branch": "2026-08-10"
+        },
+        "expiry_date": {
+          "base": "2027-10-02",
+          "branch": "2027-08-10"
+        },
+        "n2_new_rows_all_on_bd": {
+          "base": false,
+          "branch": true
+        }
+      }
+    },
+    "S-11": {
+      "fixture": "F-VOUCHER",
+      "entry": "redeem_credit_voucher",
+      "asserts": {
+        "redeem_result": {
+          "base": "ok",
+          "branch": "ok"
+        },
+        "payment_date": {
+          "base": "2026-10-02",
+          "branch": "2026-08-10"
+        },
+        "n2_new_rows_all_on_bd": {
+          "base": false,
+          "branch": true
+        }
+      }
+    },
+    "V-1": {
+      "fixture": "F-VOUCHER",
+      "entry": "voucher with expiry_date == business date",
+      "asserts": {
+        "computed_status": {
+          "base": "expired",
+          "branch": "active"
+        },
+        "redeem_result": {
+          "base": "refused",
+          "branch": "ok"
+        }
+      }
+    },
+    "V-2": {
+      "fixture": "F-VOUCHER",
+      "entry": "voucher with expiry_date == business date - 1",
+      "asserts": {
+        "computed_status": {
+          "base": "expired",
+          "branch": "expired"
+        },
+        "redeem_result": {
+          "base": "refused",
+          "branch": "refused"
+        }
+      }
+    },
+    "V-3": {
+      "fixture": "F-VOUCHER",
+      "entry": "voucher with expiry_date between the business date and the calendar date (2026-09-15)",
+      "asserts": {
+        "computed_status": {
+          "base": "expired",
+          "branch": "active"
+        },
+        "redeem_result": {
+          "base": "refused",
+          "branch": "ok"
+        }
+      }
+    },
+    "V-4": {
+      "fixture": "F-VOUCHER",
+      "entry": "open the voucher ledger report with the V-3 voucher stored active (C-2)",
+      "asserts": {
+        "http_status": {
+          "base": 200,
+          "branch": 200
+        },
+        "stored_status_after_report": {
+          "base": "expired",
+          "branch": "active"
+        }
+      }
+    },
+    "S-17": {
+      "fixture": "F-STAY",
+      "entry": "POST /checkout/<id> with an extra charge",
+      "asserts": {
+        "checkout_status": {
+          "base": "CheckedOut",
+          "branch": "CheckedOut"
+        },
+        "extra_date": {
+          "base": "2026-10-02",
+          "branch": "2026-08-10"
+        },
+        "settlement_date": {
+          "base": "2026-08-10",
+          "branch": "2026-08-10"
+        },
+        "tip_date": {
+          "base": "2026-08-10",
+          "branch": "2026-08-10"
+        },
+        "n2_new_rows_all_on_bd": {
+          "base": false,
+          "branch": true
+        }
+      }
+    },
+    "S-20": {
+      "fixture": "F-STAY",
+      "entry": "POST /reservation/<id>/overstay-charge on an Hourly stay",
+      "asserts": {
+        "charge_rows": {
+          "base": 1,
+          "branch": 1
+        },
+        "charge_date": {
+          "base": "2026-10-02",
+          "branch": "2026-08-10"
+        },
+        "n2_new_rows_all_on_bd": {
+          "base": false,
+          "branch": true
+        }
+      },
+      "cross_check": "charge_amount must be equal between base and branch (BR-6: elapsed-hours billing unchanged)"
+    },
+    "S-22-23": {
+      "fixture": "F-LAG",
+      "entry": "post_extra_charge_correction (service; no caller in app/)",
+      "asserts": {
+        "reversal_date": {
+          "base": "2026-10-02",
+          "branch": "2026-08-10"
+        },
+        "replacement_date": {
+          "base": "2026-10-02",
+          "branch": "2026-08-10"
+        },
+        "n2_new_rows_all_on_bd": {
+          "base": false,
+          "branch": true
+        }
+      }
+    },
+    "F-1": {
+      "fixture": "F-NOROW",
+      "entry": "get_business_date() with the business_date row deleted",
+      "asserts": {
+        "result": {
+          "base": "date:2026-10-02",
+          "branch": "raises:BusinessDateUnavailable"
+        },
+        "error_logged": {
+          "base": false,
+          "branch": true
+        }
+      }
+    },
+    "F-2-corr": {
+      "fixture": "F-NOROW",
+      "entry": "post_payment_correction",
+      "asserts": {
+        "outcome": {
+          "base": "completed",
+          "branch": "refused"
+        },
+        "no_rows_created": {
+          "base": false,
+          "branch": true
+        }
+      }
+    },
+    "F-2-chgcorr": {
+      "fixture": "F-NOROW",
+      "entry": "post_extra_charge_correction",
+      "asserts": {
+        "outcome": {
+          "base": "completed",
+          "branch": "refused"
+        },
+        "no_rows_created": {
+          "base": false,
+          "branch": true
+        }
+      }
+    },
+    "F-2-refund": {
+      "fixture": "F-NOROW",
+      "entry": "post_cancellation_disposition refund_full",
+      "asserts": {
+        "outcome": {
+          "base": "completed",
+          "branch": "refused"
+        },
+        "no_rows_created": {
+          "base": false,
+          "branch": true
+        }
+      }
+    },
+    "F-2-voucher": {
+      "fixture": "F-NOROW",
+      "entry": "post_cancellation_disposition credit_voucher",
+      "asserts": {
+        "outcome": {
+          "base": "completed",
+          "branch": "refused"
+        },
+        "no_rows_created": {
+          "base": false,
+          "branch": true
+        }
+      }
+    },
+    "F-2-redeem": {
+      "fixture": "F-NOROW",
+      "entry": "redeem_credit_voucher",
+      "asserts": {
+        "outcome": {
+          "base": "completed",
+          "branch": "refused"
+        },
+        "no_rows_created": {
+          "base": false,
+          "branch": true
+        }
+      }
+    },
+    "F-2-checkout": {
+      "fixture": "F-NOROW",
+      "entry": "POST /checkout/<id> with an extra charge",
+      "asserts": {
+        "outcome": {
+          "base": "completed",
+          "branch": "refused"
+        },
+        "no_rows_created": {
+          "base": false,
+          "branch": true
+        }
+      }
+    },
+    "F-2-overstay": {
+      "fixture": "F-NOROW",
+      "entry": "POST /reservation/<id>/overstay-charge",
+      "asserts": {
+        "outcome": {
+          "base": "completed",
+          "branch": "refused"
+        },
+        "no_rows_created": {
+          "base": false,
+          "branch": true
+        }
+      }
+    },
+    "D-1": {
+      "fixture": "F-LAG",
+      "entry": "ORM insert of Payment, ExtraCharge, CreditVoucher without any date (model defaults)",
+      "asserts": {
+        "payment_date": {
+          "base": "2026-10-02",
+          "branch": "2026-08-10"
+        },
+        "charge_date": {
+          "base": "2026-10-02",
+          "branch": "2026-08-10"
+        },
+        "voucher_issued_date": {
+          "base": "2026-10-02",
+          "branch": "2026-08-10"
+        }
+      }
+    },
+    "D-2": {
+      "fixture": "F-NOROW",
+      "entry": "ORM insert of Payment without a date, business_date row absent",
+      "asserts": {
+        "outcome": {
+          "base": "inserted",
+          "branch": "raised"
+        },
+        "no_rows_created": {
+          "base": false,
+          "branch": true
+        }
+      }
+    },
+    "F-3a": {
+      "fixture": "F-NOROW",
+      "entry": "occupancy_engine payload business_date label",
+      "asserts": {
+        "payload_business_date": {
+          "base": "2026-10-02",
+          "branch": null
+        },
+        "error_logged": {
+          "base": false,
+          "branch": true
+        }
+      }
+    },
+    "F-3b": {
+      "fixture": "F-NOROW",
+      "entry": "kpi_command_center._build_governance_block with no business date in its context",
+      "asserts": {
+        "result": {
+          "base": "dict",
+          "branch": "raises:BusinessDateUnavailable"
+        }
+      }
+    },
+    "F-3c": {
+      "fixture": "F-NOROW",
+      "entry": "GET /night-audit as Admin",
+      "asserts": {
+        "http_status": {
+          "base": 200,
+          "branch": 500
+        },
+        "error_logged": {
+          "base": false,
+          "branch": true
+        }
+      }
+    },
+    "F-3d": {
+      "fixture": "F-NOROW",
+      "entry": "run_night_audit with the business_date row absent",
+      "asserts": {
+        "returned": {
+          "base": "None",
+          "branch": "None"
+        },
+        "night_audit_logs_created": {
+          "base": 0,
+          "branch": 0
+        },
+        "error_logged": {
+          "base": false,
+          "branch": true
+        }
+      }
+    },
+    "N-3-AHEAD": {
+      "fixture": "F-AHEAD",
+      "entry": "all in-scope writers with business date 2026-10-03 and clock 2026-10-02 23:30; day 2026-10-02 sealed",
+      "asserts": {
+        "row_dates": {
+          "base": [
+            "2026-10-02"
+          ],
+          "branch": [
+            "2026-10-03"
+          ]
+        },
+        "inv_b01_after": {
+          "base": "VIOLATED",
+          "branch": "HOLDS"
+        },
+        "inv_b03_unchanged": {
+          "base": true,
+          "branch": true
+        }
+      }
+    },
+    "S-ALL": {
+      "fixture": "F-LAG",
+      "entry": "every in-scope writer in one copy, then INV-B04",
+      "asserts": {
+        "inv_b04_before": {
+          "base": "HOLDS",
+          "branch": "HOLDS"
+        },
+        "inv_b04_after": {
+          "base": "VIOLATED",
+          "branch": "HOLDS"
+        },
+        "n2_new_rows_all_on_bd": {
+          "base": false,
+          "branch": true
+        }
+      }
+    },
+    "DDL-1": {
+      "fixture": "F-LAG",
+      "entry": "production-copy schema: DDL defaults on the four date columns (C-1)",
+      "asserts": {
+        "ddl_defaults_absent": {
+          "base": true,
+          "branch": true
+        }
+      }
+    },
+    "DDL-2": {
+      "fixture": "F-LAG",
+      "entry": "credit_vouchers recreated with the code's DDL (which has DEFAULT (date('now'))), then a voucher issued through the application",
+      "asserts": {
+        "ddl_default_present": {
+          "base": true,
+          "branch": true
+        },
+        "issued_date": {
+          "base": "2026-10-02",
+          "branch": "2026-08-10"
+        }
+      }
+    },
+    "S-ALL-UTC": {
+      "fixture": "F-UTC",
+      "entry": "every in-scope writer in one copy with the clock at 2026-10-02 00:30 (time-of-day edge), then INV-B04",
+      "asserts": {
+        "inv_b04_after": {
+          "base": "VIOLATED",
+          "branch": "HOLDS"
+        },
+        "n2_new_rows_all_on_bd": {
+          "base": false,
+          "branch": true
+        }
+      }
+    }
+  },
+  "declared_limitations": [
+    "The proven freezer maps datetime.utcnow() to the frozen instant, so the UTC-offset edge of F-UTC cannot be represented. F-UTC is run as a 00:30 time-of-day edge only (scenario S-ALL-UTC), and the UTC DDL-default hazard is moot on production (C-1).",
+    "S-BD (the 16 already business-dated writers) is covered by the regression battery's Phase 1 writer harness and CF-10 harness, compared base against branch, in addition to the W-04 and W-18 rows inside S-17."
+  ]
+}
