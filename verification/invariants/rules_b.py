@@ -618,31 +618,54 @@ def _b05(ctx):
         'settles, the day\'s cash figure stops describing the day\'s '
         'trading, and the shift it is reconciled against is the wrong one.'),
     business_rule=(
-        'For every payment: payment_date lies between the reservation\'s '
-        'arrival date and 30 days after its departure date.'),
+        'For every payment (Founder Round 10, SR1-RULE / SR1-INT): an '
+        'advance (payment_purpose \'advance\') is dated no earlier than 30 '
+        'calendar days before the reservation\'s arrival date and no later '
+        'than 30 days after its departure date; every other payment is dated '
+        'between the arrival date and 30 days after the departure date. A '
+        'correction (corrects_id) holds exactly when the payment it corrects '
+        'holds. A cancellation refund holds exactly when every non-voided '
+        'advance on its reservation holds. Neither the correction\'s nor the '
+        'refund\'s own date is checked. A stale business date is not an '
+        'exemption.'),
     severity=Severity.MEDIUM,
     blocking=Blocking.OPERATIONAL,
     data_sources=('payments', 'reservations'),
     canonical_engine='none — read directly from the primary record',
     validation_method=(
-        'Join every payment to its reservation and bound the payment date by '
-        'the stay window. The 30-day tail is declared, not discovered: '
-        'post-checkout credit recovery is a legitimate business flow and a '
-        'tighter bound would report it as a fault.'),
+        'Join every payment to its reservation. An original payment is '
+        'bounded by its own window: arrival - 30 days .. departure + 30 days '
+        'for an advance, arrival .. departure + 30 days otherwise. A '
+        'correction inherits the verdict of the payment it corrects '
+        '(following corrects_id to the root). A refund named by its own '
+        'reservation\'s processed refund_full / refund_partial cancellation '
+        '(the SR2-REV2 lineage) inherits the verdict of that reservation\'s '
+        'non-voided advances. A correction or refund with no such origin is '
+        'bounded by its own date under the general window. Both 30-day '
+        'bounds are declared business assumptions, not discovered: '
+        'post-checkout credit recovery and advance booking are legitimate '
+        'flows. No cancellation or business-date logic is used (SR-1 before '
+        'K-7, basis-independent).'),
     evidence_produced=(
-        'Per payment: reservation stay window, payment date, days outside '
-        'the window, amount.'),
+        'Per payment: the window applied, the date that broke it, whether '
+        'the verdict is the payment\'s own or inherited (and from which '
+        'payment), days outside the window, amount.'),
     failure_message=(
-        'A payment is booked to a business date outside the stay it settles.'),
+        'A payment, or the payment a correction or refund inherits from, is '
+        'booked to a business date outside its permitted window.'),
     likely_root_causes=(
         'A posting route defaulting the date to the wall clock rather than '
         'the business date',
         'A back-dated correction entered by hand',
+        'An advance taken more than 30 days before arrival',
+        'A posting into a stale business date',
         'A long-running credit recovery beyond the declared tail'),
     suggested_investigation=(
         'Compare payment_date against created_at for the offending rows',
         'Check payment_purpose — credit_recovery legitimately lags the stay',
-        'Confirm the 30-day tail is still the right business assumption'),
+        'For an inherited violation, inspect the originating payment named '
+        'in the evidence: correcting or refunding it does not repair it',
+        'Confirm both 30-day bounds are still the right business assumptions'),
     applicable_releases='all',
     applicable_business_dates='all',
     commissioning_status=Commissioning.COMMISSIONED,
@@ -662,37 +685,121 @@ def _b06(ctx):
     import datetime as _dt
 
     TAIL_DAYS = 30
+    ADVANCE_LEAD_DAYS = 30
+    days = _dt.timedelta
+
+    every = {r['id']: r for r in ctx.sql(
+        'SELECT p.id, p.amount, p.payment_date, p.payment_purpose, '
+        '       p.corrects_id, p.is_voided, r.id AS res_id, '
+        '       r.arrival_date, r.departure_date '
+        'FROM payments p JOIN reservations r ON r.id = p.reservation_id')}
+
+    # SR2-REV2 item 2: the refund is named by exactly one reservation, that
+    # reservation is its own, the disposition generates a refund, and the
+    # cancellation was processed. Amount agreement is not lineage (item 5).
+    named_by = {}
+    for r in ctx.sql(
+            'SELECT id, cancellation_disposition, cancellation_processed_at, '
+            '       cancellation_refund_payment_id FROM reservations '
+            'WHERE cancellation_refund_payment_id IS NOT NULL'):
+        named_by.setdefault(r['cancellation_refund_payment_id'], []).append(r)
+
+    advances = {}
+    for r in every.values():
+        if (str(r['payment_purpose'] or '').lower() == 'advance'
+                and not r['is_voided']):
+            advances.setdefault(r['res_id'], []).append(r)
+
+    def as_date(value):
+        try:
+            return _dt.date.fromisoformat(str(value)[:10])
+        except (TypeError, ValueError):
+            return None
+
+    def own(row):
+        """The payment judged on its own date; None when undatable."""
+        paid_on = as_date(row['payment_date'])
+        arrival = as_date(row['arrival_date'])
+        departure = as_date(row['departure_date'])
+        if paid_on is None or arrival is None or departure is None:
+            return None
+        is_advance = str(row['payment_purpose'] or '').lower() == 'advance'
+        earliest = arrival - days(ADVANCE_LEAD_DAYS if is_advance else 0)
+        latest = departure + days(TAIL_DAYS)
+        ok = earliest <= paid_on <= latest
+        drift = (0 if ok else (earliest - paid_on).days if paid_on < earliest
+                 else (paid_on - latest).days)
+        return {'ok': ok, 'id': row['id'], 'paid_on': paid_on,
+                'earliest': earliest, 'latest': latest, 'drift': drift,
+                'window': 'advance' if is_advance else 'general'}
+
+    def is_cancellation_refund(row):
+        if str(row['payment_purpose'] or '').lower() != 'refund':
+            return False
+        names = named_by.get(row['id'], [])
+        return (len(names) == 1 and names[0]['id'] == row['res_id']
+                and names[0]['cancellation_disposition'] in
+                ('refund_full', 'refund_partial')
+                and names[0]['cancellation_processed_at'] is not None)
+
+    def assess(row, seen):
+        """(basis, own() verdicts of the payments that decide this one)."""
+        seen = seen | {row['id']}
+        if row['corrects_id'] is not None:
+            origin = every.get(row['corrects_id'])
+            if origin is not None and origin['id'] not in seen:
+                found = assess(origin, seen)[1]
+                if found:
+                    return f'inherited: corrects payment {origin["id"]}', found
+        elif is_cancellation_refund(row):
+            found = []
+            for adv in advances.get(row['res_id'], []):
+                if adv['id'] not in seen:
+                    found.extend(assess(adv, seen)[1])
+            if found:
+                return (f'inherited: cancellation refund of reservation '
+                        f'{row["res_id"]} advances', found)
+        judged = own(row)
+        return 'own date', ([judged] if judged else [])
+
     date_clause, params = ((' AND p.payment_date = ?', (ctx.date,))
                            if ctx.date else ('', ()))
     rows = ctx.sql(
-        f'SELECT p.id, p.amount, p.payment_date, p.payment_purpose, '
-        f'       r.id AS res_id, r.arrival_date, r.departure_date '
-        f'FROM payments p JOIN reservations r ON r.id = p.reservation_id '
+        f'SELECT p.id FROM payments p JOIN reservations r '
+        f'ON r.id = p.reservation_id '
         f'WHERE p.payment_date IS NOT NULL{date_clause} ORDER BY p.id', params)
 
     violations = []
     for row in rows:
-        try:
-            paid_on = _dt.date.fromisoformat(str(row['payment_date'])[:10])
-            arrival = _dt.date.fromisoformat(str(row['arrival_date'])[:10])
-            departure = _dt.date.fromisoformat(str(row['departure_date'])[:10])
-        except (TypeError, ValueError):
+        payment = every[row['id']]
+        basis, found = assess(payment, frozenset())
+        broken = [v for v in found if not v['ok']]
+        if not broken:
             continue
-        latest = departure + _dt.timedelta(days=TAIL_DAYS)
-        if arrival <= paid_on <= latest:
-            continue
-        drift = ((arrival - paid_on).days if paid_on < arrival
-                 else (paid_on - latest).days)
+        worst = max(broken, key=lambda v: v['drift'])
+        if basis == 'own date':
+            expected = f'dated between {worst["earliest"]} and {worst["latest"]}'
+            observed = f'dated {worst["paid_on"]}'
+        else:
+            expected = (f'originating payment(s) within their window; payment '
+                        f'{worst["id"]}: {worst["earliest"]} .. {worst["latest"]}')
+            observed = ', '.join(f'payment {v["id"]} dated {v["paid_on"]}'
+                                 for v in broken)
         violations.append(row_violation(
-            'payment', row['id'],
-            expected=f'dated between {arrival} and {latest}',
-            observed=f'dated {paid_on}', amount=dec(row['amount']),
-            variance=f'{drift} day(s) outside the window',
-            reservation_id=row['res_id'],
-            payment_purpose=str(row['payment_purpose'] or '')))
+            'payment', payment['id'], expected=expected, observed=observed,
+            amount=dec(payment['amount']),
+            variance=f'{worst["drift"]} day(s) outside the {worst["window"]} window',
+            reservation_id=payment['res_id'],
+            payment_purpose=str(payment['payment_purpose'] or ''),
+            basis=basis,
+            originating_payments=[v['id'] for v in broken]))
 
     return (verdict(len(rows), violations), len(rows), violations,
-            {'expected': f'payment_date within the stay + {TAIL_DAYS} days',
+            {'expected': (f'payment_date within the stay + {TAIL_DAYS} days; '
+                          f'advances from {ADVANCE_LEAD_DAYS} days before '
+                          f'arrival; corrections and cancellation refunds '
+                          f'inherit their origin\'s verdict'),
              'observed': summarise('payments', len(rows), violations),
              'inputs': {'payments_examined': len(rows),
-                        'declared_tail_days': TAIL_DAYS}})
+                        'declared_tail_days': TAIL_DAYS,
+                        'declared_advance_lead_days': ADVANCE_LEAD_DAYS}})
