@@ -75,16 +75,24 @@ _ROOM_NIGHT_STATUSES = ('CheckedIn', 'CheckedOut')
 # Business date
 # ─────────────────────────────────────────────────────────────────────
 
-def _business_date() -> _date:
-    """Resolve the current business date. Lazy import to avoid coupling."""
+def _business_date():
+    """Resolve the current business date, or ``None`` when it cannot be resolved.
+
+    K-7 / BR-5: no calendar substitution. A failure is logged as an ERROR and the
+    label that uses this value becomes ``None``; the occupancy counts do not
+    depend on it. Lazy import to avoid coupling.
+    """
     try:
         from app.services import get_business_date
         bd = get_business_date()
         if isinstance(bd, _date):
             return bd
-    except Exception:
-        pass
-    return _date.today()
+        logger.error('Business date unavailable for the occupancy payload: '
+                     'unexpected value %r', bd)
+    except Exception as exc:
+        logger.error('Business date unavailable for the occupancy payload: %s: %s',
+                     type(exc).__name__, exc)
+    return None
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -383,8 +391,9 @@ def occupancy_debug_record() -> dict:
     stale = stale_occupied_rooms()
     unflagged = occupied_rooms_not_flagged()
     orphans = checked_in_without_room()
+    bd = _business_date()      # K-7 / BR-5: None (logged) when unavailable, never the calendar
     return {
-        'business_date': _business_date().isoformat(),
+        'business_date': bd.isoformat() if bd else None,
         'occupied_rooms': len(occ_set),
         'occupied_room_ids': sorted(occ_set),
         'sellable_rooms': sell,

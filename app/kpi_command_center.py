@@ -69,7 +69,15 @@ def _build_governance_block(ctx: dict) -> dict:
     from app.models import Reservation, AuditLog
     from datetime import datetime as _dt, timedelta as _td
 
-    today = ctx.get('business_date') or date.today()
+    today = ctx.get('business_date')
+    if not today:
+        # K-7 / BR-5: no calendar default. Logged here; the route already logs and
+        # returns its JSON error envelope for any exception.
+        from app.models import BusinessDateUnavailable
+        logger.error('Business date unavailable for the governance block: '
+                     'no business_date in the context; the calendar date is not substituted')
+        raise BusinessDateUnavailable(
+            'business date unavailable: governance block needs the business date')
 
     out = {
         'credit_outstanding_total': 0.0,

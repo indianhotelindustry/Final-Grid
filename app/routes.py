@@ -3109,7 +3109,8 @@ def checkout(reservation_id):
                     reservation_id=reservation.id,
                     folio_id=_billing_folio_id(reservation),          # R-1
                     description=extra_desc,
-                    amount=extra_amount
+                    amount=extra_amount,
+                    charge_date=get_business_date()                   # K-7 W-17
                 )
                 db.session.add(extra)
                 db.session.flush()
@@ -4767,7 +4768,7 @@ def night_audit():
     import json as _json
 
     business_date = BusinessDate.query.first()
-    bd = business_date.current_date if business_date else date.today()
+    bd = get_business_date()          # K-7 / BR-5: fails closed (logged), never the calendar
     active_tab = request.args.get('tab', 'dashboard')
 
     # ── Resolve audit_date ──────────────────────────────────────────
@@ -8081,7 +8082,7 @@ def add_overstay_charge(reservation_id):
         folio_id=_billing_folio_id(reservation),                      # R-1
         description=f'Overstay — {hrs_label} @ ₹{hourly_rate:,.2f}/hr',
         amount=charge_amount,
-        charge_date=now.date()
+        charge_date=get_business_date()                               # K-7 W-20: row date only; billing hours stay on physical time
     )
     db.session.add(extra)
     db.session.flush()

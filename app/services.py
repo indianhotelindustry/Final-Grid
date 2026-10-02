@@ -1,7 +1,11 @@
 from apscheduler.schedulers.background import BackgroundScheduler
+import logging
 from datetime import datetime, date, timedelta
 from decimal import Decimal, ROUND_HALF_UP
-from app.models import db, BusinessDate, Reservation, NightAuditLog, Payment, Settings, Room
+from app.models import (db, BusinessDate, BusinessDateUnavailable, Reservation,
+                        NightAuditLog, Payment, Settings, Room)
+
+_bd_log = logging.getLogger(__name__)
 
 scheduler = BackgroundScheduler()
 
@@ -303,6 +307,8 @@ def run_night_audit(app=None, user_id=None):
                              .with_for_update()
                              .first())
             if not business_date:
+                _na_logger.error('Business date unavailable: night audit not run '
+                                 '(no business_date row); the calendar date is not substituted')
                 return
 
             _bd = business_date.current_date
@@ -617,8 +623,19 @@ def reschedule_night_audit(app=None):
             pass
 
 def get_business_date():
+    """The controlled business date. Fails closed (K-7, K7-D3 / BR-1).
+
+    When the ``business_date`` row is absent, or its ``current_date`` is NULL,
+    this logs an ERROR and raises ``BusinessDateUnavailable``. It never returns
+    the wall-clock date.
+    """
     bd = BusinessDate.query.first()
-    return bd.current_date if bd else date.today()
+    if bd is None or bd.current_date is None:
+        _bd_log.error('Business date unavailable: no business_date row (or NULL '
+                      'current_date); refusing to substitute the calendar date')
+        raise BusinessDateUnavailable(
+            'business date unavailable: no business_date row')
+    return bd.current_date
 
 
 # ---------------------------------------------------------------------------
@@ -1206,7 +1223,6 @@ def post_payment_correction(original_payment, *,
     Returns ``{'reversal': Payment, 'replacement': Payment | None}``.
     """
     from app.models import Payment, db as _db
-    from datetime import date as _date
 
     if original_payment is None:
         raise ValueError('original_payment is required')
@@ -1214,7 +1230,7 @@ def post_payment_correction(original_payment, *,
         raise ValueError('correction reason is required')
     reason = reason.strip()[:300]
 
-    today = _date.today()
+    today = get_business_date()       # K-7 / BR-2: one business date for the whole pair
 
     # R-3 / Q-2 — the pair inherits the original's folio, and a correction of
     # an unattributed historical row is refused rather than silently posted.
@@ -1295,7 +1311,6 @@ def post_extra_charge_correction(original_charge, *,
     caller exists in ``app/`` at the time of writing (CF-10 evidence).
     """
     from app.models import ExtraCharge, db as _db
-    from datetime import date as _date
 
     if original_charge is None:
         raise ValueError('original_charge is required')
@@ -1303,7 +1318,7 @@ def post_extra_charge_correction(original_charge, *,
         raise ValueError('correction reason is required')
     reason = reason.strip()[:300]
 
-    today = _date.today()
+    today = get_business_date()       # K-7 / BR-2: one business date for the whole pair
     desc_prefix = '[REVERSAL] '
     rev_desc = (desc_prefix + (original_charge.description or 'extra charge'))[:100]
 
@@ -1795,7 +1810,8 @@ def post_cancellation_disposition(reservation, *, disposition, refund_amount=0,
     if refund_amount > 0.005:
         if not refund_mode_id:
             raise ValueError('Refund mode is required when issuing a refund.')
-        from datetime import date as _date
+        # K-7 / BR-2: the business date, resolved once for every dated row of this disposition
+        _posting_date = get_business_date()
         # R-4 / CD-3 — a refund is attributed to the reservation's billing
         # folio, like any other payment. It is the one reversal-shaped path
         # that has no original row to inherit from.
@@ -1804,7 +1820,7 @@ def post_cancellation_disposition(reservation, *, disposition, refund_amount=0,
             folio_id          = resolve_billing_folio_id(reservation, user_id=user_id),
             amount            = refund_amount,
             payment_mode_id   = int(refund_mode_id),
-            payment_date      = _date.today(),
+            payment_date      = _posting_date,
             reference_number  = (refund_reference or None),
             payment_purpose   = 'refund',
             is_reversal       = True,
@@ -1842,6 +1858,11 @@ def post_cancellation_disposition(reservation, *, disposition, refund_amount=0,
     # expire) its own tracked entity.
     issued_voucher = None
     if disposition == 'credit_voucher' and voucher_amount > 0.005:
+        # K-7 / BR-2, BR-3: one business date for the refund and the voucher, resolved
+        # here so an unresolvable date refuses the whole cancellation instead of being
+        # swallowed by the 'never let voucher issuance break the cancellation' handler.
+        if refund_amount <= 0.005:
+            _posting_date = get_business_date()
         try:
             # The voucher and its strict audit row share a SAVEPOINT (CF-10):
             # if either fails both are rolled back, so no unaudited voucher
@@ -1852,6 +1873,7 @@ def post_cancellation_disposition(reservation, *, disposition, refund_amount=0,
                     amount          = voucher_amount,
                     reservation_id  = reservation.id,
                     expiry_days     = 365,   # default 1 year; admin can override later
+                    issue_date      = _posting_date,
                     user_id         = user_id,
                     notes           = f'Issued from cancellation of booking #{reservation.id} | {reason_clean}',
                     audit_writer    = audit_writer,
@@ -1934,20 +1956,25 @@ def _generate_voucher_code(prefix: str = 'CV') -> str:
 
 def issue_credit_voucher(*, guest_id, amount, reservation_id=None,
                          expiry_days=None, user_id=None, notes=None,
-                         audit_writer=None):
+                         audit_writer=None, issue_date=None):
     """Create a CreditVoucher row with a unique code and audit-log it.
+
+    Basis A (K-7 / K7-D4): ``issued_date`` is the business date and the expiry
+    anchor is the business date plus ``expiry_days``. ``issue_date`` lets a caller
+    that has already resolved the business date share it (BR-2).
 
     Returns the persisted voucher (after flush; caller commits).
     """
     from app.models import CreditVoucher, db as _db
-    from datetime import date as _d, timedelta as _td
+    from datetime import timedelta as _td
 
     if guest_id is None:
         raise ValueError('guest_id is required')
     if amount is None or float(amount) <= 0.005:
         raise ValueError('voucher amount must be > 0')
 
-    expiry = (_d.today() + _td(days=int(expiry_days))) if expiry_days else None
+    issue_date = issue_date or get_business_date()
+    expiry = (issue_date + _td(days=int(expiry_days))) if expiry_days else None
 
     # Retry on the rare collision — codes are 16 bits of entropy + date.
     for _ in range(5):
@@ -1962,7 +1989,7 @@ def issue_credit_voucher(*, guest_id, amount, reservation_id=None,
         guest_id                   = int(guest_id),
         issued_amount              = round(float(amount), 2),
         redeemed_amount            = 0,
-        issued_date                = _d.today(),
+        issued_date                = issue_date,
         expiry_date                = expiry,
         status                     = 'active',
         issued_from_reservation_id = reservation_id,
@@ -1989,10 +2016,11 @@ def issue_credit_voucher(*, guest_id, amount, reservation_id=None,
     return voucher
 
 
-def compute_voucher_status(voucher) -> str:
+def compute_voucher_status(voucher, as_of=None) -> str:
     """Derive the canonical status: active / fully_redeemed / expired / cancelled.
 
-    Reads the snapshot columns and the calendar; never mutates the row.
+    Reads the snapshot columns and the business date (K-7 basis A; ``as_of``
+    lets a caller share one resolved date); never mutates the row.
     Use ``refresh_voucher_status`` to push a derived state back into the
     column when it has changed.
     """
@@ -2005,18 +2033,17 @@ def compute_voucher_status(voucher) -> str:
     if redeemed + 0.005 >= issued:
         return 'fully_redeemed'
     if voucher.expiry_date is not None:
-        from datetime import date as _d
-        if voucher.expiry_date < _d.today():
+        if voucher.expiry_date < (as_of or get_business_date()):
             return 'expired'
     return 'active'
 
 
-def refresh_voucher_status(voucher, *, audit_writer=None) -> str:
+def refresh_voucher_status(voucher, *, audit_writer=None, as_of=None) -> str:
     """Recompute the status and persist it if it changed. Returns the new status."""
     from datetime import datetime as _dt
     if voucher is None:
         return 'cancelled'
-    new_status = compute_voucher_status(voucher)
+    new_status = compute_voucher_status(voucher, as_of=as_of)
     if new_status != voucher.status:
         old = voucher.status
         voucher.status = new_status
@@ -2062,19 +2089,23 @@ def redeem_credit_voucher(voucher, reservation, amount, *, user_id=None,
                'remaining':  float}``.
     """
     from app.models import CreditVoucher, CreditVoucherRedemption, Payment, PaymentMode, db as _db
-    from datetime import datetime as _dt, date as _d
+    from datetime import datetime as _dt
 
     if voucher is None:
         raise ValueError('voucher is required')
     if reservation is None:
         raise ValueError('reservation is required')
 
+    # K-7 / BR-2, BR-9: one business date for the status refresh, the repeated expiry
+    # test below and the redemption payment (basis A).
+    _bd = get_business_date()
+
     # Refresh status first — surfaces an expiry that hadn't been stamped yet.
-    refresh_voucher_status(voucher, audit_writer=audit_writer)
+    refresh_voucher_status(voucher, audit_writer=audit_writer, as_of=_bd)
 
     if voucher.status != 'active':
         raise ValueError(f'Voucher is {voucher.status}; cannot redeem.')
-    if voucher.expiry_date is not None and voucher.expiry_date < _d.today():
+    if voucher.expiry_date is not None and voucher.expiry_date < _bd:
         raise ValueError(f'Voucher expired on {voucher.expiry_date.isoformat()}.')
 
     amount = round(float(amount or 0), 2)
@@ -2113,7 +2144,7 @@ def redeem_credit_voucher(voucher, reservation, amount, *, user_id=None,
             folio_id         = resolve_billing_folio_id(reservation),   # R-1
             payment_mode_id  = pm.id,
             amount           = amount,
-            payment_date     = _d.today(),
+            payment_date     = _bd,
             reference_number = f'VOUCHER:{voucher.voucher_code}',
             payment_purpose  = 'settlement',
         )
@@ -2143,7 +2174,7 @@ def redeem_credit_voucher(voucher, reservation, amount, *, user_id=None,
     _db.session.add(redemption)
     _db.session.flush()
 
-    new_status = refresh_voucher_status(voucher, audit_writer=audit_writer)
+    new_status = refresh_voucher_status(voucher, audit_writer=audit_writer, as_of=_bd)
     remaining_after = voucher_remaining(voucher)
 
     # The redemption reduces a liability, so its audit is coupled too (Q-5).

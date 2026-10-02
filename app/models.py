@@ -4,6 +4,8 @@ from datetime import datetime, date
 from enum import Enum
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.encryption import EncryptedString
+import logging
+from sqlalchemy import select as _sa_select
 
 db = SQLAlchemy()
 
@@ -106,6 +108,38 @@ class BusinessDate(db.Model):
     current_date = db.Column(db.Date, nullable=False, default=date.today)
     is_locked = db.Column(db.Boolean, default=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class BusinessDateUnavailable(RuntimeError):
+    """The controlled business date could not be resolved (K-7, K7-D3).
+
+    Raised instead of substituting the wall-clock date. One type, used by the
+    resolver (``app.services.get_business_date``), by the financial date
+    defaults below and by the display fallbacks that used to use the calendar.
+    """
+
+
+_bd_log = logging.getLogger(__name__)
+
+
+def _business_date_at_insert(context):
+    """Column default for financial date columns: the business date, at INSERT time.
+
+    Replaces ``default=date.today`` (K-7, K7-D3 / BR-4). It runs on the INSERT's
+    own connection, so it never issues a session query from inside a flush, and
+    it raises ``BusinessDateUnavailable`` rather than falling back to the
+    calendar, NULL or a database-side UTC date. Writers still pass the date
+    explicitly; this is the backstop for a writer that does not.
+    """
+    row = context.connection.execute(
+        _sa_select(BusinessDate.__table__.c.current_date).limit(1)).first()
+    if row is None or row[0] is None:
+        _bd_log.error('Business date unavailable: refusing to default a financial '
+                      'date from the wall clock (no business_date row)')
+        raise BusinessDateUnavailable(
+            'business date unavailable: no business_date row to default a financial date from')
+    return row[0]
+
 
 class RoomType(db.Model):
     __tablename__ = 'room_types'
@@ -772,7 +806,7 @@ class ExtraCharge(db.Model):
     folio_id = db.Column(db.Integer, db.ForeignKey('folios.id'), nullable=True)
     description = db.Column(db.String(100), nullable=False)
     amount = db.Column(db.Numeric(10, 2), nullable=False)
-    charge_date = db.Column(db.Date, default=date.today)
+    charge_date = db.Column(db.Date, default=_business_date_at_insert)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     # charge_type: NULL = general extra charge, 'early_checkin', 'late_checkout'
     charge_type = db.Column(db.String(30), nullable=True)
@@ -806,7 +840,7 @@ class Payment(db.Model):
     folio_id = db.Column(db.Integer, db.ForeignKey('folios.id'), nullable=True)
     payment_mode_id = db.Column(db.Integer, db.ForeignKey('payment_modes.id'), nullable=False)
     amount = db.Column(db.Numeric(10, 2), nullable=False)
-    payment_date = db.Column(db.Date, default=date.today)
+    payment_date = db.Column(db.Date, default=_business_date_at_insert)
     reference_number = db.Column(db.String(100))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     # Void / refund support
@@ -1814,7 +1848,7 @@ class CreditVoucher(db.Model):
     guest_id                 = db.Column(db.Integer, db.ForeignKey('guests.id'), nullable=False)
     issued_amount            = db.Column(db.Numeric(10, 2), nullable=False)
     redeemed_amount          = db.Column(db.Numeric(10, 2), default=0, nullable=False)
-    issued_date              = db.Column(db.Date,    nullable=False, default=date.today)
+    issued_date              = db.Column(db.Date,    nullable=False, default=_business_date_at_insert)
     expiry_date              = db.Column(db.Date,    nullable=True)
     status                   = db.Column(db.String(20), default='active', nullable=False)
     issued_from_reservation_id = db.Column(db.Integer,
