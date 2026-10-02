@@ -1400,3 +1400,52 @@ Resolves the FD-P2-06 statement "INV-D02 must not treat a legitimate cancellatio
 - Authorizes: fresh backup and isolated restore rehearsal; push of `dq56-q06h1-guard`; fast-forward of `origin/main` and of the live checkout's `main` to the R1 head.
 - Not authorized: starting the live application (a separate production-start authorization is required); any other queued work; any database, schema or behaviour change beyond DQ56-R1.
 - Execution evidence: `verification/evidence/20261002_dq56_r1_production_application/`.
+
+# Founder Resolution Round 10 — SR-1 / INV-B06 rule text — FG-P2-FOUNDER-RESOLUTION-20261002-03
+
+| | |
+|---|---|
+| Recorded | 2026-10-02 |
+| Governed HEAD | `28e6b63` (branch `dq56-q06h1-guard`; `app/` and `verification/` code identical to `origin/main` `e310c66`); implementation on local branch `sr1-inv-b06` |
+| Kind | Founder rule text for the FD-P2-06 INV-B06 amendment (SR-1), answering DQ-01…DQ-05, plus two interpretation answers given in session. Recorded verbatim |
+| Identifier | `SR1-RULE` (directive) and `SR1-INT` (interpretation answers) |
+| Context | FD-P2-06 adopted the principle and reserved "the amendment's exact text, negative seeds and commissioning" to a later directive. Decision package: `verification/evidence/20261002_overnight_sr1/SR1_DECISION_REQUIRED.md` (branch `overnight-20261002`) |
+
+## SR1-RULE — Founder Directive — SR-1 / INV-B06, verbatim
+
+> Founder Directive — SR-1 / INV-B06
+> Proceed with SR-1 using the following founder decisions:
+> 1. DQ-01: Pre-arrival advances are permitted up to 30 calendar days before the reservation arrival date. Advances earlier than 30 days are violations.
+> 2. DQ-02: Refunds inherit the temporal validity of their originating transaction. Corrections inherit the temporal validity of the transaction they correct. Do not introduce cancellation-date/business-date refund logic in SR-1; that belongs to the K-7 dependency.
+> 3. DQ-03: Add negative coverage for advances beyond 30 days, non-exempt pre-arrival payments, stale-business-date deposits, invalid post-departure transactions, and refund/correction lineage whose originating transaction is outside the permitted window.
+> 4. DQ-04: Implement SR-1 before K-7 using basis-independent rules. Do not modify K-7, business-date logic, application financial writers, or production.
+> 5. DQ-05: Record FD-P2-06 as the explicit Phase 6 carve-out authorizing refinement of INV-B06 despite the general "invariants not touched" statement.
+> 6. The production business date being 53 days stale is not an exemption from INV-B06 and must remain a separate K-7/production issue.
+> 7. No production changes, no merge to main, and no deployment are authorized by this directive.
+> 8. First record these decisions verbatim in FOUNDER_DECISIONS.md as the next SR-1 decision round.
+> 9. Then implement only INV-B06 verification/invariant changes on an isolated branch.
+> 10. Run the targeted 13 scenarios and the appropriate regression suite against a disposable production copy.
+> 11. Do not re-baseline unrelated failures. Report baseline-versus-implementation differences explicitly.
+> 12. Stop after the evidence package is complete and wait for separate authorization to merge/push
+
+## SR1-INT — Interpretation answers (in session, 2026-10-02), verbatim
+
+Asked before implementation because DQ-02 admits two readings with different results.
+
+> **Q1.** DQ-02 says refunds and corrections "inherit the temporal validity" of their originating transaction. Which reading: inherit the *verdict* (a refund or correction is valid exactly when its originating transaction is valid; its own date is not checked) or inherit the *window* (it must itself be dated inside its originating transaction's permitted window)?
+>
+> **Founder answer:** "Inherit the verdict"
+
+> **Q2.** A cancellation refund has no link to a single payment row; the application computes it from all non-voided `'advance'` payments on the reservation (`app/services.py` `advance_summary`). SR2-RULE names the cancellation disposition as its origin for lineage purposes, but that has no date SR-1 may use. Does the refund inherit from its reservation's advances, or from the cancellation disposition (no INV-B06 date check)?
+>
+> **Founder answer:** "Its reservation's advances" — the refund's originating transactions are the non-voided advance payments it was drawn from; under the verdict reading the refund fails if any of those advances is outside its window.
+
+## DQ-05 — Phase 6 carve-out (as directed in item 5)
+
+FD-P2-06 (this file, `:1178-1187`) is recorded as the explicit carve-out from Master Plan Phase 6 "Not touched: invariant semantics" that authorizes the refinement of INV-B06. Phase 6 stands for every other invariant.
+
+## Effect
+
+- DQ-01…DQ-05 (overnight queue) are RULED by this round.
+- Authorizes: on an isolated branch, changes to INV-B06 in `verification/invariants/rules_b.py` (rule, metadata, negative seed); the 13 targeted scenarios and the regression battery on disposable copies of production.
+- Not authorized: any change to `app/`, the schema, K-7, business-date logic, financial writers, production, other invariants, baselines of unrelated failures; push, merge or deployment.
