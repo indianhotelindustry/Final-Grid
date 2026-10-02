@@ -9,6 +9,7 @@
 | Later commits (no `app/` change) | `940366e` regression drivers · `e11a0a1` S-TL, comparers, mutation script · this evidence commit. `git diff 463ad7a HEAD -- app tools` is empty |
 | Outcome | **GREEN 174/174** on the branch. **RED 173/174** on the base: the single mismatch is a registered expectation that was imprecise (section 3.3). Mutation proof **17/17**. Regression battery: **0 verdict-level differences** between control and branch. Production untouched |
 | Status | **K-7 implemented and evidenced on the local branch. STOPPED at the Founder boundary.** |
+| Directive C-7 | The open G6 conditions are stated in section 7A (C1 and C2 evidenced by K-7; C3, C4 and C5 open). Added by an evidence correction after the integration gate review found the statement missing |
 
 ## 1. What changed (5 files, +119 / −36)
 
@@ -143,6 +144,20 @@ The 16 already business-dated writers; production invariant statuses; every verd
 - **Merge is deployment-at-rest.** `SukoonPMS/` is the live checkout, so merging this branch replaces live code; it takes effect at the next application start. That start, and any business-date advance, remain separate PD-004 acts.
 - **Production effect today: none.** Production holds no corrections, refunds or vouchers; the production database is byte-identical and the application is stopped.
 - **Existing defect candidate (not K-7):** a voucher force-expired through the admin route is flipped back to `active` by the next status refresh unless its date has passed (read from the code, not run).
+
+## 7A. G6 and G3 status after K-7 (directive criterion C-7, added by evidence correction)
+
+Unit 3.1 **does not pass G6**. What K-7 evidences and what stays open, stated against the G6 conditions (`CERTIFICATION_GATES.md:36`):
+
+| G6 condition | State after K-7 | Evidence |
+|---|---|---|
+| **C1** single derivation | **EVIDENCED by K-7** on the branch (not yet integrated) | BR-1 and BR-5: `get_business_date()` fails closed; the occupancy, KPI and night-audit-view calendar fallbacks are removed. Harness F-1, F-3a, F-3b, F-3c; mutants M11 to M15 |
+| **C2** no wall-clock financial dating | **EVIDENCED by K-7** on the branch (not yet integrated) | the eight writer sites, voucher issue/expiry (basis A) and the three model defaults date from the business date. Harness S-08-09 to S-22-23, S-TL, V-1 to V-4, D-1/D-2, DDL-2, N-3, S-ALL; mutants M01 to M10c |
+| **C3** close, reopen and interrupted-close semantics | **OPEN** | not part of unit 3.1 (units 3.2 to 3.5). The Complete (`app/reports.py:3121-3125`) and Reopen (`:3225-3229`) silent skips remain, recorded as residual Phase 3.2/3.4 items (Founder Round 12, F-3) |
+| **C4** staleness escalation | **OPEN** | unit 3.6. No definition of "stale" exists (B-10 #5). The production business date is 2026-08-10, 53 days behind the calendar on 2026-10-02. "No trading and no new vouchers while stale" are operating rules, not code (BR-11) |
+| **C5** N7 multi-day sequence | **OPEN** | unit 3.8 and the G11 multi-day rehearsal. Not started |
+
+**G3** stays OPEN. Its K-7 item (business-date dating at all writers) is implemented and evidenced on the local branch and closes under GT-D1 on that evidence; it is not integrated into `main`. The scope question GT-D13 (Q17/Q20), a named release tag and the G3 pack at that tag remain open.
 
 ## 8. Remaining Founder decisions (none blocks anything already done)
 
