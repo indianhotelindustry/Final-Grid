@@ -1,0 +1,253 @@
+====================================================================================================
+FINALGRID — GOLDEN MASTER VERIFICATION
+Production Verification Framework, Wave 0 Deliverable 2
+====================================================================================================
+Master set      : phase1_aa6d9e91
+Master captured : 2026-09-09T16:01:49 (app v2.2.18)
+Current run     : 2026-10-02T06:32:40 (app v2.2.18)
+Master clock    : 2026-08-10T12:00:00
+Current clock   : 2026-08-10T12:00:00
+Read-only       : VERIFIED
+
+Surfaces compared : 158
+Surfaces clean    : 127
+Differences       : 41
+Blocking          : 1
+
+VERDICT           : FAIL
+
+----------------------------------------------------------------------------------------------------
+DIFFERENCES BY KIND
+----------------------------------------------------------------------------------------------------
+  BODY_CHANGED                31
+  FIGURE_ADDED                 3
+  FIGURE_CHANGED               3
+  FIGURE_REMOVED               3
+  NORMALISATION_CHANGED        1
+
+====================================================================================================
+DIFFERENCES
+====================================================================================================
+
+main.command_center_data   [FINANCIAL]
+  /api/dashboard/command-center/data
+    [BLOCK] FIGURE_CHANGED         $.alerts[0].days_active
+            master : 75
+            current: 57   (delta -18)
+
+ai.anomaly_dashboard   [ADVISORY]
+  /ai/anomalies
+    [WARN ] BODY_CHANGED          
+            master : 24d58ae1c3acfe4f
+            current: b4310bd1d1b6ab3a
+
+ai.predictive_maintenance_dashboard   [ADVISORY]
+  /ai/predictive-maintenance
+    [WARN ] BODY_CHANGED          
+            master : 77ff033ed87e8235
+            current: 22569752d477affc
+
+ai.sentiment_dashboard   [ADVISORY]
+  /ai/sentiment
+    [WARN ] BODY_CHANGED          
+            master : 32fa0a0bb604b64a
+            current: 98a0986c64952917
+
+ai_pricing.dashboard   [ADVISORY]
+  /ai/pricing/dashboard
+    [WARN ] BODY_CHANGED          
+            master : 7abb566c17d4316b
+            current: 62599f39b99b8232
+
+auth.change_password   [OPERATIONAL]
+  /auth/change-password
+    [WARN ] BODY_CHANGED          
+            master : 479cc790cb03aa5b
+            current: 6ba115719329e44e
+
+auth.shifts   [OPERATIONAL]
+  /auth/shifts
+    [WARN ] BODY_CHANGED          
+            master : 6647f65ca51cc52a
+            current: 6a103c95fa1f8d7b
+
+auth.users   [OPERATIONAL]
+  /auth/users
+    [WARN ] BODY_CHANGED          
+            master : 620f701f37d99b3d
+            current: 0b7cf79fa09d0bb6
+
+backup.index   [OPERATIONAL]
+  /backup/
+    [WARN ] BODY_CHANGED          
+            master : 6e62ae8d2160b39a
+            current: 396dfab2e46e026f
+    [WARN ] FIGURE_CHANGED         files[len]
+            master : 1
+            current: 0   (delta -1)
+    [WARN ] FIGURE_REMOVED         files[0].created_at
+            master : 2026-08-09T05:18:01.646944
+            current: 
+    [WARN ] FIGURE_REMOVED         files[0].size_kb
+            master : 954
+            current: 
+    [WARN ] FIGURE_REMOVED         files[0][len]
+            master : 3
+            current: 
+
+feedback.dashboard   [OPERATIONAL]
+  /feedback/dashboard
+    [WARN ] BODY_CHANGED          
+            master : 3d0653de35deff09
+            current: 6f4fe4c3942ee28e
+
+groups.index   [OPERATIONAL]
+  /groups/
+    [WARN ] BODY_CHANGED          
+            master : 0c97ef98dcd6ddbb
+            current: 117044e0b4f42488
+
+groups.new_group   [OPERATIONAL]
+  /groups/new
+    [WARN ] BODY_CHANGED          
+            master : 1bf7087aef92f233
+            current: 0e5d08a3e3a093a2
+
+loyalty.config   [FINANCIAL]
+  /loyalty/config
+    [WARN ] BODY_CHANGED          
+            master : 29650578772432aa
+            current: 3a9c84351ec7c6dc
+
+loyalty.dashboard   [OPERATIONAL]
+  /loyalty/
+    [WARN ] BODY_CHANGED          
+            master : c26b72621a0e951c
+            current: 1293c5c8bf96f7af
+
+loyalty.members   [OPERATIONAL]
+  /loyalty/members
+    [WARN ] BODY_CHANGED          
+            master : f89441d867e13de9
+            current: b5d8796f4ea53d25
+
+loyalty.milestones   [FINANCIAL]
+  /loyalty/milestones
+    [WARN ] BODY_CHANGED          
+            master : 1081bd31e16e8ded
+            current: 38400475e8b106e6
+
+loyalty.transactions   [FINANCIAL]
+  /loyalty/transactions
+    [WARN ] BODY_CHANGED          
+            master : 8ad1b9f297a65938
+            current: 33eb0a949029ec3f
+
+main.command_center_data   [FINANCIAL]
+  /api/dashboard/command-center/data
+    [WARN ] BODY_CHANGED          
+            master : c1ba414f2dd1be02
+            current: 5c5e51ab96459ace
+
+main.guest_folio__any_guest   [FINANCIAL]
+  /guest/1
+    [WARN ] BODY_CHANGED          
+            master : 2ca62fd43d67245b
+            current: ac64bacfab854d61
+
+main.hk_mobile   [OPERATIONAL]
+  /hk
+    [WARN ] BODY_CHANGED          
+            master : 9b9a5a1c33bd2515
+            current: 11e58fc8734ffd9f
+
+main.invoice_manager   [FINANCIAL]
+  /invoice-manager
+    [WARN ] BODY_CHANGED          
+            master : b0ec505eb3a77d18
+            current: 923b4fc67effeb46
+
+main.night_audit   [FINANCIAL]
+  /night-audit
+    [WARN ] BODY_CHANGED          
+            master : 71e0720694a65b46
+            current: 4b84d5059b4c5558
+    [WARN ] NORMALISATION_CHANGED 
+            master : {'csp_nonce_attr': 4, 'csrf_input': 2, 'csrf_meta': 1}
+            current: {'csp_nonce_attr': 4, 'csrf_meta': 1, 'csrf_input': 1}
+
+main.room_grid   [OPERATIONAL]
+  /room-grid
+    [WARN ] BODY_CHANGED          
+            master : b3705d054418b618
+            current: 8fca7da6c59ecd6a
+
+ota.bookings   [FINANCIAL]
+  /ota/bookings
+    [WARN ] BODY_CHANGED          
+            master : 65c5a0e9d84794ae
+            current: 2d7c8ea43fb3cf3c
+
+ota.dashboard   [FINANCIAL]
+  /ota/
+    [WARN ] BODY_CHANGED          
+            master : 6affae7eaeeca6cb
+            current: f007a698bc67c6ac
+
+ota.settings   [FINANCIAL]
+  /ota/settings
+    [WARN ] BODY_CHANGED          
+            master : d543bdcba1b4d5f6
+            current: e1ec7f5b10f83474
+
+ota.webhook_logs   [FINANCIAL]
+  /ota/webhook/logs
+    [WARN ] BODY_CHANGED          
+            master : 42ad1a041ae015b4
+            current: 7bb638fd660a5147
+
+rates.notification_logs   [OPERATIONAL]
+  /rates/notification-logs
+    [WARN ] BODY_CHANGED          
+            master : c46a134c37964469
+            current: b9b73ed437dbc25d
+    [WARN ] FIGURE_ADDED           logs[5][type]
+            master : 
+            current: NotificationLog
+    [WARN ] FIGURE_ADDED           logs[6][type]
+            master : 
+            current: NotificationLog
+    [WARN ] FIGURE_ADDED           logs[7][type]
+            master : 
+            current: NotificationLog
+    [WARN ] FIGURE_CHANGED         logs[len]
+            master : 5
+            current: 8   (delta +3)
+
+reports.daily_profit_snapshot   [FINANCIAL]
+  /reports/daily-profit-snapshot
+    [WARN ] BODY_CHANGED          
+            master : 6d83ab9af581a496
+            current: 07689cf46a119fa0
+
+reports.index   [FINANCIAL]
+  /reports/
+    [WARN ] BODY_CHANGED          
+            master : 6b243e0ed7a7a440
+            current: 1af1f1776a153cf9
+
+reports.money_at_risk   [FINANCIAL]
+  /reports/money-at-risk
+    [WARN ] BODY_CHANGED          
+            master : d5938b896986e757
+            current: fffa7a6d65e8c8b6
+
+webhook.webhook_logs   [OPERATIONAL]
+  /webhook/logs
+    [WARN ] BODY_CHANGED          
+            master : 33578ddd01da95fc
+            current: 32432232a0d1f2fc
+
+====================================================================================================
+END OF REPORT
+====================================================================================================

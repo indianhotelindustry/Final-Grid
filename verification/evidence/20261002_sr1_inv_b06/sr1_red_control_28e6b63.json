@@ -1,0 +1,519 @@
+{
+  "task": "SR-1 / INV-B06 targeted verification",
+  "label": "red_control_28e6b63",
+  "worktree": "C:\\wtsr1base",
+  "worktree_commit": "28e6b633725b4974d483cc9a1af7d3a053576ef5",
+  "code_tree_status": "",
+  "finished": "2026-10-02T11:50:49",
+  "scenario_window": {
+    "arrival": "2026-09-20",
+    "departure": "2026-09-22"
+  },
+  "production_sha256_before": "21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434",
+  "production_sha256_after": "21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434",
+  "passed": 18,
+  "total": 28,
+  "results": [
+    {
+      "case": "P-00",
+      "what": "unseeded production copy",
+      "expect": "HOLDS",
+      "got": "HOLDS",
+      "pass": true,
+      "note": "flagged=[]"
+    },
+    {
+      "case": "N-1",
+      "what": "registered negative seed applied to a production copy",
+      "expect": "VIOLATED",
+      "got": "VIOLATED",
+      "pass": true,
+      "note": "seed=UPDATE payments SET payment_date = DATE(payment_date, '-400 day') WHERE id = (SE flagged=[1]"
+    },
+    {
+      "case": "P-1",
+      "what": "advance at booking, 20 days before arrival",
+      "expect": [
+        "HOLDS",
+        []
+      ],
+      "got": [
+        "VIOLATED",
+        [
+          7
+        ]
+      ],
+      "pass": false,
+      "note": ""
+    },
+    {
+      "case": "P-2",
+      "what": "advance at booking, 400 days before arrival (DQ-01: beyond 30 days)",
+      "expect": [
+        "VIOLATED",
+        [
+          7
+        ]
+      ],
+      "got": [
+        "VIOLATED",
+        [
+          7
+        ]
+      ],
+      "pass": true,
+      "note": ""
+    },
+    {
+      "case": "P-3",
+      "what": "booking-time voucher application (purpose settlement), 20 days before arrival",
+      "expect": [
+        "VIOLATED",
+        [
+          7
+        ]
+      ],
+      "got": [
+        "VIOLATED",
+        [
+          7
+        ]
+      ],
+      "pass": true,
+      "note": ""
+    },
+    {
+      "case": "P-4",
+      "what": "correction pair of a valid advance, posted 10 days before arrival",
+      "expect": [
+        "HOLDS",
+        []
+      ],
+      "got": [
+        "VIOLATED",
+        [
+          7,
+          8,
+          9
+        ]
+      ],
+      "pass": false,
+      "note": ""
+    },
+    {
+      "case": "P-5",
+      "what": "cancellation refund (SR2-REV2 lineage) of a valid advance",
+      "expect": [
+        "HOLDS",
+        []
+      ],
+      "got": [
+        "VIOLATED",
+        [
+          7,
+          8
+        ]
+      ],
+      "pass": false,
+      "note": ""
+    },
+    {
+      "case": "P-6",
+      "what": "settlement inside the stay",
+      "expect": [
+        "HOLDS",
+        []
+      ],
+      "got": [
+        "HOLDS",
+        []
+      ],
+      "pass": true,
+      "note": ""
+    },
+    {
+      "case": "P-7",
+      "what": "credit recovery 10 days after departure",
+      "expect": [
+        "HOLDS",
+        []
+      ],
+      "got": [
+        "HOLDS",
+        []
+      ],
+      "pass": true,
+      "note": ""
+    },
+    {
+      "case": "N-2",
+      "what": "settlement 5 days before arrival (non-exempt pre-arrival)",
+      "expect": [
+        "VIOLATED",
+        [
+          7
+        ]
+      ],
+      "got": [
+        "VIOLATED",
+        [
+          7
+        ]
+      ],
+      "pass": true,
+      "note": ""
+    },
+    {
+      "case": "N-3",
+      "what": "advance 31 days after departure (post-departure)",
+      "expect": [
+        "VIOLATED",
+        [
+          7
+        ]
+      ],
+      "got": [
+        "VIOLATED",
+        [
+          7
+        ]
+      ],
+      "pass": true,
+      "note": ""
+    },
+    {
+      "case": "N-4",
+      "what": "advance 31 days before arrival (one day beyond the window)",
+      "expect": [
+        "VIOLATED",
+        [
+          7
+        ]
+      ],
+      "got": [
+        "VIOLATED",
+        [
+          7
+        ]
+      ],
+      "pass": true,
+      "note": ""
+    },
+    {
+      "case": "N-5",
+      "what": "refund with no cancellation lineage, 5 days before arrival",
+      "expect": [
+        "VIOLATED",
+        [
+          8
+        ]
+      ],
+      "got": [
+        "VIOLATED",
+        [
+          7,
+          8
+        ]
+      ],
+      "pass": false,
+      "note": ""
+    },
+    {
+      "case": "N-6",
+      "what": "stale-business-date check-in deposit (NULL purpose), 53 days before arrival",
+      "expect": [
+        "VIOLATED",
+        [
+          7
+        ]
+      ],
+      "got": [
+        "VIOLATED",
+        [
+          7
+        ]
+      ],
+      "pass": true,
+      "note": ""
+    },
+    {
+      "case": "S-01",
+      "what": "advance exactly 30 days before arrival (inclusive boundary)",
+      "expect": [
+        "HOLDS",
+        []
+      ],
+      "got": [
+        "VIOLATED",
+        [
+          7
+        ]
+      ],
+      "pass": false,
+      "note": ""
+    },
+    {
+      "case": "S-02",
+      "what": "settlement 31 days after departure (invalid post-departure)",
+      "expect": [
+        "VIOLATED",
+        [
+          7
+        ]
+      ],
+      "got": [
+        "VIOLATED",
+        [
+          7
+        ]
+      ],
+      "pass": true,
+      "note": ""
+    },
+    {
+      "case": "S-03",
+      "what": "settlement exactly 30 days after departure (tail boundary)",
+      "expect": [
+        "HOLDS",
+        []
+      ],
+      "got": [
+        "HOLDS",
+        []
+      ],
+      "pass": true,
+      "note": ""
+    },
+    {
+      "case": "S-04",
+      "what": "correction pair whose original advance is 45 days before arrival",
+      "expect": [
+        "VIOLATED",
+        [
+          7,
+          8,
+          9
+        ]
+      ],
+      "got": [
+        "VIOLATED",
+        [
+          7,
+          8,
+          9
+        ]
+      ],
+      "pass": true,
+      "note": ""
+    },
+    {
+      "case": "S-05",
+      "what": "cancellation refund whose only advance is 45 days before arrival",
+      "expect": [
+        "VIOLATED",
+        [
+          7,
+          8
+        ]
+      ],
+      "got": [
+        "VIOLATED",
+        [
+          7,
+          8
+        ]
+      ],
+      "pass": true,
+      "note": ""
+    },
+    {
+      "case": "S-06",
+      "what": "cancellation refund drawn from one valid and one out-of-window advance",
+      "expect": [
+        "VIOLATED",
+        [
+          8,
+          9
+        ]
+      ],
+      "got": [
+        "VIOLATED",
+        [
+          7,
+          8,
+          9
+        ]
+      ],
+      "pass": false,
+      "note": ""
+    },
+    {
+      "case": "S-07",
+      "what": "correction of a valid settlement posted 45 days after departure (verdict, ADR-004)",
+      "expect": [
+        "HOLDS",
+        []
+      ],
+      "got": [
+        "VIOLATED",
+        [
+          8,
+          9
+        ]
+      ],
+      "pass": false,
+      "note": ""
+    },
+    {
+      "case": "S-08",
+      "what": "correction of a correction whose root advance is 45 days before arrival",
+      "expect": [
+        "VIOLATED",
+        [
+          7,
+          8,
+          9,
+          10,
+          11
+        ]
+      ],
+      "got": [
+        "VIOLATED",
+        [
+          7,
+          8,
+          9,
+          10,
+          11
+        ]
+      ],
+      "pass": true,
+      "note": ""
+    },
+    {
+      "case": "S-09",
+      "what": "correction of a valid advance dated 400 days before arrival (own date unchecked)",
+      "expect": [
+        "HOLDS",
+        []
+      ],
+      "got": [
+        "VIOLATED",
+        [
+          7,
+          8,
+          9
+        ]
+      ],
+      "pass": false,
+      "note": ""
+    },
+    {
+      "case": "S-10",
+      "what": "correction naming a missing original, 5 days before arrival (no origin: own date)",
+      "expect": [
+        "VIOLATED",
+        [
+          7
+        ]
+      ],
+      "got": [
+        "VIOLATED",
+        [
+          7
+        ]
+      ],
+      "pass": true,
+      "note": ""
+    },
+    {
+      "case": "S-11",
+      "what": "cancellation refund whose only advance is voided (no origin: own date, before arrival)",
+      "expect": [
+        "VIOLATED",
+        [
+          8
+        ]
+      ],
+      "got": [
+        "VIOLATED",
+        [
+          7,
+          8
+        ]
+      ],
+      "pass": false,
+      "note": ""
+    },
+    {
+      "case": "S-12",
+      "what": "S-04 evaluated for the correction's business date only (origin out of scope)",
+      "expect": [
+        "VIOLATED",
+        [
+          8,
+          9
+        ]
+      ],
+      "got": [
+        "VIOLATED",
+        [
+          8,
+          9
+        ]
+      ],
+      "pass": true,
+      "note": ""
+    },
+    {
+      "case": "APP",
+      "what": "real writers: refund of a 20-day advance; correction of a past stay posted today",
+      "expect": [
+        "HOLDS",
+        []
+      ],
+      "got": [
+        "VIOLATED",
+        [
+          7,
+          8,
+          10,
+          11
+        ]
+      ],
+      "pass": false,
+      "note": "{\"today\": \"2026-10-02\", \"app1_advance\": [7, \"2026-10-02\"], \"app1_refund\": [8, \"2026-10-02\"], \"app2_settlement\": [9, \"2026-08-10\"], \"app2_reversal\": [10, \"2026-10-02\"], \"app2_replacement\": [11, \"2026-10-02\"]}",
+      "writer_rows": {
+        "today": "2026-10-02",
+        "app1_advance": [
+          7,
+          "2026-10-02"
+        ],
+        "app1_refund": [
+          8,
+          "2026-10-02"
+        ],
+        "app2_settlement": [
+          9,
+          "2026-08-10"
+        ],
+        "app2_reversal": [
+          10,
+          "2026-10-02"
+        ],
+        "app2_replacement": [
+          11,
+          "2026-10-02"
+        ]
+      }
+    },
+    {
+      "case": "PROD",
+      "what": "production pms.db unchanged across the run",
+      "expect": "21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434",
+      "got": "21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434",
+      "pass": true,
+      "note": ""
+    }
+  ]
+}
