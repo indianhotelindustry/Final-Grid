@@ -452,6 +452,10 @@
         "inv_b03_unchanged": {
           "base": true,
           "branch": true
+        },
+        "any_row_in_sealed_day": {
+          "base": true,
+          "branch": false
         }
       }
     },
@@ -515,5 +519,6 @@
   "declared_limitations": [
     "The proven freezer maps datetime.utcnow() to the frozen instant, so the UTC-offset edge of F-UTC cannot be represented. F-UTC is run as a 00:30 time-of-day edge only (scenario S-ALL-UTC), and the UTC DDL-default hazard is moot on production (C-1).",
     "S-BD (the 16 already business-dated writers) is covered by the regression battery's Phase 1 writer harness and CF-10 harness, compared base against branch, in addition to the W-04 and W-18 rows inside S-17."
-  ]
+  ],
+  "amendment_before_recorded_run": "Added assertion N-3-AHEAD.any_row_in_sealed_day (base true, branch false) because the registered row_dates expectation is imprecise: the set of new-row dates also contains the already business-dated writers and fixture rows, so the base value ['2026-10-02'] is expected to FAIL and will be reported as such. Nothing else changed. A dry run at the base tree (not recorded as evidence) matched 166 of 167 registered assertions; the single mismatch was that one."
 }
