@@ -1490,3 +1490,69 @@ Note on the text: the Founder's message carried two interface paste-markers (`Pa
 - **Not ruled by this round:** the K7-D4 voucher basis; K7-D10; K7-D5 and K7-D6 beyond "outside K-7"; K7-D8 / DQ-61 (deployment sequencing); GT-D7 / BD-D1…BD-D5 (the 53-day stale business date); B-10 #4 and #5; any other open DQ or GT item.
 - **Not authorized:** K-7 implementation (it begins only after the Founder has reviewed the package and records an activation entry naming `FG-P3-1-K7-DIRECTIVE-01`); push; merge; deployment; an application start; any production data change; advancing the business date.
 - **Status of record (facts, not decisions):** SR-1 / INV-B06 is integrated; `main` = `origin/main` = `0938069`. DQ-56 / DQ56-R1 is applied to the live checkout (`app/` guard for 2026-08-09; production application stopped). Detail and the list of governance-record gaps for the Founder to dictate are in `G3_GOVERNANCE_STATUS_REFRESH.md`.
+
+# Founder Resolution Round 12 — K-7 activation rulings — FG-P2-FOUNDER-RESOLUTION-20261002-05
+
+| | |
+|---|---|
+| Recorded | 2026-10-02 |
+| Governed HEAD | `0938069` (`main` = `origin/main`). Recorded on the local branch `k7-phase-3-1`, which carries Round 11 (`545eae1`) and the review pack (`beb8e15`) on top of `0938069`; `app/` and the verification code are identical to `0938069` |
+| Kind | Founder rulings F-1 to F-6, K7-D4, BD-D1; K7-D10 left undecided; instruction on governance entries G-1 to G-7; corrections C-1 to C-3; activation of `FG-P3-1-K7-DIRECTIVE-01`. Recorded verbatim |
+| Identifier | `R12-F1`, `R12-F2`, `R12-F3`, `R12-F4`, `R12-F5`, `R12-F6`, `R12-K7-D4`, `R12-BD-D1`, `R12-ACTIVATION` |
+| Source | Founder message of 2026-10-02 in session, in reply to the K-7 Founder Decision Review Pack (`verification/evidence/20261002_round11_k7_directive/K7_FOUNDER_DECISION_REVIEW_PACK.md`) |
+
+## Round 12 — Founder rulings and directive, verbatim
+
+> Round 12 — K-7 Founder rulings.
+> I accept the following:
+> F-1 — Voucher basis: A
+> - Use the business date throughout for voucher issue/expiry semantics.
+> - While the business date is stale, do not issue new vouchers.
+> - Do not alter existing production vouchers; production currently has none.
+> F-2 — Seed row: leave unchanged.
+> F-3 — Silent business-date readers:
+> - Do not expand K-7 scope to Complete/Reopen.
+> - Do not change their semantics under this directive.
+> - Record them explicitly as residual Phase 3.2/3.4 items.
+> - run_night_audit may receive the logged-error handling specified in the K-7 directive, provided it does not silently substitute the wall-clock date.
+> F-4 — DDL default: leave the existing DDL unchanged. Record the corrected finding that production's existing credit_vouchers.issued_date has no DDL default.
+> F-5 — Read-only displays: accept the proposed error/None behavior, provided it is deterministic, logged and does not substitute the system calendar date.
+> F-6 — Authorization boundary: K-7 activation authorizes implementation and evidence generation on the local branch only. It does NOT authorize push, merge, deployment, production start, business-date change or trading.
+> K7-D4: adopt voucher basis A as above.
+> BD-D1: adopt sequence S1: complete K-7 implementation/evidence first; address the stale business date separately and time its remediation to go-live. No trading while the business date remains stale.
+> K7-D10: remains undecided and outside this directive.
+> Governance entries G-1 through G-7: do not invent missing authorization wording. Prepare them for later Founder review, but do not treat them as ruled by this Round.
+> C-1 through C-3: record the corrections from the review pack, without silently expanding K-7 scope.
+> Now:
+> 1. append these rulings as Round 12 to FOUNDER_DECISIONS.md;
+> 2. activate FG-P3-1-K7-DIRECTIVE-01;
+> 3. freeze the directive after activation;
+> 4. begin K-7 implementation and RED/GREEN verification on the local branch only;
+> 5. run the required regression battery and declared-delta checks;
+> 6. produce the complete K-7 implementation/evidence report.
+> Hard boundary: absolutely no push, merge, production deployment, production start, database modification, migration, business-date change, or trading.
+> Stop after the local implementation and evidence package is complete and report the exact commit, test results, changed files, declared deltas, and any remaining Founder decisions.
+
+## Activation of `FG-P3-1-K7-DIRECTIVE-01`
+
+- **Status:** ACTIVE and FROZEN from this entry.
+- **Frozen text:** `verification/evidence/20261002_k7_phase_3_1/K7_PHASE_3_1_DIRECTIVE_FROZEN.md`, SHA-256 `28413d8e381fcefced8e6d9f0fc7798a1ef682e3f6d4e39025d0502ae4589f95`. It is the Round 11 draft (`20261002_round11_k7_directive/K7_PHASE_3_1_DIRECTIVE.md`, left unedited) with exactly the answers above and corrections C-1 to C-3 applied. Any later deviation is recorded in the implementation report; the frozen file is not edited.
+- **Branch:** `k7-phase-3-1`, local only. **Base for code:** `0938069`.
+
+## Corrections C-1 to C-3 (recorded as stated in the review pack §2.7; scope not expanded)
+
+- **C-1 (corrected finding):** production's `credit_vouchers.issued_date` is `DATE NOT NULL` with no DDL default; `payments.payment_date`, `extra_charges.charge_date` and `business_date.current_date` have none. The DDL defaults at `app/__init__.py:1794` (`DEFAULT (date('now'))`) and `:1577` (`DEFAULT CURRENT_DATE`) exist only in code that creates fresh tables. Source: the schema of the verified recovery point `pms_20261002_093338_dq56-apply-pre.db`, read 2026-10-02.
+- **C-2:** the two voucher expiry tests (`app/services.py:2009`, `:2077`) must follow one basis; `refresh_voucher_status` persists the derived status and `expired_at` and runs on redemption, on the lookup API and when the voucher ledger report is opened.
+- **C-3:** the direct readers of the business-date row are the nine listed in the review pack §2.2. `get_business_date()` has 115 call sites that all raise when the row is absent once it fails closed.
+
+## Residuals recorded (F-3)
+
+Residual Phase 3.2 / 3.4 items, not changed by K-7: `app/reports.py:3121-3125` (Complete marks the day Completed and silently skips the date advance when the row is absent) and `app/reports.py:3225-3229` (Reopen silently skips the roll-back). `app/reports.py:3557-3560` (Force Close) already refuses with a message.
+
+## Effect
+
+- **RULED:** F-1 (voucher basis **A**; no new vouchers while the date is stale), F-2, F-3, F-4, F-5, F-6, K7-D4 = A, BD-D1 = **S1** (K-7 first; stale-date remediation separate and timed to go-live; no trading while stale).
+- **Left undecided and outside this directive:** K7-D10 (close-path alternatives).
+- **Not ruled by this round:** governance entries G-1 to G-7. They are prepared in the review pack §4 for later Founder review; no missing authorization wording was supplied or invented, and none is treated as ruled. BD-D2 to BD-D5, K7-D5 and every other open item are unchanged.
+- **Authorizes:** K-7 implementation and evidence generation on the local branch `k7-phase-3-1`, under the frozen directive.
+- **Not authorized:** push, merge, tag, deployment, production start, any production data change, a database modification outside disposable copies, a migration, a business-date change, trading.
