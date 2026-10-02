@@ -1,0 +1,350 @@
+{
+ "cf10_harness.log": {
+  "verdict_lines": [
+   240,
+   240
+  ],
+  "verdict_differences": [],
+  "date_lines": [
+   0,
+   0
+  ],
+  "date_differences": []
+ },
+ "cf10_w14_declared.log": {
+  "verdict_lines": [
+   14,
+   14
+  ],
+  "verdict_differences": [],
+  "date_lines": [
+   0,
+   0
+  ],
+  "date_differences": []
+ },
+ "legacy\\dq56.log": {
+  "verdict_lines": [
+   0,
+   0
+  ],
+  "verdict_differences": [],
+  "date_lines": [
+   0,
+   0
+  ],
+  "date_differences": []
+ },
+ "legacy\\phase1_execution.log": {
+  "verdict_lines": [
+   26,
+   26
+  ],
+  "verdict_differences": [],
+  "date_lines": [
+   0,
+   0
+  ],
+  "date_differences": []
+ },
+ "legacy\\phase1_execution_declared.log": {
+  "verdict_lines": [
+   44,
+   44
+  ],
+  "verdict_differences": [],
+  "date_lines": [
+   0,
+   0
+  ],
+  "date_differences": []
+ },
+ "legacy\\phase2a.log": {
+  "verdict_lines": [
+   29,
+   29
+  ],
+  "verdict_differences": [],
+  "date_lines": [
+   0,
+   0
+  ],
+  "date_differences": []
+ },
+ "legacy\\q06.log": {
+  "verdict_lines": [
+   0,
+   0
+  ],
+  "verdict_differences": [],
+  "date_lines": [
+   0,
+   0
+  ],
+  "date_differences": []
+ },
+ "legacy\\retention.log": {
+  "verdict_lines": [
+   18,
+   18
+  ],
+  "verdict_differences": [],
+  "date_lines": [
+   0,
+   0
+  ],
+  "date_differences": []
+ },
+ "legacy\\test_restore_db.log": {
+  "verdict_lines": [
+   0,
+   0
+  ],
+  "verdict_differences": [],
+  "date_lines": [
+   0,
+   0
+  ],
+  "date_differences": []
+ },
+ "legacy\\w20.log": {
+  "verdict_lines": [
+   23,
+   23
+  ],
+  "verdict_differences": [],
+  "date_lines": [
+   1,
+   1
+  ],
+  "date_differences": [
+   {
+    "context": " created row : {'id': 3, 'reservation_id': 6, 'folio_id': 6, 'amount': 3100.0, 'descriptio",
+    "base_dates": [
+     "2026-10-02"
+    ],
+    "branch_dates": [
+     "2026-08-10"
+    ]
+   }
+  ]
+ },
+ "legacy\\writers_A.log": {
+  "verdict_lines": [
+   86,
+   86
+  ],
+  "verdict_differences": [],
+  "date_lines": [
+   9,
+   9
+  ],
+  "date_differences": [
+   {
+    "context": " HTTP 302 status=CheckedOut due=1050.00 payments=[{'id': 12, 'folio_id': 11, 'amount': 165",
+    "base_dates": [
+     "2026-08-10",
+     "2026-10-02",
+     "2026-08-10"
+    ],
+    "branch_dates": [
+     "2026-08-10",
+     "2026-08-10",
+     "2026-08-10"
+    ]
+   }
+  ]
+ },
+ "legacy\\writers_A_declared.log": {
+  "verdict_lines": [
+   100,
+   100
+  ],
+  "verdict_differences": [],
+  "date_lines": [
+   11,
+   11
+  ],
+  "date_differences": [
+   {
+    "context": " HTTP 302 status=CheckedOut due=1050.00 payments=[{'id': 12, 'folio_id': 11, 'amount': 165",
+    "base_dates": [
+     "2026-08-10",
+     "2026-10-02",
+     "2026-08-10"
+    ],
+    "branch_dates": [
+     "2026-08-10",
+     "2026-08-10",
+     "2026-08-10"
+    ]
+   }
+  ]
+ },
+ "legacy\\writers_B.log": {
+  "verdict_lines": [
+   48,
+   48
+  ],
+  "verdict_differences": [],
+  "date_lines": [
+   4,
+   4
+  ],
+  "date_differences": [
+   {
+    "context": " add-payment HTTP 200; void HTTP 302; payments=[{'id': 7, 'folio_id': 5, 'amount': 300.0, ",
+    "base_dates": [
+     "2026-08-09",
+     "2026-10-02",
+     "2026-10-02"
+    ],
+    "branch_dates": [
+     "2026-08-09",
+     "2026-08-10",
+     "2026-08-10"
+    ]
+   },
+   {
+    "context": " new_reservation HTTP 302; reservation=6; payments=[{'id': 10, 'folio_id': 6, 'amount': 30",
+    "base_dates": [
+     "2026-08-10",
+     "2026-10-02"
+    ],
+    "branch_dates": [
+     "2026-08-10",
+     "2026-08-10"
+    ]
+   },
+   {
+    "context": " HTTP 200 {'amount_applied': 200.0, 'payment_id': 12, 'redemption_id': 1, 'remaining': 300",
+    "base_dates": [
+     "2026-10-02"
+    ],
+    "branch_dates": [
+     "2026-08-10"
+    ]
+   },
+   {
+    "context": " original=3 reversal=4 replacement=5 charges=[{'id': 3, 'folio_id': 8, 'amount': 300.0, 'p",
+    "base_dates": [
+     "2026-08-10",
+     "2026-10-02",
+     "2026-10-02"
+    ],
+    "branch_dates": [
+     "2026-08-10",
+     "2026-08-10",
+     "2026-08-10"
+    ]
+   }
+  ]
+ },
+ "legacy\\writers_B_declared.log": {
+  "verdict_lines": [
+   48,
+   48
+  ],
+  "verdict_differences": [],
+  "date_lines": [
+   4,
+   4
+  ],
+  "date_differences": [
+   {
+    "context": " add-payment HTTP 200; void HTTP 302; payments=[{'id': 7, 'folio_id': 5, 'amount': 300.0, ",
+    "base_dates": [
+     "2026-08-09",
+     "2026-10-02",
+     "2026-10-02"
+    ],
+    "branch_dates": [
+     "2026-08-09",
+     "2026-08-10",
+     "2026-08-10"
+    ]
+   },
+   {
+    "context": " new_reservation HTTP 302; reservation=6; payments=[{'id': 10, 'folio_id': 6, 'amount': 30",
+    "base_dates": [
+     "2026-08-10",
+     "2026-10-02"
+    ],
+    "branch_dates": [
+     "2026-08-10",
+     "2026-08-10"
+    ]
+   },
+   {
+    "context": " HTTP 200 {'amount_applied': 200.0, 'payment_id': 12, 'redemption_id': 1, 'remaining': 300",
+    "base_dates": [
+     "2026-10-02"
+    ],
+    "branch_dates": [
+     "2026-08-10"
+    ]
+   },
+   {
+    "context": " original=3 reversal=4 replacement=5 charges=[{'id': 3, 'folio_id': 8, 'amount': 300.0, 'p",
+    "base_dates": [
+     "2026-08-10",
+     "2026-10-02",
+     "2026-10-02"
+    ],
+    "branch_dates": [
+     "2026-08-10",
+     "2026-08-10",
+     "2026-08-10"
+    ]
+   }
+  ]
+ },
+ "legacy\\writers_C.log": {
+  "verdict_lines": [
+   16,
+   16
+  ],
+  "verdict_differences": [],
+  "date_lines": [
+   0,
+   0
+  ],
+  "date_differences": []
+ },
+ "legacy\\writers_C_declared.log": {
+  "verdict_lines": [
+   16,
+   16
+  ],
+  "verdict_differences": [],
+  "date_lines": [
+   0,
+   0
+  ],
+  "date_differences": []
+ },
+ "legacy\\writers_D.log": {
+  "verdict_lines": [
+   42,
+   42
+  ],
+  "verdict_differences": [],
+  "date_lines": [
+   0,
+   0
+  ],
+  "date_differences": []
+ },
+ "legacy\\writers_D_declared.log": {
+  "verdict_lines": [
+   50,
+   50
+  ],
+  "verdict_differences": [],
+  "date_lines": [
+   0,
+   0
+  ],
+  "date_differences": []
+ }
+}

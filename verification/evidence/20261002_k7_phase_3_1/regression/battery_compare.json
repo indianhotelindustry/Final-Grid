@@ -1,0 +1,383 @@
+{
+  "exit_codes": {
+    "cf10_actor": {
+      "base": "1",
+      "branch": "1",
+      "same": true
+    },
+    "cf10_cf11": {
+      "base": "1",
+      "branch": "1",
+      "same": true
+    },
+    "cf10_corr": {
+      "base": "1",
+      "branch": "1",
+      "same": true
+    },
+    "cf10_na": {
+      "base": "1",
+      "branch": "1",
+      "same": true
+    },
+    "cf10_voucher": {
+      "base": "1",
+      "branch": "1",
+      "same": true
+    },
+    "cf10_w10": {
+      "base": "1",
+      "branch": "1",
+      "same": true
+    },
+    "cf10_w12": {
+      "base": "1",
+      "branch": "1",
+      "same": true
+    },
+    "cf10_w13": {
+      "base": "1",
+      "branch": "1",
+      "same": true
+    },
+    "cf10_w14": {
+      "base": "1",
+      "branch": "1",
+      "same": true
+    },
+    "cf10_w14_declared": {
+      "base": "1",
+      "branch": "1",
+      "same": true
+    },
+    "cf10_w24": {
+      "base": "1",
+      "branch": "1",
+      "same": true
+    },
+    "dq56": {
+      "base": "0",
+      "branch": "0",
+      "same": true
+    },
+    "phase1_execution": {
+      "base": "1",
+      "branch": "1",
+      "same": true
+    },
+    "phase1_execution_declared": {
+      "base": "0",
+      "branch": "0",
+      "same": true
+    },
+    "phase2a": {
+      "base": "0",
+      "branch": "0",
+      "same": true
+    },
+    "pvf_cross_implementation": {
+      "base": "1",
+      "branch": "1",
+      "same": true
+    },
+    "pvf_ds_commission": {
+      "base": "0",
+      "branch": "0",
+      "same": true
+    },
+    "pvf_ds_run": {
+      "base": "0",
+      "branch": "0",
+      "same": true
+    },
+    "pvf_fault_run": {
+      "base": "1",
+      "branch": "1",
+      "same": true
+    },
+    "pvf_gm_verify": {
+      "base": "1",
+      "branch": "1",
+      "same": true
+    },
+    "pvf_inv_commission": {
+      "base": "1",
+      "branch": "1",
+      "same": true
+    },
+    "pvf_inv_registry": {
+      "base": "0",
+      "branch": "0",
+      "same": true
+    },
+    "pvf_inv_run": {
+      "base": "1",
+      "branch": "1",
+      "same": true
+    },
+    "pvf_replay_verify": {
+      "base": "1",
+      "branch": "1",
+      "same": true
+    },
+    "q06": {
+      "base": "0",
+      "branch": "0",
+      "same": true
+    },
+    "retention": {
+      "base": "0",
+      "branch": "0",
+      "same": true
+    },
+    "test_restore_db": {
+      "base": "0",
+      "branch": "0",
+      "same": true
+    },
+    "w20": {
+      "base": "0",
+      "branch": "0",
+      "same": true
+    },
+    "writers_A": {
+      "base": "1",
+      "branch": "1",
+      "same": true
+    },
+    "writers_A_declared": {
+      "base": "0",
+      "branch": "0",
+      "same": true
+    },
+    "writers_B": {
+      "base": "0",
+      "branch": "0",
+      "same": true
+    },
+    "writers_B_declared": {
+      "base": "0",
+      "branch": "0",
+      "same": true
+    },
+    "writers_C": {
+      "base": "0",
+      "branch": "0",
+      "same": true
+    },
+    "writers_C_declared": {
+      "base": "0",
+      "branch": "0",
+      "same": true
+    },
+    "writers_D": {
+      "base": "1",
+      "branch": "1",
+      "same": true
+    },
+    "writers_D_declared": {
+      "base": "0",
+      "branch": "0",
+      "same": true
+    }
+  },
+  "pvf": {
+    "inv_run": {
+      "lines_base": 265,
+      "lines_branch": 265,
+      "verdict_level_differences": 0,
+      "sample": []
+    },
+    "ds_run": {
+      "lines_base": 12,
+      "lines_branch": 12,
+      "verdict_level_differences": 0,
+      "sample": []
+    },
+    "ds_commission": {
+      "lines_base": 85,
+      "lines_branch": 85,
+      "verdict_level_differences": 0,
+      "sample": []
+    },
+    "fault_run": {
+      "lines_base": 223,
+      "lines_branch": 223,
+      "verdict_level_differences": 0,
+      "sample": []
+    },
+    "gm_verify": {
+      "lines_base": 268,
+      "lines_branch": 268,
+      "verdict_level_differences": 0,
+      "sample": []
+    },
+    "replay_verify": {
+      "lines_base": 90,
+      "lines_branch": 90,
+      "verdict_level_differences": 0,
+      "sample": []
+    },
+    "cross_implementation": {
+      "lines_base": 170,
+      "lines_branch": 170,
+      "verdict_level_differences": 0,
+      "sample": []
+    },
+    "inv_registry": {
+      "lines_base": 1280,
+      "lines_branch": 1280,
+      "verdict_level_differences": 0,
+      "sample": []
+    },
+    "inv_commission": {
+      "lines_base": 301,
+      "lines_branch": 301,
+      "verdict_level_differences": 0,
+      "sample": []
+    }
+  },
+  "inv_statuses": {},
+  "json_diffs": {
+    "cf10/results_base_actor.json": {
+      "cases_base": 11,
+      "cases_branch": 11,
+      "differences": []
+    },
+    "cf10/results_base_cf11.json": {
+      "cases_base": 48,
+      "cases_branch": 48,
+      "differences": []
+    },
+    "cf10/results_base_corr.json": {
+      "cases_base": 46,
+      "cases_branch": 46,
+      "differences": []
+    },
+    "cf10/results_base_na.json": {
+      "cases_base": 21,
+      "cases_branch": 21,
+      "differences": []
+    },
+    "cf10/results_base_voucher.json": {
+      "cases_base": 9,
+      "cases_branch": 9,
+      "differences": []
+    },
+    "cf10/results_base_w10.json": {
+      "cases_base": 25,
+      "cases_branch": 25,
+      "differences": []
+    },
+    "cf10/results_base_w12.json": {
+      "cases_base": 16,
+      "cases_branch": 16,
+      "differences": []
+    },
+    "cf10/results_base_w13.json": {
+      "cases_base": 16,
+      "cases_branch": 16,
+      "differences": []
+    },
+    "cf10/results_base_w24.json": {
+      "cases_base": 38,
+      "cases_branch": 38,
+      "differences": []
+    },
+    "cf10/results_basedeclared_w14.json": {
+      "cases_base": 15,
+      "cases_branch": 15,
+      "differences": []
+    },
+    "legacy/dq56_base.json": {
+      "cases_base": 0,
+      "cases_branch": 0,
+      "differences": []
+    },
+    "legacy/phase1_execution_declared_result.json": {
+      "cases_base": 44,
+      "cases_branch": 44,
+      "differences": [
+        {
+          "case": "/results/T-N02b",
+          "base": {
+            "expect": "{'in_house_outstanding', 'total_outstanding', 'checkout_outstanding_list', 'open_folios_count', 'negative_folios', 'checkout_outstanding_total', 'closed_folios_count', 'open_folio_list'}",
+            "got": "{'in_house_outstanding', 'total_outstanding', 'checkout_outstanding_list', 'open_folios_count', 'negative_folios', 'checkout_outstanding_total', 'closed_folios_count', 'open_folio_list'}",
+            "pass": true
+          },
+          "branch": {
+            "expect": "{'open_folios_count', 'checkout_outstanding_total', 'open_folio_list', 'checkout_outstanding_list', 'total_outstanding', 'in_house_outstanding', 'closed_folios_count', 'negative_folios'}",
+            "got": "{'open_folios_count', 'checkout_outstanding_total', 'open_folio_list', 'checkout_outstanding_list', 'total_outstanding', 'in_house_outstanding', 'closed_folios_count', 'negative_folios'}",
+            "pass": true
+          }
+        }
+      ]
+    },
+    "legacy/phase2a_result.json": {
+      "cases_base": 29,
+      "cases_branch": 29,
+      "differences": []
+    },
+    "legacy/q06_fix_regression_result.json": {
+      "cases_base": 0,
+      "cases_branch": 0,
+      "differences": []
+    },
+    "legacy/retention_test_result.json": {
+      "cases_base": 18,
+      "cases_branch": 18,
+      "differences": [
+        {
+          "case": "/results/RC-08",
+          "base": {
+            "expect": "2026-06-24 13:00:38.267164",
+            "got": "2026-06-24 13:00:38.267164",
+            "pass": true
+          },
+          "branch": {
+            "expect": "2026-06-24 13:00:38.324188",
+            "got": "2026-06-24 13:00:38.324188",
+            "pass": true
+          }
+        }
+      ]
+    },
+    "legacy/w20_result.json": {
+      "cases_base": 23,
+      "cases_branch": 23,
+      "differences": []
+    },
+    "legacy/writers_setA_declared.json": {
+      "cases_base": 108,
+      "cases_branch": 108,
+      "differences": []
+    },
+    "legacy/writers_setB.json": {
+      "cases_base": 60,
+      "cases_branch": 60,
+      "differences": []
+    },
+    "legacy/writers_setB_declared.json": {
+      "cases_base": 60,
+      "cases_branch": 60,
+      "differences": []
+    },
+    "legacy/writers_setC.json": {
+      "cases_base": 20,
+      "cases_branch": 20,
+      "differences": []
+    },
+    "legacy/writers_setC_declared.json": {
+      "cases_base": 20,
+      "cases_branch": 20,
+      "differences": []
+    },
+    "legacy/writers_setD_declared.json": {
+      "cases_base": 54,
+      "cases_branch": 54,
+      "differences": []
+    }
+  },
+  "notes": [],
+  "inv_statuses_compared": 26
+}

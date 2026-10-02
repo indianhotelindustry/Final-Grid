@@ -1,0 +1,76 @@
+{
+  "task": "K-7 / Phase 3.1 implementation and evidence (FG-P3-1-K7-DIRECTIVE-01)",
+  "authorization": "Founder Round 12; directive frozen, SHA-256 28413d8e381fcefced8e6d9f0fc7798a1ef682e3f6d4e39025d0502ae4589f95",
+  "branch": "k7-phase-3-1 (local only; not pushed, not merged, not deployed)",
+  "base_commit": "d21eb50 (activation; app/ identical to main 0938069)",
+  "tested_code_commit": "463ad7a",
+  "files_changed": [
+    "app/models.py",
+    "app/services.py",
+    "app/routes.py",
+    "app/occupancy_engine.py",
+    "app/kpi_command_center.py"
+  ],
+  "diff": {
+    "insertions": 119,
+    "deletions": 36
+  },
+  "harness": {
+    "scenarios": 32,
+    "assertions": 174,
+    "discriminating_assertions": 61,
+    "red_base": {
+      "passed": 173,
+      "total": 174,
+      "note": "single mismatch is the imprecise registered N-3-AHEAD.row_dates expectation; companion assertion any_row_in_sealed_day matches"
+    },
+    "green_branch": {
+      "passed": 174,
+      "total": 174
+    }
+  },
+  "mutation_proof": {
+    "mutations": 17,
+    "turned_red": 17
+  },
+  "regression_battery": {
+    "steps_with_identical_exit_codes": "all",
+    "pvf_verdict_level_differences": 0,
+    "invariants_compared": 26,
+    "invariant_differences": 0,
+    "legacy_suite_verdict_line_differences": 0,
+    "dq56_guard_tests_identical": "9 of 9",
+    "only_movements": "recorded row dates of W-08/09, W-11, W-17, W-20, W-22/23",
+    "preexisting_failures_identical_both_sides": [
+      "CF-10 gate P-01 (old production anchor)",
+      "fault-run",
+      "gm-verify",
+      "replay-verify",
+      "cross-implementation Q06/Q14/Q17/Q20",
+      "inv-commission"
+    ]
+  },
+  "unlisted_movement": "none found",
+  "safety": {
+    "production_pms_db_sha256": "21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434",
+    "production_opened_read_only_as_copy_source_only": true,
+    "application_started_in_live_folder": false,
+    "env_loaded": false,
+    "business_date_changed": false,
+    "pushed": false,
+    "merged": false,
+    "migration_run": false
+  },
+  "privacy": {
+    "phone_redactions_in_committed_log_copies": 71,
+    "pack_scan": "0 phone-like, 0 email-like, 0 secret-style"
+  },
+  "remaining_founder_decisions": [
+    "push/merge authorization",
+    "G-1..G-7 record entries",
+    "K7-D10 and BD-D2..BD-D5",
+    "code guard for stale-date operating rules",
+    "Complete/Reopen residuals into 3.2/3.4",
+    "K7-D5, K7-D8"
+  ]
+}

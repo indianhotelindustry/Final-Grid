@@ -1,0 +1,178 @@
+{
+  "group": "w13",
+  "started": "2026-10-02T18:29:53",
+  "finished": "2026-10-02T18:29:54",
+  "app_root": "C:\\wk7base",
+  "app_commit": "d21eb50bfe2624b598290217827046954a1bf791",
+  "app_tree_clean": true,
+  "harness": "verification\\_work\\k7reg\\verify_cf10_cf11.py",
+  "copy": "C:\\wk7base\\verification\\_work\\cf10_w13.db",
+  "copy_method": "sqlite-backup-api",
+  "production_sha256_before": "21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434",
+  "production_sha256_after": "21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434",
+  "gates_total": 16,
+  "gates_passed": 15,
+  "verdict": "FAIL",
+  "checks": [
+    {
+      "case": "W13-01",
+      "writer": "W-13",
+      "what": "charge + CICO log posted, rest of request committed",
+      "expect": "(None, 1, 1, True)",
+      "got": "(None, 1, 1, True)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W13-02",
+      "writer": "W-13",
+      "what": "strict posted audit on the charge row",
+      "expect": "1",
+      "got": "1",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W13-03",
+      "writer": "W-13",
+      "what": "charge audit: amount, folio, charge_type, flow",
+      "expect": "(300.0, 5, 'late_checkout', 'cico')",
+      "got": "(300.0, 5, 'late_checkout', 'cico')",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W13-04",
+      "writer": "W-13",
+      "what": "charge audit actor is the operator",
+      "expect": "2",
+      "got": "2",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W13-05",
+      "writer": "W-13",
+      "what": "reservation audit names the charge row",
+      "expect": "(1, 3, 2)",
+      "got": "(1, 3, 2)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W13-06",
+      "writer": "W-13",
+      "what": "CICO log links the charge row",
+      "expect": "3",
+      "got": "3",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W13-C",
+      "writer": "W-13",
+      "what": "second post for same type adds nothing",
+      "expect": "(None, 1)",
+      "got": "(None, 1)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W13-E1",
+      "writer": "W-13",
+      "what": "user_id=None: posted, both audits attributed to the logged-in operator",
+      "expect": "(None, 1, 2, 2)",
+      "got": "(None, 1, 2, 2)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "W13-B-F1-any",
+      "writer": "W-13",
+      "what": "F1 on any audit: no charge/log; rest of request commits",
+      "expect": "{'charges': 0, 'cico_logs': 0, 'sentinel': True}",
+      "got": "{'charges': 0, 'cico_logs': 0, 'sentinel': True}",
+      "pass": true,
+      "severity": "gate",
+      "note": "RuntimeError: injected F1: audit row could not be constructed"
+    },
+    {
+      "case": "W13-B-F1-charge",
+      "writer": "W-13",
+      "what": "F1 on charge audit: no charge/log; rest of request commits",
+      "expect": "{'charges': 0, 'cico_logs': 0, 'sentinel': True}",
+      "got": "{'charges': 0, 'cico_logs': 0, 'sentinel': True}",
+      "pass": true,
+      "severity": "gate",
+      "note": "RuntimeError: injected F1: audit row could not be constructed"
+    },
+    {
+      "case": "W13-B-F1-reservation",
+      "writer": "W-13",
+      "what": "F1 on reservation audit: no charge/log; rest of request commits",
+      "expect": "{'charges': 0, 'cico_logs': 0, 'sentinel': True}",
+      "got": "{'charges': 0, 'cico_logs': 0, 'sentinel': True}",
+      "pass": true,
+      "severity": "gate",
+      "note": "RuntimeError: injected F1: audit row could not be constructed"
+    },
+    {
+      "case": "W13-B-F2-any",
+      "writer": "W-13",
+      "what": "F2 on any audit: no charge/log; rest of request commits",
+      "expect": "{'charges': 0, 'cico_logs': 0, 'sentinel': True}",
+      "got": "{'charges': 0, 'cico_logs': 0, 'sentinel': True}",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError: audit row for ExtraCharge 5 (posted) could not be written: RuntimeError: injecte"
+    },
+    {
+      "case": "W13-B-F2-charge",
+      "writer": "W-13",
+      "what": "F2 on charge audit: no charge/log; rest of request commits",
+      "expect": "{'charges': 0, 'cico_logs': 0, 'sentinel': True}",
+      "got": "{'charges': 0, 'cico_logs': 0, 'sentinel': True}",
+      "pass": true,
+      "severity": "gate",
+      "note": "AuditCouplingError: audit row for ExtraCharge 5 (posted) could not be written: RuntimeError: injecte"
+    },
+    {
+      "case": "W13-B-F2-reservation",
+      "writer": "W-13",
+      "what": "F2 on reservation audit: no charge/log; rest of request commits",
+      "expect": "{'charges': 0, 'cico_logs': 0, 'sentinel': True}",
+      "got": "{'charges': 0, 'cico_logs': 0, 'sentinel': True}",
+      "pass": true,
+      "severity": "gate",
+      "note": "RuntimeError: injected F2: audit insert failed"
+    },
+    {
+      "case": "W13-D",
+      "writer": "W-13",
+      "what": "zero amount: nothing posted",
+      "expect": "(None, 0)",
+      "got": "(None, 0)",
+      "pass": true,
+      "severity": "gate",
+      "note": ""
+    },
+    {
+      "case": "P-01",
+      "writer": "prod",
+      "what": "production database unchanged (sha256 == anchor)",
+      "expect": "'51dd83b7f0fa42a3e85afb0f46c1a5f7cc6978436ff361250caef9ae92830bc2'",
+      "got": "'21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434'",
+      "pass": false,
+      "severity": "gate",
+      "note": ""
+    }
+  ]
+}

@@ -1,0 +1,2471 @@
+{
+  "task": "K-7 Phase 3.1 harness",
+  "role": "base",
+  "label": "red_base_d21eb50",
+  "worktree": "C:\\wk7base",
+  "worktree_commit": "d21eb50bfe2624b598290217827046954a1bf791",
+  "code_tree_status": "",
+  "production_sha256_before": "21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434",
+  "production_sha256_after": "21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434",
+  "passed": 173,
+  "total": 174,
+  "results": [
+    {
+      "case": "S-08-09",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-08-09",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-08-09",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-08-09",
+      "assert": "reversal_date",
+      "expect": "2026-10-02",
+      "got": "2026-10-02",
+      "pass": true
+    },
+    {
+      "case": "S-08-09",
+      "assert": "replacement_date",
+      "expect": "2026-10-02",
+      "got": "2026-10-02",
+      "pass": true
+    },
+    {
+      "case": "S-08-09",
+      "assert": "n2_new_rows_all_on_bd",
+      "expect": false,
+      "got": false,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "S-08-09-route",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-08-09-route",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-08-09-route",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-08-09-route",
+      "assert": "reversal_date",
+      "expect": "2026-10-02",
+      "got": "2026-10-02",
+      "pass": true
+    },
+    {
+      "case": "S-08-09-route",
+      "assert": "replacement_date",
+      "expect": "2026-10-02",
+      "got": "2026-10-02",
+      "pass": true
+    },
+    {
+      "case": "S-08-09-route",
+      "assert": "n2_new_rows_all_on_bd",
+      "expect": false,
+      "got": false,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "S-10",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-10",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-10",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-10",
+      "assert": "refund_date",
+      "expect": "2026-10-02",
+      "got": "2026-10-02",
+      "pass": true
+    },
+    {
+      "case": "S-10",
+      "assert": "n2_new_rows_all_on_bd",
+      "expect": false,
+      "got": false,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "S-VI",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-VI",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-VI",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-VI",
+      "assert": "issued_date",
+      "expect": "2026-10-02",
+      "got": "2026-10-02",
+      "pass": true
+    },
+    {
+      "case": "S-VI",
+      "assert": "expiry_date",
+      "expect": "2027-10-02",
+      "got": "2027-10-02",
+      "pass": true
+    },
+    {
+      "case": "S-VI",
+      "assert": "n2_new_rows_all_on_bd",
+      "expect": false,
+      "got": false,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "S-11",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-11",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-11",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-11",
+      "assert": "redeem_result",
+      "expect": "ok",
+      "got": "ok",
+      "pass": true
+    },
+    {
+      "case": "S-11",
+      "assert": "payment_date",
+      "expect": "2026-10-02",
+      "got": "2026-10-02",
+      "pass": true
+    },
+    {
+      "case": "S-11",
+      "assert": "n2_new_rows_all_on_bd",
+      "expect": false,
+      "got": false,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "V-1",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "V-1",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "V-1",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "V-1",
+      "assert": "computed_status",
+      "expect": "expired",
+      "got": "expired",
+      "pass": true
+    },
+    {
+      "case": "V-1",
+      "assert": "redeem_result",
+      "expect": "refused",
+      "got": "refused",
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "V-2",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "V-2",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "V-2",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "V-2",
+      "assert": "computed_status",
+      "expect": "expired",
+      "got": "expired",
+      "pass": true
+    },
+    {
+      "case": "V-2",
+      "assert": "redeem_result",
+      "expect": "refused",
+      "got": "refused",
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "V-3",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "V-3",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "V-3",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "V-3",
+      "assert": "computed_status",
+      "expect": "expired",
+      "got": "expired",
+      "pass": true
+    },
+    {
+      "case": "V-3",
+      "assert": "redeem_result",
+      "expect": "refused",
+      "got": "refused",
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "V-4",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "V-4",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "V-4",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "V-4",
+      "assert": "http_status",
+      "expect": 200,
+      "got": 200,
+      "pass": true
+    },
+    {
+      "case": "V-4",
+      "assert": "stored_status_after_report",
+      "expect": "expired",
+      "got": "expired",
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "S-17",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-17",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-17",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-17",
+      "assert": "checkout_status",
+      "expect": "CheckedOut",
+      "got": "CheckedOut",
+      "pass": true
+    },
+    {
+      "case": "S-17",
+      "assert": "extra_date",
+      "expect": "2026-10-02",
+      "got": "2026-10-02",
+      "pass": true
+    },
+    {
+      "case": "S-17",
+      "assert": "settlement_date",
+      "expect": "2026-08-10",
+      "got": "2026-08-10",
+      "pass": true
+    },
+    {
+      "case": "S-17",
+      "assert": "tip_date",
+      "expect": "2026-08-10",
+      "got": "2026-08-10",
+      "pass": true
+    },
+    {
+      "case": "S-17",
+      "assert": "n2_new_rows_all_on_bd",
+      "expect": false,
+      "got": false,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "S-20",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-20",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-20",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-20",
+      "assert": "charge_rows",
+      "expect": 1,
+      "got": 1,
+      "pass": true
+    },
+    {
+      "case": "S-20",
+      "assert": "charge_date",
+      "expect": "2026-10-02",
+      "got": "2026-10-02",
+      "pass": true
+    },
+    {
+      "case": "S-20",
+      "assert": "n2_new_rows_all_on_bd",
+      "expect": false,
+      "got": false,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "S-22-23",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-22-23",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-22-23",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-22-23",
+      "assert": "reversal_date",
+      "expect": "2026-10-02",
+      "got": "2026-10-02",
+      "pass": true
+    },
+    {
+      "case": "S-22-23",
+      "assert": "replacement_date",
+      "expect": "2026-10-02",
+      "got": "2026-10-02",
+      "pass": true
+    },
+    {
+      "case": "S-22-23",
+      "assert": "n2_new_rows_all_on_bd",
+      "expect": false,
+      "got": false,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "F-1",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-1",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-1",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-1",
+      "assert": "result",
+      "expect": "date:2026-10-02",
+      "got": "date:2026-10-02",
+      "pass": true
+    },
+    {
+      "case": "F-1",
+      "assert": "error_logged",
+      "expect": false,
+      "got": false,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "F-2-corr",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-2-corr",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-2-corr",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-2-corr",
+      "assert": "outcome",
+      "expect": "completed",
+      "got": "completed",
+      "pass": true
+    },
+    {
+      "case": "F-2-corr",
+      "assert": "no_rows_created",
+      "expect": false,
+      "got": false,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "F-2-chgcorr",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-2-chgcorr",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-2-chgcorr",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-2-chgcorr",
+      "assert": "outcome",
+      "expect": "completed",
+      "got": "completed",
+      "pass": true
+    },
+    {
+      "case": "F-2-chgcorr",
+      "assert": "no_rows_created",
+      "expect": false,
+      "got": false,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "F-2-refund",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-2-refund",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-2-refund",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-2-refund",
+      "assert": "outcome",
+      "expect": "completed",
+      "got": "completed",
+      "pass": true
+    },
+    {
+      "case": "F-2-refund",
+      "assert": "no_rows_created",
+      "expect": false,
+      "got": false,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "F-2-voucher",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-2-voucher",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-2-voucher",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-2-voucher",
+      "assert": "outcome",
+      "expect": "completed",
+      "got": "completed",
+      "pass": true
+    },
+    {
+      "case": "F-2-voucher",
+      "assert": "no_rows_created",
+      "expect": false,
+      "got": false,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "F-2-redeem",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-2-redeem",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-2-redeem",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-2-redeem",
+      "assert": "outcome",
+      "expect": "completed",
+      "got": "completed",
+      "pass": true
+    },
+    {
+      "case": "F-2-redeem",
+      "assert": "no_rows_created",
+      "expect": false,
+      "got": false,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "F-2-checkout",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-2-checkout",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-2-checkout",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-2-checkout",
+      "assert": "outcome",
+      "expect": "completed",
+      "got": "completed",
+      "pass": true
+    },
+    {
+      "case": "F-2-checkout",
+      "assert": "no_rows_created",
+      "expect": false,
+      "got": false,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "F-2-overstay",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-2-overstay",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-2-overstay",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-2-overstay",
+      "assert": "outcome",
+      "expect": "completed",
+      "got": "completed",
+      "pass": true
+    },
+    {
+      "case": "F-2-overstay",
+      "assert": "no_rows_created",
+      "expect": false,
+      "got": false,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "D-1",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "D-1",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "D-1",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "D-1",
+      "assert": "payment_date",
+      "expect": "2026-10-02",
+      "got": "2026-10-02",
+      "pass": true
+    },
+    {
+      "case": "D-1",
+      "assert": "charge_date",
+      "expect": "2026-10-02",
+      "got": "2026-10-02",
+      "pass": true
+    },
+    {
+      "case": "D-1",
+      "assert": "voucher_issued_date",
+      "expect": "2026-10-02",
+      "got": "2026-10-02",
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "D-2",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "D-2",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "D-2",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "D-2",
+      "assert": "outcome",
+      "expect": "inserted",
+      "got": "inserted",
+      "pass": true
+    },
+    {
+      "case": "D-2",
+      "assert": "no_rows_created",
+      "expect": false,
+      "got": false,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "F-3a",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-3a",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-3a",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-3a",
+      "assert": "payload_business_date",
+      "expect": "2026-10-02",
+      "got": "2026-10-02",
+      "pass": true
+    },
+    {
+      "case": "F-3a",
+      "assert": "error_logged",
+      "expect": false,
+      "got": false,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "F-3b",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-3b",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-3b",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-3b",
+      "assert": "result",
+      "expect": "dict",
+      "got": "dict",
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "F-3c",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-3c",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-3c",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-3c",
+      "assert": "http_status",
+      "expect": 200,
+      "got": 200,
+      "pass": true
+    },
+    {
+      "case": "F-3c",
+      "assert": "error_logged",
+      "expect": false,
+      "got": false,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "F-3d",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-3d",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-3d",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "F-3d",
+      "assert": "returned",
+      "expect": "None",
+      "got": "None",
+      "pass": true
+    },
+    {
+      "case": "F-3d",
+      "assert": "night_audit_logs_created",
+      "expect": 0,
+      "got": 0,
+      "pass": true
+    },
+    {
+      "case": "F-3d",
+      "assert": "error_logged",
+      "expect": false,
+      "got": false,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "N-3-AHEAD",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "N-3-AHEAD",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "N-3-AHEAD",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "N-3-AHEAD",
+      "assert": "row_dates",
+      "expect": [
+        "2026-10-02"
+      ],
+      "got": [
+        "2026-10-02",
+        "2026-10-03"
+      ],
+      "pass": false
+    },
+    {
+      "case": "N-3-AHEAD",
+      "assert": "inv_b01_after",
+      "expect": "VIOLATED",
+      "got": "VIOLATED",
+      "pass": true
+    },
+    {
+      "case": "N-3-AHEAD",
+      "assert": "inv_b03_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "N-3-AHEAD",
+      "assert": "any_row_in_sealed_day",
+      "expect": true,
+      "got": true,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "S-ALL",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-ALL",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-ALL",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-ALL",
+      "assert": "inv_b04_before",
+      "expect": "HOLDS",
+      "got": "HOLDS",
+      "pass": true
+    },
+    {
+      "case": "S-ALL",
+      "assert": "inv_b04_after",
+      "expect": "VIOLATED",
+      "got": "VIOLATED",
+      "pass": true
+    },
+    {
+      "case": "S-ALL",
+      "assert": "n2_new_rows_all_on_bd",
+      "expect": false,
+      "got": false,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "DDL-1",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "DDL-1",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "DDL-1",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "DDL-1",
+      "assert": "ddl_defaults_absent",
+      "expect": true,
+      "got": true,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "DDL-2",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "DDL-2",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "DDL-2",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "DDL-2",
+      "assert": "ddl_default_present",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "DDL-2",
+      "assert": "issued_date",
+      "expect": "2026-10-02",
+      "got": "2026-10-02",
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "S-ALL-UTC",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-ALL-UTC",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-ALL-UTC",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-ALL-UTC",
+      "assert": "inv_b04_after",
+      "expect": "VIOLATED",
+      "got": "VIOLATED",
+      "pass": true
+    },
+    {
+      "case": "S-ALL-UTC",
+      "assert": "n2_new_rows_all_on_bd",
+      "expect": false,
+      "got": false,
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "S-TL",
+      "assert": "freeze_proven",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-TL",
+      "assert": "d11_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-TL",
+      "assert": "sealed_0809_unchanged",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-TL",
+      "assert": "w17_w20_charges",
+      "expect": 2,
+      "got": 2,
+      "pass": true
+    },
+    {
+      "case": "S-TL",
+      "assert": "tax_lines_follow_row_date",
+      "expect": true,
+      "got": true,
+      "pass": true
+    },
+    {
+      "case": "S-TL",
+      "assert": "tax_line_dates",
+      "expect": [
+        "2026-10-02"
+      ],
+      "got": [
+        "2026-10-02"
+      ],
+      "pass": true,
+      "obs_digest": null
+    },
+    {
+      "case": "PROD",
+      "assert": "production pms.db unchanged",
+      "expect": "21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434",
+      "got": "21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434",
+      "pass": true
+    }
+  ],
+  "observations": {
+    "S-08-09": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "reversal_date": "2026-10-02",
+      "replacement_date": "2026-10-02",
+      "bd_in_force": "2026-08-10",
+      "new_rows": [
+        {
+          "table": "payments",
+          "id": 7,
+          "date": "2026-08-10"
+        },
+        {
+          "table": "payments",
+          "id": 8,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "payments",
+          "id": 9,
+          "date": "2026-10-02"
+        }
+      ],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [
+        "2026-08-10",
+        "2026-10-02"
+      ],
+      "rows_in_sealed_day": 2,
+      "any_row_in_sealed_day": true,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "S-08-09-route": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "http_status": 302,
+      "reversal_date": "2026-10-02",
+      "replacement_date": "2026-10-02",
+      "bd_in_force": "2026-08-10",
+      "new_rows": [
+        {
+          "table": "payments",
+          "id": 8,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "payments",
+          "id": 9,
+          "date": "2026-10-02"
+        }
+      ],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [
+        "2026-10-02"
+      ],
+      "rows_in_sealed_day": 2,
+      "any_row_in_sealed_day": true,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "S-10": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "refund_date": "2026-10-02",
+      "bd_in_force": "2026-08-10",
+      "new_rows": [
+        {
+          "table": "payments",
+          "id": 7,
+          "date": "2026-08-10"
+        },
+        {
+          "table": "payments",
+          "id": 8,
+          "date": "2026-10-02"
+        }
+      ],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [
+        "2026-08-10",
+        "2026-10-02"
+      ],
+      "rows_in_sealed_day": 1,
+      "any_row_in_sealed_day": true,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "S-VI": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "issued_date": "2026-10-02",
+      "expiry_date": "2027-10-02",
+      "bd_in_force": "2026-08-10",
+      "new_rows": [
+        {
+          "table": "payments",
+          "id": 7,
+          "date": "2026-08-10"
+        },
+        {
+          "table": "credit_vouchers",
+          "id": 1,
+          "date": "2026-10-02"
+        }
+      ],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [
+        "2026-08-10",
+        "2026-10-02"
+      ],
+      "rows_in_sealed_day": 1,
+      "any_row_in_sealed_day": true,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "S-11": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "computed_status": "active",
+      "redeem_result": "ok",
+      "payment_date": "2026-10-02",
+      "bd_in_force": "2026-08-10",
+      "new_rows": [
+        {
+          "table": "payments",
+          "id": 7,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "credit_vouchers",
+          "id": 1,
+          "date": "2026-08-10"
+        }
+      ],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [
+        "2026-08-10",
+        "2026-10-02"
+      ],
+      "rows_in_sealed_day": 1,
+      "any_row_in_sealed_day": true,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "V-1": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "computed_status": "expired",
+      "redeem_result": "refused",
+      "payment_date": null,
+      "refusal": "Voucher is expired; cannot redeem.",
+      "bd_in_force": "2026-08-10",
+      "new_rows": [
+        {
+          "table": "credit_vouchers",
+          "id": 1,
+          "date": "2026-08-10"
+        }
+      ],
+      "n2_new_rows_all_on_bd": true,
+      "row_dates": [
+        "2026-08-10"
+      ],
+      "rows_in_sealed_day": 0,
+      "any_row_in_sealed_day": false,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "V-2": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "computed_status": "expired",
+      "redeem_result": "refused",
+      "payment_date": null,
+      "refusal": "Voucher is expired; cannot redeem.",
+      "bd_in_force": "2026-08-10",
+      "new_rows": [
+        {
+          "table": "credit_vouchers",
+          "id": 1,
+          "date": "2026-08-10"
+        }
+      ],
+      "n2_new_rows_all_on_bd": true,
+      "row_dates": [
+        "2026-08-10"
+      ],
+      "rows_in_sealed_day": 0,
+      "any_row_in_sealed_day": false,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "V-3": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "computed_status": "expired",
+      "redeem_result": "refused",
+      "payment_date": null,
+      "refusal": "Voucher is expired; cannot redeem.",
+      "bd_in_force": "2026-08-10",
+      "new_rows": [
+        {
+          "table": "credit_vouchers",
+          "id": 1,
+          "date": "2026-08-10"
+        }
+      ],
+      "n2_new_rows_all_on_bd": true,
+      "row_dates": [
+        "2026-08-10"
+      ],
+      "rows_in_sealed_day": 0,
+      "any_row_in_sealed_day": false,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "V-4": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "http_status": 200,
+      "stored_status_after_report": "expired",
+      "bd_in_force": "2026-08-10",
+      "new_rows": [
+        {
+          "table": "credit_vouchers",
+          "id": 1,
+          "date": "2026-08-10"
+        }
+      ],
+      "n2_new_rows_all_on_bd": true,
+      "row_dates": [
+        "2026-08-10"
+      ],
+      "rows_in_sealed_day": 0,
+      "any_row_in_sealed_day": false,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "S-17": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "http_status": 302,
+      "checkout_status": "CheckedOut",
+      "extra_date": "2026-10-02",
+      "tip_date": "2026-08-10",
+      "settlement_date": "2026-08-10",
+      "bd_in_force": "2026-08-10",
+      "new_rows": [
+        {
+          "table": "payments",
+          "id": 7,
+          "date": "2026-08-10"
+        },
+        {
+          "table": "extra_charges",
+          "id": 3,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "extra_charges",
+          "id": 4,
+          "date": "2026-08-10"
+        }
+      ],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [
+        "2026-08-10",
+        "2026-10-02"
+      ],
+      "rows_in_sealed_day": 1,
+      "any_row_in_sealed_day": true,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "S-20": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "http_status": 302,
+      "charge_rows": 1,
+      "charge_date": "2026-10-02",
+      "charge_amount": 2400.0,
+      "bd_in_force": "2026-08-10",
+      "new_rows": [
+        {
+          "table": "extra_charges",
+          "id": 3,
+          "date": "2026-10-02"
+        }
+      ],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [
+        "2026-10-02"
+      ],
+      "rows_in_sealed_day": 1,
+      "any_row_in_sealed_day": true,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "S-22-23": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "reversal_date": "2026-10-02",
+      "replacement_date": "2026-10-02",
+      "bd_in_force": "2026-08-10",
+      "new_rows": [
+        {
+          "table": "extra_charges",
+          "id": 3,
+          "date": "2026-08-10"
+        },
+        {
+          "table": "extra_charges",
+          "id": 4,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "extra_charges",
+          "id": 5,
+          "date": "2026-10-02"
+        }
+      ],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [
+        "2026-08-10",
+        "2026-10-02"
+      ],
+      "rows_in_sealed_day": 2,
+      "any_row_in_sealed_day": true,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "F-1": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "result": "date:2026-10-02",
+      "error_logged": false,
+      "bd_in_force": null,
+      "new_rows": [],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [],
+      "rows_in_sealed_day": 0,
+      "any_row_in_sealed_day": false,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "F-2-corr": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "raw_outcome": "completed",
+      "exception": null,
+      "rows_delta": 4,
+      "no_rows_created": false,
+      "outcome": "completed",
+      "bd_in_force": null,
+      "new_rows": [
+        {
+          "table": "payments",
+          "id": 8,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "payments",
+          "id": 9,
+          "date": "2026-10-02"
+        }
+      ],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [
+        "2026-10-02"
+      ],
+      "rows_in_sealed_day": 2,
+      "any_row_in_sealed_day": true,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "F-2-chgcorr": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "raw_outcome": "completed",
+      "exception": null,
+      "rows_delta": 4,
+      "no_rows_created": false,
+      "outcome": "completed",
+      "bd_in_force": null,
+      "new_rows": [
+        {
+          "table": "extra_charges",
+          "id": 4,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "extra_charges",
+          "id": 5,
+          "date": "2026-10-02"
+        }
+      ],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [
+        "2026-10-02"
+      ],
+      "rows_in_sealed_day": 2,
+      "any_row_in_sealed_day": true,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "F-2-refund": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "raw_outcome": "completed",
+      "exception": null,
+      "rows_delta": 3,
+      "no_rows_created": false,
+      "outcome": "completed",
+      "bd_in_force": null,
+      "new_rows": [
+        {
+          "table": "payments",
+          "id": 8,
+          "date": "2026-10-02"
+        }
+      ],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [
+        "2026-10-02"
+      ],
+      "rows_in_sealed_day": 1,
+      "any_row_in_sealed_day": true,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "F-2-voucher": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "raw_outcome": "completed",
+      "exception": null,
+      "rows_delta": 3,
+      "no_rows_created": false,
+      "outcome": "completed",
+      "bd_in_force": null,
+      "new_rows": [
+        {
+          "table": "credit_vouchers",
+          "id": 1,
+          "date": "2026-10-02"
+        }
+      ],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [
+        "2026-10-02"
+      ],
+      "rows_in_sealed_day": 1,
+      "any_row_in_sealed_day": true,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "F-2-redeem": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "raw_outcome": "completed",
+      "exception": null,
+      "rows_delta": 3,
+      "no_rows_created": false,
+      "outcome": "completed",
+      "bd_in_force": null,
+      "new_rows": [
+        {
+          "table": "payments",
+          "id": 7,
+          "date": "2026-10-02"
+        }
+      ],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [
+        "2026-10-02"
+      ],
+      "rows_in_sealed_day": 1,
+      "any_row_in_sealed_day": true,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "F-2-checkout": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "raw_outcome": "completed",
+      "exception": null,
+      "rows_delta": 8,
+      "no_rows_created": false,
+      "outcome": "completed",
+      "bd_in_force": null,
+      "new_rows": [
+        {
+          "table": "payments",
+          "id": 7,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "extra_charges",
+          "id": 3,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "extra_charges",
+          "id": 4,
+          "date": "2026-10-02"
+        }
+      ],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [
+        "2026-10-02"
+      ],
+      "rows_in_sealed_day": 3,
+      "any_row_in_sealed_day": true,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "F-2-overstay": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "raw_outcome": "completed",
+      "exception": null,
+      "rows_delta": 3,
+      "no_rows_created": false,
+      "outcome": "completed",
+      "bd_in_force": null,
+      "new_rows": [
+        {
+          "table": "extra_charges",
+          "id": 3,
+          "date": "2026-10-02"
+        }
+      ],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [
+        "2026-10-02"
+      ],
+      "rows_in_sealed_day": 1,
+      "any_row_in_sealed_day": true,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "D-1": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "payment_date": "2026-10-02",
+      "charge_date": "2026-10-02",
+      "voucher_issued_date": "2026-10-02",
+      "bd_in_force": "2026-08-10",
+      "new_rows": [
+        {
+          "table": "payments",
+          "id": 7,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "extra_charges",
+          "id": 3,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "credit_vouchers",
+          "id": 1,
+          "date": "2026-10-02"
+        }
+      ],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [
+        "2026-10-02"
+      ],
+      "rows_in_sealed_day": 3,
+      "any_row_in_sealed_day": true,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "D-2": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "raw_outcome": "completed",
+      "exception": null,
+      "rows_delta": 1,
+      "no_rows_created": false,
+      "outcome": "inserted",
+      "bd_in_force": null,
+      "new_rows": [
+        {
+          "table": "payments",
+          "id": 7,
+          "date": "2026-10-02"
+        }
+      ],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [
+        "2026-10-02"
+      ],
+      "rows_in_sealed_day": 1,
+      "any_row_in_sealed_day": true,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "F-3a": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "payload_business_date": "2026-10-02",
+      "raised": null,
+      "error_logged": false,
+      "bd_in_force": null,
+      "new_rows": [],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [],
+      "rows_in_sealed_day": 0,
+      "any_row_in_sealed_day": false,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "F-3b": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "result": "dict",
+      "bd_in_force": null,
+      "new_rows": [],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [],
+      "rows_in_sealed_day": 0,
+      "any_row_in_sealed_day": false,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "F-3c": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "http_status": 200,
+      "error_logged": false,
+      "bd_in_force": null,
+      "new_rows": [],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [],
+      "rows_in_sealed_day": 0,
+      "any_row_in_sealed_day": false,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "F-3d": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "returned": "None",
+      "night_audit_logs_created": 0,
+      "error_logged": false,
+      "bd_in_force": null,
+      "new_rows": [],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [],
+      "rows_in_sealed_day": 0,
+      "any_row_in_sealed_day": false,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "N-3-AHEAD": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T23:30:00",
+      "ops": {
+        "corr": {
+          "reversal_date": "2026-10-02",
+          "replacement_date": "2026-10-02"
+        },
+        "chgcorr": {
+          "reversal_date": "2026-10-02",
+          "replacement_date": "2026-10-02"
+        },
+        "refund": {
+          "refund_date": "2026-10-02"
+        },
+        "voucher": {
+          "issued_date": "2026-10-02",
+          "expiry_date": "2027-10-02"
+        },
+        "redeem": {
+          "computed_status": "active",
+          "redeem_result": "ok",
+          "payment_date": "2026-10-02"
+        },
+        "checkout": {
+          "http_status": 302,
+          "checkout_status": "CheckedOut",
+          "extra_date": "2026-10-02",
+          "tip_date": "2026-10-03",
+          "settlement_date": "2026-10-03"
+        },
+        "overstay": {
+          "http_status": 302,
+          "charge_rows": 1,
+          "charge_date": "2026-10-02",
+          "charge_amount": 3600.0
+        }
+      },
+      "bd_in_force": "2026-10-03",
+      "new_rows": [
+        {
+          "table": "payments",
+          "id": 7,
+          "date": "2026-10-03"
+        },
+        {
+          "table": "payments",
+          "id": 8,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "payments",
+          "id": 9,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "payments",
+          "id": 10,
+          "date": "2026-10-03"
+        },
+        {
+          "table": "payments",
+          "id": 11,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "payments",
+          "id": 12,
+          "date": "2026-10-03"
+        },
+        {
+          "table": "payments",
+          "id": 13,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "payments",
+          "id": 14,
+          "date": "2026-10-03"
+        },
+        {
+          "table": "extra_charges",
+          "id": 3,
+          "date": "2026-10-03"
+        },
+        {
+          "table": "extra_charges",
+          "id": 4,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "extra_charges",
+          "id": 5,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "extra_charges",
+          "id": 6,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "extra_charges",
+          "id": 7,
+          "date": "2026-10-03"
+        },
+        {
+          "table": "extra_charges",
+          "id": 8,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "credit_vouchers",
+          "id": 1,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "credit_vouchers",
+          "id": 2,
+          "date": "2026-10-03"
+        }
+      ],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [
+        "2026-10-02",
+        "2026-10-03"
+      ],
+      "rows_in_sealed_day": 9,
+      "any_row_in_sealed_day": true,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0,
+      "inv_b01_after": "VIOLATED",
+      "inv_b03_unchanged": true,
+      "inv_b03_before_after": [
+        "HOLDS",
+        "HOLDS"
+      ]
+    },
+    "S-ALL": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "ops": {
+        "corr": {
+          "reversal_date": "2026-10-02",
+          "replacement_date": "2026-10-02"
+        },
+        "chgcorr": {
+          "reversal_date": "2026-10-02",
+          "replacement_date": "2026-10-02"
+        },
+        "refund": {
+          "refund_date": "2026-10-02"
+        },
+        "voucher": {
+          "issued_date": "2026-10-02",
+          "expiry_date": "2027-10-02"
+        },
+        "redeem": {
+          "computed_status": "active",
+          "redeem_result": "ok",
+          "payment_date": "2026-10-02"
+        },
+        "checkout": {
+          "http_status": 302,
+          "checkout_status": "CheckedOut",
+          "extra_date": "2026-10-02",
+          "tip_date": "2026-08-10",
+          "settlement_date": "2026-08-10"
+        },
+        "overstay": {
+          "http_status": 302,
+          "charge_rows": 1,
+          "charge_date": "2026-10-02",
+          "charge_amount": 2400.0
+        }
+      },
+      "bd_in_force": "2026-08-10",
+      "new_rows": [
+        {
+          "table": "payments",
+          "id": 7,
+          "date": "2026-08-10"
+        },
+        {
+          "table": "payments",
+          "id": 8,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "payments",
+          "id": 9,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "payments",
+          "id": 10,
+          "date": "2026-08-10"
+        },
+        {
+          "table": "payments",
+          "id": 11,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "payments",
+          "id": 12,
+          "date": "2026-08-10"
+        },
+        {
+          "table": "payments",
+          "id": 13,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "payments",
+          "id": 14,
+          "date": "2026-08-10"
+        },
+        {
+          "table": "extra_charges",
+          "id": 3,
+          "date": "2026-08-10"
+        },
+        {
+          "table": "extra_charges",
+          "id": 4,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "extra_charges",
+          "id": 5,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "extra_charges",
+          "id": 6,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "extra_charges",
+          "id": 7,
+          "date": "2026-08-10"
+        },
+        {
+          "table": "extra_charges",
+          "id": 8,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "credit_vouchers",
+          "id": 1,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "credit_vouchers",
+          "id": 2,
+          "date": "2026-08-10"
+        }
+      ],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [
+        "2026-08-10",
+        "2026-10-02"
+      ],
+      "rows_in_sealed_day": 9,
+      "any_row_in_sealed_day": true,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0,
+      "inv_b04_before": "HOLDS",
+      "inv_b04_after": "VIOLATED"
+    },
+    "DDL-1": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "column_defaults": {
+        "credit_vouchers.issued_date": null,
+        "payments.payment_date": null,
+        "extra_charges.charge_date": null,
+        "business_date.current_date": null
+      },
+      "ddl_defaults_absent": true,
+      "bd_in_force": "2026-08-10",
+      "new_rows": [],
+      "n2_new_rows_all_on_bd": true,
+      "row_dates": [],
+      "rows_in_sealed_day": 0,
+      "any_row_in_sealed_day": false,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "DDL-2": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "ddl_default_present": true,
+      "issued_date": "2026-10-02",
+      "expiry_date": "2027-10-02",
+      "bd_in_force": "2026-08-10",
+      "new_rows": [
+        {
+          "table": "payments",
+          "id": 7,
+          "date": "2026-08-10"
+        },
+        {
+          "table": "credit_vouchers",
+          "id": 1,
+          "date": "2026-10-02"
+        }
+      ],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [
+        "2026-08-10",
+        "2026-10-02"
+      ],
+      "rows_in_sealed_day": 1,
+      "any_row_in_sealed_day": true,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    },
+    "S-ALL-UTC": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T00:30:00",
+      "ops": {
+        "corr": {
+          "reversal_date": "2026-10-02",
+          "replacement_date": "2026-10-02"
+        },
+        "chgcorr": {
+          "reversal_date": "2026-10-02",
+          "replacement_date": "2026-10-02"
+        },
+        "refund": {
+          "refund_date": "2026-10-02"
+        },
+        "voucher": {
+          "issued_date": "2026-10-02",
+          "expiry_date": "2027-10-02"
+        },
+        "redeem": {
+          "computed_status": "active",
+          "redeem_result": "ok",
+          "payment_date": "2026-10-02"
+        },
+        "checkout": {
+          "http_status": 302,
+          "checkout_status": "CheckedOut",
+          "extra_date": "2026-10-02",
+          "tip_date": "2026-08-10",
+          "settlement_date": "2026-08-10"
+        },
+        "overstay": {
+          "http_status": 302,
+          "charge_rows": 1,
+          "charge_date": "2026-10-02",
+          "charge_amount": 1300.0
+        }
+      },
+      "bd_in_force": "2026-08-10",
+      "new_rows": [
+        {
+          "table": "payments",
+          "id": 7,
+          "date": "2026-08-10"
+        },
+        {
+          "table": "payments",
+          "id": 8,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "payments",
+          "id": 9,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "payments",
+          "id": 10,
+          "date": "2026-08-10"
+        },
+        {
+          "table": "payments",
+          "id": 11,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "payments",
+          "id": 12,
+          "date": "2026-08-10"
+        },
+        {
+          "table": "payments",
+          "id": 13,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "payments",
+          "id": 14,
+          "date": "2026-08-10"
+        },
+        {
+          "table": "extra_charges",
+          "id": 3,
+          "date": "2026-08-10"
+        },
+        {
+          "table": "extra_charges",
+          "id": 4,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "extra_charges",
+          "id": 5,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "extra_charges",
+          "id": 6,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "extra_charges",
+          "id": 7,
+          "date": "2026-08-10"
+        },
+        {
+          "table": "extra_charges",
+          "id": 8,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "credit_vouchers",
+          "id": 1,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "credit_vouchers",
+          "id": 2,
+          "date": "2026-08-10"
+        }
+      ],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [
+        "2026-08-10",
+        "2026-10-02"
+      ],
+      "rows_in_sealed_day": 9,
+      "any_row_in_sealed_day": true,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0,
+      "inv_b04_before": "HOLDS",
+      "inv_b04_after": "VIOLATED"
+    },
+    "S-TL": {
+      "freeze_proven": true,
+      "clock": "2026-10-02T12:00:00",
+      "tax_lines": {
+        "3": {
+          "charge_date": "2026-10-02",
+          "tax_line_dates": [
+            "2026-10-02"
+          ],
+          "tax_line_count": 2
+        },
+        "5": {
+          "charge_date": "2026-10-02",
+          "tax_line_dates": [
+            "2026-10-02"
+          ],
+          "tax_line_count": 2
+        }
+      },
+      "w17_w20_charges": 2,
+      "tax_lines_follow_row_date": true,
+      "tax_line_dates": [
+        "2026-10-02"
+      ],
+      "bd_in_force": "2026-08-10",
+      "new_rows": [
+        {
+          "table": "payments",
+          "id": 7,
+          "date": "2026-08-10"
+        },
+        {
+          "table": "extra_charges",
+          "id": 3,
+          "date": "2026-10-02"
+        },
+        {
+          "table": "extra_charges",
+          "id": 4,
+          "date": "2026-08-10"
+        },
+        {
+          "table": "extra_charges",
+          "id": 5,
+          "date": "2026-10-02"
+        }
+      ],
+      "n2_new_rows_all_on_bd": false,
+      "row_dates": [
+        "2026-08-10",
+        "2026-10-02"
+      ],
+      "rows_in_sealed_day": 2,
+      "any_row_in_sealed_day": true,
+      "d11_unchanged": true,
+      "sealed_0809_unchanged": true,
+      "error_log_count": 0
+    }
+  }
+}

@@ -1,0 +1,99 @@
+2026-10-02 18:27:02 [WARNING] app: Running on SQLite — row-level locking (with_for_update) is not enforced. SQLite uses a database-wide write lock; concurrent writers will serialise. Move to PostgreSQL for true per-row locking and higher concurrency.
+2026-10-02 18:27:02 [INFO] app: ------- SECURITY MODE -------
+2026-10-02 18:27:02 [INFO] app:   env                : production
+2026-10-02 18:27:02 [INFO] app:   secret_key         : set (>=32 chars)
+2026-10-02 18:27:02 [INFO] app:   updater_signing    : ENFORCED
+2026-10-02 18:27:02 [INFO] app:   encryption         : available
+2026-10-02 18:27:02 [INFO] app:   lan_access         : disabled (127.0.0.1 only)
+2026-10-02 18:27:02 [INFO] app:   schema_drift_mode  : warn-only
+2026-10-02 18:27:02 [INFO] app: -----------------------------
+2026-10-02 18:27:03 [INFO] app: db.create_all() skipped in production. Use Alembic migrations for schema changes. Set DB_AUTO_CREATE=1 to force-enable at next boot.
+2026-10-02 18:27:03 [INFO] app: SQLite: ensured table credit_vouchers exists
+2026-10-02 18:27:03 [INFO] app: SQLite: ensured table credit_voucher_redemptions exists
+2026-10-02 18:27:03 [INFO] apscheduler.scheduler: Scheduler started
+2026-10-02 18:27:03 [INFO] apscheduler.scheduler: Added job "setup_backup_scheduler.<locals>._scheduled_backup" to job store "default"
+2026-10-02 18:27:03 [INFO] app.backup_manager: Daily backup scheduled at 03:00
+2026-10-02 18:27:03 [INFO] apscheduler.scheduler: Added job "flush_notification_queue" to job store "default"
+2026-10-02 18:27:03 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._prune_old_logs" to job store "default"
+2026-10-02 18:27:03 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._run_predictive_maintenance" to job store "default"
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:27:03 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+[dq56] app + verification from C:\wk7 ; source (read-only) C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\instance\pms.db ; live .env NOT loaded
+[replay] working copy : C:\wk7\verification\_work\pvf_replay.db (sqlite-backup-api)
+[replay] source sha256: 21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434
+[replay] business date: 2026-08-10
+[replay] history      : 2026-08-09 .. 2026-08-10  (10 dates, 8 with no activity)
+[replay] PASS A: probing 10 dates at their own date
+[replay] PASS A: 10/10 dates
+[replay] PASS B: same dates, reverse order (order-independence proof)
+[replay] PASS B: 10/10 dates
+[replay] PASS C: re-asking 9 past dates with the clock at 2026-08-10
+[replay] PASS C (as-at today): 9/9 dates
+
+====================================================================================================
+FINALGRID — HISTORICAL REPLAY VERIFICATION
+Production Verification Framework, Wave 0 Deliverable 3
+====================================================================================================
+Stored replay     : production
+Stored captured   : 2026-08-31T04:35:44 (app v2.2.18)
+Current run       : 2026-10-02T12:57:02 (app v2.2.18)
+Business date     : 2026-08-10 -> 2026-08-10
+Read-only         : VERIFIED
+
+Dates compared    : 10
+Dates clean       : 8
+Differences       : 2
+Blocking          : 1
+
+VERDICT           : FAIL
+
+----------------------------------------------------------------------------------------------------
+DIFFERENCES BY KIND
+----------------------------------------------------------------------------------------------------
+  ENGINE_CHANGED                   2
+
+====================================================================================================
+DIFFERENCES
+====================================================================================================
+Severity follows the state of the day: a closed day may not move
+at all, an open past day may move but is reported, and the
+current business date is expected to move.
+
+2026-08-09   [CLOSED]
+    [BLOCK] ENGINE_CHANGED             nas.tax_snapshot.total_taxable
+            stored : 2285.7
+            current: 1142.85   (delta -1142.85)
+
+2026-08-10   [BUSINESS_DATE]
+    [INFO ] ENGINE_CHANGED             nas.tax_snapshot.total_taxable
+            stored : 5904.76
+            current: 2952.38   (delta -2952.38)
+
+====================================================================================================
+END OF REPORT
+====================================================================================================
+
+[replay] evidence pack: C:\wk7\verification\evidence\20261002_125702_replay_verify_production
+2026-10-02 18:27:03 [INFO] apscheduler.scheduler: Scheduler has been shut down

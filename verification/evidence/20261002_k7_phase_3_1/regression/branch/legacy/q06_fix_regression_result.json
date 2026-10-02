@@ -1,0 +1,102 @@
+{
+  "cases": [
+    {
+      "description": "old algorithm reproduces the ~2x doubled base",
+      "detail": "old_naive_sum=2285.70  gst_report_base=1142.85  ratio=2.0000",
+      "id": "RC-Q06-01[2026-08-09]",
+      "passed": true
+    },
+    {
+      "description": "fixed total_taxable == true charge-level base (once)",
+      "detail": "fixed=1142.85  true_base=1142.85",
+      "id": "RC-Q06-02[2026-08-09]",
+      "passed": true
+    },
+    {
+      "description": "fixed tax_snapshot agrees with get_gst_report (taxable)",
+      "detail": null,
+      "id": "RC-Q06-04[2026-08-09]",
+      "passed": true
+    },
+    {
+      "description": "total_tax unchanged (CGST+SGST+IGST sums preserved)",
+      "detail": "tax_snapshot.total_tax=57.14  get_gst_report.total_tax=57.14",
+      "id": "RC-Q06-03[2026-08-09]",
+      "passed": true
+    },
+    {
+      "description": "no individual by_rate bucket exceeds the true base",
+      "detail": "by_rate={\"CGST @ 2%\": 1142.85, \"SGST @ 2%\": 1142.85}",
+      "id": "RC-Q06-05[2026-08-09]",
+      "passed": true
+    },
+    {
+      "description": "total_lines / exempt_lines unaffected by the fix",
+      "detail": "total_lines=4  raw_rows=4",
+      "id": "RC-Q06-06[2026-08-09]",
+      "passed": true
+    },
+    {
+      "description": "old algorithm reproduces the ~2x doubled base",
+      "detail": "old_naive_sum=5904.76  gst_report_base=2952.38  ratio=2.0000",
+      "id": "RC-Q06-01[2026-08-10]",
+      "passed": true
+    },
+    {
+      "description": "fixed total_taxable == true charge-level base (once)",
+      "detail": "fixed=2952.38  true_base=2952.38",
+      "id": "RC-Q06-02[2026-08-10]",
+      "passed": true
+    },
+    {
+      "description": "fixed tax_snapshot agrees with get_gst_report (taxable)",
+      "detail": null,
+      "id": "RC-Q06-04[2026-08-10]",
+      "passed": true
+    },
+    {
+      "description": "total_tax unchanged (CGST+SGST+IGST sums preserved)",
+      "detail": "tax_snapshot.total_tax=147.60  get_gst_report.total_tax=147.60",
+      "id": "RC-Q06-03[2026-08-10]",
+      "passed": true
+    },
+    {
+      "description": "no individual by_rate bucket exceeds the true base",
+      "detail": "by_rate={\"CGST @ 2%\": 2952.3799999999997, \"SGST @ 2%\": 2952.3799999999997}",
+      "id": "RC-Q06-05[2026-08-10]",
+      "passed": true
+    },
+    {
+      "description": "total_lines / exempt_lines unaffected by the fix",
+      "detail": "total_lines=8  raw_rows=8",
+      "id": "RC-Q06-06[2026-08-10]",
+      "passed": true
+    },
+    {
+      "description": "interstate (IGST) case \u2014 none exists in this dataset",
+      "detail": "no IGST rows found; case not exercisable on this data, reported explicitly",
+      "id": "RC-Q06-07",
+      "passed": true
+    },
+    {
+      "description": "sealed NightAuditLog 2026-08-09 record byte-identical before/after",
+      "detail": "hash_before=d248ae5413672f269cdefc9ad73ad18f1da28f3fca86c2248213b976f8ba4128 hash_after=d248ae5413672f269cdefc9ad73ad18f1da28f3fca86c2248213b976f8ba4128",
+      "id": "RC-Q06-08",
+      "passed": true
+    }
+  ],
+  "nightauditlog_20260809": {
+    "present_before": true,
+    "snapshot_hash_after": "d248ae5413672f269cdefc9ad73ad18f1da28f3fca86c2248213b976f8ba4128",
+    "snapshot_hash_before": "d248ae5413672f269cdefc9ad73ad18f1da28f3fca86c2248213b976f8ba4128",
+    "unchanged": true
+  },
+  "production_sha256_after": "21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434",
+  "production_sha256_before": "21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434",
+  "production_untouched": true,
+  "summary": {
+    "all_pass": true,
+    "passed": 14,
+    "total": 14
+  }
+}

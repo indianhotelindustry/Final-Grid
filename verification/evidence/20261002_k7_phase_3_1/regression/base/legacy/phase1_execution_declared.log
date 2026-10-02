@@ -1,0 +1,132 @@
+2026-10-02 18:30:28 [WARNING] app: Running on SQLite — row-level locking (with_for_update) is not enforced. SQLite uses a database-wide write lock; concurrent writers will serialise. Move to PostgreSQL for true per-row locking and higher concurrency.
+2026-10-02 18:30:28 [INFO] app: ------- SECURITY MODE -------
+2026-10-02 18:30:28 [INFO] app:   env                : production
+2026-10-02 18:30:28 [INFO] app:   secret_key         : set (>=32 chars)
+2026-10-02 18:30:28 [INFO] app:   updater_signing    : ENFORCED
+2026-10-02 18:30:28 [INFO] app:   encryption         : available
+2026-10-02 18:30:28 [INFO] app:   lan_access         : disabled (127.0.0.1 only)
+2026-10-02 18:30:28 [INFO] app:   schema_drift_mode  : warn-only
+2026-10-02 18:30:28 [INFO] app: -----------------------------
+2026-10-02 18:30:28 [INFO] app: db.create_all() skipped in production. Use Alembic migrations for schema changes. Set DB_AUTO_CREATE=1 to force-enable at next boot.
+2026-10-02 18:30:28 [INFO] app: SQLite: ensured table credit_vouchers exists
+2026-10-02 18:30:28 [INFO] app: SQLite: ensured table credit_voucher_redemptions exists
+2026-10-02 18:30:29 [INFO] apscheduler.scheduler: Scheduler started
+2026-10-02 18:30:29 [INFO] apscheduler.scheduler: Added job "setup_backup_scheduler.<locals>._scheduled_backup" to job store "default"
+2026-10-02 18:30:29 [INFO] app.backup_manager: Daily backup scheduled at 03:00
+2026-10-02 18:30:29 [INFO] apscheduler.scheduler: Added job "flush_notification_queue" to job store "default"
+2026-10-02 18:30:29 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._prune_old_logs" to job store "default"
+2026-10-02 18:30:29 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._run_predictive_maintenance" to job store "default"
+C:/wk7base/verification/_work/k7reg/reg_phase1_execution_verify.py:379: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  res_pay = db.session.query(Reservation).get(ids['res_ok'])
+2026-10-02 18:30:32 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+C:/wk7base/verification/_work/k7reg/reg_phase1_execution_verify.py:412: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  rr = db.session.query(Reservation).get(ids['res_ok'])
+2026-10-02 18:30:32 [ERROR] app.routes: add_payment failed reservation_id=5: injected audit failure
+Traceback (most recent call last):
+  File "C:\wk7base\app\routes.py", line 5874, in add_payment
+    _write_audit_strict('Payment', payment.id, 'posted',
+  File "C:\wk7base\app\routes.py", line 364, in _write_audit_strict
+    return audited_financial_write(entity_type, entity_id, action,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:/wk7base/verification/_work/k7reg/reg_phase1_execution_verify.py", line 473, in exploding_audit
+    raise svc.AuditCouplingError('injected audit failure')
+app.services.AuditCouplingError: injected audit failure
+2026-10-02 18:30:32 [ERROR] app: POS charge failed for res=5: injected audit failure
+Traceback (most recent call last):
+  File "C:\wk7base\app\pos.py", line 128, in post_charge
+    audited_financial_write(
+  File "C:/wk7base/verification/_work/k7reg/reg_phase1_execution_verify.py", line 473, in exploding_audit
+    raise svc.AuditCouplingError('injected audit failure')
+app.services.AuditCouplingError: injected audit failure
+2026-10-02 18:30:32 [INFO] app.services: Night audit for 2026-08-10 created as Pending — blockers: 1 pending checkout(s)
+2026-10-02 18:30:32 [INFO] app.services: Night audit skipped for 2026-08-10 — log already exists (status=Pending)
+2026-10-02 18:30:32 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:32 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:32 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:32 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:32 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:32 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:32 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+[k7-legacy] app + verification from C:\wk7base ; source (read-only) C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\instance\pms.db ; live .env NOT loaded
+[k7-legacy] undeclared no-operator calls run as SYSTEM 'verification:phase1_execution'
+======================================================================================================================
+PHASE 1 — FINANCIAL FOUNDATION: FOLIO ATTRIBUTION
+======================================================================================================================
+production        : C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\instance\pms.db
+sha256 before     : 21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434
+frozen anchor     : *** MISMATCH ***
+disposable copy   : C:\wk7base\verification\_work\phase1_folio.db  (sqlite-backup-api)
+----------------------------------------------------------------------------------------------------------------------
+D11 population    : payments=[1, 2, 3, 4, 5, 6] charges=[1, 2]  (must be identical at the end)
+----------------------------------------------------------------------------------------------------------------------
+fixtures          : {'res_ok': 5, 'res_raw': 6, 'folio_ok': 5}
+----------------------------------------------------------------------------------------------------------------------
+S2 — ATTRIBUTION FOUNDATION (resolver lifecycle, Q-1)
+----------------------------------------------------------------------------------------------------------------------
+OK    T-L01  existing folio A returned                      expect=5                          got=5                          
+OK    T-L02  returned folio is letter A                     expect='A'                        got='A'                        
+OK    T-L03  resolver accepts reservation id                expect=5                          got=5                          
+OK    T-L05  repeated resolution creates no folio           expect=1                          got=1                          
+OK    T-L06  folio B never selected when A exists           expect=(5, 'A')                   got=(5, 'A')                   
+OK    T-L07  raw-SQL reservation starts with no folio       expect=0                          got=0                          
+OK    T-L08  missing folio A is created (Q-1)               expect=('A', 6)                   got=('A', 6)                   
+OK    T-L09  folio creation is audited (Q-1)                expect=True                       got=True                       
+OK    T-L10  exactly one folio created for that reservation expect=1                          got=1                          
+OK    T-L11  second resolution reuses the created folio     expect=7                          got=7                          
+OK    T-L12  None reservation fails closed                  expect='FolioResolutionError'     got='FolioResolutionError'     
+OK    T-L13  unknown reservation fails closed               expect='FolioResolutionError'     got='FolioResolutionError'     
+OK    T-L14  audited_financial_write persists a row         expect=True                       got=True                       
+OK    T-L15  audit helper fails closed on bad input         expect='AuditCouplingError'       got='AuditCouplingError'       
+----------------------------------------------------------------------------------------------------------------------
+S3a — WRITER COVERAGE (every originating constructor attributes)
+----------------------------------------------------------------------------------------------------------------------
+OK    T-W01  every enumerated writer constructor sets folio_id expect=[]                         got=[]                         
+OK    T-W02  no financial constructor anywhere lacks folio_id expect=[]                         got=[]                         33 call sites scanned
+----------------------------------------------------------------------------------------------------------------------
+S3b — RUNTIME ATTRIBUTION
+----------------------------------------------------------------------------------------------------------------------
+OK    T-W05  add_payment attributes to folio A              expect=(200, 5)                   got=(200, 5)                   
+OK    T-W15  POS charge attributed and audited in one commit expect=(200, 5, True)             got=(200, 5, True)             
+OK    T-W20  overstay charge attributed (if posted)         expect=True                       got=True                       no charge posted
+OK    T-W13  CICO charge attributed                         expect=5                          got=5                          
+OK    T-W08  payment correction inherits attribution        expect=5                          got=5                          
+OK    T-Q02  correction of a NULL-folio original is refused (Q-2) expect='FolioResolutionError'     got='FolioResolutionError'     
+----------------------------------------------------------------------------------------------------------------------
+S3c — AUDIT COUPLING (Q-5)
+----------------------------------------------------------------------------------------------------------------------
+OK    T-A01  audit failure rolls back the payment           expect=8                          got=8                          
+OK    T-A02  audit failure rolls back the POS charge        expect=4                          got=4                          
+OK    T-A03  payment caller is told it failed (no false success) expect=True                       got=True                       
+OK    T-A04  POS caller is told it failed (no false success) expect=True                       got=True                       
+----------------------------------------------------------------------------------------------------------------------
+S4 — ROOM RENT AND NIGHT AUDIT
+----------------------------------------------------------------------------------------------------------------------
+OK    T-R01  night audit posts room rent attributed to folio A expect=(1, [8], [datetime.date(20 got=(1, [8], [datetime.date(20 
+OK    T-R02  night audit rerun posts no duplicate room rent expect=1                          got=1                          
+OK    T-R04  folio balance still excludes room revenue      expect=0.0                        got=0.0                        room rent posted = 1200.00
+----------------------------------------------------------------------------------------------------------------------
+S5 — RECONCILIATION ATTRIBUTION CONTROL (unit 1.7)
+----------------------------------------------------------------------------------------------------------------------
+OK    T-N01  attribution control is its own report section  expect=True                       got=True                       
+OK    T-N02  existing folio_control keys all still present  expect=set()                      got=set()                      
+OK    T-N02b folio_control gains no key (replay ledger intact) expect={'in_house_outstanding', ' got={'in_house_outstanding', ' 
+OK    T-N02c attribution is not nested inside folio_control expect=False                      got=False                      
+OK    T-N03  reservation and folio views reconcile          expect=True                       got=True                       
+OK    T-N04  unattributed bucket is exactly the D11 rows    expect=([1, 2, 3, 4, 5, 6], [1, 2 got=([1, 2, 3, 4, 5, 6], [1, 2 
+OK    T-N05  unattributed rows are flagged, not shown as clean expect='warning'                  got='warning'                  
+OK    T-N06  D11 total is reported separately, not netted in expect=4776.19                    got=4776.19                    
+OK    T-N07  no row is routed to another reservation's folio expect=0                          got=0                          
+OK    T-N08  control detects a misrouted row (P9 commissioning) expect=('danger', 1)              got=('danger', 1)              
+----------------------------------------------------------------------------------------------------------------------
+D11 FREEZE AND PRODUCTION INTEGRITY
+----------------------------------------------------------------------------------------------------------------------
+OK    T-D01  NULL-folio payment id set unchanged            expect=[1, 2, 3, 4, 5, 6]         got=[1, 2, 3, 4, 5, 6]         
+OK    T-D02  NULL-folio charge id set unchanged             expect=[1, 2]                     got=[1, 2]                     
+OK    T-D03  D11 payment amounts unchanged                  expect={1: 800.0, 2: 400.0, 3: 15 got={1: 800.0, 2: 400.0, 3: 15 
+OK    T-D04  D11 charge amounts unchanged                   expect={1: 380.95, 2: 95.24}      got={1: 380.95, 2: 95.24}      
+OK    T-P01  production database unchanged                  expect='21dc0e970caf261fd38e1ccc9 got='21dc0e970caf261fd38e1ccc9 
+----------------------------------------------------------------------------------------------------------------------
+RESULT: 44 / 44 passed
+======================================================================================================================
+result.json written
+2026-10-02 18:30:32 [INFO] apscheduler.scheduler: Scheduler has been shut down

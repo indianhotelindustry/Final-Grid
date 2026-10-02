@@ -1,0 +1,18 @@
+RED M01 W-08/W-09 correction pair from the calendar                        failed=6 
+RED M02 W-22/W-23 charge correction from the calendar                      failed=3 
+RED M03 W-10 refund from the calendar                                      failed=2 
+RED M04 voucher issue date and expiry anchor from the calendar             failed=4 
+RED M05 W-11 redemption payment from the calendar                          failed=2 
+RED M06 voucher status derivation from the calendar (services.py:2009 site failed=5 
+RED M07 repeated redemption expiry test from the calendar (services.py:207 failed=1 
+RED M08 W-17 checkout extra from the calendar                              failed=3 
+RED M09 W-20 overstay row from the wall clock                              failed=3 
+RED M10 model defaults back to date.today                                  failed=1 
+RED M10b Payment default back to date.today                                failed=3 
+RED M10c CreditVoucher default back to date.today                          failed=1 
+RED M11 get_business_date falls back to the calendar                       failed=8 
+RED M12 run_night_audit stays silent                                       failed=1 
+RED M13 occupancy label falls back to the calendar                         failed=1 
+RED M14 KPI governance block defaults to the calendar                      failed=1 
+RED M15 night-audit view falls back to the calendar                        failed=2 
+N-6: 17/17 mutations turned the matching scenarios RED

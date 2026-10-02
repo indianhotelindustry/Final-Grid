@@ -1,0 +1,46 @@
+2026-10-02 18:30:05 [WARNING] app: Running on SQLite — row-level locking (with_for_update) is not enforced. SQLite uses a database-wide write lock; concurrent writers will serialise. Move to PostgreSQL for true per-row locking and higher concurrency.
+2026-10-02 18:30:05 [INFO] app: ------- SECURITY MODE -------
+2026-10-02 18:30:05 [INFO] app:   env                : production
+2026-10-02 18:30:05 [INFO] app:   secret_key         : set (>=32 chars)
+2026-10-02 18:30:05 [INFO] app:   updater_signing    : ENFORCED
+2026-10-02 18:30:05 [INFO] app:   encryption         : available
+2026-10-02 18:30:05 [INFO] app:   lan_access         : disabled (127.0.0.1 only)
+2026-10-02 18:30:05 [INFO] app:   schema_drift_mode  : warn-only
+2026-10-02 18:30:05 [INFO] app: -----------------------------
+2026-10-02 18:30:05 [INFO] app: db.create_all() skipped in production. Use Alembic migrations for schema changes. Set DB_AUTO_CREATE=1 to force-enable at next boot.
+2026-10-02 18:30:05 [INFO] app: SQLite: ensured table credit_vouchers exists
+2026-10-02 18:30:05 [INFO] app: SQLite: ensured table credit_voucher_redemptions exists
+2026-10-02 18:30:05 [INFO] apscheduler.scheduler: Scheduler started
+2026-10-02 18:30:05 [INFO] apscheduler.scheduler: Added job "setup_backup_scheduler.<locals>._scheduled_backup" to job store "default"
+2026-10-02 18:30:05 [INFO] app.backup_manager: Daily backup scheduled at 03:00
+2026-10-02 18:30:05 [INFO] apscheduler.scheduler: Added job "flush_notification_queue" to job store "default"
+2026-10-02 18:30:05 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._prune_old_logs" to job store "default"
+2026-10-02 18:30:05 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._run_predictive_maintenance" to job store "default"
+[k7-legacy] app + verification from C:\wk7 ; source (read-only) C:\Users\SIPL Server\Downloads\DSS\FinalGrid\SukoonPMS\instance\pms.db ; live .env NOT loaded
+[k7-legacy] undeclared no-operator calls run as SYSTEM 'verification:cf10_w14'
+============================================================================================================================================
+CF-10 / CF-11 HARDENING - GROUP w14
+app root C:\wk7  commit 940366e7a6b095529e39895662a78433491b87ab  app/ clean: True
+production sha256 before: 21dc0e970caf261fd38e1ccc9f8d4ca8c88a07ff8161cf22d63465203953e434 (*** MISMATCH ***)
+============================================================================================================================================
+copy=C:\wk7\verification\_work\cf10_w14.db  business date=2026-08-10  vacant=36  admin=2
+W-14 manual no-show with a fee
+OK    W14-01       W-14    no-show posted with one fee and one log                    expect=(True, 'NoShow', 1, 1) got=(True, 'NoShow', 1, 1) No-show posted successfully.
+OK    W14-02       W-14    strict posted audit on the fee row                         expect=1                      got=1                      
+OK    W14-03       W-14    fee audit: amount, folio, flow, business date              expect=(500.0, 5, 'noshow_fee got=(500.0, 5, 'noshow_fee 
+OK    W14-04       W-14    fee audit actor is the operator                            expect=2                      got=2                      
+OK    W14-05       W-14    noshow_posted audit names the fee row                      expect=(1, 3)                 got=(1, 3)                 
+OK    W14-C        W-14    repeat: refused, still one fee                             expect=(False, 1)             got=(False, 1)             Cannot post no-show: status is NoShow.
+OK    W14-B-F1-any W-14    F1 on any audit: not a no-show, no fee, no log             expect=(False, {'status': 'Re got=(False, {'status': 'Re Failed to post no-show: injected F1: audit row could not be constructed
+OK    W14-B-F1-fee W-14    F1 on fee audit: not a no-show, no fee, no log             expect=(False, {'status': 'Re got=(False, {'status': 'Re Failed to post no-show: injected F1: audit row could not be constructed
+OK    W14-B-F1-noshow_posted W-14    F1 on noshow_posted audit: not a no-show, no fee, no log   expect=(False, {'status': 'Re got=(False, {'status': 'Re Failed to post no-show: injected F1: audit row could not be constructed
+OK    W14-B-F2-any W-14    F2 on any audit: not a no-show, no fee, no log             expect=(False, {'status': 'Re got=(False, {'status': 'Re Failed to post no-show: audit row for ExtraCharge 4 (posted) could not be written: Runtime
+OK    W14-B-F2-fee W-14    F2 on fee audit: not a no-show, no fee, no log             expect=(False, {'status': 'Re got=(False, {'status': 'Re Failed to post no-show: audit row for ExtraCharge 4 (posted) could not be written: Runtime
+OK    W14-B-F2-noshow_posted W-14    F2 on noshow_posted audit: not a no-show, no fee, no log   expect=(False, {'status': 'Re got=(False, {'status': 'Re Failed to post no-show: injected F2: audit insert failed
+W-14 automated (night-audit style) call: no operator, no request
+OK    W14-E1       W-14    automated: fee posted and strictly audited                 expect=(1, 1)                 got=(1, 1)                 
+NOTE  W14-E2       W-14    automated: audit actor (system convention)                 expect=0                      got=None                   staff_user_id=0 with users.id=0 present: 0 - FK-enforcing engines reject this; system identity is an open founder decision (AR-013 / ADR-011)
+FAIL  P-01         prod    production database unchanged (sha256 == anchor)           expect='51dd83b7f0fa42a3e85af got='21dc0e970caf261fd38e1 
+--------------------------------------------------------------------------------------------------------------------------------------------
+GROUP w14: 13/14 gates passed -> FAIL
+2026-10-02 18:30:05 [INFO] apscheduler.scheduler: Scheduler has been shut down

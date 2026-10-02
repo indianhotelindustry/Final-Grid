@@ -1,0 +1,100 @@
+C:\wk7\verification\evidence\20261002_dq56_r1_guard\verify_dq56.py:91: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  R = {'label': a.label, 'app_root': app_root, 'started_utc': datetime.utcnow().isoformat(),
+2026-10-02 18:30:42 [WARNING] app: Running on SQLite — row-level locking (with_for_update) is not enforced. SQLite uses a database-wide write lock; concurrent writers will serialise. Move to PostgreSQL for true per-row locking and higher concurrency.
+2026-10-02 18:30:42 [INFO] app: ------- SECURITY MODE -------
+2026-10-02 18:30:42 [INFO] app:   env                : production
+2026-10-02 18:30:42 [INFO] app:   secret_key         : set (>=32 chars)
+2026-10-02 18:30:42 [INFO] app:   updater_signing    : ENFORCED
+2026-10-02 18:30:42 [INFO] app:   encryption         : available
+2026-10-02 18:30:42 [INFO] app:   lan_access         : disabled (127.0.0.1 only)
+2026-10-02 18:30:42 [INFO] app:   schema_drift_mode  : warn-only
+2026-10-02 18:30:42 [INFO] app: -----------------------------
+2026-10-02 18:30:42 [INFO] app: db.create_all() skipped in production. Use Alembic migrations for schema changes. Set DB_AUTO_CREATE=1 to force-enable at next boot.
+2026-10-02 18:30:42 [INFO] app: SQLite: ensured table credit_vouchers exists
+2026-10-02 18:30:42 [INFO] app: SQLite: ensured table credit_voucher_redemptions exists
+2026-10-02 18:30:43 [INFO] apscheduler.scheduler: Scheduler started
+2026-10-02 18:30:43 [INFO] apscheduler.scheduler: Added job "setup_backup_scheduler.<locals>._scheduled_backup" to job store "default"
+2026-10-02 18:30:43 [INFO] app.backup_manager: Daily backup scheduled at 03:00
+2026-10-02 18:30:43 [INFO] apscheduler.scheduler: Added job "flush_notification_queue" to job store "default"
+2026-10-02 18:30:43 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._prune_old_logs" to job store "default"
+2026-10-02 18:30:43 [INFO] apscheduler.scheduler: Added job "create_app.<locals>._run_predictive_maintenance" to job store "default"
+2026-10-02 18:30:43 [INFO] apscheduler.scheduler: Scheduler has been shut down
+[base] T-01_reopen_protected_admin done
+[base] T-04_T-05_lock_after_reopen_attempt done
+[base] T-02_run_protected_roles done
+2026-10-02 18:30:45 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:45 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+[base] T-03_chain_protected done
+[base] T-09_role_matrix_protected done
+2026-10-02 18:30:46 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:46 [WARNING] app.reports: Deprecated template rendered: reports/night_audit.html (format='dq56-deprecated', date=2026-08-09, user=dq56_admin). Reachable only via an unrecognised format value; report this caller before W1-R8 step 5 deletes it.
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [WARNING] app.reports: Deprecated template rendered: reports/night_audit.html (format='dq56-deprecated', date=2026-08-09, user=dq56_admin). Reachable only via an unrecognised format value; report this caller before W1-R8 step 5 deletes it.
+[base] T-08_ui_protected done
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [WARNING] app.reports: Deprecated template rendered: reports/night_audit.html (format='dq56-deprecated', date=2026-08-10, user=dq56_admin). Reachable only via an unrecognised format value; report this caller before W1-R8 step 5 deletes it.
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [WARNING] app.reports: Deprecated template rendered: reports/night_audit.html (format='dq56-deprecated', date=2026-08-10, user=dq56_admin). Reachable only via an unrecognised format value; report this caller before W1-R8 step 5 deletes it.
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:47 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:48 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:48 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:48 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:48 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:48 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:48 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:48 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:48 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:48 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+[base] T-06_other_day_close_reopen_close done
+2026-10-02 18:30:48 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:48 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:48 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:48 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:48 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:48 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:48 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:48 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:48 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+2026-10-02 18:30:48 [INFO] app.gst: GST rate=5.00% source=room_type_override room_type=Deluxe
+[base] T-07_run_other_closed_day done
+C:\wk7\verification\evidence\20261002_dq56_r1_guard\verify_dq56.py:389: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  R['finished_utc'] = datetime.utcnow().isoformat()
+[base] written C:/Users/SIPLSE~1/AppData/Local/Temp/claude/c--Users-SIPL-Server-Downloads-DSS-FinalGrid/f1c98a43-4627-43a2-b62c-e827406741ed/scratchpad/reg_base/legacy/dq56_base.json

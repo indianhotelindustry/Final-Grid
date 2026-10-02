@@ -1,0 +1,256 @@
+{
+  "worktree": "C:\\wk7mut",
+  "results": [
+    {
+      "mutation": "M01 W-08/W-09 correction pair from the calendar",
+      "file": "app/services.py",
+      "scenarios": [
+        "S-08-09",
+        "S-08-09-route"
+      ],
+      "turned_red": true,
+      "failed_assertions": 6,
+      "sample": [
+        "FAIL S-08-09 reversal_date expect=\"2026-08-10\" got=\"2026-10-02\"",
+        "FAIL S-08-09 replacement_date expect=\"2026-08-10\" got=\"2026-10-02\"",
+        "FAIL S-08-09 n2_new_rows_all_on_bd expect=true got=false"
+      ],
+      "child_error": false
+    },
+    {
+      "mutation": "M02 W-22/W-23 charge correction from the calendar",
+      "file": "app/services.py",
+      "scenarios": [
+        "S-22-23"
+      ],
+      "turned_red": true,
+      "failed_assertions": 3,
+      "sample": [
+        "FAIL S-22-23 reversal_date expect=\"2026-08-10\" got=\"2026-10-02\"",
+        "FAIL S-22-23 replacement_date expect=\"2026-08-10\" got=\"2026-10-02\"",
+        "FAIL S-22-23 n2_new_rows_all_on_bd expect=true got=false"
+      ],
+      "child_error": false
+    },
+    {
+      "mutation": "M03 W-10 refund from the calendar",
+      "file": "app/services.py",
+      "scenarios": [
+        "S-10"
+      ],
+      "turned_red": true,
+      "failed_assertions": 2,
+      "sample": [
+        "FAIL S-10 refund_date expect=\"2026-08-10\" got=\"2026-10-02\"",
+        "FAIL S-10 n2_new_rows_all_on_bd expect=true got=false"
+      ],
+      "child_error": false
+    },
+    {
+      "mutation": "M04 voucher issue date and expiry anchor from the calendar",
+      "file": "app/services.py",
+      "scenarios": [
+        "S-VI",
+        "DDL-2"
+      ],
+      "turned_red": true,
+      "failed_assertions": 4,
+      "sample": [
+        "FAIL S-VI issued_date expect=\"2026-08-10\" got=\"2026-10-02\"",
+        "FAIL S-VI expiry_date expect=\"2027-08-10\" got=\"2027-10-02\"",
+        "FAIL S-VI n2_new_rows_all_on_bd expect=true got=false"
+      ],
+      "child_error": false
+    },
+    {
+      "mutation": "M05 W-11 redemption payment from the calendar",
+      "file": "app/services.py",
+      "scenarios": [
+        "S-11"
+      ],
+      "turned_red": true,
+      "failed_assertions": 2,
+      "sample": [
+        "FAIL S-11 payment_date expect=\"2026-08-10\" got=\"2026-10-02\"",
+        "FAIL S-11 n2_new_rows_all_on_bd expect=true got=false"
+      ],
+      "child_error": false
+    },
+    {
+      "mutation": "M06 voucher status derivation from the calendar (services.py:2009 site)",
+      "file": "app/services.py",
+      "scenarios": [
+        "V-1",
+        "V-3",
+        "V-4"
+      ],
+      "turned_red": true,
+      "failed_assertions": 5,
+      "sample": [
+        "FAIL V-1 computed_status expect=\"active\" got=\"expired\"",
+        "FAIL V-1 redeem_result expect=\"ok\" got=\"refused\"",
+        "FAIL V-3 computed_status expect=\"active\" got=\"expired\""
+      ],
+      "child_error": false
+    },
+    {
+      "mutation": "M07 repeated redemption expiry test from the calendar (services.py:2077 site)",
+      "file": "app/services.py",
+      "scenarios": [
+        "V-3"
+      ],
+      "turned_red": true,
+      "failed_assertions": 1,
+      "sample": [
+        "FAIL V-3 redeem_result expect=\"ok\" got=\"refused\""
+      ],
+      "child_error": false
+    },
+    {
+      "mutation": "M08 W-17 checkout extra from the calendar",
+      "file": "app/routes.py",
+      "scenarios": [
+        "S-17",
+        "S-TL"
+      ],
+      "turned_red": true,
+      "failed_assertions": 3,
+      "sample": [
+        "FAIL S-17 extra_date expect=\"2026-08-10\" got=\"2026-10-02\"",
+        "FAIL S-17 n2_new_rows_all_on_bd expect=true got=false",
+        "FAIL S-TL tax_line_dates expect=[\"2026-08-10\"] got=[\"2026-08-10\", \"2026-10-02\"]"
+      ],
+      "child_error": false
+    },
+    {
+      "mutation": "M09 W-20 overstay row from the wall clock",
+      "file": "app/routes.py",
+      "scenarios": [
+        "S-20",
+        "S-TL"
+      ],
+      "turned_red": true,
+      "failed_assertions": 3,
+      "sample": [
+        "FAIL S-20 charge_date expect=\"2026-08-10\" got=\"2026-10-02\"",
+        "FAIL S-20 n2_new_rows_all_on_bd expect=true got=false",
+        "FAIL S-TL tax_line_dates expect=[\"2026-08-10\"] got=[\"2026-08-10\", \"2026-10-02\"]"
+      ],
+      "child_error": false
+    },
+    {
+      "mutation": "M10 model defaults back to date.today",
+      "file": "app/models.py",
+      "scenarios": [
+        "D-1"
+      ],
+      "turned_red": true,
+      "failed_assertions": 1,
+      "sample": [
+        "FAIL D-1 charge_date expect=\"2026-08-10\" got=\"2026-10-02\""
+      ],
+      "child_error": false
+    },
+    {
+      "mutation": "M10b Payment default back to date.today",
+      "file": "app/models.py",
+      "scenarios": [
+        "D-1",
+        "D-2"
+      ],
+      "turned_red": true,
+      "failed_assertions": 3,
+      "sample": [
+        "FAIL D-1 payment_date expect=\"2026-08-10\" got=\"2026-10-02\"",
+        "FAIL D-2 outcome expect=\"raised\" got=\"inserted\"",
+        "FAIL D-2 no_rows_created expect=true got=false"
+      ],
+      "child_error": false
+    },
+    {
+      "mutation": "M10c CreditVoucher default back to date.today",
+      "file": "app/models.py",
+      "scenarios": [
+        "D-1"
+      ],
+      "turned_red": true,
+      "failed_assertions": 1,
+      "sample": [
+        "FAIL D-1 voucher_issued_date expect=\"2026-08-10\" got=\"2026-10-02\""
+      ],
+      "child_error": false
+    },
+    {
+      "mutation": "M11 get_business_date falls back to the calendar",
+      "file": "app/services.py",
+      "scenarios": [
+        "F-1",
+        "F-2-corr",
+        "F-2-refund",
+        "F-2-redeem"
+      ],
+      "turned_red": true,
+      "failed_assertions": 8,
+      "sample": [
+        "FAIL F-1 result expect=\"raises:BusinessDateUnavailable\" got=\"date:2026-10-02\"",
+        "FAIL F-1 error_logged expect=true got=false",
+        "FAIL F-2-corr outcome expect=\"refused\" got=\"completed\""
+      ],
+      "child_error": false
+    },
+    {
+      "mutation": "M12 run_night_audit stays silent",
+      "file": "app/services.py",
+      "scenarios": [
+        "F-3d"
+      ],
+      "turned_red": true,
+      "failed_assertions": 1,
+      "sample": [
+        "FAIL F-3d error_logged expect=true got=false"
+      ],
+      "child_error": false
+    },
+    {
+      "mutation": "M13 occupancy label falls back to the calendar",
+      "file": "app/occupancy_engine.py",
+      "scenarios": [
+        "F-3a"
+      ],
+      "turned_red": true,
+      "failed_assertions": 1,
+      "sample": [
+        "FAIL F-3a payload_business_date expect=null got=\"2026-10-02\""
+      ],
+      "child_error": false
+    },
+    {
+      "mutation": "M14 KPI governance block defaults to the calendar",
+      "file": "app/kpi_command_center.py",
+      "scenarios": [
+        "F-3b"
+      ],
+      "turned_red": true,
+      "failed_assertions": 1,
+      "sample": [
+        "FAIL F-3b result expect=\"raises:BusinessDateUnavailable\" got=\"dict\""
+      ],
+      "child_error": false
+    },
+    {
+      "mutation": "M15 night-audit view falls back to the calendar",
+      "file": "app/routes.py",
+      "scenarios": [
+        "F-3c"
+      ],
+      "turned_red": true,
+      "failed_assertions": 2,
+      "sample": [
+        "FAIL F-3c http_status expect=500 got=200",
+        "FAIL F-3c error_logged expect=true got=false"
+      ],
+      "child_error": false
+    }
+  ],
+  "all_turned_red": true
+}
