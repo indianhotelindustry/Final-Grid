@@ -408,6 +408,23 @@ with app.app_context():
         OBS.update(op_checkout(current_bd_date()))
     elif SCEN == 'S-20':
         OBS.update(op_overstay())
+    elif SCEN == 'S-TL':
+        o1 = op_checkout(current_bd_date())
+        o2 = op_overstay()
+        ids = [r[0] for r in raw("SELECT id FROM extra_charges WHERE description IN ('K7 extra') OR description LIKE 'Overstay%' ORDER BY id")]
+        # tax lines are produced lazily by the supported entry point (invoice / GST summary path)
+        from app.gst_service import ensure_all_tax_lines
+        for rid in sorted({r[0] for r in raw("SELECT reservation_id FROM extra_charges WHERE description IN ('K7 extra') OR description LIKE 'Overstay%'")}):
+            ensure_all_tax_lines(db.session.get(m.Reservation, rid))
+        tl = {}
+        for cid in ids:
+            rows = raw("SELECT charge_date FROM tax_lines WHERE charge_source_type = 'extra_charge' AND charge_source_id = ?", str(cid))
+            cd = raw('SELECT charge_date FROM extra_charges WHERE id = ?', cid)[0][0]
+            tl[str(cid)] = {'charge_date': cd, 'tax_line_dates': sorted({r[0] for r in rows}), 'tax_line_count': len(rows)}
+        OBS['tax_lines'] = tl
+        OBS['w17_w20_charges'] = len(ids)
+        OBS['tax_lines_follow_row_date'] = bool(tl) and all(v['tax_line_count'] > 0 and v['tax_line_dates'] == [v['charge_date']] for v in tl.values())
+        OBS['tax_line_dates'] = sorted({d for v in tl.values() for d in v['tax_line_dates']})
     elif SCEN == 'S-22-23':
         OBS.update(op_chgcorr(current_bd_date()))
     elif SCEN == 'D-1':

@@ -514,11 +514,34 @@
           "branch": true
         }
       }
+    },
+    "S-TL": {
+      "fixture": "F-STAY",
+      "entry": "POST /checkout/<id> with an extra charge and POST /reservation/<id>/overstay-charge, then the tax lines generated for those two charges (frozen directive section 7.3 S-TL)",
+      "asserts": {
+        "w17_w20_charges": {
+          "base": 2,
+          "branch": 2
+        },
+        "tax_lines_follow_row_date": {
+          "base": true,
+          "branch": true
+        },
+        "tax_line_dates": {
+          "base": [
+            "2026-10-02"
+          ],
+          "branch": [
+            "2026-08-10"
+          ]
+        }
+      }
     }
   },
   "declared_limitations": [
     "The proven freezer maps datetime.utcnow() to the frozen instant, so the UTC-offset edge of F-UTC cannot be represented. F-UTC is run as a 00:30 time-of-day edge only (scenario S-ALL-UTC), and the UTC DDL-default hazard is moot on production (C-1).",
     "S-BD (the 16 already business-dated writers) is covered by the regression battery's Phase 1 writer harness and CF-10 harness, compared base against branch, in addition to the W-04 and W-18 rows inside S-17."
   ],
-  "amendment_before_recorded_run": "Added assertion N-3-AHEAD.any_row_in_sealed_day (base true, branch false) because the registered row_dates expectation is imprecise: the set of new-row dates also contains the already business-dated writers and fixture rows, so the base value ['2026-10-02'] is expected to FAIL and will be reported as such. Nothing else changed. A dry run at the base tree (not recorded as evidence) matched 166 of 167 registered assertions; the single mismatch was that one."
+  "amendment_before_recorded_run": "Added assertion N-3-AHEAD.any_row_in_sealed_day (base true, branch false) because the registered row_dates expectation is imprecise: the set of new-row dates also contains the already business-dated writers and fixture rows, so the base value ['2026-10-02'] is expected to FAIL and will be reported as such. Nothing else changed. A dry run at the base tree (not recorded as evidence) matched 166 of 167 registered assertions; the single mismatch was that one.",
+  "amendment_S_TL": "Added S-TL (a normative test of the frozen directive that was missing from the first registration), registered before any run of it. Everything else is unchanged; the recorded RED and GREEN runs are repeated with the final harness."
 }
