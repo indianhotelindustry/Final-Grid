@@ -216,6 +216,8 @@ def op_corr_route():
     p = mk_payment(r, 400, date(2026, 8, 9))
     pid = p.id
     db.session.commit()
+    global MAX_BEFORE
+    MAX_BEFORE = max_ids()       # measurement mechanic: only rows created by the route are scanned (N-2)
     resp = client().post('/payment/%d/void' % pid, data={
         'void_reason': 'K7 harness', 'audit_override': '1', 'audit_override_reason': 'K7 harness override',
         'correction_new_amount': '350'})
